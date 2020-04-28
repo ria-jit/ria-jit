@@ -1,0 +1,54 @@
+//Meeting Notes for
+//28.04.2020 12:00 Uhr
+//@author Flo
+
+- getting an overview over the assignment at hand
+- setup Figma as working and planning environment
+- roadmap considerations: Einarbeiten -> Ende Mai, Zwischenpräsentation bis Juli (Grundlegende Zielsetzung)
+- Abgabe Oktober! (Ausarbeitung?)
+
+- RISC-V ABI overview for parsing and translating the individual opcodes:
+    -> from page 130
+    -> relevant is:
+        - RV32I base instruction set
+        - RV64I base instruction set
+        - then floating point extensions (F, D, Q)
+        - then multiplication extensions (M)
+        - then atomic extensions (A)
+    -> see opcode table: different types of instructions: {R, I, S, B, U, J}-type
+        - recognizable by the primary opcode
+        - for 32-bit instructions: instr[1:0] always == 1
+        - then mapped to categories according to table 24.1 in spec (p. 129) according to instr[4:2] and instr[6:5]
+    -> parsing strategy:
+        - extract primary opcode
+        - then (e.g. case OP-IMM in tab 24.1, primary opcode 00 100 11) parse primary opcode
+        - parse funct3 field to determine subtype
+        - parse funct7 field to determine instruction
+    -> jump and branch instructions: instr[6:5] == 11 for all jump and syscall instructions
+        - translate basic blocks until we find instr[6:5] == 11 or EOF/end of area
+
+- parsing setup as lookup table: function pointers to functions for translation
+
+- prepare memory? first map registers to memory, then optimize
+- link our emulator in ld with -Ttext=<address> to force loading our program to specific memory area
+    --> avoid using offsets for every memory access for client
+    --> map to high virtual address (paging will do the rest)
+    --> we can use the native client memory addresses, our emulator is out of the way
+
+Open questions:
+===============
+- information paper about project?
+- all instructions have 32-bit opcodes?
+- caching of translated instructions?
+
+TODO:
+============
+- merge flo/ELFexperiment -> develop
+- write function taking int* for each instruction
+- extract opcode, create lookup in table
+- build hierarchy opcode -> funct3/funct7 -> ...
+
+- Noah: build translator hierarchy from instruction field -> single instruction function calls
+- Flo: build single parsing functions
+- Simon: build ELF file parsing logic, opcode extraction
+- Johannes: research for register mapping to memory?
