@@ -1,5 +1,7 @@
 //
 // Created by noah on 29.04.20.
+// Based on RISC-V-Spec.pdf ../documentation/RISC-V-Spec.pdf
+// For register assembly conventions look at page 137
 //
 #include "parser.h"
 #include <stdlib.h>
@@ -17,7 +19,7 @@
 // extract big_shamt bit[25:20]
 #define EXTRACT_BIG_SHAMT(instr) (instr>>20&0b111111)
 // extract imm_11 bit[31:20]
-#define EXTRACT_IMM_11(instr) ((unsigned int)instr>>20) //no and needed because of logic right shift
+#define EXTRACT_IMM_11(instr) (instr>>20) //sign extend!
 
 typedef int *t_inst; //maybe replace with some struct with meta info later
 typedef void t_parse_result; //maybe some more return information later
@@ -191,8 +193,8 @@ t_parse_result parse_OP_IMM_32(t_inst instruction) {
     // extract func 3 bits[14:12]
     switch (EXTRACT_FUNC3(*instruction)) {
         case 0: {
-            //extract imm bits[31:20] 12 bits
-            int imm = *instruction >> 20 & 0xfff;
+            //extract imm bits[31:20] 12 bits we need sign extension!
+            int imm = *instruction >> 20;
             printf("ADDIW rd: %d, rs1 %d, imm %d\n", EXTRACT_RD(*instruction), EXTRACT_RS1(*instruction), imm);
             break;
         }
