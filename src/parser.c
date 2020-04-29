@@ -14,8 +14,10 @@
 #define EXTRACT_RS2(instr) (instr>>20&0b11111)
 // extract func3 bit[14:12]
 #define EXTRACT_FUNC3(instr) (instr>>12&0b111)
-// extract func3 bit[14:12]
-#define EXTRACT_FUNC3(instr) (instr>>12&0b111)
+// extract big_shamt bit[25:20]
+#define EXTRACT_BIG_SHAMT(instr) (instr>>20&0b111111)
+// extract imm_11 bit[31:20]
+#define EXTRACT_IMM_11(instr) ((unsigned int)instr>>20) //no and needed because of logic right shift
 
 typedef int *t_inst; //maybe replace with some struct with meta info later
 typedef void t_parse_result; //maybe some more return information later
@@ -148,8 +150,9 @@ void not_implemented(t_inst instruction) {
 
 t_parse_result parse_LUI(t_inst instruction) {
     //extract imm [31:12] 20 bits
-    int imm = *instruction >> 12 & 0xfffff;
-    printf("LUI rd: %d, imm32: %#x\n", EXTRACT_RD(*instruction), imm);
+    // fills rd with the upper 20 bits and fills lower 12 bits with zeros
+    int imm = *instruction & (0xfffff << 12);
+    printf("LUI rd: %d, imm32: %#010x\n", EXTRACT_RD(*instruction), imm);
 }
 
 t_parse_result parse_LOAD(t_inst instruction) {
@@ -165,7 +168,19 @@ t_parse_result parse_MISC_MEM(t_inst instruction) {
 }
 
 t_parse_result parse_OP_IMM(t_inst instruction) {
-    not_implemented(instruction);
+    switch (EXTRACT_FUNC3(*instruction)) {
+        case 0: { //ADDI
+            printf("ADDI rd %d, rs1 %d, imm %d\n", EXTRACT_RD(*instruction),EXTRACT_RS1(*instruction),EXTRACT_IMM_11(*instruction));
+            break;
+        }
+        case 1: { //SLLI opcode and func3 are unique
+            printf("SLLI rd %d, rs1 %d, shamt %d\n",EXTRACT_RD(*instruction), EXTRACT_RS1(*instruction),EXTRACT_BIG_SHAMT(*instruction));
+            break;
+        }
+        default:{
+            not_implemented(instruction);
+        }
+    }
 }
 
 t_parse_result parse_AUIPC(t_inst instruction) {
