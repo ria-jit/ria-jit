@@ -6,6 +6,17 @@
 #include <stdio.h>
 
 #define N_OPCODE 32 //inst[6:2] 5 bit 2⁵ = 32
+// extract rd register number bit[11:7]
+#define EXTRACT_RD(instr) (instr>>7&0b11111)
+// extract rs1 register number bit[19:15]
+#define EXTRACT_RS1(instr) (instr>>15&0b11111)
+// extract rs2 register number bit[24:20]
+#define EXTRACT_RS2(instr) (instr>>20&0b11111)
+// extract func3 bit[14:12]
+#define EXTRACT_FUNC3(instr) (instr>>12&0b111)
+// extract func3 bit[14:12]
+#define EXTRACT_FUNC3(instr) (instr>>12&0b111)
+
 typedef int *t_inst; //maybe replace with some struct with meta info later
 typedef void t_parse_result; //maybe some more return information later
 
@@ -14,26 +25,48 @@ t_parse_result (*opcode_lookup[N_OPCODE])(int *instruction);
 
 //function prototypes
 t_parse_result parse_LOAD(t_inst instruction);
+
 t_parse_result parse_LOAD_FP(t_inst instruction);
+
 t_parse_result parse_MISC_MEM(t_inst instruction);
+
 t_parse_result parse_OP_IMM(t_inst instruction);
+
 t_parse_result parse_AUIPC(t_inst instruction);
+
 t_parse_result parse_OP_IMM_32(t_inst instruction);
+
 t_parse_result parse_STORE(t_inst instruction);
+
 t_parse_result parse_STORE_FP(t_inst instruction);
+
 t_parse_result parse_AMO(t_inst instruction);
+
 t_parse_result parse_OP(t_inst instruction);
+
 t_parse_result parse_LUI(t_inst instruction);
+
 t_parse_result parse_OP_32(t_inst instruction);
+
 t_parse_result parse_MADD(t_inst instruction);
+
 t_parse_result parse_MSUB(t_inst instruction);
+
 t_parse_result parse_NMSUB(t_inst instruction);
+
 t_parse_result parse_NMADD(t_inst instruction);
+
 t_parse_result parse_OP_FP(t_inst instruction);
+
 t_parse_result parse_BRANCH(t_inst instruction);
+
 t_parse_result parse_JALR(t_inst instruction);
+
 t_parse_result parse_JAL(t_inst instruction);
+
 t_parse_result parse_SYSTEM(t_inst instruction);
+
+t_parse_result not_implemented(t_inst instruction);
 
 void test_parsing() {
     /*
@@ -58,10 +91,6 @@ void test_parsing() {
     for (int i = 0; i < 4; i++) {
         parse_instruction(&memory[i]);
     }
-}
-
-void not_implemented(t_inst instruction) {
-    printf("Error when trying to parse \"%#010x\", instruction not implemented!", *instruction);
 }
 
 void fill_lookuptables(void) {
@@ -111,3 +140,107 @@ void parse_instruction(t_inst instruction) {
     int opcode = *instruction >> 2 & 0x1f;
     opcode_lookup[opcode](instruction);
 }
+
+
+void not_implemented(t_inst instruction) {
+    printf("Error when trying to parse \"%#010x\", instruction not implemented!", *instruction);
+}
+
+t_parse_result parse_LUI(t_inst instruction) {
+    //extract imm [31:12] 20 bits
+    int imm = *instruction >> 12 & 0xfffff;
+    printf("LUI rd: %d, imm32: %#x\n", EXTRACT_RD(*instruction), imm);
+}
+
+t_parse_result parse_LOAD(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_LOAD_FP(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_MISC_MEM(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_OP_IMM(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_AUIPC(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_OP_IMM_32(t_inst instruction) {
+    // extract func 3 bits[14:12]
+    switch (EXTRACT_FUNC3(*instruction)) {
+        case 0: {
+            //extract imm bits[31:20] 12 bits
+            int imm = *instruction >> 20 & 0xfff;
+            printf("ADDIW rd: %d, rs1 %d, imm %d\n", EXTRACT_RD(*instruction), EXTRACT_RS1(*instruction), imm);
+            break;
+        }
+        default: {
+            not_implemented(instruction);
+            break;
+        }
+    }
+}
+
+t_parse_result parse_STORE(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_STORE_FP(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_AMO(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_OP(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_OP_32(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_MADD(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_MSUB(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_NMSUB(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_NMADD(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_OP_FP(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_BRANCH(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_JALR(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_JAL(t_inst instruction) {
+    not_implemented(instruction);
+}
+
+t_parse_result parse_SYSTEM(t_inst instruction) {
+    not_implemented(instruction);
+}
+
