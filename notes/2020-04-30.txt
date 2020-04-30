@@ -1,0 +1,44 @@
+//Meeting Notes for
+//30.04.2020 12:00 Uhr (+ Alexis)
+//@author Flo
+
+- login for the regular ERA-practical course
+
+- code generation for x86 strategy:
+    -> only decode instructions in first step
+    -> struct: opcode field, registers (read/write), immediates (sign/0-extend)
+    -> for optimization: which instruction writes into which register?
+    -> print function for struct for debugging purposes
+    -> flag for control flow? arithmetic? writing data? for optimization
+    -> flag for instruction type?
+    -> enum for opcode - one entry for each mnemonic
+
+- code generation libraries: libraries too bloated, generate opcodes ourselves
+
+- code generation possibly messy for x86: see SDM, aengelke/fadec
+
+- simple code generation at first, optimize later
+    -> pointer for end of current code cache, starting point for next block
+
+- implement code cache: for generated x86 instructions
+
+- open addressing: 2^12 * 8 byte: hash table
+    hash function: bits 4-16 of risc-v address? check memory address for content, if full, skip onwards
+    linear probing
+
+- recognizing basic block boundaries via inst[6:5] == 11 is correct
+
+- main loop, RISC-V instruction pointer - hash table lookup? already translated?
+    if yes, execute that; if no, translate block
+
+- decode RISC-V instructions, save structs on the stack, iterate through them to generate code in code cache
+    -> hash map for code cache of already generated code
+
+- single stepping mode: for debugging: logging and stepping through instructions one by one
+
+- state of project at presentation: ready for benchmarking, possibly some optimizations
+
+- useful links:
+  =============
+    github aengelke/fadec (decode.c)
+    defuse.ca/online-x86-asssembler.htm
