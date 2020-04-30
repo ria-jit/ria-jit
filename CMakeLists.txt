@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.16)
 project(DynamicBinaryTranslatorRISCV64->x86-64)
 
 set(CMAKE_C_STANDARD 99)
+set(TRANSLATOR_BASE 0x780000000000)
+
+link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
+
+add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
 set(ASMJIT_EMBED TRUE)
 add_definitions(-DASMJIT_STATIC)

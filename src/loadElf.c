@@ -11,6 +11,7 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 typedef int t_map_result;
@@ -47,6 +48,22 @@ t_map_result mapMemory(char *filePath) {
                 Elf64_Addr vaddr = segment.p_vaddr;
                 printf("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
                        "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
+                if ((vaddr + memory_size) > TRANSLATOR_BASE) {
+                    printf("Bad. This segment wants to be in the translators memory region");
+                    return 1;
+                }
+                //Allocate memory for the segment at the correct address and map the file segment into that memory
+                void *segment_in_memory =
+                        mmap((void *) vaddr, memory_size, PROT_READ, MAP_FIXED + MAP_PRIVATE, fd, load_offset);
+                //Failed means that we couldn't get enough memory at the correct address
+                if (segment_in_memory == MAP_FAILED) {
+                    printf("Could not map segment %i because error %i", i, errno);
+                    return 1;
+                }
+                //Initialize additional memory to 0.
+                if (memory_size > physical_size) {
+                    memset((segment_in_memory + physical_size), 0, memory_size - physical_size);
+                }
                 break;
             }
             case PT_DYNAMIC: //Fallthrough
