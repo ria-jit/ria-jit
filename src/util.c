@@ -5,6 +5,6 @@
 #include "util.h"
 #include <stdio.h>
 
-void not_implemented() {
-    printf("Not yet implemented");
+void not_yet_implemented() {
+    printf("Not yet implemented\n");
 }

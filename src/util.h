@@ -5,10 +5,7 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
 
-//our RISC-V program counter, can be expanded
-typedef void* t_risc_pc;
-
-//the RISC-V memonic of the instruction
+//the RISC-V mnemonic of the instruction
 typedef enum {
     LUI, ADDIW, SLLI, ADDI
 } t_risc_mnem;
@@ -44,6 +41,6 @@ typedef struct {
     t_risc_raw_instr raw_bytes;
 } t_risc_instr;
 
-void not_implemented();
+void not_yet_implemented();
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H

@@ -3,4 +3,4 @@ project(DynamicBinaryTranslatorRISCV64->x86-64 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable("target" src/main.c src/parser.c src/parser.h src/gen.c src/gen.h src/util.c src/util.h)
+add_executable("target" src/main.c src/parser.c src/parser.h src/gen.c src/gen.h src/util.c src/util.h src/cache.c src/cache.h)
