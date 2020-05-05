@@ -18,7 +18,7 @@ int parse_jump_immediate(t_risc_instr* instr) {
     niceCleanImmediate |= (bullCrapFunkyImmediate & 0x00FF000) << 11;
     niceCleanImmediate |= (bullCrapFunkyImmediate & 0x0100000) << 2;
     niceCleanImmediate |= (bullCrapFunkyImmediate & 0x7FE00000) >> 9;
-    niceCleanImmediate >>= 10;
+    niceCleanImmediate >>= 11;
 
     return niceCleanImmediate;
 }
