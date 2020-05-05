@@ -7,7 +7,8 @@
 
 #define UNSEEN_CODE -1
 
-typedef unsigned int t_risc_addr;
+#include "util.h"
+
 typedef int t_cache_loc;
 
 //cache entries for translated code segments

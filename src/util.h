@@ -7,7 +7,38 @@
 
 //the RISC-V mnemonic of the instruction
 typedef enum {
-    LUI, ADDIW, SLLI, ADDI
+    //---RV32I---
+    LUI, //load upper Imm
+    AUIPC, //register = Imm
+
+    //control flow
+    JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU,
+
+    //load & store
+    LBW, LBU, LHU, SB, SH, SW,
+
+    //Arithmetic
+    ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND,
+
+    //??????
+    FENCE, FENCE_I,
+
+    //---RV64I---
+    //load & store
+    LWU, LD, SD,
+
+    //Arithmetic
+    //SLLI,
+    //SRLI,
+    //SRAI,
+    ADDIW, SLLIW, SRLIW, SRAIW, ADDW, SUBW, SLLW, SRLW, SRAW,
+
+    //---RV32M---
+    MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU,
+
+    //---RV64M---
+    MULW, DIVW, DIVUW, REMW, REMUW
+
 } t_risc_mnem;
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
@@ -22,7 +53,7 @@ typedef enum {
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    MEMORY, BRANCH, ARITH_LOGIC, NOP
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
@@ -31,7 +62,11 @@ typedef int* t_risc_imm;
 //carry a pointer to the raw instruction in the struct (could be expanded)
 typedef int* t_risc_raw_instr;
 
+//riscV address
+typedef unsigned long int t_risc_addr;
+
 typedef struct {
+    t_risc_addr addr;
     t_risc_mnem mnem;
     t_risc_optype optype;
     t_risc_reg reg_src_1;
@@ -40,6 +75,8 @@ typedef struct {
     t_risc_imm imm;
     t_risc_raw_instr raw_bytes;
 } t_risc_instr;
+
+int parse_jump_immediate(t_risc_instr* instr);
 
 void not_yet_implemented();
 
