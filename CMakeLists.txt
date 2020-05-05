@@ -15,6 +15,7 @@ include_directories(lib/asmjit/src)
 
 add_executable("target" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h src/gen.c src/gen.h src/util.c src/util.h
         src/cache.c
-        src/cache.h src/blockloader.h src/blockloader.c src/translate.cpp src/translate.hpp src/register.c src/register.h)
+        src/cache.h src/blockloader.h src/blockloader.c src/translate.cpp src/translate.hpp src/register.c
+        src/register.h src/loadElf.c)
 
 target_link_libraries("target" ${ASMJIT_DEPS})
