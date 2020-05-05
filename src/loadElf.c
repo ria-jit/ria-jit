@@ -10,13 +10,14 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <string.h>
-#include <unistd.h>
 #include <errno.h>
-
-
-typedef int t_map_result;
+#include <unistd.h>
+#include <stdbool.h>
+#include "util.h"
+#include "loadElf.h"
 
 t_map_result mapMemory(char *filePath) {
+    t_map_result result;
     printf("Reading %s...\n", filePath);
 
     //get the file descriptor
@@ -48,9 +49,11 @@ t_map_result mapMemory(char *filePath) {
                 Elf64_Addr vaddr = segment.p_vaddr;
                 printf("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
                        "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
+                //Refuse to map to a location in the address space of the translator.
                 if ((vaddr + memory_size) > TRANSLATOR_BASE) {
                     printf("Bad. This segment wants to be in the translators memory region");
-                    return 1;
+                    result.valid = 0;
+                    return result;
                 }
                 //Allocate memory for the segment at the correct address and map the file segment into that memory
                 void *segment_in_memory =
@@ -58,7 +61,8 @@ t_map_result mapMemory(char *filePath) {
                 //Failed means that we couldn't get enough memory at the correct address
                 if (segment_in_memory == MAP_FAILED) {
                     printf("Could not map segment %i because error %i", i, errno);
-                    return 1;
+                    result.valid = 0;
+                    return result;
                 }
                 //Initialize additional memory to 0.
                 if (memory_size > physical_size) {
@@ -69,7 +73,8 @@ t_map_result mapMemory(char *filePath) {
             case PT_DYNAMIC: //Fallthrough
             case PT_INTERP: {
                 printf("Bad. Got file that needs dynamic linking.");
-                return 1;
+                result.valid = 0;
+                return result;
             }
 
         }
@@ -77,5 +82,11 @@ t_map_result mapMemory(char *filePath) {
 
     close(fd);
 
-    return 0;
+    //Entry address for starting of translation.
+    t_risc_addr entry = header->e_entry;
+
+    result.valid = true;
+    result.startAddress = entry;
+
+    return result;
 }
