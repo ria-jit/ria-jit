@@ -5,6 +5,9 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
 
+//error codes for internal reference
+#define FAIL_HEAP_ALLOC 0x1000
+
 //the RISC-V mnemonic of the instruction
 typedef enum {
     //---RV32I---
