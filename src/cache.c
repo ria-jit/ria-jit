@@ -115,7 +115,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 void print_values() {
     for (int i = 0; i < count_entries; ++i) {
         if (cache_table[i].cache_loc != 0) {
-            printf("cache_table[%d]: RISC-V addr %lu at cache loc %d\n",
+            printf("cache_table[%d]: RISC-V addr %lu at cache loc %p\n",
                     i,
                     cache_table[i].risc_addr,
                     cache_table[i].cache_loc);
