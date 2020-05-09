@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "util.h"
 #include "cache.h"
+#include "translate.h"
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -21,6 +22,7 @@ int main() {
     printf("Hello World!\n");
     test_parsing();
     transcode_loop();
+    test_generation();
     return 0;
 }
 
