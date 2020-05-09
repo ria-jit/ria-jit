@@ -5,6 +5,7 @@
 #include "translate.h"
 #include <iostream>
 #include <asmjit/asmjit.h>
+#include <sys/mman.h>
 
 using namespace asmjit;
 
@@ -20,54 +21,7 @@ void test_generation() {
     std::cout << "Testing code generation with a few examples...\n";
 
     test_simple_assembly();
-    //test_strlen_example();
-
-    //fixme segmentation fault?
     test_strlen_relocated();
-}
-
-void test_strlen_example() { //experiment with a strlen example
-    JitRuntime runtime;
-    CodeHolder codeHolder;
-
-    codeHolder.init(runtime.codeInfo());
-    x86::Assembler a(&codeHolder);
-
-    //create the labels for our strlen call
-    Label loop_cond = a.newLabel();
-    Label loop_break = a.newLabel();
-
-    typedef int (*asm_strlen)(char*);
-
-    //unix calling convention, so the first argument is in rdi, return value in rax
-    x86::Gp str = x86::rdi;
-    x86::Gp len = x86::rax;
-
-    a.xor_(len, len);
-
-    a.bind(loop_cond);
-    a.cmp(x86::byte_ptr(str), 0);
-    a.jz(loop_break);
-    a.inc(len);
-    a.inc(str);
-    a.jmp(loop_cond);
-
-    a.bind(loop_break);
-    a.ret();
-
-    asm_strlen generated;
-    Error err = runtime.add(&generated, &codeHolder);
-    if (err) {
-        std::cout << "Bad. Error in assembly. Code: " << std::dec << err;
-        return;
-    }
-
-    std::string hello = "DynamicBinaryTranslation";
-    char *string = const_cast<char *>(hello.c_str());
-    int result = generated(string); //expected 24
-    std::cout << "Length of string " << hello << " is " << std::dec << result;
-
-    runtime.release(generated);
 }
 
 void test_strlen_relocated() {
@@ -107,7 +61,7 @@ void test_strlen_relocated() {
     size_t codeSize = codeHolder.codeSize();
 
     //allocate for worst case code size
-    void *ptr = malloc(codeSize);
+    void *ptr = mmap(nullptr, codeSize, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANON, -1, 0);
     if (!ptr) {
         std::cout << "Bad. Memory allocation failed.\n";
         return;
@@ -115,23 +69,17 @@ void test_strlen_relocated() {
 
     //relocate code in object
     codeHolder.relocateToBase(reinterpret_cast<uint64_t>(ptr));
-
     codeSize = codeHolder.codeSize();
+    
+    CodeBuffer buffer = codeHolder.sectionById(0)->buffer();
+    memcpy(ptr, buffer.data(), buffer.size());
+    __builtin___clear_cache(static_cast<char *>(ptr), static_cast<char *>(ptr) + codeSize - 1);
 
-    //this can likely be replaced by doing (--> README.md)
-    //  for (Section* s : code.sections())
-    //      memcpy((uint8_t*) ptr + section->offset(), section->data(), section->bufferSize());
-    codeHolder.copyFlattenedData(ptr, codeSize, CodeHolder::kCopyWithPadding);
-
-    //cast to function
-    auto generated = ptr_as_func<asm_strlen>(ptr);
-
-    std::string hello = "DynamicBinaryTranslation";
+    std::string hello = "Hello, World!";
     char *string = const_cast<char *>(hello.c_str());
-    int result = generated(string); //expected 24
-    std::cout << "Length of string " << hello << " is " << std::dec << result;
+    std::cout << "String " << hello << " has length " << ((asm_strlen) ptr)(string);
 
-    free(ptr);
+    munmap(ptr, codeSize);
 }
 
 void test_simple_assembly() {
@@ -155,7 +103,7 @@ void test_simple_assembly() {
     }
 
     int retValue = output();
-    std::cout << "Function returned " << std::hex << retValue << ", expected was 0xBEEF :)\n";
+    std::cout << "Function returned " << std::hex << retValue << std::dec << ", expected was 0xBEEF :)\n";
 
     runtime.release(output);
 }
