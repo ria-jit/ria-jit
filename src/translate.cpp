@@ -261,18 +261,39 @@ void translate_instr(t_risc_instr instr) {
     }
 }
 
+/**
+ * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
+ * proper sign-extension of a 32-bit result in rd.
+ * @param instr
+ */
 void translate_addiw(t_risc_instr instr) {
-
+    std::cout << "Translate addiw...\n";
 }
 
+/**
+ * SLLI is a logical left shift.
+ * The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+ * @param instr
+ */
 void translate_slli(t_risc_instr instr) {
-
+    std::cout << "Translate slli...\n";
 }
 
+/**
+ * LUI places the 20-bit U-immediate into bits 31-12 of register rd and places zero in the lowest 12 bits.
+ * The 32-bit result is sign-extended to 64 bits.
+ * @param instr
+ */
 void translate_lui(t_risc_instr instr) {
-
+    std::cout << "Translate lui...\n";
 }
 
+/**
+ * ADDI adds the sign-extended 12-bit immediate to register rs1.
+ * Overflow is ignored and the result is the low (in our case) 64 bit of the result.
+ * The result is stored in rd.
+ * @param instr
+ */
 void translate_addi(t_risc_instr instr) {
-
+    std::cout << "Translate addi...\n";
 }
