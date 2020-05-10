@@ -12,8 +12,13 @@ extern "C" {
 #endif
 
 void test_generation();
+
+//basic block translation management
 void init_block();
 t_cache_loc finalize_block();
+
+//instruction translation
+void translate_instr(t_risc_instr instr);
 
 #ifdef __cplusplus
 }

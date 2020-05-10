@@ -11,6 +11,14 @@ using namespace asmjit;
 
 void generate_strlen();
 
+void translate_addi(t_risc_instr instr);
+
+void translate_lui(t_risc_instr instr);
+
+void translate_slli(t_risc_instr instr);
+
+void translate_addiw(t_risc_instr instr);
+
 /**
  * The AsmJit code holder for our generated x86 machine code.
  */
@@ -84,14 +92,14 @@ t_cache_loc finalize_block() {
 void generate_strlen() {
     //initialize new block
     init_block();
-    
+
     //calling convention: first argument in rdi, ret value in rax
     x86::Gp str = x86::rdi;
     x86::Gp len = x86::rax;
 
     Label loop_cond = a->newLabel();
     Label loop_end = a->newLabel();
-    
+
     a->xor_(len, len);
     a->bind(loop_cond);
     a->cmp(x86::byte_ptr(str), 0);
@@ -103,12 +111,168 @@ void generate_strlen() {
 
     //finalize block and get cached location
     t_cache_loc executable = finalize_block();
-    
+
     //call the assembled function on a string
     std::string hello_world = "Hello, World!"; //len = 13
     char *string = const_cast<char *>(hello_world.c_str());
-    typedef int (*str_len_asm)(char*);
+    typedef int (*str_len_asm)(char *);
     int ret = ((str_len_asm) executable)(string);
 
     std::cout << "Length of string " << string << " is " << ret;
+}
+
+/**
+ * Translate the passed instruction and add the output
+ * to the current x86 block.
+ * @param instr the RISC instruction to translate
+ */
+void translate_instr(t_risc_instr instr) {
+    //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
+
+    switch(instr.mnem) {
+        case LUI:
+            translate_lui(instr);
+            break;
+        case AUIPC:
+            break;
+        case JAL:
+            break;
+        case JALR:
+            break;
+        case BEQ:
+            break;
+        case BNE:
+            break;
+        case BLT:
+            break;
+        case BGE:
+            break;
+        case BLTU:
+            break;
+        case BGEU:
+            break;
+        case LBW:
+            break;
+        case LBU:
+            break;
+        case LHU:
+            break;
+        case SB:
+            break;
+        case SH:
+            break;
+        case SW:
+            break;
+        case ADDI:
+            translate_addi(instr);
+            break;
+        case SLTI:
+            break;
+        case SLTIU:
+            break;
+        case XORI:
+            break;
+        case ORI:
+            break;
+        case ANDI:
+            break;
+        case SLLI:
+            translate_slli(instr);
+            break;
+        case SRLI:
+            break;
+        case SRAI:
+            break;
+        case ADD:
+            break;
+        case SUB:
+            break;
+        case SLL:
+            break;
+        case SLT:
+            break;
+        case SLTU:
+            break;
+        case XOR:
+            break;
+        case SRL:
+            break;
+        case SRA:
+            break;
+        case OR:
+            break;
+        case AND:
+            break;
+        case FENCE:
+            break;
+        case FENCE_I:
+            break;
+        case LWU:
+            break;
+        case LD:
+            break;
+        case SD:
+            break;
+        case ADDIW:
+            translate_addiw(instr);
+            break;
+        case SLLIW:
+            break;
+        case SRLIW:
+            break;
+        case SRAIW:
+            break;
+        case ADDW:
+            break;
+        case SUBW:
+            break;
+        case SLLW:
+            break;
+        case SRLW:
+            break;
+        case SRAW:
+            break;
+        case MUL:
+            break;
+        case MULH:
+            break;
+        case MULHSU:
+            break;
+        case MULHU:
+            break;
+        case DIV:
+            break;
+        case DIVU:
+            break;
+        case REM:
+            break;
+        case REMU:
+            break;
+        case MULW:
+            break;
+        case DIVW:
+            break;
+        case DIVUW:
+            break;
+        case REMW:
+            break;
+        case REMUW:
+            break;
+    }
+}
+
+void translate_addiw(t_risc_instr instr) {
+
+}
+
+void translate_slli(t_risc_instr instr) {
+
+}
+
+void translate_lui(t_risc_instr instr) {
+
+}
+
+void translate_addi(t_risc_instr instr) {
+
 }

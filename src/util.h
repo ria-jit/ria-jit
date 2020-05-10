@@ -6,6 +6,8 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
 
 //error codes for internal reference
+#include <stdint.h>
+
 #define FAIL_HEAP_ALLOC 0x1000
 
 //the RISC-V mnemonic of the instruction
@@ -53,6 +55,9 @@ typedef enum {
     x30, x31,
     pc
 } t_risc_reg;
+
+//register value type
+typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
