@@ -52,7 +52,7 @@ static inline int extract_imm_J(int instr) {
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
 static inline int extract_imm_B(int instr) {
     return (instr >> (31 - 12) & (1 << 12)) | (instr << (11 - 7) & (1 << 11) |
-           (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110));
+                                               (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110));
 }
 
 //function prototypes
@@ -125,19 +125,55 @@ void test_parsing() {
 
 void parse_instruction(t_risc_instr instr_struct) {
     // print out the line to parse in grouped binary as in the spec
-    t_risc_raw_instr instruction = instr_struct.raw_bytes;
-    printf("Parsing: %#010x\n", *instruction);
+    int raw_instr = *instr_struct.raw_bytes;
+    printf("Parsing: %#010x\n", raw_instr);
+
+    //fill basic struct
+    instr_struct.reg_dest = extract_rd(raw_instr);
+    instr_struct.reg_src_1 = extract_rs1(raw_instr);
+    //instr_struct.reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
+
     //extract opcode bits[6:2]
-    t_opcodes opcode = *instruction >> 2 & 0x1f;
-    switch(opcode){
+    t_opcodes opcode = raw_instr >> 2 & 0x1f;
+    switch (opcode) {
         case OP_LUI:
-            parse_LUI(instruction);
+            parse_LUI(&raw_instr);
+            instr_struct.optype = UPPER_IMMEDIATE;
+            instr_struct.mnem = LUI;
+            instr_struct.imm = extract_imm_U(raw_instr);
             break;
         case OP_OP_IMM_32:
-            parse_OP_IMM_32(instruction);
+            parse_OP_IMM_32(&raw_instr);
+            instr_struct.optype = IMMEDIATE;
+            switch (extract_func3(raw_instr)) {
+                case 0: {
+                    instr_struct.mnem = ADDIW;
+                    instr_struct.imm = extract_imm_I(raw_instr);
+                    break;
+                }
+                default: {
+                    not_yet_implemented("Instruction");
+                }
+            }
             break;
         case OP_OP_IMM:
-            parse_OP_IMM(instruction);
+            parse_OP_IMM(&raw_instr);
+            instr_struct.optype = IMMEDIATE;
+            switch (extract_func3(raw_instr)) {
+                case 0: { //ADDI
+                    instr_struct.mnem = ADDI;
+                    instr_struct.imm = extract_imm_I(raw_instr);
+                    break;
+                }
+                case 1: { //SLLI opcode and func3 are unique
+                    instr_struct.mnem = SLLI;
+                    instr_struct.imm = extract_big_shamt(raw_instr);
+                    break;
+                }
+                default: {
+                    not_yet_implemented("Instruction");
+                }
+            }
             break;
         default:
             not_yet_implemented("OPCODE");
@@ -194,8 +230,8 @@ t_parse_result parse_OP_IMM_32(t_risc_raw_instr instruction) {
     switch (extract_func3(*instruction)) {
         case 0: {
             //extract imm bits[31:20] 12 bits we need sign extension!
-            int imm = *instruction >> 20;
-            printf("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction), imm);
+            printf("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+                   extract_imm_I(*instruction));
             break;
         }
         default: {
