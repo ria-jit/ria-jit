@@ -86,6 +86,6 @@ typedef struct {
 
 int parse_jump_immediate(t_risc_instr* instr);
 
-void not_yet_implemented();
+void not_yet_implemented(const char* info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H

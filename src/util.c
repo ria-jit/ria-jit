@@ -4,9 +4,13 @@
 
 #include "util.h"
 #include <stdio.h>
+#include <string.h>
 
-void not_yet_implemented() {
-    printf("Not yet implemented\n");
+void not_yet_implemented(const char* info) {
+    char str[1024];
+    strcpy(str, info);
+    strcat(str," - not yet implemented\n");
+    printf(str);
 }
 
 //defunkify a J-type immediate; not tested -> dont use

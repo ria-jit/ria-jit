@@ -3,11 +3,11 @@
 //
 
 #include <stdio.h>
-#include "parser.h"
 #include <stdbool.h>
 #include "util.h"
 #include "cache.h"
 #include "translate.h"
+#include "parser.h"
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -56,7 +56,7 @@ int transcode_loop() {
  * @return cache location of the translated code
  */
 t_cache_loc translate_block(t_risc_addr risc_addr) {
-    not_yet_implemented();
+    not_yet_implemented("Translate Block");
     return 0;
 }
 
@@ -66,12 +66,12 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
  * @return the program counter value after execution of the translated basic block
  */
 t_risc_addr execute_cached(t_cache_loc loc) {
-    not_yet_implemented();
+    not_yet_implemented("Execute Cached");
     return 0;
 }
 
 t_risc_instr *decode_next() {
-    not_yet_implemented();
+    not_yet_implemented("Decode next");
     return NULL;
 }
 
@@ -80,6 +80,6 @@ t_risc_instr *decode_next() {
  * @return initial RISC-V program counter value
  */
 t_risc_addr init_entry_pc() {
-    not_yet_implemented();
+    not_yet_implemented("Init entry pc");
     return 0;
 }
