@@ -8,21 +8,27 @@
 #include <stdio.h>
 
 #define N_OPCODE 32 //inst[6:2] 5 bit 2⁵ = 32
-// extract rd register number bit[11:7]
-#define EXTRACT_RD(instr) (instr>>7&0b11111)
-// extract rs1 register number bit[19:15]
-#define EXTRACT_RS1(instr) (instr>>15&0b11111)
-// extract rs2 register number bit[24:20]
-#define EXTRACT_RS2(instr) (instr>>20&0b11111)
-// extract func3 bit[14:12]
-#define EXTRACT_FUNC3(instr) (instr>>12&0b111)
-// extract big_shamt bit[25:20]
-#define EXTRACT_BIG_SHAMT(instr) (instr>>20&0b111111)
-// extract imm_11 bit[31:20]
-#define EXTRACT_IMM_11(instr) (instr>>20) //sign extend!
 
 typedef int *t_inst; //maybe replace with some struct with meta info later
 typedef void t_parse_result; //maybe some more return information later
+
+// extract rd register number bit[11:7]
+int extract_rd(int instr) { return instr >> 7 & 0b11111; }
+
+// extract rs1 register number bit[19:15]
+int extract_rs1(int instr) { return instr >> 15 & 0b11111; }
+
+// extract rs2 register number bit[24:20]
+int extract_rs2(int instr) { return instr >> 20 & 0b11111; }
+
+// extract func3 bit [14:12]
+int extract_func3(int instr) { return instr >> 12 & 0b111; }
+
+// extract big_shamt bit[25:20]
+int extract_big_shamt(int instr) { return instr >> 20 & 0b111111; }
+
+// extract imm_11 bit[31:20]
+int extract_imm_11(int instr) { return instr >> 20; } //sign extend!
 
 // lookup table for opcode
 t_parse_result (*opcode_lookup[N_OPCODE])(int *instruction);
@@ -154,7 +160,7 @@ t_parse_result parse_LUI(t_inst instruction) {
     //extract imm [31:12] 20 bits
     // fills rd with the upper 20 bits and fills lower 12 bits with zeros
     int imm = *instruction & (0xfffff << 12);
-    printf("LUI rd: %d, imm32: %#010x\n", EXTRACT_RD(*instruction), imm);
+    printf("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), imm);
 }
 
 t_parse_result parse_LOAD(t_inst instruction) {
@@ -170,16 +176,18 @@ t_parse_result parse_MISC_MEM(t_inst instruction) {
 }
 
 t_parse_result parse_OP_IMM(t_inst instruction) {
-    switch (EXTRACT_FUNC3(*instruction)) {
+    switch (extract_func3(*instruction)) {
         case 0: { //ADDI
-            printf("ADDI rd %d, rs1 %d, imm %d\n", EXTRACT_RD(*instruction),EXTRACT_RS1(*instruction),EXTRACT_IMM_11(*instruction));
+            printf("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+                   extract_imm_11(*instruction));
             break;
         }
         case 1: { //SLLI opcode and func3 are unique
-            printf("SLLI rd %d, rs1 %d, shamt %d\n",EXTRACT_RD(*instruction), EXTRACT_RS1(*instruction),EXTRACT_BIG_SHAMT(*instruction));
+            printf("SLLI rd %d, rs1 %d, shamt %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+                   extract_big_shamt(*instruction));
             break;
         }
-        default:{
+        default: {
             not_implemented(instruction);
         }
     }
@@ -191,11 +199,11 @@ t_parse_result parse_AUIPC(t_inst instruction) {
 
 t_parse_result parse_OP_IMM_32(t_inst instruction) {
     // extract func 3 bits[14:12]
-    switch (EXTRACT_FUNC3(*instruction)) {
+    switch (extract_func3(*instruction)) {
         case 0: {
             //extract imm bits[31:20] 12 bits we need sign extension!
             int imm = *instruction >> 20;
-            printf("ADDIW rd: %d, rs1 %d, imm %d\n", EXTRACT_RD(*instruction), EXTRACT_RS1(*instruction), imm);
+            printf("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction), imm);
             break;
         }
         default: {
