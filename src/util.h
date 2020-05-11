@@ -26,7 +26,10 @@ typedef enum {
     ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND,
 
     //??????
-    FENCE, FENCE_I,
+    FENCE, ECALL, EBREAK, FENCE_I,
+
+    //CSRR
+    CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI,
 
     //---RV64I---
     //load & store
@@ -61,11 +64,11 @@ typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
-typedef int* t_risc_imm;
+typedef int t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
 typedef int* t_risc_raw_instr;

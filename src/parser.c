@@ -52,51 +52,15 @@ static inline int extract_imm_J(int instr) {
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
 static inline int32_t extract_imm_B(int32_t instr) {
     return (instr >> (31 - 12) & 0xfffff000) | (instr << (11 - 7) & (1 << 11)) |
-                                               (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
+           (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
 }
 
-//function prototypes
-t_parse_result parse_LOAD(t_risc_raw_instr instruction);
-
-t_parse_result parse_LOAD_FP(t_risc_raw_instr instruction);
-
-t_parse_result parse_MISC_MEM(t_risc_raw_instr instruction);
-
+//function prototypes DEPRECATED
 t_parse_result parse_OP_IMM(t_risc_raw_instr instruction);
-
-t_parse_result parse_AUIPC(t_risc_raw_instr instruction);
 
 t_parse_result parse_OP_IMM_32(t_risc_raw_instr instruction);
 
-t_parse_result parse_STORE(t_risc_raw_instr instruction);
-
-t_parse_result parse_STORE_FP(t_risc_raw_instr instruction);
-
-t_parse_result parse_AMO(t_risc_raw_instr instruction);
-
-t_parse_result parse_OP(t_risc_raw_instr instruction);
-
 t_parse_result parse_LUI(t_risc_raw_instr instruction);
-
-t_parse_result parse_OP_32(t_risc_raw_instr instruction);
-
-t_parse_result parse_MADD(t_risc_raw_instr instruction);
-
-t_parse_result parse_MSUB(t_risc_raw_instr instruction);
-
-t_parse_result parse_NMSUB(t_risc_raw_instr instruction);
-
-t_parse_result parse_NMADD(t_risc_raw_instr instruction);
-
-t_parse_result parse_OP_FP(t_risc_raw_instr instruction);
-
-t_parse_result parse_BRANCH(t_risc_raw_instr instruction);
-
-t_parse_result parse_JALR(t_risc_raw_instr instruction);
-
-t_parse_result parse_JAL(t_risc_raw_instr instruction);
-
-t_parse_result parse_SYSTEM(t_risc_raw_instr instruction);
 
 void test_parsing() {
     /*
@@ -124,6 +88,8 @@ void test_parsing() {
 }
 
 void parse_instruction(t_risc_instr *p_instr_struct) {
+    //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
+
     // print out the line to parse in grouped binary as in the spec
     t_risc_instr instr_struct = *p_instr_struct;
     int raw_instr = *instr_struct.raw_bytes;
@@ -158,70 +124,77 @@ void parse_instruction(t_risc_instr *p_instr_struct) {
             instr_struct.mnem = JALR;
             instr_struct.imm = extract_imm_I(raw_instr);
             break;
+        case OP_MISC_MEM:
+            instr_struct.optype = SYSTEM;
+            instr_struct.imm = extract_imm_I(raw_instr);
+            switch(extract_func3(raw_instr)){
+                case 0:
+                    instr_struct.mnem = FENCE;
+                    break;
+                case 1:
+                    instr_struct.mnem = FENCE_I;
+                    break;
+                default:
+                    not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
+            }
+            break;
         case OP_BRANCH:
             // BEQ, BNE...
             instr_struct.optype = BRANCH;
             instr_struct.reg_src_2 = extract_rs2(raw_instr);
             instr_struct.imm = extract_imm_B(raw_instr);
             switch (extract_func3(raw_instr)) {
-                case 0:{
+                case 0:
                     instr_struct.mnem = BEQ;
                     break;
-                }
-                case 1:{
+                case 1:
                     instr_struct.mnem = BNE;
                     break;
-                }
-                case 4:{
+                case 4:
                     instr_struct.mnem = BLT;
                     break;
-                }
-                case 5:{
+                case 5:
                     instr_struct.mnem = BGE;
                     break;
-                }
-                case 6:{
+                case 6:
                     instr_struct.mnem = BLTU;
                     break;
-                }
-                case 7:{
+                case 7:
                     instr_struct.mnem = BGEU;
                     break;
-                }
-                default:{
+                default:
                     not_yet_implemented("Invalid func3 for BRANCH Opcode");
-                }
             }
             break;
         case OP_LOAD:
             instr_struct.optype = IMMEDIATE;
             instr_struct.imm = extract_imm_I(raw_instr);
             switch (extract_func3(raw_instr)) {
-                case 0:{
+                case 0: {
                     instr_struct.mnem = LB;
                     break;
                 }
-                case 1:{
+                case 1: {
                     instr_struct.mnem = LH;
                     break;
                 }
-                case 2:{
+                case 2: {
                     instr_struct.mnem = LW;
                     break;
                 }
-                case 3:{
+                case 3: {
                     instr_struct.mnem = LD;
                     break;
                 }
-                case 4:{
+                case 4: {
                     instr_struct.mnem = LBU;
                     break;
                 }
-                case 5:{
+                case 5: {
                     instr_struct.mnem = LHU;
                     break;
                 }
-                case 6:{
+                case 6: {
                     instr_struct.mnem = LWU;
                     break;
                 }
@@ -230,32 +203,204 @@ void parse_instruction(t_risc_instr *p_instr_struct) {
                 }
             }
             break;
+        case OP_STORE:
+            instr_struct.optype = STORE;
+            instr_struct.imm = extract_imm_S(raw_instr);
+            instr_struct.reg_src_2 = extract_rs2(raw_instr);
+            switch (extract_func3(raw_instr)) {
+                case 0:
+                    instr_struct.mnem = SB;
+                    break;
+                case 1:
+                    instr_struct.mnem = SH;
+                    break;
+                case 2:
+                    instr_struct.mnem = SW;
+                    break;
+                case 3:
+                    instr_struct.mnem = SD;
+                    break;
+                default:
+                    not_yet_implemented("Invalid OP_STORE Instruction");
+            }
+            break;
+        case OP_OP:
+            instr_struct.optype = REG_REG;
+            instr_struct.reg_src_2 = extract_rs2(raw_instr);
+            if(raw_instr & (1<<25)) {
+                switch (extract_func3(raw_instr)) {
+                    case 0:
+                        instr_struct.mnem = MUL;
+                        break;
+                    case 1:
+                        instr_struct.mnem = MULH;
+                        break;
+                    case 2:
+                        instr_struct.mnem = MULHSU;
+                        break;
+                    case 3:
+                        instr_struct.mnem = MULHU;
+                        break;
+                    case 4:
+                        instr_struct.mnem = DIV;
+                        break;
+                    case 5:
+                        instr_struct.mnem = DIVU;
+                        break;
+                    case 6:
+                        instr_struct.mnem = REM;
+                        break;
+                    case 7:
+                        instr_struct.mnem = REMU;
+                        break;
+                }
+            } else {
+                switch (extract_func3(raw_instr)) {
+                    case 0:
+                        if (raw_instr & (1 << 30)) {
+                            //SRAI
+                            instr_struct.mnem = SUB;
+                        } else {
+                            //SRLI
+                            instr_struct.mnem = ADD;
+                        }
+                        break;
+                    case 1:
+                        instr_struct.mnem = SLL;
+                        break;
+                    case 2:
+                        instr_struct.mnem = SLT;
+                        break;
+                    case 3:
+                        instr_struct.mnem = SLTU;
+                        break;
+                    case 4:
+                        instr_struct.mnem = XOR;
+                        break;
+                    case 5:
+                        if (raw_instr & (1 << 30)) {
+                            //SRAI
+                            instr_struct.mnem = SRA;
+                        } else {
+                            //SRLI
+                            instr_struct.mnem = SRL;
+                        }
+                        break;
+                    case 6:
+                        instr_struct.mnem = OR;
+                        break;
+                    case 7:
+                        instr_struct.mnem = AND;
+                        break;
+                }
+            }
+            break;
+        case OP_SYSTEM:
+            instr_struct.optype = SYSTEM;
+            instr_struct.imm = extract_imm_I(raw_instr);
+            switch(extract_func3(raw_instr)){
+                case 0:
+                    if(raw_instr & (1<<20)){
+                        instr_struct.mnem = ECALL;
+                    } else {
+                        instr_struct.mnem = EBREAK;
+                    }
+                    break;
+                case 1:
+                    instr_struct.mnem = CSRRW;
+                    break;
+                case 2:
+                    instr_struct.mnem = CSRRS;
+                    break;
+                case 3:
+                    instr_struct.mnem = CSRRC;
+                    break;
+                case 5:
+                    instr_struct.mnem = CSRRWI;
+                    break;
+                case 6:
+                    instr_struct.mnem = CSRRSI;
+                    break;
+                case 7:
+                    instr_struct.mnem = CSRRCI;
+                    break;
+                default:
+                    not_yet_implemented("Invalid CSSR Instruction");
+            }
+            break;
         case OP_OP_IMM_32:
             parse_OP_IMM_32(&raw_instr);
             instr_struct.optype = IMMEDIATE;
             switch (extract_func3(raw_instr)) {
-                case 0: {
+                case 0:
                     instr_struct.mnem = ADDIW;
                     instr_struct.imm = extract_imm_I(raw_instr);
                     break;
-                }
-                case 1: { //SLLIW opcode and func3 are unique
+                case 1: //SLLIW opcode and func3 are unique
                     instr_struct.mnem = SLLIW;
                     instr_struct.imm = extract_small_shamt(raw_instr);
                     break;
-                }
-                case 5: { //SRAIW / SRLIW
+                case 5: //SRAIW / SRLIW
                     instr_struct.imm = extract_small_shamt(raw_instr);
-                    if(raw_instr & (1<<30)){
+                    if (raw_instr & (1 << 30)) {
                         //SRAI
                         instr_struct.mnem = SRAIW;
                     } else {
                         //SRLI
                         instr_struct.mnem = SRLIW;
                     }
-                }
-                default: {
+                default:
                     not_yet_implemented("Invalid OP_IMM_32 Instruction");
+            }
+            break;
+        case OP_OP_32:
+            instr_struct.optype = REG_REG;
+            instr_struct.reg_src_2 = extract_rs2(raw_instr);
+            if(raw_instr & (1<<25)){
+                switch (extract_func3(raw_instr)) {
+                    case 0:
+                        instr_struct.mnem = MULW;
+                        break;
+                    case 4:
+                        instr_struct.mnem = DIVW;
+                        break;
+                    case 5:
+                        instr_struct.mnem = DIVUW;
+                        break;
+                    case 6:
+                        instr_struct.mnem = REMW;
+                        break;
+                    case 7:
+                        instr_struct.mnem = REMUW;
+                        break;
+                    default:
+                        not_yet_implemented("Invalid OP_32 RV64M Instruction");
+                }
+            } else {
+                switch (extract_func3(raw_instr)) {
+                    case 0:
+                        if (raw_instr & (1 << 30)) {
+                            //SRAI
+                            instr_struct.mnem = SUBW;
+                        } else {
+                            //SRLI
+                            instr_struct.mnem = ADDW;
+                        }
+                        break;
+                    case 1:
+                        instr_struct.mnem = SLLW;
+                        break;
+                    case 5:
+                        if (raw_instr & (1 << 30)) {
+                            //SRAI
+                            instr_struct.mnem = SRAW;
+                        } else {
+                            //SRLI
+                            instr_struct.mnem = SRLW;
+                        }
+                        break;
+                    default:
+                        not_yet_implemented("Invalid OP_32 Instruction");
                 }
             }
             break;
@@ -263,46 +408,44 @@ void parse_instruction(t_risc_instr *p_instr_struct) {
             parse_OP_IMM(&raw_instr);
             instr_struct.optype = IMMEDIATE;
             switch (extract_func3(raw_instr)) {
-                case 0: { //ADDI
+                case 0: //ADDI
                     instr_struct.mnem = ADDI;
                     instr_struct.imm = extract_imm_I(raw_instr);
                     break;
-                }
-                case 1: { //SLLI opcode and func3 are unique
+                case 1: //SLLI opcode and func3 are unique
                     instr_struct.mnem = SLLI;
                     instr_struct.imm = extract_big_shamt(raw_instr);
                     break;
-                }
-                case 2: { //SLTI
+                case 2: //SLTI
                     instr_struct.mnem = SLTI;
                     instr_struct.imm = extract_imm_I(raw_instr);
-                }
-                case 3: { //SLTIU
+                    break;
+                case 3: //SLTIU
                     instr_struct.mnem = SLTIU;
                     instr_struct.imm = extract_imm_I(raw_instr);
-                }
-                case 4: {
+                    break;
+                case 4:
                     instr_struct.mnem = XORI;
                     instr_struct.imm = extract_imm_I(raw_instr);
-                }
-                case 5: { //SRAI / SRLI
+                    break;
+                case 5: //SRAI / SRLI
                     instr_struct.imm = extract_big_shamt(raw_instr);
-                    if(raw_instr & (1<<30)){
+                    if (raw_instr & (1 << 30)) {
                         //SRAI
                         instr_struct.mnem = SRAI;
                     } else {
                         //SRLI
                         instr_struct.mnem = SRLI;
                     }
-                }
-                case 6: {
+                    break;
+                case 6:
                     instr_struct.mnem = XORI;
                     instr_struct.imm = extract_imm_I(raw_instr);
-                }
-                case 7: {
+                    break;
+                case 7:
                     instr_struct.mnem = ANDI;
                     instr_struct.imm = extract_imm_I(raw_instr);
-                }
+                    break;
                 default: {
                     not_yet_implemented("Invalid OP_IMM Instruction");
                 }

@@ -7,10 +7,7 @@
 #include <string.h>
 
 void not_yet_implemented(const char* info) {
-    char str[1024];
-    strcpy(str, info);
-    strcat(str," - not yet implemented");
-    puts(str);
+    printf("%s - not yet implemented\n", info);
 }
 
 //defunkify a J-type immediate; not tested -> dont use
