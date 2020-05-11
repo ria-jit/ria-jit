@@ -67,7 +67,7 @@ typedef enum {
 //carry immediate values in the instruction struct
 typedef int* t_risc_imm;
 
-//carry a pointer to the raw instruction in the struct (could be expanded)
+//carry a pointer to the raw instruction in the struct
 typedef int* t_risc_raw_instr;
 
 //riscV address

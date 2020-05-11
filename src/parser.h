@@ -29,7 +29,11 @@ typedef enum {
     OP_SYSTEM = 28,
 } t_opcodes;
 
-void parse_instruction(int *instruction);
+/**
+ * Parse given raw_instruction and save all data in the struct.
+ * @param t_rist_instr a pointer to the struct with a raw address to be filled
+ */
+void parse_instruction(t_risc_instr instr_struct);
 void test_parsing(void);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H

@@ -11,7 +11,6 @@
 
 #define N_OPCODE 32 //inst[6:2] 5 bit 2⁵ = 32
 
-typedef int *t_inst; //maybe replace with some struct with meta info later
 typedef void t_parse_result; //maybe some more return information later
 
 // extract rd register number bit[11:7]
@@ -57,47 +56,47 @@ static inline int extract_imm_B(int instr) {
 }
 
 //function prototypes
-t_parse_result parse_LOAD(t_inst instruction);
+t_parse_result parse_LOAD(t_risc_raw_instr instruction);
 
-t_parse_result parse_LOAD_FP(t_inst instruction);
+t_parse_result parse_LOAD_FP(t_risc_raw_instr instruction);
 
-t_parse_result parse_MISC_MEM(t_inst instruction);
+t_parse_result parse_MISC_MEM(t_risc_raw_instr instruction);
 
-t_parse_result parse_OP_IMM(t_inst instruction);
+t_parse_result parse_OP_IMM(t_risc_raw_instr instruction);
 
-t_parse_result parse_AUIPC(t_inst instruction);
+t_parse_result parse_AUIPC(t_risc_raw_instr instruction);
 
-t_parse_result parse_OP_IMM_32(t_inst instruction);
+t_parse_result parse_OP_IMM_32(t_risc_raw_instr instruction);
 
-t_parse_result parse_STORE(t_inst instruction);
+t_parse_result parse_STORE(t_risc_raw_instr instruction);
 
-t_parse_result parse_STORE_FP(t_inst instruction);
+t_parse_result parse_STORE_FP(t_risc_raw_instr instruction);
 
-t_parse_result parse_AMO(t_inst instruction);
+t_parse_result parse_AMO(t_risc_raw_instr instruction);
 
-t_parse_result parse_OP(t_inst instruction);
+t_parse_result parse_OP(t_risc_raw_instr instruction);
 
-t_parse_result parse_LUI(t_inst instruction);
+t_parse_result parse_LUI(t_risc_raw_instr instruction);
 
-t_parse_result parse_OP_32(t_inst instruction);
+t_parse_result parse_OP_32(t_risc_raw_instr instruction);
 
-t_parse_result parse_MADD(t_inst instruction);
+t_parse_result parse_MADD(t_risc_raw_instr instruction);
 
-t_parse_result parse_MSUB(t_inst instruction);
+t_parse_result parse_MSUB(t_risc_raw_instr instruction);
 
-t_parse_result parse_NMSUB(t_inst instruction);
+t_parse_result parse_NMSUB(t_risc_raw_instr instruction);
 
-t_parse_result parse_NMADD(t_inst instruction);
+t_parse_result parse_NMADD(t_risc_raw_instr instruction);
 
-t_parse_result parse_OP_FP(t_inst instruction);
+t_parse_result parse_OP_FP(t_risc_raw_instr instruction);
 
-t_parse_result parse_BRANCH(t_inst instruction);
+t_parse_result parse_BRANCH(t_risc_raw_instr instruction);
 
-t_parse_result parse_JALR(t_inst instruction);
+t_parse_result parse_JALR(t_risc_raw_instr instruction);
 
-t_parse_result parse_JAL(t_inst instruction);
+t_parse_result parse_JAL(t_risc_raw_instr instruction);
 
-t_parse_result parse_SYSTEM(t_inst instruction);
+t_parse_result parse_SYSTEM(t_risc_raw_instr instruction);
 
 void test_parsing() {
     /*
@@ -118,12 +117,15 @@ void test_parsing() {
     printf("First line of memory %#010x, first byte: %#x\n", memory[0], ((unsigned char *) memory)[0]);
 
     for (int i = 0; i < 4; i++) {
-        parse_instruction(&memory[i]);
+        t_risc_instr instr;
+        instr.raw_bytes = &memory[i];
+        parse_instruction(instr);
     }
 }
 
-void parse_instruction(t_inst instruction) {
+void parse_instruction(t_risc_instr instr_struct) {
     // print out the line to parse in grouped binary as in the spec
+    t_risc_raw_instr instruction = instr_struct.raw_bytes;
     printf("Parsing: %#010x\n", *instruction);
     //extract opcode bits[6:2]
     t_opcodes opcode = *instruction >> 2 & 0x1f;
@@ -143,29 +145,29 @@ void parse_instruction(t_inst instruction) {
 }
 
 
-void not_implemented(t_inst instruction) {
+void not_implemented(t_risc_raw_instr instruction) {
     printf("Error when trying to parse \"%#010x\", instruction not implemented!", *instruction);
 }
 
-t_parse_result parse_LUI(t_inst instruction) {
+t_parse_result parse_LUI(t_risc_raw_instr instruction) {
     //extract imm [31:12] 20 bits
     // fills rd with the upper 20 bits and fills lower 12 bits with zeros
     printf("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), extract_imm_U(*instruction));
 }
 
-t_parse_result parse_LOAD(t_inst instruction) {
+t_parse_result parse_LOAD(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_LOAD_FP(t_inst instruction) {
+t_parse_result parse_LOAD_FP(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_MISC_MEM(t_inst instruction) {
+t_parse_result parse_MISC_MEM(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_OP_IMM(t_inst instruction) {
+t_parse_result parse_OP_IMM(t_risc_raw_instr instruction) {
     switch (extract_func3(*instruction)) {
         case 0: { //ADDI
             printf("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
@@ -183,11 +185,11 @@ t_parse_result parse_OP_IMM(t_inst instruction) {
     }
 }
 
-t_parse_result parse_AUIPC(t_inst instruction) {
+t_parse_result parse_AUIPC(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_OP_IMM_32(t_inst instruction) {
+t_parse_result parse_OP_IMM_32(t_risc_raw_instr instruction) {
     // extract func 3 bits[14:12]
     switch (extract_func3(*instruction)) {
         case 0: {
@@ -203,59 +205,59 @@ t_parse_result parse_OP_IMM_32(t_inst instruction) {
     }
 }
 
-t_parse_result parse_STORE(t_inst instruction) {
+t_parse_result parse_STORE(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_STORE_FP(t_inst instruction) {
+t_parse_result parse_STORE_FP(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_AMO(t_inst instruction) {
+t_parse_result parse_AMO(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_OP(t_inst instruction) {
+t_parse_result parse_OP(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_OP_32(t_inst instruction) {
+t_parse_result parse_OP_32(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_MADD(t_inst instruction) {
+t_parse_result parse_MADD(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_MSUB(t_inst instruction) {
+t_parse_result parse_MSUB(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_NMSUB(t_inst instruction) {
+t_parse_result parse_NMSUB(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_NMADD(t_inst instruction) {
+t_parse_result parse_NMADD(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_OP_FP(t_inst instruction) {
+t_parse_result parse_OP_FP(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_BRANCH(t_inst instruction) {
+t_parse_result parse_BRANCH(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_JALR(t_inst instruction) {
+t_parse_result parse_JALR(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_JAL(t_inst instruction) {
+t_parse_result parse_JAL(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
-t_parse_result parse_SYSTEM(t_inst instruction) {
+t_parse_result parse_SYSTEM(t_risc_raw_instr instruction) {
     not_implemented(instruction);
 }
 
