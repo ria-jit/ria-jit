@@ -151,9 +151,13 @@ void translate_instr(t_risc_instr instr) {
             break;
         case BGEU:
             break;
-        case LBW:
+        case LB:
             break;
         case LBU:
+            break;
+        case LH:
+            break;
+        case LW:
             break;
         case LHU:
             break;

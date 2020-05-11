@@ -20,7 +20,7 @@ typedef enum {
     JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU,
 
     //load & store
-    LBW, LBU, LHU, SB, SH, SW,
+    LB, LH, LW, LBU, LHU, SB, SH, SW,
 
     //Arithmetic
     ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND,
