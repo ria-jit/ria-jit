@@ -31,7 +31,9 @@ t_risc_addr mapIntoMemory(char *filePath) {
     __off_t size = statbuf.st_size;
 
     //map the executable file into memory
-    char *exec = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+    //Try putting it closely above TRANSLATOR_BASE so it goes in our address space and the other regions are free for
+    // the mapping.
+    char *exec = mmap((void *) TRANSLATOR_BASE + 0x10000000, size, PROT_READ, MAP_SHARED, fd, 0);
 
     //read as elf header
     Elf64_Ehdr *header = (Elf64_Ehdr *) exec;
@@ -85,6 +87,8 @@ t_risc_addr mapIntoMemory(char *filePath) {
         }
     }
 
+    //Close and unmap the elf file
+    munmap(exec, size);
     close(fd);
 
 
