@@ -12,12 +12,10 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include "util.h"
 #include "loadElf.h"
 
-t_map_result mapMemory(char *filePath) {
-    t_map_result result;
+t_risc_addr mapIntoMemory(char *filePath) {
     printf("Reading %s...\n", filePath);
 
     //get the file descriptor
@@ -52,8 +50,7 @@ t_map_result mapMemory(char *filePath) {
                 //Refuse to map to a location in the address space of the translator.
                 if ((vaddr + memory_size) > TRANSLATOR_BASE) {
                     printf("Bad. This segment wants to be in the translators memory region");
-                    result.valid = 0;
-                    return result;
+                    return INVALID_ELF_MAP;
                 }
                 //Allocate memory for the segment at the correct address and map the file segment into that memory
                 void *segment_in_memory =
@@ -61,8 +58,7 @@ t_map_result mapMemory(char *filePath) {
                 //Failed means that we couldn't get enough memory at the correct address
                 if (segment_in_memory == MAP_FAILED) {
                     printf("Could not map segment %i because error %i", i, errno);
-                    result.valid = 0;
-                    return result;
+                    return INVALID_ELF_MAP;
                 }
                 //Initialize additional memory to 0.
                 if (memory_size > physical_size) {
@@ -73,8 +69,7 @@ t_map_result mapMemory(char *filePath) {
             case PT_DYNAMIC: //Fallthrough
             case PT_INTERP: {
                 printf("Bad. Got file that needs dynamic linking.");
-                result.valid = 0;
-                return result;
+                return INVALID_ELF_MAP;
             }
 
         }
@@ -82,11 +77,7 @@ t_map_result mapMemory(char *filePath) {
 
     close(fd);
 
-    //Entry address for starting of translation.
-    t_risc_addr entry = header->e_entry;
 
-    result.valid = true;
-    result.startAddress = entry;
-
-    return result;
+    //Entry address for start of translation.
+    return header->e_entry;
 }
