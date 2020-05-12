@@ -385,6 +385,7 @@ void translate_block(t_risc_addr risc_addr) {
 
     // get memory for structs
     // parse until jump/branch found - count register
+    uint32_t reg_count[N_REG];
     // make register allocation
     // translate structs
 
@@ -395,7 +396,7 @@ void translate_block(t_risc_addr risc_addr) {
         //block_cache.push_back(risc_instr);
 
         //parse_instruction(&block_cache.back());
-        parse_instruction(&risc_instr);
+        parse_instruction(&risc_instr,reg_count);
 
         instructions_in_block++;
 

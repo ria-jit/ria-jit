@@ -17,8 +17,8 @@ int get_block(t_risc_instr* block_cache, t_risc_addr risc_addr) {
         //int32_t rawInstr = 0x38537; //value for testing
 
         block_cache->addr = risc_addr;
-
-        parse_instruction(block_cache);
+        uint32_t data[32];
+        parse_instruction(block_cache,data);
 
         instructions_in_block++;
 
