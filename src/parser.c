@@ -82,11 +82,15 @@ void test_parsing() {
 
     for (int i = 0; i < 4; i++) {
         t_risc_instr instr;
-        instr.addr = &memory[i];
+        instr.addr = (uintptr_t)&memory[i];
         parse_instruction(&instr);
     }
 }
 
+/**
+ *
+ * @param p_instr_struct struct filled with the addr of the instruction to be translated
+ */
 void parse_instruction(t_risc_instr *p_instr_struct) {
     //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
 

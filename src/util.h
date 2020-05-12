@@ -62,6 +62,7 @@ typedef enum {
     x30, x31,
     pc
 } t_risc_reg;
+#define N_REG 32
 
 //register value type
 typedef uint64_t t_risc_reg_val;
@@ -76,6 +77,12 @@ typedef int32_t t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
 typedef uintptr_t t_risc_addr;
+
+// Idea
+typedef struct{
+    uint32_t reg_count[N_REG];
+    uint32_t reg_map[N_REG];
+} t_register_allocation;
 
 typedef struct {
     t_risc_addr addr;

@@ -289,6 +289,9 @@ void translate_risc_instr(t_risc_instr instr) {
  * @param instr
  */
 void translate_addiw(t_risc_instr instr) {
+    // cache memory register in
+    // mov rd, rs1
+    // add rs1, instr.imm
     std::cout << "Translate addiw...\n";
 }
 
@@ -379,6 +382,11 @@ void translate_block(t_risc_addr risc_addr) {
 
     int instructions_in_block = 0;
     t_risc_instr risc_instr = {};
+
+    // get memory for structs
+    // parse until jump/branch found - count register
+    // make register allocation
+    // translate structs
 
     while(true) {
 
