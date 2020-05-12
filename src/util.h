@@ -75,7 +75,7 @@ typedef enum {
 typedef int32_t t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
-typedef int32_t *t_risc_addr;
+typedef uintptr_t t_risc_addr;
 
 typedef struct {
     t_risc_addr addr;
