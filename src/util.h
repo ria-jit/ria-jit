@@ -72,10 +72,10 @@ typedef enum {
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
-typedef int t_risc_imm;
+typedef int32_t t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
-typedef uintptr_t t_risc_addr;
+typedef int32_t *t_risc_addr;
 
 typedef struct {
     t_risc_addr addr;

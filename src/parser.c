@@ -92,7 +92,7 @@ void parse_instruction(t_risc_instr *p_instr_struct) {
 
     // print out the line to parse in grouped binary as in the spec
     t_risc_instr instr_struct = *p_instr_struct;
-    int32_t raw_instr = instr_struct.addr;
+    int32_t raw_instr = *instr_struct.addr;
     printf("Parsing: %#010x\n", raw_instr);
 
     //fill basic struct

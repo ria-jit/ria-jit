@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include "util.h"
 #include "cache.h"
-#include "translate.h"
+#include "translate.hpp"
 #include "parser.h"
 
 //just temporary - we need some way to control transcoding globally?

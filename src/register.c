@@ -51,6 +51,7 @@ void set_value(t_risc_reg reg, t_risc_reg_val val) {
     }
 }
 
+// DEPRECATED
 size_t convert_to_index(t_risc_reg reg) {
     switch(reg) {
         case x0:

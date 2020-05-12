@@ -35,7 +35,7 @@ void init_hash_table() {
 }
 
 inline unsigned int hash(t_risc_addr risc_addr) {
-    return (risc_addr & HASH_MASK) >> 4;
+    return ((uintptr_t)risc_addr & HASH_MASK) >> 4;
 }
 
 /**
@@ -117,7 +117,7 @@ void print_values() {
         if (cache_table[i].cache_loc != 0) {
             printf("cache_table[%d]: RISC-V addr %lu at cache loc %p\n",
                     i,
-                    cache_table[i].risc_addr,
+                   (uintptr_t)cache_table[i].risc_addr,
                     cache_table[i].cache_loc);
         }
     }

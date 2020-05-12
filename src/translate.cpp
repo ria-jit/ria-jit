@@ -2,7 +2,7 @@
 // Created by flo on 09.05.20.
 //
 
-#include "translate.h"
+#include "translate.hpp"
 #include <iostream>
 #include <asmjit/asmjit.h>
 #include <sys/mman.h>
