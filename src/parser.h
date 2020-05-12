@@ -35,9 +35,10 @@ typedef enum {
 
 /**
  * Parse given raw_instruction and save all data in the struct.
- * @param t_rist_instr a pointer to the struct with a raw address to be filled
+ * @param instr_struct a pointer to the struct with a raw address to be filled
+ * @param reg_count uint32_t[N_REG] structure to count the register use
  */
-void parse_instruction(t_risc_instr *instr_struct);
+void parse_instruction(t_risc_instr *instr_struct, uint32_t* reg_count);
 void test_parsing(void);
 
 #ifdef __cplusplus

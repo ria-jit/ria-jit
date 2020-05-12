@@ -91,7 +91,7 @@ void test_parsing() {
  *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
-void parse_instruction(t_risc_instr *p_instr_struct) {
+void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
     //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
 
     // print out the line to parse in grouped binary as in the spec
