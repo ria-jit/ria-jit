@@ -14,6 +14,10 @@
 #include <unistd.h>
 #include "util.h"
 #include "loadElf.h"
+//Apparently not included in the headers on my version.
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0x200000
+#endif
 
 t_risc_addr mapIntoMemory(char *filePath) {
     printf("Reading %s...\n", filePath);
@@ -54,10 +58,16 @@ t_risc_addr mapIntoMemory(char *filePath) {
                 }
                 //Allocate memory for the segment at the correct address and map the file segment into that memory
                 void *segment_in_memory =
-                        mmap((void *) vaddr, memory_size, PROT_READ, MAP_FIXED + MAP_PRIVATE, fd, load_offset);
+                        mmap((void *) vaddr, memory_size, PROT_READ, MAP_FIXED_NOREPLACE + MAP_PRIVATE, fd,
+                             load_offset);
                 //Failed means that we couldn't get enough memory at the correct address
                 if (segment_in_memory == MAP_FAILED) {
                     printf("Could not map segment %i because error %i", i, errno);
+                    return INVALID_ELF_MAP;
+                }
+                //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
+                if (segment_in_memory != (void *) vaddr) {
+                    printf("Did not get the correct memory address for segment %i.", i);
                     return INVALID_ELF_MAP;
                 }
                 //Initialize additional memory to 0.
