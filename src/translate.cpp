@@ -382,11 +382,7 @@ void translate_block(t_risc_addr risc_addr) {
 
     while(true) {
 
-        //TODO here: somehow obtain the raw contents of the instruction at address risc_addr
-        //int testMemoryContent = 0x38537; //value for testing
-        //int32_t *rawInstr = &testMemoryContent;
-
-        risc_instr.addr = risc_addr;
+         risc_instr.addr = risc_addr;
 
         //block_cache.push_back(risc_instr);
 
