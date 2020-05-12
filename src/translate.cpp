@@ -19,6 +19,16 @@ void translate_slli(t_risc_instr instr);
 
 void translate_addiw(t_risc_instr instr);
 
+
+void translate_JAL(t_risc_instr instr);
+void translate_JALR(t_risc_instr instr);
+void translate_BEQ(t_risc_instr instr);
+void translate_BNE(t_risc_instr instr);
+void translate_BLT(t_risc_instr instr);
+void translate_BGE(t_risc_instr instr);
+void translate_BLTU(t_risc_instr instr);
+void translate_BGEU(t_risc_instr instr);
+
 /**
  * The AsmJit code holder for our generated x86 machine code.
  */
@@ -126,7 +136,7 @@ void generate_strlen() {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_instr(t_risc_instr instr) {
+void translate_risc_instr(t_risc_instr instr) {
     //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
 
     switch(instr.mnem) {
@@ -136,20 +146,28 @@ void translate_instr(t_risc_instr instr) {
         case AUIPC:
             break;
         case JAL:
+            translate_JAL(instr);
             break;
         case JALR:
+            translate_JALR(instr);
             break;
         case BEQ:
+            translate_BEQ(instr);
             break;
         case BNE:
+            translate_BNE(instr);
             break;
         case BLT:
+            translate_BLT(instr);
             break;
         case BGE:
+            translate_BGE(instr);
             break;
         case BLTU:
+            translate_BLTU(instr);
             break;
         case BGEU:
+            translate_BGEU(instr);
             break;
         case LB:
             break;
@@ -300,4 +318,123 @@ void translate_lui(t_risc_instr instr) {
  */
 void translate_addi(t_risc_instr instr) {
     std::cout << "Translate addi...\n";
+}
+
+
+
+/**
+ * The following instructions return to the binary translator after writing pc
+ * */
+
+void translate_JAL(t_risc_instr instr) {
+    std::cout << "Translate JAL should not ever be needed" << std::endl;
+}
+
+void translate_JALR(t_risc_instr instr) {
+    std::cout << "Translate JALR" << std::endl;
+}
+
+void translate_BEQ(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+void translate_BNE(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+void translate_BLT(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+void translate_BGE(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+void translate_BLTU(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+void translate_BGEU(t_risc_instr instr) {
+    std::cout << "Translate BRANCH" << std::endl;
+}
+
+
+
+//NEITHER FINISHED NOR TESTED
+
+#include "util.h"
+#include "parser.h"
+//#include <vector>
+
+//void translate_risc_instr(t_risc_instr risc_instr);
+void translate_risc_JAL_onlylink(t_risc_instr risc_instr);
+//void translate_risc_JALR(t_risc_instr risc_instr);
+//void translate_risc_BRANCH(t_risc_instr risc_instr);
+
+
+void translate_block(t_risc_addr risc_addr) {
+
+    //why even save the structs?
+    //std::vector<t_risc_instr> block_cache;
+
+    int instructions_in_block = 0;
+    t_risc_instr risc_instr = {};
+
+    while(true) {
+
+        //TODO here: somehow obtain the raw contents of the instruction at address risc_addr
+        int testMemoryContent = 0x38537; //value for testing
+        t_risc_raw_instr rawInstr = &testMemoryContent;
+
+        risc_instr.addr = risc_addr;
+        risc_instr.raw_bytes = rawInstr;
+
+        //block_cache.push_back(risc_instr);
+
+        //parse_instruction(&block_cache.back());
+        parse_instruction(&risc_instr);
+
+        instructions_in_block++;
+
+        ///branch?
+        if (risc_instr.optype == BRANCH) { ///BEQ, BNE, BLT, BGE, BLTU, BGEU
+            translate_risc_instr(risc_instr);
+            break;
+        }
+
+        ///unconditional jump? -> follow
+        if (risc_instr.optype == JUMP) {   ///JAL, JALR
+            if(risc_instr.mnem == JAL) {
+                ///calculate address of jump destination
+                risc_addr += risc_instr.imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
+
+                ///link
+                translate_risc_JAL_onlylink(risc_instr);
+            }
+            else if(risc_instr.mnem == JALR) {
+                ///destination address unknown at translate time
+                translate_risc_instr(risc_instr);
+                break;
+            }
+            else {
+                ///should not get here
+                std::cerr << "Oops: line " << __LINE__ << " in " __FILE__ << std::endl;
+            }
+        }
+
+        ///no jump or branch -> continue fetching
+        else {
+            translate_risc_instr(risc_instr);
+
+            ///next instruction address
+            risc_addr += 4;
+        }
+    }
+
+    std::cout << "Translated Block: " << instructions_in_block << " instructions" << std::endl;
+}
+
+///writes rd but doesn't actually jump
+void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
+    not_yet_implemented("single-instruction JAL onlylink translator not implemented yet");
 }

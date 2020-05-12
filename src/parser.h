@@ -5,6 +5,10 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     OP_LOAD = 0,
     OP_LOAD_FP = 1,
@@ -35,5 +39,9 @@ typedef enum {
  */
 void parse_instruction(t_risc_instr *instr_struct);
 void test_parsing(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H

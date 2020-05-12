@@ -18,7 +18,7 @@ void init_block();
 t_cache_loc finalize_block();
 
 //instruction translation
-void translate_instr(t_risc_instr instr);
+void translate_risc_instr(t_risc_instr instr);
 
 #ifdef __cplusplus
 }

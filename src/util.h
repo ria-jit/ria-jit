@@ -8,6 +8,10 @@
 //error codes for internal reference
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FAIL_HEAP_ALLOC 0x1000
 
 //the RISC-V mnemonic of the instruction
@@ -90,5 +94,9 @@ typedef struct {
 int parse_jump_immediate(t_risc_instr* instr);
 
 void not_yet_implemented(const char* info);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
