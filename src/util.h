@@ -75,10 +75,7 @@ typedef enum {
 typedef int t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
-typedef int* t_risc_raw_instr;
-
-//riscV address
-typedef unsigned long int t_risc_addr;
+typedef uintptr_t t_risc_addr;
 
 typedef struct {
     t_risc_addr addr;
@@ -88,7 +85,6 @@ typedef struct {
     t_risc_reg reg_src_2;
     t_risc_reg reg_dest;
     t_risc_imm imm;
-    t_risc_raw_instr raw_bytes;
 } t_risc_instr;
 
 int parse_jump_immediate(t_risc_instr* instr);

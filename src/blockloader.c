@@ -14,10 +14,9 @@ int get_block(t_risc_instr* block_cache, t_risc_addr risc_addr) {
     while(1) {
 
         //get the raw contents of the instruction at address risc_addr somehow
-        t_risc_raw_instr rawInstr = 0x38537; //value for testing
+        //int32_t rawInstr = 0x38537; //value for testing
 
         block_cache->addr = risc_addr;
-        block_cache->raw_bytes = rawInstr;
 
         parse_instruction(block_cache);
 
