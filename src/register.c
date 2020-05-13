@@ -13,7 +13,7 @@ size_t convert_to_index(t_risc_reg reg);
  * contents[0] is undefined, as x0 is hardwired to 0 -
  * it is left unused in order to avoid off-by-one errors in indexing.
  */
-t_risc_reg_val contents[33];
+t_risc_reg_val risc_register_memory[33];
 
 /**
  * Get the value currently in the passed register.
@@ -31,7 +31,7 @@ t_risc_reg_val get_value(t_risc_reg reg) {
             //an access to x0 always yields 0
             return 0;
         default:
-            return contents[index];
+            return risc_register_memory[index];
     }
 }
 
@@ -46,7 +46,7 @@ void set_value(t_risc_reg reg, t_risc_reg_val val) {
             //a write to x0 (hardwired zero) is ignored
             return;
         default:
-            contents[index] = val;
+            risc_register_memory[index] = val;
             return;
     }
 }
