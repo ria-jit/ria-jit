@@ -6,10 +6,13 @@
 #include <iostream>
 #include <asmjit/asmjit.h>
 #include <sys/mman.h>
+#include "register.h"
 
 using namespace asmjit;
 
 void generate_strlen();
+
+x86::Gp get_mapped_reg(t_risc_reg reg);
 
 void translate_addi(t_risc_instr instr);
 
@@ -129,6 +132,20 @@ void generate_strlen() {
     int ret = ((str_len_asm) executable)(string);
 
     std::cout << "Length of string " << string << " is " << ret;
+}
+
+/**
+ * Get the register mapping for the RISC-V register reg in the current context.
+ * @param reg the RISC-V register in use
+ * @return the x86 register we map it to in this context
+ */
+x86::Gp get_mapped_reg(t_risc_reg reg) {
+    /*
+     * We have an array which lists the usage numbers for the RISC-V regs. 
+     * Potentially sort that and evaluate to figure out the mapping to x86?
+     */
+    not_yet_implemented("get_mapped_reg()");
+    return x86::rax;
 }
 
 /**
@@ -280,6 +297,22 @@ void translate_risc_instr(t_risc_instr instr) {
             break;
         case REMUW:
             break;
+        case ECALL:
+            break;
+        case EBREAK:
+            break;
+        case CSRRW:
+            break;
+        case CSRRS:
+            break;
+        case CSRRC:
+            break;
+        case CSRRWI:
+            break;
+        case CSRRSI:
+            break;
+        case CSRRCI:
+            break;
     }
 }
 
@@ -289,10 +322,23 @@ void translate_risc_instr(t_risc_instr instr) {
  * @param instr
  */
 void translate_addiw(t_risc_instr instr) {
-    // cache memory register in
     // mov rd, rs1
-    // add rs1, instr.imm
+    // add rd, instr.imm
+
     std::cout << "Translate addiw...\n";
+
+    //sign-extend the immediate to 32-bit
+    uint64_t imm = instr.imm & 0x00000FFF;
+    if (0x00000800 & imm) {
+        imm += 0xFFFFF000;
+    }
+
+    //add 32-bit, sign-extend to 64-bit and write back
+    auto reg_base = reinterpret_cast<uint64_t>(get_reg_data());
+    a->mov(x86::edx, x86::ptr(reg_base, 8 * instr.reg_src_1));
+    a->add(x86::edx, imm);
+    a->movsx(x86::rax, x86::edx);
+    a->mov(x86::ptr(reg_base, 8 * instr.reg_dest), x86::rax);
 }
 
 /**
@@ -301,7 +347,13 @@ void translate_addiw(t_risc_instr instr) {
  * @param instr
  */
 void translate_slli(t_risc_instr instr) {
+    //mov rd, rs1
+    //shl rd, (instr.imm & 0x3F)
     std::cout << "Translate slli...\n";
+    auto reg_base = reinterpret_cast<uint64_t>(get_reg_data());
+    a->mov(x86::rax, x86::ptr(reg_base, 8 * instr.reg_src_1));
+    a->shl(x86::rax, instr.imm & 0b111111);
+    a->mov(x86::ptr(reg_base, 8 * instr.reg_dest), x86::rax);
 }
 
 /**
@@ -310,6 +362,7 @@ void translate_slli(t_risc_instr instr) {
  * @param instr
  */
 void translate_lui(t_risc_instr instr) {
+    //mov rd, extended
     std::cout << "Translate lui...\n";
 }
 
