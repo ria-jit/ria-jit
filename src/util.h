@@ -62,7 +62,7 @@ typedef enum {
     x30, x31,
     pc
 } t_risc_reg;
-#define N_REG 32
+#define N_REG 33
 
 //register value type
 typedef uint64_t t_risc_reg_val;

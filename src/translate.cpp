@@ -8,7 +8,28 @@
 #include <sys/mman.h>
 #include "register.h"
 
+
+
+#include "util.h"
+#include "parser.h"
+#include <vector>
+#include <numeric>
+#include <algorithm>
+#include <unordered_map>
+
+
+
 using namespace asmjit;
+
+///register information for translator functions
+struct register_info {
+    asmjit::x86::Gp* map;
+    bool* mapped;
+    uint64_t base;
+};
+
+//instruction translation
+void translate_risc_instr(t_risc_instr instr, register_info& r_info);
 
 void generate_strlen();
 
@@ -24,7 +45,7 @@ void translate_addiw(t_risc_instr instr);
 
 
 void translate_JAL(t_risc_instr instr);
-void translate_JALR(t_risc_instr instr);
+void translate_JALR(t_risc_instr instr, register_info& r_info);
 void translate_BEQ(t_risc_instr instr);
 void translate_BNE(t_risc_instr instr);
 void translate_BLT(t_risc_instr instr);
@@ -153,7 +174,7 @@ x86::Gp get_mapped_reg(t_risc_reg reg) {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_risc_instr(t_risc_instr instr) {
+void translate_risc_instr(t_risc_instr instr, register_info& r_info) {
     //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
 
     switch(instr.mnem) {
@@ -166,7 +187,7 @@ void translate_risc_instr(t_risc_instr instr) {
             translate_JAL(instr);
             break;
         case JALR:
-            translate_JALR(instr);
+            translate_JALR(instr, r_info);
             break;
         case BEQ:
             translate_BEQ(instr);
@@ -386,8 +407,47 @@ void translate_JAL(t_risc_instr instr) {
     std::cout << "Translate JAL should not ever be needed" << std::endl;
 }
 
-void translate_JALR(t_risc_instr instr) {
+void translate_JALR(t_risc_instr instr, register_info& r_info) {
+    /**
+     * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1,
+     * then setting the least-significant bit of the result to zero.
+     * The address of the instruction following the jump (pc+4)is written to register rd.
+     * Register x0 can be used as the destination if the result is not required.
+     */
     std::cout << "Translate JALR" << std::endl;
+
+    //assuming rax is unused, usage information will probably be added to r_info
+
+    ///mov rs1 to temp register
+    if(r_info.mapped[instr.reg_src_1]) {
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+    }
+
+    ///add immediate to rs1
+    a->add(x86::rax, instr.imm);
+
+    ///set last bit to zero
+    //why??? not aligned to 4 bit boundary would throw exception anyway...
+    a->and_(x86::rax, -2);
+
+    ///write target addr to pc
+    if(r_info.mapped[t_risc_reg::pc]) {
+        a->mov(r_info.map[pc], x86::rax);
+    } else {
+        a->mov(x86::ptr(r_info.base + 8 * t_risc_reg::pc), x86::rax);
+    }
+
+    ///write addr of next instruction in rd
+    if(instr.reg_dest != t_risc_reg::x0) {
+        if(r_info.mapped[instr.reg_dest]) {
+            a->mov(r_info.map[instr.reg_dest], instr.addr + 4);
+        } else {
+            a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), instr.addr + 4);
+        }
+    }
+
 }
 
 void translate_BEQ(t_risc_instr instr) {
@@ -418,27 +478,26 @@ void translate_BGEU(t_risc_instr instr) {
 
 //NEITHER FINISHED NOR TESTED
 
-#include "util.h"
-#include "parser.h"
-#include <vector>
-#include <numeric>
-#include <algorithm>
-#include <unordered_map>
+
 
 void translate_risc_JAL_onlylink(t_risc_instr risc_instr);
-void load_risc_registers(std::unordered_map<t_risc_reg, asmjit::x86::Gp> map);
-void save_risc_registers(std::unordered_map<t_risc_reg, asmjit::x86::Gp> map);
+void load_risc_registers(register_info r_info);
+void save_risc_registers(register_info r_info);
 
 
-void translate_block(t_risc_addr risc_addr) {
+t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     t_risc_instr risc_instr = {};
 
-    // get memory for structs
+    /// get memory for structs
+    //what was the problem with 2 standard libraries again?
+    //I could use a custom class or arrays instead,
+    //but that would be less elegant.
     std::vector<t_risc_instr> block_cache;
-    // parse until branch found - count register
-    //uint32_t reg_count[N_REG];
-    std::vector<uint32_t> reg_count(N_REG);
+
+    ///count register usage
+    uint32_t reg_count[N_REG];
+    //std::vector<uint32_t> reg_count(N_REG);
 
     //parse structs
     while(true) {
@@ -447,58 +506,8 @@ void translate_block(t_risc_addr risc_addr) {
 
         block_cache.push_back(risc_instr);
 
-        parse_instruction(&block_cache.back(), reg_count.data());
+        parse_instruction(&block_cache.back(), reg_count);
         //parse_instruction(&risc_instr,reg_count);
-
-
-        /*
-        ///branch?
-        if (block_cache.back().optype == BRANCH) { ///BEQ, BNE, BLT, BGE, BLTU, BGEU
-            ///destination address unknown at translate time
-            break;
-        }
-
-        ///unconditional jump? -> follow
-        if (block_cache.back().optype == JUMP) {   ///JAL, JALR
-            if(block_cache.back().mnem == JAL) {
-                ///link
-                ///replace [JAL rd, offset] with [AUIPC rd, 4]
-                ///(4 because next risc_addr)
-                //this AUIPC would not be possible on actual Risc V,
-                //because the lower 12 bits would always be zero.
-                //we can do this here, because the immediate parsing
-                //is done before this step: in parse_instruction()
-                //where AUIPC is parsed as IMMEDIADE instead of UPPER_IMMEDIATE
-                block_cache.back() = t_risc_instr {
-                    risc_addr,
-                    AUIPC,
-                    IMMEDIATE,
-                    x0,
-                    x0,
-                    block_cache.back().reg_dest,
-                    4
-                };
-
-                ///calculate address of jump destination
-                risc_addr += block_cache.back().imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
-
-            }
-            else if(block_cache.back().mnem == JALR) {
-                ///destination address unknown at translate time
-                break;
-            }
-            else {
-                ///should not get here
-                std::cerr << "Oops: line " << __LINE__ << " in " __FILE__ << std::endl;
-            }
-        }
-        ///no jump or branch -> continue fetching
-        else {
-            ///next instruction address
-            risc_addr += 4;
-        }
-        */
-
 
         switch(block_cache.back().optype) {
 
@@ -556,61 +565,13 @@ void translate_block(t_risc_addr risc_addr) {
 
     }
 
-    /*
-    while(true) {
-
-        risc_instr.addr = risc_addr;
-
-        block_cache.push_back(risc_instr);
-
-        parse_instruction(&block_cache.back(), reg_count);
-        //parse_instruction(&risc_instr,reg_count);
-
-        instructions_in_block++;
-
-        ///branch?
-        if (risc_instr.optype == BRANCH) { ///BEQ, BNE, BLT, BGE, BLTU, BGEU
-            translate_risc_instr(risc_instr);
-            break;
-        }
-
-        ///unconditional jump? -> follow
-        if (risc_instr.optype == JUMP) {   ///JAL, JALR
-            if(risc_instr.mnem == JAL) {
-                ///calculate address of jump destination
-                risc_addr += risc_instr.imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
-
-                ///link
-                translate_risc_JAL_onlylink(risc_instr);
-            }
-            else if(risc_instr.mnem == JALR) {
-                ///destination address unknown at translate time
-                translate_risc_instr(risc_instr);
-                break;
-            }
-            else {
-                ///should not get here
-                std::cerr << "Oops: line " << __LINE__ << " in " __FILE__ << std::endl;
-            }
-        }
-
-        ///no jump or branch -> continue fetching
-        else {
-            translate_risc_instr(risc_instr);
-
-            ///next instruction address
-            risc_addr += 4;
-        }
-    }
-    */
-
     PARSE_DONE:
 
     ///REGISTER ALLOCATION:
 
     /*
-    *The idea is to allocate the most used Risc V registers to the real x86_64 registers
-    *but we cant use all the available x86_64 registers because we need some of them for
+    *The idea is to allocate the most used Risc V registers to real x86_64 registers
+    *but we can not use all the available x86_64 registers because we need some of them for
     *the translated instructions that expand to multiple x86_64 instructions which probably
     *have to store some temporary values.
     *
@@ -620,18 +581,23 @@ void translate_block(t_risc_addr risc_addr) {
     *and also because the allocation will probably be different for the next basic block.
     */
 
+
+    //Again, I dont remember the exact problematic with using the standard library anymore.
+    //The unordered_map /*could be*/ is replaced by (multiple) arrays,
+    //and we could of course implement the sorting algorithm or whatever we'll use later on ourselves.
+
     ///rank registers by usage
     std::vector<int> indices(N_REG);
     std::iota(indices.begin(), indices.end(), 0);
     std::stable_sort(indices.begin(),
             indices.end(),
-            [&](int a, int b){return reg_count[a] < reg_count[b];}
+            [&](int a, int b){return reg_count[a] > reg_count[b];}
             );
 
     ///create allocation MAPping
-    std::unordered_map<t_risc_reg, asmjit::x86::Gp> register_map;
-    //alternatively: asmjit::x86::Gp register_map[N_REG];
-    //and bool allocated[N_REG];
+    //std::unordered_map<t_risc_reg, asmjit::x86::Gp> register_map;
+    asmjit::x86::Gp register_map[N_REG];
+    bool mapped[N_REG];
 
 
 
@@ -642,30 +608,56 @@ void translate_block(t_risc_addr risc_addr) {
                                                      asmjit::x86::r14, asmjit::x86::r15};
 
     for(int i = 0; i < x86_64_registers.size(); i++) {
-        if(indices[i] != t_risc_reg::x0) {
+        if(indices[i] != t_risc_reg::x0 && reg_count[indices[i]] > 2) {
+            register_map[indices[i]] = x86_64_registers[i];
+            mapped[indices[i]] = true;
+
+            /*
             register_map.insert(
                     std::pair<t_risc_reg, asmjit::x86::Gp>(
                             static_cast<t_risc_reg>(indices[i]), x86_64_registers[i]
                     )
             );
+             */
+        } else {
+            //I'm not sure if it's zero initialized...
+            mapped[indices[i]] = false;
         }
     }
     //notice: risc reg x0 will need special treatment
 
+    ///create info struct
+    register_info r_info = {
+        register_map,
+        mapped,
+        reinterpret_cast<uint64_t>(get_reg_data())
+    };
 
+
+    ///initialize new block
+    init_block();
+
+    ///save the x86_64 registers
+    //???
 
     ///load registers
-    load_risc_registers(register_map);
+    load_risc_registers(r_info);
 
     /// translate structs
-    for(int i = 0; i < block_cache.size(); i++) {
-        translate_risc_instr(block_cache[i]);
+    for(t_risc_instr& i : block_cache) {
+        translate_risc_instr(i, r_info);
     }
 
     ///save registers
-    save_risc_registers(register_map);
+    save_risc_registers(r_info);
+
+    ///load the saved x86_64 registers
+    //???
 
     std::cout << "Translated Block: " << block_cache.size() << " instructions" << std::endl;
+
+    ///finalize block and return cached location
+    return finalize_block();
 }
 
 ///writes rd but doesn't actually jump
@@ -674,19 +666,19 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
 }
 
 ///loads the Risc V registers into their allocated x86_64 registers
-void load_risc_registers(std::unordered_map<t_risc_reg, asmjit::x86::Gp> map) {
-    for(int i = t_risc_reg::x1 ; i <= t_risc_reg::pc; i++) {
-        if(map.find(static_cast<t_risc_reg>(i)) != map.end()) {
-            //load into x86_64 register from risc_register_memory
+void load_risc_registers(register_info r_info) {
+    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc ; i++) {
+        if(r_info.mapped[i]) {
+            a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i));
         }
     }
 }
 
 ///saves the Risc V registers into their respective memory fields
-void save_risc_registers(std::unordered_map<t_risc_reg, asmjit::x86::Gp> map) {
-    for(int i = t_risc_reg::x1 ; i <= t_risc_reg::pc; i++) {
-        if(map.find(static_cast<t_risc_reg>(i)) != map.end()) {
-            //load into risc_register_memory from x86_64 register
+void save_risc_registers(register_info r_info) {
+    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc ; i++) {
+        if(r_info.mapped[i]) {
+            a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
         }
     }
 }
