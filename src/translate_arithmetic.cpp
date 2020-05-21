@@ -103,260 +103,550 @@ void translate_addi(t_risc_instr instr, register_info r_info) {
 
 /**
 * Translate the AUIPC instruction.
-* Description
+* AUIPC (add upper immediate to pc) is used to build pc-relative addresses and uses the U-type
+* format. AUIPC forms a 32-bit offset from the 20-bit U-immediate, filling in the lowest 12 bits with
+* zeros, adds this offset to the address of the AUIPC instruction, then places the result in register
+* rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AUIPC(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate AUIPC…" << std::endl;
+
+    //prepare immediate (20-bit into 31-12)
+    uint32_t prepared = instr.imm;
+
+    //shift left by 12-bits so as to leave the lower 12 bits zero
+    prepared <<= 12;
+
+    //add offset to the pc and store in rd
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[pc]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[pc]);
+        a->add(r_info.map[instr.reg_dest], prepared);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * pc));
+        a->add(x86::rax, prepared);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SLTI instruction.
-* Description
+* SLTI (set less than immediate) places the value 1 in register rd if register rs1 is less than the sign-
+* extended 12-bit immediate when both are treated as signed numbers, else 0 is written to rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLTI…" << std::endl;
+
+    //prepare sign-extended immediate
+    uint64_t prepared = instr.imm;
+    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
+
+    const Label &not_less = a->newLabel();
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->cmp(r_info.map[instr.reg_src_1], prepared);
+        a->jnl(not_less);
+        a->inc(r_info.map[instr.reg_dest]);
+        a->bind(not_less);
+    } else {
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), prepared);
+        a->jnl(not_less);
+        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->bind(not_less);
+    }
 }
 
 /**
 * Translate the SLTIU instruction.
-* Description
+* SLTIU (set less than immediate unsigned) places the value 1 in register rd if register rs1 is less than the sign-
+* extended 12-bit immediate when both are treated as unsigned numbers, else 0 is written to rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTIU(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLTIU…" << std::endl;
+
+    //prepare sign-extended immediate
+    uint64_t prepared = instr.imm;
+    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
+
+    const Label &not_below = a->newLabel();
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->cmp(r_info.map[instr.reg_src_1], prepared);
+        a->jnb(not_below);
+        a->inc(r_info.map[instr.reg_dest]);
+        a->bind(not_below);
+    } else {
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), prepared);
+        a->jnb(not_below);
+        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1));
+        a->bind(not_below);
+    }
 }
 
 /**
 * Translate the XORI instruction.
-* Description
+* Performs a bitwise XOR on the register rs1 and the sign-extended 12-bit immediate
+* and places the result into rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XORI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate XORI…" << std::endl;
+
+    //prepare sign-extended immediate
+    uint64_t prepared = instr.imm;
+    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->xor_(r_info.map[instr.reg_dest], prepared);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->xor_(x86::rax, prepared);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the ORI instruction.
-* Description
+* Performs a bitwise OR on the register rs1 and the sign-extended 12-bit immediate
+* and places the result into rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ORI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ORI…" << std::endl;
+
+    //prepare sign-extended immediate
+    uint64_t prepared = instr.imm;
+    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->or_(r_info.map[instr.reg_dest], prepared);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->or_(x86::rax, prepared);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the ANDI instruction.
-* Description
+* Performs a bitwise AND on the register rs1 and the sign-extended 12-bit immediate
+* and places the result into rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ANDI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ANDI…" << std::endl;
+
+    //prepare sign-extended immediate
+    uint64_t prepared = instr.imm;
+    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->and_(r_info.map[instr.reg_dest], prepared);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->and_(x86::rax, prepared);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SRLI instruction.
-* Description
+* Translate the SRLI instruction. SRLI is a logical right shift.
+* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRLI…" << std::endl;
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->shr(x86::rax, instr.imm & 0b111111);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SRAI instruction.
-* Description
+* Translate the SRAI instruction. SRAI is an arithmetic right shift.
+* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRAI…" << std::endl;
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->sar(x86::rax, instr.imm & 0b111111);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the ADD instruction.
-* Description
+* ADD performs the addition of rs1 and rs2. Overflows
+* are ignored and the low XLEN bits of results are written to the destination rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADD(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ADD…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->add(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->add(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SUB instruction.
-* Description
+* SUB performs the subtraction of rs2 from rs1. Overflows
+* are ignored and the low XLEN bits of results are written to the destination rd.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUB(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SUB…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->sub(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->sub(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SLL instruction.
-* Description
+* SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
+* register rs1 by the shift amount held in the lower 5 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLL(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLL…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->shl(r_info.map[instr.reg_dest], x86::cl);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->shl(x86::rax, x86::cl);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SLT instruction.
-* Description
+* SLT and SLTU perform signed and unsigned compares respectively, writing 1 to rd if rs1 < rs2, 0 otherwise.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLT(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLT…" << std::endl;
+
+    const Label &not_less = a->newLabel();
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
+        a->jnl(not_less);
+        a->inc(r_info.map[instr.reg_dest]);
+        a->bind(not_less);
+    } else {
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), x86::rax);
+        a->jnl(not_less);
+        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->bind(not_less);
+    }
 }
 
 /**
 * Translate the SLTU instruction.
-* Description
+* SLT and SLTU perform signed and unsigned compares respectively, writing 1 to rd if rs1 < rs2, 0 otherwise.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTU(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLTU…" << std::endl;
+
+    const Label &not_below = a->newLabel();
+
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
+        a->jnb(not_below);
+        a->inc(r_info.map[instr.reg_dest]);
+        a->bind(not_below);
+    } else {
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), x86::rax);
+        a->jnb(not_below);
+        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->bind(not_below);
+    }
 }
 
 /**
 * Translate the XOR instruction.
-* Description
+* XOR performs the bitwise logical XOR of rs1 and rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XOR(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate XOR…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->xor_(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SRL instruction.
-* Description
+* SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
+* register rs1 by the shift amount held in the lower 5 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRL(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRL…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->shr(r_info.map[instr.reg_dest], x86::cl);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->shr(x86::rax, x86::cl);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the SRA instruction.
-* Description
+* SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
+* register rs1 by the shift amount held in the lower 5 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRA(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRA…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->sar(r_info.map[instr.reg_dest], x86::cl);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->sar(x86::rax, x86::cl);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the OR instruction.
-* Description
+* OR performs the bitwise logical OR of rs1 and rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_OR(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate OR…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->or_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->or_(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the AND instruction.
-* Description
+* AND performs the bitwise logical AND of rs1 and rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AND(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate AND…" << std::endl;
+
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->and_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->and_(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SLLIW instruction.
-* Description
+* Translate the SLLIW instruction. It is defined analogous to SLLI, but operates on 32-bit values.
+* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLLIW(t_risc_instr instr, register_info r_info) {
+    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SLLIW…" << std::endl;
+    //shift left the 32-bit value
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+        a->shl(x86::eax, instr.imm & 0b111111);
+        a->mov(r_info.map[instr.reg_dest], x86::rax);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->shl(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SRLIW instruction.
-* Description
+* Translate the SRLIW instruction. It is defined analogous to SRLI, but operates on 32-bit values.
+* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLIW(t_risc_instr instr, register_info r_info) {
+    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SRLIW…" << std::endl;
+    //shift right the 32-bit value
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+        a->shr(x86::eax, instr.imm & 0b111111);
+        a->mov(r_info.map[instr.reg_dest], x86::rax);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->shr(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SRAIW instruction.
-* Description
+* Translate the SRAIW instruction. It is defined analogous to SRAI, but operates on 32-bit values.
+* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAIW(t_risc_instr instr, register_info r_info) {
+    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SRAIW…" << std::endl;
+    //shift right the 32-bit value
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+        a->sar(x86::eax, instr.imm & 0b111111);
+        a->mov(r_info.map[instr.reg_dest], x86::rax);
+    } else {
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->sar(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
 * Translate the ADDW instruction.
-* Description
+* ADDW and SUBW are RV64I-only instructions that are defined analogously to ADD and SUB
+* but operate on 32-bit values and produce signed 32-bit results. Overflows are ignored, and the low
+* 32-bits of the result is sign-extended to 64-bits and written to the destination register.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADDW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ADDW…" << std::endl;
+    //todo translate
 }
 
 /**
 * Translate the SUBW instruction.
-* Description
+* ADDW and SUBW are RV64I-only instructions that are defined analogously to ADD and SUB
+* but operate on 32-bit values and produce signed 32-bit results. Overflows are ignored, and the low
+* 32-bits of the result is sign-extended to 64-bits and written to the destination register.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUBW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SUBW…" << std::endl;
+    //todo translate
 }
 
 /**
 * Translate the SLLW instruction.
-* Description
+* SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously defined but operate
+* on 32-bit values and produce signed 32-bit results. The shift amount is given by rs2[4:0]
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
+* @see SLL, SRL, SRA
 */
 void translate_SLLW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLLW…" << std::endl;
+    //todo translate
 }
 
 /**
-* Translate the SRLW instruction.
-* Description
+* Translate the SLRW instruction.
+* SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously defined but operate
+* on 32-bit values and produce signed 32-bit results. The shift amount is given by rs2[4:0]
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
+* @see SLL, SRL, SRA
 */
 void translate_SRLW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRLW…" << std::endl;
+    //todo translate
 }
 
 /**
 * Translate the SRAW instruction.
-* Description
+* SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously defined but operate
+* on 32-bit values and produce signed 32-bit results. The shift amount is given by rs2[4:0]
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
+* @see SLL, SRL, SRA
 */
 void translate_SRAW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRAW…" << std::endl;
+    //todo translate
 }
