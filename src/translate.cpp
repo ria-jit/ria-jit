@@ -7,7 +7,8 @@
 #include <asmjit/asmjit.h>
 #include <sys/mman.h>
 #include "register.h"
-
+#include "translate_arithmetic.hpp"
+#include "translate_controlflow.h"
 
 #include "util.h"
 #include "parser.h"
@@ -19,51 +20,20 @@
 
 using namespace asmjit;
 
-///register information for translator functions
-struct register_info {
-    asmjit::x86::Gp *map;
-    bool *mapped;
-    uint64_t base;
-};
 
 //instruction translation
 void translate_risc_instr(t_risc_instr instr, register_info &r_info);
-
 void generate_strlen();
-
-void translate_addi(t_risc_instr instr, register_info r_info);
-
-void translate_lui(t_risc_instr instr, register_info r_info);
-
-void translate_slli(t_risc_instr instr, register_info r_info);
-
-void translate_addiw(t_risc_instr instr, register_info r_info);
-
-void translate_JAL(t_risc_instr instr, register_info r_info);
-
-void translate_JALR(t_risc_instr instr, register_info &r_info);
-
-void translate_BEQ(t_risc_instr instr, register_info r_info);
-
-void translate_BNE(t_risc_instr instr, register_info r_info);
-
-void translate_BLT(t_risc_instr instr, register_info r_info);
-
-void translate_BGE(t_risc_instr instr, register_info r_info);
-
-void translate_BLTU(t_risc_instr instr, register_info r_info);
-
-void translate_BGEU(t_risc_instr instr, register_info r_info);
 
 /**
  * The AsmJit code holder for our generated x86 machine code.
  */
-static CodeHolder code;
+CodeHolder code;
 
 /**
  * The Assembly emitter that writes to the CodeBuffer in the CodeHolder.
  */
-static x86::Assembler *a;
+x86::Assembler *a;
 
 /**
  * Quick example to test code generation using AsmJit.
@@ -324,177 +294,6 @@ void translate_risc_instr(t_risc_instr instr, register_info &r_info) {
             break;
     }
 }
-
-/**
- * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
- * proper sign-extension of a 32-bit result in rd.
- * @param instr
- */
-void translate_addiw(t_risc_instr instr, register_info r_info) {
-    // mov rd, rs1
-    // add rd, instr.imm
-
-    std::cout << "Translate addiw...\n";
-
-    //sign-extend the immediate to 32-bit
-    uint64_t imm = instr.imm & 0x00000FFF;
-    if (0x00000800 & imm) {
-        imm += 0xFFFFF000;
-    }
-
-    //add 32-bit, sign-extend to 64-bit and write back
-    auto reg_base = reinterpret_cast<uint64_t>(get_reg_data());
-    a->mov(x86::edx, x86::ptr(reg_base, 8 * instr.reg_src_1));
-    a->add(x86::edx, imm);
-    a->movsx(x86::rax, x86::edx);
-    a->mov(x86::ptr(reg_base, 8 * instr.reg_dest), x86::rax);
-}
-
-/**
- * SLLI is a logical left shift.
- * The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
- * @param instr
- */
-void translate_slli(t_risc_instr instr, register_info r_info) {
-    //mov rd, rs1
-    //shl rd, (instr.imm & 0x3F)
-    std::cout << "Translate slli...\n";
-    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
-        a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);
-    } else {
-        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->shl(x86::rax, instr.imm & 0b111111);
-        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
-    }
-}
-
-/**
- * LUI places the 20-bit U-immediate into bits 31-12 of register rd and places zero in the lowest 12 bits.
- * The 32-bit result is sign-extended to 64 bits.
- * @param instr
- */
-void translate_lui(t_risc_instr instr, register_info r_info) {
-    //mov rd, extended
-    std::cout << "Translate lui...\n";
-
-    //prepare immediate (20-bit into 31-12, sign extend to 64)
-    uint64_t prepared = instr.imm;
-
-    //shift left by 12-bits so as to leave the lower 12 bits zero
-    prepared <<= 12;
-
-    //sign-extend to 64-bit if the sign-bit is set
-    if (0x80000000 & prepared) prepared |= 0xFFFFFFFF00000000;
-
-    //move into register
-    if (r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], prepared);
-    } else {
-        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), prepared);
-    }
-}
-
-/**
- * ADDI adds the sign-extended 12-bit immediate to register rs1.
- * Overflow is ignored and the result is the low (in our case) 64 bit of the result.
- * The result is stored in rd.
- * @param instr
- */
-void translate_addi(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate addi...\n";
-
-    //prepare immediate (sign-extend to 64-bit)
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
-    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
-        a->add(r_info.map[instr.reg_dest], prepared);
-    } else {
-        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->add(x86::rax, prepared);
-        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
-    }
-}
-
-
-/**
- * The following instructions return to the binary translator after writing pc
- * */
-
-void translate_JAL(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate JAL should not ever be needed" << std::endl;
-}
-
-void translate_JALR(t_risc_instr instr, register_info &r_info) {
-    /**
-     * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1,
-     * then setting the least-significant bit of the result to zero.
-     * The address of the instruction following the jump (pc+4)is written to register rd.
-     * Register x0 can be used as the destination if the result is not required.
-     */
-    std::cout << "Translate JALR" << std::endl;
-
-    //assuming rax is unused, usage information will probably be added to r_info
-
-    ///mov rs1 to temp register
-    if (r_info.mapped[instr.reg_src_1]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-    } else {
-        a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-    }
-
-    ///add immediate to rs1
-    a->add(x86::rax, instr.imm);
-
-    ///set last bit to zero
-    //why??? not aligned to 4 bit boundary would throw exception anyway...
-    a->and_(x86::rax, -2);
-
-    ///write target addr to pc
-    if (r_info.mapped[t_risc_reg::pc]) {
-        a->mov(r_info.map[pc], x86::rax);
-    } else {
-        a->mov(x86::ptr(r_info.base + 8 * t_risc_reg::pc), x86::rax);
-    }
-
-    ///write addr of next instruction in rd
-    if (instr.reg_dest != t_risc_reg::x0) {
-        if (r_info.mapped[instr.reg_dest]) {
-            a->mov(r_info.map[instr.reg_dest], instr.addr + 4);
-        } else {
-            a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), instr.addr + 4);
-        }
-    }
-
-}
-
-void translate_BEQ(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-void translate_BNE(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-void translate_BLT(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-void translate_BGE(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-void translate_BLTU(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-void translate_BGEU(t_risc_instr instr, register_info r_info) {
-    std::cout << "Translate BRANCH" << std::endl;
-}
-
-
 
 //NEITHER FINISHED NOR TESTED
 

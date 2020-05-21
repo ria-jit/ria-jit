@@ -8,6 +8,20 @@
 #include "cache.h"
 
 #ifdef __cplusplus
+#include <asmjit/asmjit.h>
+
+/**
+ * Register information for the translator functions.
+ */
+struct register_info {
+    asmjit::x86::Gp *map;
+    bool *mapped;
+    uint64_t base;
+};
+
+extern asmjit::CodeHolder code;
+extern asmjit::x86::Assembler *a;
+
 extern "C" {
 #endif
 
