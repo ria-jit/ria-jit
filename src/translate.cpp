@@ -33,8 +33,6 @@ void translate_risc_instr(t_risc_instr instr, register_info& r_info);
 
 void generate_strlen();
 
-x86::Gp get_mapped_reg(t_risc_reg reg);
-
 void translate_addi(t_risc_instr instr);
 
 void translate_lui(t_risc_instr instr);
@@ -153,20 +151,6 @@ void generate_strlen() {
     int ret = ((str_len_asm) executable)(string);
 
     std::cout << "Length of string " << string << " is " << ret;
-}
-
-/**
- * Get the register mapping for the RISC-V register reg in the current context.
- * @param reg the RISC-V register in use
- * @return the x86 register we map it to in this context
- */
-x86::Gp get_mapped_reg(t_risc_reg reg) {
-    /*
-     * We have an array which lists the usage numbers for the RISC-V regs. 
-     * Potentially sort that and evaluate to figure out the mapping to x86?
-     */
-    not_yet_implemented("get_mapped_reg()");
-    return x86::rax;
 }
 
 /**
