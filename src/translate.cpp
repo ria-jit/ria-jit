@@ -8,7 +8,11 @@
 #include <sys/mman.h>
 #include "register.h"
 #include "translate_arithmetic.hpp"
-#include "translate_controlflow.h"
+#include "translate_controlflow.hpp"
+#include "translate_csr.hpp"
+#include "translate_loadstore.hpp"
+#include "translate_m_ext.hpp"
+#include "translate_other.hpp"
 
 #include "util.h"
 #include "parser.h"
@@ -23,6 +27,7 @@ using namespace asmjit;
 
 //instruction translation
 void translate_risc_instr(t_risc_instr instr, register_info &r_info);
+
 void generate_strlen();
 
 /**
@@ -139,8 +144,6 @@ void translate_risc_instr(t_risc_instr instr, register_info &r_info) {
         case LUI:
             translate_lui(instr, r_info);
             break;
-        case AUIPC:
-            break;
         case JAL:
             translate_JAL(instr, r_info);
             break;
@@ -165,132 +168,194 @@ void translate_risc_instr(t_risc_instr instr, register_info &r_info) {
         case BGEU:
             translate_BGEU(instr, r_info);
             break;
-        case LB:
-            break;
-        case LBU:
-            break;
-        case LH:
-            break;
-        case LW:
-            break;
-        case LHU:
-            break;
-        case SB:
-            break;
-        case SH:
-            break;
-        case SW:
-            break;
         case ADDI:
             translate_addi(instr, r_info);
-            break;
-        case SLTI:
-            break;
-        case SLTIU:
-            break;
-        case XORI:
-            break;
-        case ORI:
-            break;
-        case ANDI:
             break;
         case SLLI:
             translate_slli(instr, r_info);
             break;
-        case SRLI:
-            break;
-        case SRAI:
-            break;
-        case ADD:
-            break;
-        case SUB:
-            break;
-        case SLL:
-            break;
-        case SLT:
-            break;
-        case SLTU:
-            break;
-        case XOR:
-            break;
-        case SRL:
-            break;
-        case SRA:
-            break;
-        case OR:
-            break;
-        case AND:
-            break;
-        case FENCE:
-            break;
-        case FENCE_I:
-            break;
-        case LWU:
-            break;
-        case LD:
-            break;
-        case SD:
-            break;
         case ADDIW:
             translate_addiw(instr, r_info);
             break;
+        case AUIPC:
+            translate_AUIPC(instr, r_info);
+            break;
+        case SLTI:
+            translate_SLTI(instr, r_info);
+            break;
+        case SLTIU:
+            translate_SLTIU(instr, r_info);
+            break;
+        case XORI:
+            translate_XORI(instr, r_info);
+            break;
+        case ORI:
+            translate_ORI(instr, r_info);
+            break;
+        case ANDI:
+            translate_ANDI(instr, r_info);
+            break;
+        case SRLI:
+            translate_SRLI(instr, r_info);
+            break;
+        case SRAI:
+            translate_SRAI(instr, r_info);
+            break;
+        case ADD:
+            translate_ADD(instr, r_info);
+            break;
+        case SUB:
+            translate_SUB(instr, r_info);
+            break;
+        case SLL:
+            translate_SLL(instr, r_info);
+            break;
+        case SLT:
+            translate_SLT(instr, r_info);
+            break;
+        case SLTU:
+            translate_SLTU(instr, r_info);
+            break;
+        case XOR:
+            translate_XOR(instr, r_info);
+            break;
+        case SRL:
+            translate_SRL(instr, r_info);
+            break;
+        case SRA:
+            translate_SRA(instr, r_info);
+            break;
+        case OR:
+            translate_OR(instr, r_info);
+            break;
+        case AND:
+            translate_AND(instr, r_info);
+            break;
         case SLLIW:
+            translate_SLLIW(instr, r_info);
             break;
         case SRLIW:
+            translate_SRLIW(instr, r_info);
             break;
         case SRAIW:
+            translate_SRAIW(instr, r_info);
             break;
         case ADDW:
+            translate_ADDW(instr, r_info);
             break;
         case SUBW:
+            translate_SUBW(instr, r_info);
             break;
         case SLLW:
+            translate_SLLW(instr, r_info);
             break;
         case SRLW:
+            translate_SRLW(instr, r_info);
             break;
         case SRAW:
-            break;
-        case MUL:
-            break;
-        case MULH:
-            break;
-        case MULHSU:
-            break;
-        case MULHU:
-            break;
-        case DIV:
-            break;
-        case DIVU:
-            break;
-        case REM:
-            break;
-        case REMU:
-            break;
-        case MULW:
-            break;
-        case DIVW:
-            break;
-        case DIVUW:
-            break;
-        case REMW:
-            break;
-        case REMUW:
-            break;
-        case ECALL:
-            break;
-        case EBREAK:
+            translate_SRAW(instr, r_info);
             break;
         case CSRRW:
+            translate_CSRRW(instr, r_info);
             break;
         case CSRRS:
+            translate_CSRRS(instr, r_info);
             break;
         case CSRRC:
+            translate_CSRRC(instr, r_info);
             break;
         case CSRRWI:
+            translate_CSRRWI(instr, r_info);
             break;
         case CSRRSI:
+            translate_CSRRSI(instr, r_info);
             break;
         case CSRRCI:
+            translate_CSRRCI(instr, r_info);
+            break;
+        case LB:
+            translate_LB(instr, r_info);
+            break;
+        case LH:
+            translate_LH(instr, r_info);
+            break;
+        case LW:
+            translate_LW(instr, r_info);
+            break;
+        case LBU:
+            translate_LBU(instr, r_info);
+            break;
+        case LHU:
+            translate_LHU(instr, r_info);
+            break;
+        case SB:
+            translate_SB(instr, r_info);
+            break;
+        case SH:
+            translate_SH(instr, r_info);
+            break;
+        case SW:
+            translate_SW(instr, r_info);
+            break;
+        case LWU:
+            translate_LWU(instr, r_info);
+            break;
+        case LD:
+            translate_LD(instr, r_info);
+            break;
+        case SD:
+            translate_SD(instr, r_info);
+            break;
+        case MUL:
+            translate_MUL(instr, r_info);
+            break;
+        case MULH:
+            translate_MULH(instr, r_info);
+            break;
+        case MULHSU:
+            translate_MULHSU(instr, r_info);
+            break;
+        case MULHU:
+            translate_MULHU(instr, r_info);
+            break;
+        case DIV:
+            translate_DIV(instr, r_info);
+            break;
+        case DIVU:
+            translate_DIVU(instr, r_info);
+            break;
+        case REM:
+            translate_REM(instr, r_info);
+            break;
+        case REMU:
+            translate_REMU(instr, r_info);
+            break;
+        case MULW:
+            translate_MULW(instr, r_info);
+            break;
+        case DIVW:
+            translate_DIVW(instr, r_info);
+            break;
+        case DIVUW:
+            translate_DIVUW(instr, r_info);
+            break;
+        case REMW:
+            translate_REMW(instr, r_info);
+            break;
+        case REMUW:
+            translate_REMUW(instr, r_info);
+            break;
+        case FENCE:
+            translate_FENCE(instr, r_info);
+            break;
+        case ECALL:
+            translate_ECALL(instr, r_info);
+            break;
+        case EBREAK:
+            translate_EBREAK(instr, r_info);
+            break;
+        case FENCE_I:
+            translate_FENCE_I(instr, r_info);
             break;
     }
 }

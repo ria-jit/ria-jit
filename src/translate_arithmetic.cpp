@@ -100,3 +100,263 @@ void translate_addi(t_risc_instr instr, register_info r_info) {
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
+
+/**
+* Translate the AUIPC instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_AUIPC(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate AUIPC…" << std::endl;
+}
+
+/**
+* Translate the SLTI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLTI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLTI…" << std::endl;
+}
+
+/**
+* Translate the SLTIU instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLTIU(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLTIU…" << std::endl;
+}
+
+/**
+* Translate the XORI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_XORI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate XORI…" << std::endl;
+}
+
+/**
+* Translate the ORI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_ORI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate ORI…" << std::endl;
+}
+
+/**
+* Translate the ANDI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_ANDI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate ANDI…" << std::endl;
+}
+
+/**
+* Translate the SRLI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRLI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRLI…" << std::endl;
+}
+
+/**
+* Translate the SRAI instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRAI(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRAI…" << std::endl;
+}
+
+/**
+* Translate the ADD instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_ADD(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate ADD…" << std::endl;
+}
+
+/**
+* Translate the SUB instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SUB(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SUB…" << std::endl;
+}
+
+/**
+* Translate the SLL instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLL(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLL…" << std::endl;
+}
+
+/**
+* Translate the SLT instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLT(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLT…" << std::endl;
+}
+
+/**
+* Translate the SLTU instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLTU(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLTU…" << std::endl;
+}
+
+/**
+* Translate the XOR instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_XOR(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate XOR…" << std::endl;
+}
+
+/**
+* Translate the SRL instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRL(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRL…" << std::endl;
+}
+
+/**
+* Translate the SRA instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRA(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRA…" << std::endl;
+}
+
+/**
+* Translate the OR instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_OR(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate OR…" << std::endl;
+}
+
+/**
+* Translate the AND instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_AND(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate AND…" << std::endl;
+}
+
+/**
+* Translate the SLLIW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLLIW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLLIW…" << std::endl;
+}
+
+/**
+* Translate the SRLIW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRLIW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRLIW…" << std::endl;
+}
+
+/**
+* Translate the SRAIW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRAIW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRAIW…" << std::endl;
+}
+
+/**
+* Translate the ADDW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_ADDW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate ADDW…" << std::endl;
+}
+
+/**
+* Translate the SUBW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SUBW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SUBW…" << std::endl;
+}
+
+/**
+* Translate the SLLW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SLLW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SLLW…" << std::endl;
+}
+
+/**
+* Translate the SRLW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRLW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRLW…" << std::endl;
+}
+
+/**
+* Translate the SRAW instruction.
+* Description
+* @param instr the RISC-V instruction to translate
+* @param r_info the runtime register mapping (RISC-V -> x86)
+*/
+void translate_SRAW(t_risc_instr instr, register_info r_info) {
+    std::cout << "Translate SRAW…" << std::endl;
+}

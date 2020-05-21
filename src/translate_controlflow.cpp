@@ -2,7 +2,7 @@
 // Created by flo on 21.05.20.
 //
 
-#include "translate_controlflow.h"
+#include "translate_controlflow.hpp"
 #include <iostream>
 #include "register.h"
 
