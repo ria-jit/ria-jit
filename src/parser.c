@@ -62,7 +62,7 @@ t_parse_result parse_OP_IMM_32(int32_t* instruction);
 
 t_parse_result parse_LUI(int32_t* instruction);
 
-void test_parsing() {
+void test_parsing(void) {
     /*
      * dissassembly of li a0, 0xDEADBEEF
      *  00038537                lui     a0,0x38

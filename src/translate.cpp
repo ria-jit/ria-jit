@@ -524,7 +524,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
 
     ///initialize new block
-    init_block();
+    init_block(); //x86::Assembler a(&code)
 
     ///save the x86_64 registers
     //???
