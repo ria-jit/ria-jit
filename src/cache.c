@@ -2,6 +2,21 @@
 // Created by flo on 02.05.20.
 //
 
+/**
+ * This cache stores the translated code blocks.
+ * After the table is initialized, the RISC-V program address of the basic block is added to the cache,
+ * together with the starting address of the function in memory that translates that block.
+ * Calls will happen according to the sequence
+ *  1. encounter a RISC-V address in execution
+ *  2. check if program cache contains that address (via lookup_cache_entry())
+ *      --> if UNSEEN_CODE: nullptr return indicates that this block is not present.
+ *          3. translate the block and place the address returned by the translator.cpp's finalize_block()
+ *             into the cache together with that blocks RISC-V address.
+ *      --> else: we have seen this code before
+ *          3. the cache returns a void* to the translated block in memory. cast that to a function pointer and
+ *             call it in order to execute the cached function.
+ */
+
 #include <stddef.h>
 #include "cache.h"
 #include "util.h"
