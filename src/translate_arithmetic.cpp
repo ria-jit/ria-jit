@@ -19,16 +19,10 @@ void translate_addiw(t_risc_instr instr, register_info r_info) {
 
     std::cout << "Translate addiw...\n";
 
-    //sign-extend the immediate to 32-bit
-    uint64_t imm = instr.imm & 0x00000FFF;
-    if (0x00000800 & imm) {
-        imm += 0xFFFFF000;
-    }
-
     //add 32-bit, sign-extend to 64-bit and write back
     auto reg_base = reinterpret_cast<uint64_t>(get_reg_data());
     a->mov(x86::edx, x86::ptr(reg_base, 8 * instr.reg_src_1));
-    a->add(x86::edx, imm);
+    a->add(x86::edx, instr.imm);
     a->movsx(x86::rax, x86::edx);
     a->mov(x86::ptr(reg_base, 8 * instr.reg_dest), x86::rax);
 }
@@ -61,20 +55,11 @@ void translate_lui(t_risc_instr instr, register_info r_info) {
     //mov rd, extended
     std::cout << "Translate lui...\n";
 
-    //prepare immediate (20-bit into 31-12, sign extend to 64)
-    uint64_t prepared = instr.imm;
-
-    //shift left by 12-bits so as to leave the lower 12 bits zero
-    prepared <<= 12;
-
-    //sign-extend to 64-bit if the sign-bit is set
-    if (0x80000000 & prepared) prepared |= 0xFFFFFFFF00000000;
-
     //move into register
     if (r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], prepared);
+        a->mov(r_info.map[instr.reg_dest], instr.imm);
     } else {
-        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), prepared);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), instr.imm);
     }
 }
 
@@ -87,16 +72,12 @@ void translate_lui(t_risc_instr instr, register_info r_info) {
 void translate_addi(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate addi...\n";
 
-    //prepare immediate (sign-extend to 64-bit)
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
-        a->add(r_info.map[instr.reg_dest], prepared);
+        a->add(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->add(x86::rax, prepared);
+        a->add(x86::rax, instr.imm);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -113,19 +94,13 @@ void translate_addi(t_risc_instr instr, register_info r_info) {
 void translate_AUIPC(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate AUIPC…" << std::endl;
 
-    //prepare immediate (20-bit into 31-12)
-    uint32_t prepared = instr.imm;
-
-    //shift left by 12-bits so as to leave the lower 12 bits zero
-    prepared <<= 12;
-
     //add offset to the pc and store in rd
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[pc]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[pc]);
-        a->add(r_info.map[instr.reg_dest], prepared);
+        a->add(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * pc));
-        a->add(x86::rax, prepared);
+        a->add(x86::rax, instr.imm);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -140,21 +115,17 @@ void translate_AUIPC(t_risc_instr instr, register_info r_info) {
 void translate_SLTI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLTI…" << std::endl;
 
-    //prepare sign-extended immediate
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     const Label &not_less = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
-        a->cmp(r_info.map[instr.reg_src_1], prepared);
+        a->cmp(r_info.map[instr.reg_src_1], instr.imm);
         a->jnl(not_less);
         a->inc(r_info.map[instr.reg_dest]);
         a->bind(not_less);
     } else {
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
-        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), prepared);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), instr.imm);
         a->jnl(not_less);
         a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
         a->bind(not_less);
@@ -171,21 +142,17 @@ void translate_SLTI(t_risc_instr instr, register_info r_info) {
 void translate_SLTIU(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLTIU…" << std::endl;
 
-    //prepare sign-extended immediate
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     const Label &not_below = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
-        a->cmp(r_info.map[instr.reg_src_1], prepared);
+        a->cmp(r_info.map[instr.reg_src_1], instr.imm);
         a->jnb(not_below);
         a->inc(r_info.map[instr.reg_dest]);
         a->bind(not_below);
     } else {
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0);
-        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), prepared);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), instr.imm);
         a->jnb(not_below);
         a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1));
         a->bind(not_below);
@@ -202,16 +169,12 @@ void translate_SLTIU(t_risc_instr instr, register_info r_info) {
 void translate_XORI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate XORI…" << std::endl;
 
-    //prepare sign-extended immediate
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
-        a->xor_(r_info.map[instr.reg_dest], prepared);
+        a->xor_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->xor_(x86::rax, prepared);
+        a->xor_(x86::rax, instr.imm);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -226,16 +189,12 @@ void translate_XORI(t_risc_instr instr, register_info r_info) {
 void translate_ORI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ORI…" << std::endl;
 
-    //prepare sign-extended immediate
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
-        a->or_(r_info.map[instr.reg_dest], prepared);
+        a->or_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->or_(x86::rax, prepared);
+        a->or_(x86::rax, instr.imm);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -250,16 +209,12 @@ void translate_ORI(t_risc_instr instr, register_info r_info) {
 void translate_ANDI(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ANDI…" << std::endl;
 
-    //prepare sign-extended immediate
-    uint64_t prepared = instr.imm;
-    if (0x800 & prepared) prepared |= 0xFFFFFFFFFFFFF000;
-
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
-        a->and_(r_info.map[instr.reg_dest], prepared);
+        a->and_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->and_(x86::rax, prepared);
+        a->and_(x86::rax, instr.imm);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
