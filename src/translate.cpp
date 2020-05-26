@@ -97,6 +97,7 @@ t_cache_loc finalize_block() {
 }
 
 /**
+ * Deprecated! Only for example and testing purposes.
  * Generates a basic strlen loop in machine code and executes it
  * by calling the generated code in memory.
  */

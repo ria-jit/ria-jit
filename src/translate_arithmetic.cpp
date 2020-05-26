@@ -16,15 +16,17 @@ using namespace asmjit;
 void translate_addiw(t_risc_instr instr, register_info r_info) {
     // mov rd, rs1
     // add rd, instr.imm
-
     std::cout << "Translate addiw...\n";
-
-    //add 32-bit, sign-extend to 64-bit and write back
-    auto reg_base = reinterpret_cast<uint64_t>(get_reg_data());
-    a->mov(x86::edx, x86::ptr(reg_base, 8 * instr.reg_src_1));
-    a->add(x86::edx, instr.imm);
-    a->movsx(x86::rax, x86::edx);
-    a->mov(x86::ptr(reg_base, 8 * instr.reg_dest), x86::rax);
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->add(x86::edx, instr.imm);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        a->mov(x86::edx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->add(x86::edx, instr.imm);
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
@@ -485,16 +487,17 @@ void translate_AND(t_risc_instr instr, register_info r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLLIW(t_risc_instr instr, register_info r_info) {
-    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SLLIW…" << std::endl;
     //shift left the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->shl(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->shl(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);
     } else {
-        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->shl(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->shl(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -506,16 +509,17 @@ void translate_SLLIW(t_risc_instr instr, register_info r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLIW(t_risc_instr instr, register_info r_info) {
-    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SRLIW…" << std::endl;
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->shr(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->shr(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);
     } else {
-        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->shr(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->shr(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -527,16 +531,17 @@ void translate_SRLIW(t_risc_instr instr, register_info r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAIW(t_risc_instr instr, register_info r_info) {
-    //todo: sign-extend 32-bit value and write to destination register!
     std::cout << "Translate SRAIW…" << std::endl;
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->sar(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->sar(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);
     } else {
-        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->sar(x86::eax, instr.imm & 0b111111);
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->sar(x86::edx, instr.imm & 0b111111);
+        a->movsx(x86::rax, x86::edx);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -551,7 +556,20 @@ void translate_SRAIW(t_risc_instr instr, register_info r_info) {
 */
 void translate_ADDW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate ADDW…" << std::endl;
-    //todo translate
+    /*
+     * todo verify!
+     * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
+     */
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->add(x86::rdx, r_info.map[instr.reg_src_2]);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        a->mov(x86::edx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->add(x86::edx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
@@ -564,7 +582,20 @@ void translate_ADDW(t_risc_instr instr, register_info r_info) {
 */
 void translate_SUBW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SUBW…" << std::endl;
-    //todo translate
+    /*
+     * todo verify!
+     * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
+     */
+    if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->sub(x86::rdx, r_info.map[instr.reg_src_2]);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        a->mov(x86::edx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->sub(x86::edx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
@@ -577,11 +608,27 @@ void translate_SUBW(t_risc_instr instr, register_info r_info) {
 */
 void translate_SLLW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SLLW…" << std::endl;
-    //todo translate
+
+    //todo verify (see above)
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->shl(x86::edx, x86::cl);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        //shift in 32-bit register, then write-back
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->shl(x86::edx, x86::cl);
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
-* Translate the SLRW instruction.
+* Translate the SRLW instruction.
 * SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously defined but operate
 * on 32-bit values and produce signed 32-bit results. The shift amount is given by rs2[4:0]
 * @param instr the RISC-V instruction to translate
@@ -590,7 +637,23 @@ void translate_SLLW(t_risc_instr instr, register_info r_info) {
 */
 void translate_SRLW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRLW…" << std::endl;
-    //todo translate
+
+    //todo verify (see above)
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->shr(x86::edx, x86::cl);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        //shift in 32-bit register, then write-back
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->shr(x86::edx, x86::cl);
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
 
 /**
@@ -603,5 +666,21 @@ void translate_SRLW(t_risc_instr instr, register_info r_info) {
 */
 void translate_SRAW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate SRAW…" << std::endl;
-    //todo translate
+
+    //todo verify (see above)
+    if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
+        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->and_(x86::rcx, 0b11111);
+        a->sar(x86::edx, x86::cl);
+        a->movsx(r_info.map[instr.reg_dest], x86::edx);
+    } else {
+        //shift in 32-bit register, then write-back
+        a->mov(x86::rdx, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::rcx, x86::ptr(r_info.base, 8 * instr.reg_src_2));
+        a->and_(x86::rcx, 0b11111);
+        a->sar(x86::edx, x86::cl);
+        a->movsx(x86::rax, x86::edx);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+    }
 }
