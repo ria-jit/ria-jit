@@ -8,20 +8,20 @@
 #include "util.h"
 #include "translate.hpp"
 
-void translate_JAL(t_risc_instr instr, register_info r_info);
+void translate_JAL(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_JALR(t_risc_instr instr, register_info &r_info);
+void translate_JALR(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BEQ(t_risc_instr instr, register_info r_info);
+void translate_BEQ(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BNE(t_risc_instr instr, register_info r_info);
+void translate_BNE(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BLT(t_risc_instr instr, register_info r_info);
+void translate_BLT(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BGE(t_risc_instr instr, register_info r_info);
+void translate_BGE(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BLTU(t_risc_instr instr, register_info r_info);
+void translate_BLTU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_BGEU(t_risc_instr instr, register_info r_info);
+void translate_BGEU(const t_risc_instr &instr, const register_info &r_info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_CONTROLFLOW_HPP
