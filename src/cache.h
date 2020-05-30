@@ -21,9 +21,9 @@ typedef struct {
 
 void init_hash_table(void);
 
-unsigned int hash(t_risc_addr risc_addr);
+size_t hash(t_risc_addr risc_addr);
 
-unsigned int find_lin_slot(t_risc_addr risc_addr);
+size_t find_lin_slot(t_risc_addr risc_addr);
 
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr);
 
