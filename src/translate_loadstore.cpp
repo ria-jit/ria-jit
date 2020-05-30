@@ -3,7 +3,6 @@
 //
 
 #include "translate_loadstore.hpp"
-#include <iostream>
 #include "register.h"
 
 /**

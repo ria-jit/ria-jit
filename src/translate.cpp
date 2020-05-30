@@ -3,7 +3,6 @@
 //
 
 #include "translate.hpp"
-#include <iostream>
 #include <asmjit/asmjit.h>
 #include <sys/mman.h>
 #include "register.h"
@@ -440,7 +439,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                     default: {
                         ///should not get here
-                        std::cerr << "Oops: line " << __LINE__ << " in " __FILE__ << std::endl;
+                        printf("Oops: line %d in %s\n", __LINE__, __FILE__);
                     }
                 }
             }

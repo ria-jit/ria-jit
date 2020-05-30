@@ -3,7 +3,6 @@
 //
 
 #include "translate_other.hpp"
-#include <iostream>
 #include "register.h"
 
 /**
