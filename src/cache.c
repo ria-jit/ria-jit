@@ -35,7 +35,7 @@ int count_entries = 0;
 /**
  * Initializes the hash table array.
  */
-void init_hash_table() {
+void init_hash_table(void) {
     //allocate memory for our table
     cache_table = malloc(table_size * sizeof(t_cache_entry));
 
@@ -127,7 +127,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 /**
  * Print out the hash table contents.
  */
-void print_values() {
+void print_values(void) {
     for (int i = 0; i < count_entries; ++i) {
         if (cache_table[i].cache_loc != 0) {
             printf("cache_table[%d]: RISC-V addr %lu at cache loc %p\n",

@@ -19,7 +19,7 @@ typedef struct {
     t_cache_loc cache_loc;
 } t_cache_entry;
 
-void init_hash_table();
+void init_hash_table(void);
 
 unsigned int hash(t_risc_addr risc_addr);
 
@@ -29,6 +29,6 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr);
 
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc);
 
-void print_values();
+void print_values(void);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_CACHE_H
