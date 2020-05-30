@@ -12,7 +12,7 @@
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_FENCE(t_risc_instr instr, register_info r_info) {
+void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate FENCE…" << std::endl;
 }
 
@@ -22,7 +22,7 @@ void translate_FENCE(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_ECALL(t_risc_instr instr, register_info r_info) {
+void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate ECALL…" << std::endl;
 }
 
@@ -32,7 +32,7 @@ void translate_ECALL(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_EBREAK(t_risc_instr instr, register_info r_info) {
+void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate EBREAK…" << std::endl;
 }
 
@@ -42,6 +42,6 @@ void translate_EBREAK(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_FENCE_I(t_risc_instr instr, register_info r_info) {
+void translate_FENCE_I(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate FENCE_I…" << std::endl;
 }

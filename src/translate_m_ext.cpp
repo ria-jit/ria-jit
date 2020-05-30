@@ -24,7 +24,7 @@ using namespace asmjit;
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_MUL(t_risc_instr instr, register_info r_info) {
+void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate MUL…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -45,7 +45,7 @@ void translate_MUL(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_MULH(t_risc_instr instr, register_info r_info) {
+void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate MULH…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -69,7 +69,7 @@ void translate_MULH(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_MULHSU(t_risc_instr instr, register_info r_info) {
+void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate MULHSU…" << std::endl;
 
     /*
@@ -118,7 +118,7 @@ void translate_MULHSU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_MULHU(t_risc_instr instr, register_info r_info) {
+void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate MULHU…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -142,7 +142,7 @@ void translate_MULHU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_DIV(t_risc_instr instr, register_info r_info) {
+void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate DIV…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -180,7 +180,7 @@ void translate_DIV(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_DIVU(t_risc_instr instr, register_info r_info) {
+void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate DIVU…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -220,7 +220,7 @@ void translate_DIVU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_REM(t_risc_instr instr, register_info r_info) {
+void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate REM…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -260,7 +260,7 @@ void translate_REM(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_REMU(t_risc_instr instr, register_info r_info) {
+void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate REMU…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -298,7 +298,7 @@ void translate_REMU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_MULW(t_risc_instr instr, register_info r_info) {
+void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate MULW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -323,7 +323,7 @@ void translate_MULW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_DIVW(t_risc_instr instr, register_info r_info) {
+void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate DIVW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -365,7 +365,7 @@ void translate_DIVW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_DIVUW(t_risc_instr instr, register_info r_info) {
+void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate DIVUW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -408,7 +408,7 @@ void translate_DIVUW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_REMW(t_risc_instr instr, register_info r_info) {
+void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate REMW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -451,7 +451,7 @@ void translate_REMW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_REMUW(t_risc_instr instr, register_info r_info) {
+void translate_REMUW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate REMUW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {

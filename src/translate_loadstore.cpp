@@ -12,7 +12,7 @@
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LB(t_risc_instr instr, register_info r_info) {
+void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LB…" << std::endl;
 }
 
@@ -22,7 +22,7 @@ void translate_LB(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LH(t_risc_instr instr, register_info r_info) {
+void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LH…" << std::endl;
 }
 
@@ -32,7 +32,7 @@ void translate_LH(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LW(t_risc_instr instr, register_info r_info) {
+void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LW…" << std::endl;
 }
 
@@ -42,7 +42,7 @@ void translate_LW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LBU(t_risc_instr instr, register_info r_info) {
+void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LBU…" << std::endl;
 }
 
@@ -52,7 +52,7 @@ void translate_LBU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LHU(t_risc_instr instr, register_info r_info) {
+void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LHU…" << std::endl;
 }
 
@@ -62,7 +62,7 @@ void translate_LHU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_SB(t_risc_instr instr, register_info r_info) {
+void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate SB…" << std::endl;
 }
 
@@ -72,7 +72,7 @@ void translate_SB(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_SH(t_risc_instr instr, register_info r_info) {
+void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate SH…" << std::endl;
 }
 
@@ -82,7 +82,7 @@ void translate_SH(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_SW(t_risc_instr instr, register_info r_info) {
+void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate SW…" << std::endl;
 }
 
@@ -92,7 +92,7 @@ void translate_SW(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LWU(t_risc_instr instr, register_info r_info) {
+void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LWU…" << std::endl;
 }
 
@@ -102,7 +102,7 @@ void translate_LWU(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_LD(t_risc_instr instr, register_info r_info) {
+void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate LD…" << std::endl;
 }
 
@@ -112,6 +112,6 @@ void translate_LD(t_risc_instr instr, register_info r_info) {
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
-void translate_SD(t_risc_instr instr, register_info r_info) {
+void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
     std::cout << "Translate SD…" << std::endl;
 }

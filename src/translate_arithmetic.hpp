@@ -8,64 +8,64 @@
 #include "util.h"
 #include "translate.hpp"
 
-void translate_addi(t_risc_instr instr, register_info r_info);
+void translate_addi(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_lui(t_risc_instr instr, register_info r_info);
+void translate_lui(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_slli(t_risc_instr instr, register_info r_info);
+void translate_slli(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_addiw(t_risc_instr instr, register_info r_info);
+void translate_addiw(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_AUIPC(t_risc_instr instr, register_info r_info);
+void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLTI(t_risc_instr instr, register_info r_info);
+void translate_SLTI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLTIU(t_risc_instr instr, register_info r_info);
+void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_XORI(t_risc_instr instr, register_info r_info);
+void translate_XORI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_ORI(t_risc_instr instr, register_info r_info);
+void translate_ORI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_ANDI(t_risc_instr instr, register_info r_info);
+void translate_ANDI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRLI(t_risc_instr instr, register_info r_info);
+void translate_SRLI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRAI(t_risc_instr instr, register_info r_info);
+void translate_SRAI(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_ADD(t_risc_instr instr, register_info r_info);
+void translate_ADD(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SUB(t_risc_instr instr, register_info r_info);
+void translate_SUB(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLL(t_risc_instr instr, register_info r_info);
+void translate_SLL(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLT(t_risc_instr instr, register_info r_info);
+void translate_SLT(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLTU(t_risc_instr instr, register_info r_info);
+void translate_SLTU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_XOR(t_risc_instr instr, register_info r_info);
+void translate_XOR(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRL(t_risc_instr instr, register_info r_info);
+void translate_SRL(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRA(t_risc_instr instr, register_info r_info);
+void translate_SRA(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_OR(t_risc_instr instr, register_info r_info);
+void translate_OR(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_AND(t_risc_instr instr, register_info r_info);
+void translate_AND(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLLIW(t_risc_instr instr, register_info r_info);
+void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRLIW(t_risc_instr instr, register_info r_info);
+void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRAIW(t_risc_instr instr, register_info r_info);
+void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_ADDW(t_risc_instr instr, register_info r_info);
+void translate_ADDW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SUBW(t_risc_instr instr, register_info r_info);
+void translate_SUBW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SLLW(t_risc_instr instr, register_info r_info);
+void translate_SLLW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRLW(t_risc_instr instr, register_info r_info);
+void translate_SRLW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SRAW(t_risc_instr instr, register_info r_info);
+void translate_SRAW(const t_risc_instr &instr, const register_info &r_info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_ARITHMETIC_HPP

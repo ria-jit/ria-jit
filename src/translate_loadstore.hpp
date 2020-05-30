@@ -8,26 +8,26 @@
 #include "util.h"
 #include "translate.hpp"
 
-void translate_LB(t_risc_instr instr, register_info r_info);
+void translate_LB(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LH(t_risc_instr instr, register_info r_info);
+void translate_LH(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LW(t_risc_instr instr, register_info r_info);
+void translate_LW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LBU(t_risc_instr instr, register_info r_info);
+void translate_LBU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LHU(t_risc_instr instr, register_info r_info);
+void translate_LHU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SB(t_risc_instr instr, register_info r_info);
+void translate_SB(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SH(t_risc_instr instr, register_info r_info);
+void translate_SH(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SW(t_risc_instr instr, register_info r_info);
+void translate_SW(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LWU(t_risc_instr instr, register_info r_info);
+void translate_LWU(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_LD(t_risc_instr instr, register_info r_info);
+void translate_LD(const t_risc_instr &instr, const register_info &r_info);
 
-void translate_SD(t_risc_instr instr, register_info r_info);
+void translate_SD(const t_risc_instr &instr, const register_info &r_info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_LOADSTORE_HPP
