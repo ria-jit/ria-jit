@@ -25,7 +25,7 @@ using namespace asmjit;
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate MUL…" << std::endl;
+    log_verbose("Translate MUL…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -46,7 +46,7 @@ void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate MULH…" << std::endl;
+    log_verbose("Translate MULH…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -70,7 +70,7 @@ void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate MULHSU…" << std::endl;
+    log_verbose("Translate MULHSU…\n");
 
     /*
      * For signed × unsigned multiplication, we cannot directly use MUL or IMUL (unsigned² and signed², respectively).
@@ -119,7 +119,7 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate MULHU…" << std::endl;
+    log_verbose("Translate MULHU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -143,7 +143,7 @@ void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate DIV…" << std::endl;
+    log_verbose("Translate DIV…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -181,7 +181,7 @@ void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate DIVU…" << std::endl;
+    log_verbose("Translate DIVU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -221,7 +221,7 @@ void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate REM…" << std::endl;
+    log_verbose("Translate REM…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -261,7 +261,7 @@ void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate REMU…" << std::endl;
+    log_verbose("Translate REMU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -299,7 +299,7 @@ void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate MULW…" << std::endl;
+    log_verbose("Translate MULW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -324,7 +324,7 @@ void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate DIVW…" << std::endl;
+    log_verbose("Translate DIVW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -366,7 +366,7 @@ void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate DIVUW…" << std::endl;
+    log_verbose("Translate DIVUW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -409,7 +409,7 @@ void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate REMW…" << std::endl;
+    log_verbose("Translate REMW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -452,7 +452,7 @@ void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMUW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate REMUW…" << std::endl;
+    log_verbose("Translate REMUW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately

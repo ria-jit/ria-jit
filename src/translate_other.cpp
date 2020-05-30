@@ -13,7 +13,7 @@
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate FENCE…" << std::endl;
+    log_verbose("Translate FENCE…\n");
 }
 
 /**
@@ -23,7 +23,7 @@ void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate ECALL…" << std::endl;
+    log_verbose("Translate ECALL…\n");
 }
 
 /**
@@ -33,7 +33,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate EBREAK…" << std::endl;
+    log_verbose("Translate EBREAK…\n");
 }
 
 /**
@@ -43,5 +43,5 @@ void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE_I(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate FENCE_I…" << std::endl;
+    log_verbose("Translate FENCE_I…\n");
 }

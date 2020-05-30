@@ -13,7 +13,7 @@
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LB…" << std::endl;
+    log_verbose("Translate LB…\n");
 }
 
 /**
@@ -23,7 +23,7 @@ void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LH…" << std::endl;
+    log_verbose("Translate LH…\n");
 }
 
 /**
@@ -33,7 +33,7 @@ void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LW…" << std::endl;
+    log_verbose("Translate LW…\n");
 }
 
 /**
@@ -43,7 +43,7 @@ void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LBU…" << std::endl;
+    log_verbose("Translate LBU…\n");
 }
 
 /**
@@ -53,7 +53,7 @@ void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LHU…" << std::endl;
+    log_verbose("Translate LHU…\n");
 }
 
 /**
@@ -63,7 +63,7 @@ void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SB…" << std::endl;
+    log_verbose("Translate SB…\n");
 }
 
 /**
@@ -73,7 +73,7 @@ void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SH…" << std::endl;
+    log_verbose("Translate SH…\n");
 }
 
 /**
@@ -83,7 +83,7 @@ void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SW…" << std::endl;
+    log_verbose("Translate SW…\n");
 }
 
 /**
@@ -93,7 +93,7 @@ void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LWU…" << std::endl;
+    log_verbose("Translate LWU…\n");
 }
 
 /**
@@ -103,7 +103,7 @@ void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate LD…" << std::endl;
+    log_verbose("Translate LD…\n");
 }
 
 /**
@@ -113,5 +113,5 @@ void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SD…" << std::endl;
+    log_verbose("Translate SD…\n");
 }

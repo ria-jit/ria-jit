@@ -7,12 +7,19 @@
 
 //error codes for internal reference
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define FAIL_HEAP_ALLOC 0x1000
+
+/**
+* Should log verbosely what the translator is doing.
+* This is used by log_verbose().
+*/
+extern bool verbose;
 
 //the RISC-V mnemonic of the instruction
 typedef enum {
@@ -105,6 +112,8 @@ typedef struct {
 int parse_jump_immediate(t_risc_instr* instr);
 
 void not_yet_implemented(const char* info);
+
+void log_verbose(const char* message);
 
 #ifdef __cplusplus
 }

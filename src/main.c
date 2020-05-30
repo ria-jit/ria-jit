@@ -15,14 +15,16 @@ bool finalize = false;
 
 //prototypes
 int transcode_loop();
+
 t_risc_addr init_entry_pc();
+
 t_risc_addr execute_cached(t_cache_loc loc);
+
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     int opt_index = 0;
-    char* file_path = NULL;
-    bool verbose = false;
+    char *file_path = NULL;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
     while ((opt_index = getopt(argc, argv, ":f:vh")) != -1) {
@@ -61,7 +63,7 @@ int transcode_loop() {
 
     init_hash_table();
 
-    while(!finalize) {
+    while (!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(pc);
 

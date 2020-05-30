@@ -3,7 +3,6 @@
 //
 
 #include "translate_arithmetic.hpp"
-#include <iostream>
 #include "register.h"
 
 using namespace asmjit;
@@ -16,7 +15,7 @@ using namespace asmjit;
 void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
     // mov rd, rs1
     // add rd, instr.imm
-    std::cout << "Translate addiw...\n";
+    log_verbose("Translate addiw...\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->add(x86::edx, instr.imm);
@@ -37,7 +36,7 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
 void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, rs1
     //shl rd, (instr.imm & 0x3F)
-    std::cout << "Translate slli...\n";
+    log_verbose("Translate slli...\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -55,7 +54,7 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, extended
-    std::cout << "Translate lui...\n";
+    log_verbose("Translate lui...\n");
 
     //move into register
     if (r_info.mapped[instr.reg_dest]) {
@@ -72,7 +71,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
  * @param instr
  */
 void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate addi...\n";
+    log_verbose("Translate addi...\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -94,7 +93,7 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate AUIPC…" << std::endl;
+    log_verbose("Translate AUIPC…\n");
 
     //add offset to the pc and store in rd
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[pc]) {
@@ -115,7 +114,7 @@ void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLTI…" << std::endl;
+    log_verbose("Translate SLTI…\n");
 
     const Label &not_less = a->newLabel();
 
@@ -142,7 +141,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLTIU…" << std::endl;
+    log_verbose("Translate SLTIU…\n");
 
     const Label &not_below = a->newLabel();
 
@@ -169,7 +168,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate XORI…" << std::endl;
+    log_verbose("Translate XORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -189,7 +188,7 @@ void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate ORI…" << std::endl;
+    log_verbose("Translate ORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -209,7 +208,7 @@ void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate ANDI…" << std::endl;
+    log_verbose("Translate ANDI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -228,7 +227,7 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRLI…" << std::endl;
+    log_verbose("Translate SRLI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -246,7 +245,7 @@ void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRAI…" << std::endl;
+    log_verbose("Translate SRAI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -265,7 +264,7 @@ void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate ADD…" << std::endl;
+    log_verbose("Translate ADD…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -285,7 +284,7 @@ void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SUB…" << std::endl;
+    log_verbose("Translate SUB…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -305,7 +304,7 @@ void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLL…" << std::endl;
+    log_verbose("Translate SLL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -328,7 +327,7 @@ void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLT…" << std::endl;
+    log_verbose("Translate SLT…\n");
 
     const Label &not_less = a->newLabel();
 
@@ -355,7 +354,7 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLTU…" << std::endl;
+    log_verbose("Translate SLTU…\n");
 
     const Label &not_below = a->newLabel();
 
@@ -382,7 +381,7 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate XOR…" << std::endl;
+    log_verbose("Translate XOR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -402,7 +401,7 @@ void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRL…" << std::endl;
+    log_verbose("Translate SRL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -426,7 +425,7 @@ void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRA…" << std::endl;
+    log_verbose("Translate SRA…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -449,7 +448,7 @@ void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate OR…" << std::endl;
+    log_verbose("Translate OR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -468,7 +467,7 @@ void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate AND…" << std::endl;
+    log_verbose("Translate AND…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -487,7 +486,7 @@ void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLLIW…" << std::endl;
+    log_verbose("Translate SLLIW…\n");
     //shift left the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -509,7 +508,7 @@ void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRLIW…" << std::endl;
+    log_verbose("Translate SRLIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -531,7 +530,7 @@ void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRAIW…" << std::endl;
+    log_verbose("Translate SRAIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -555,7 +554,7 @@ void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate ADDW…" << std::endl;
+    log_verbose("Translate ADDW…\n");
     /*
      * todo verify!
      * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
@@ -581,7 +580,7 @@ void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SUBW…" << std::endl;
+    log_verbose("Translate SUBW…\n");
     /*
      * todo verify!
      * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
@@ -607,7 +606,7 @@ void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SLLW…" << std::endl;
+    log_verbose("Translate SLLW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -636,7 +635,7 @@ void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRLW…" << std::endl;
+    log_verbose("Translate SRLW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -665,7 +664,7 @@ void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRAW(const t_risc_instr &instr, const register_info &r_info) {
-    std::cout << "Translate SRAW…" << std::endl;
+    log_verbose("Translate SRAW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {

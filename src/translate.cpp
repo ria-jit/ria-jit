@@ -44,7 +44,7 @@ x86::Assembler *a;
  * Quick example to test code generation using AsmJit.
  */
 void test_generation() {
-    std::cout << "Testing code generation with a String length example...\n";
+    log_verbose("Testing code generation with a String length example...\n");
     generate_strlen();
 }
 
@@ -78,7 +78,7 @@ t_cache_loc finalize_block() {
     //allocate executable page for determined worst case code size, initialized to 0
     void *ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     if (!ptr) {
-        std::cout << "Bad. Memory allocation fault.\n";
+        printf("Bad. Memory allocation fault.\n");
         return nullptr;
     }
 
@@ -130,7 +130,7 @@ void generate_strlen() {
     typedef int (*str_len_asm)(char *);
     int ret = ((str_len_asm) executable)(string);
 
-    std::cout << "Length of string " << string << " is " << ret;
+    printf("Length of string %s is %d", string, ret);
 }
 
 /**
@@ -543,8 +543,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///load the saved x86_64 registers
     //???
-
-    std::cout << "Translated Block: " << block_cache.size() << " instructions" << std::endl;
+    printf("Translated block: %zu instructions\n", block_cache.size());
 
     ///finalize block and return cached location
     return finalize_block();
