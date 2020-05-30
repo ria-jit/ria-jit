@@ -8,6 +8,7 @@
 #include "cache.h"
 #include "translate.hpp"
 #include "parser.h"
+#include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -18,7 +19,36 @@ t_risc_addr init_entry_pc();
 t_risc_addr execute_cached(t_cache_loc loc);
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
-int main() {
+int main(int argc, char* argv[]) {
+    int opt_index = 0;
+    char* file_path = NULL;
+    bool verbose = false;
+
+    //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
+    while ((opt_index = getopt(argc, argv, ":f:vh")) != -1) {
+        switch (opt_index) {
+            case 'v':
+                verbose = true;
+                break;
+            case 'f':
+                file_path = optarg;
+                break;
+            case ':':
+            case 'h':
+            default:
+                fprintf(stderr, "Usage: dynamic-translate -f <filename> [-v][…]\n");
+                return 1;
+        }
+    }
+
+    printf("Verbose: %d\n", verbose);
+    printf("File path: %s\n", file_path);
+
+    if (file_path == NULL) {
+        fprintf(stderr, "Bad. Invalid file path.\n");
+        return 2;
+    }
+
     printf("Hello World!\n");
     test_parsing();
     transcode_loop();
