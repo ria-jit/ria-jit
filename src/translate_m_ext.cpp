@@ -8,7 +8,14 @@
 
 using namespace asmjit;
 
-//todo: implement the correct division edge case semantics as per p. 44 of the RISC-V spec
+/**
+ * see p. 44 of the RISC-V-Spec
+ * The semantics for division by zero and division overflow are summarized in Table 7.1. The quotient
+ * of division by zero has all bits set, and the remainder of division by zero equals the dividend. Signed
+ * division overflow occurs only when the most-negative integer is divided by −1. The quotient of a
+ * signed division with overflow is equal to the dividend, and the remainder is zero. Unsigned division
+ * overflow cannot occur.
+ */
 
 /**
 * Translate the MUL instruction.
@@ -21,14 +28,11 @@ void translate_MUL(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate MUL…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->imul(r_info.map[instr.reg_src_2]);
-        //we only need the lower XLEN = 64 bits of the result
-        a->mov(r_info.map[instr.reg_dest], x86::rax);
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->imul(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
-        a->imul(x86::ptr(r_info.base, 8 * instr.reg_src_2));
-        //we only need the lower XLEN = 64 bits of the result
+        a->imul(x86::rax,x86::ptr(r_info.base, 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
     }
 }
@@ -134,6 +138,7 @@ void translate_MULHU(t_risc_instr instr, register_info r_info) {
 * Translate the DIV instruction.
 * DIV and DIVU perform an XLEN bits by XLEN bits signed and unsigned integer division of rs1 by
 * rs2, rounding towards zero.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -141,15 +146,30 @@ void translate_DIV(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate DIV…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], 0xFFFFFFFFFFFFFFFF);
+        a->cmp(r_info.map[instr.reg_src_2], 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(r_info.map[instr.reg_src_2]);
         a->mov(r_info.map[instr.reg_dest], x86::rax);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->cmp(x86::ptr(r_info.base, 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::ptr(r_info.base, 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+
+        a->bind(div_zero);
     }
 }
 
@@ -164,15 +184,30 @@ void translate_DIVU(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate DIVU…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], 0xFFFFFFFFFFFFFFFF);
+        a->cmp(r_info.map[instr.reg_src_2], 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->div(r_info.map[instr.reg_src_2]);
         a->mov(r_info.map[instr.reg_dest], x86::rax);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->cmp(x86::ptr(r_info.base, 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::ptr(r_info.base, 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+
+        a->bind(div_zero);
     }
 }
 
@@ -181,6 +216,7 @@ void translate_DIVU(t_risc_instr instr, register_info r_info) {
 * DIV and DIVU perform an XLEN bits by XLEN bits signed and unsigned integer division of rs1 by
 * rs2, rounding towards zero. REM and REMU provide the remainder of the corresponding division
 * operation. For REM, the sign of the result equals the sign of the dividend.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -188,21 +224,39 @@ void translate_REM(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate REM…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->cmp(r_info.map[instr.reg_src_2], 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(r_info.map[instr.reg_src_2]);
         a->mov(r_info.map[instr.reg_dest], x86::rdx);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+        a->cmp(x86::ptr(r_info.base, 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::ptr(r_info.base, 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rdx);
+
+        a->bind(div_zero);
     }
 }
 
 /**
 * Translate the REMU instruction.
-* Description
+* DIV and DIVU perform an XLEN bits by XLEN bits signed and unsigned integer division of rs1 by
+* rs2, rounding towards zero. REM and REMU provide the remainder of the corresponding division
+* operation. For REM, the sign of the result equals the sign of the dividend.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -210,15 +264,30 @@ void translate_REMU(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate REMU…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+        a->cmp(r_info.map[instr.reg_src_2], 0);
+        a->jz(div_zero);
+
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->div(r_info.map[instr.reg_src_2]);
         a->mov(r_info.map[instr.reg_dest], x86::rdx);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+        a->cmp(x86::ptr(r_info.base, 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::ptr(r_info.base, 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rdx);
+
+        a->bind(div_zero);
     }
 }
 
@@ -250,6 +319,7 @@ void translate_MULW(t_risc_instr instr, register_info r_info) {
 * DIVW and DIVUW are RV64 instructions that divide the lower 32 bits of rs1 by the lower 32
 * bits of rs2, treating them as signed and unsigned integers respectively, placing the 32-bit quotient
 * in rd, sign-extended to 64 bits.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -257,17 +327,32 @@ void translate_DIVW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate DIVW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], 0xFFFFFFFFFFFFFFFF);
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->cmp(x86::ecx, 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::ecx);
         a->movsx(r_info.map[instr.reg_dest], x86::eax);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->mov(x86::eax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsx(x86::rcx, x86::eax);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rcx);
+
+        a->bind(div_zero);
     }
 }
 
@@ -276,6 +361,7 @@ void translate_DIVW(t_risc_instr instr, register_info r_info) {
 * DIVW and DIVUW are RV64 instructions that divide the lower 32 bits of rs1 by the lower 32
 * bits of rs2, treating them as signed and unsigned integers respectively, placing the 32-bit quotient
 * in rd, sign-extended to 64 bits.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -283,17 +369,32 @@ void translate_DIVUW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate DIVUW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], 0xFFFFFFFFFFFFFFFF);
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->cmp(x86::ecx, 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::ecx);
         a->movsx(r_info.map[instr.reg_dest], x86::eax);
+
+        a->bind(div_zero);
     } else {
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->mov(x86::eax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsx(x86::rcx, x86::eax);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rcx);
+
+        a->bind(div_zero);
     }
 }
 
@@ -303,6 +404,7 @@ void translate_DIVUW(t_risc_instr instr, register_info r_info) {
 * bits of rs2, treating them as signed and unsigned integers respectively, placing the 32-bit quotient
 * in rd, sign-extended to 64 bits. REMW and REMUW are RV64 instructions that provide the
 * corresponding signed and unsigned remainder operations respectively.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -310,23 +412,42 @@ void translate_REMW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate REMW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->cmp(x86::ecx, 0);
+        a->jz(div_zero);
+
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::ecx);
         a->movsx(r_info.map[instr.reg_dest], x86::edx);
+
+        a->bind(div_zero);
     } else {
-        a->mov(x86::eax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+        a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsx(x86::rcx, x86::edx);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rcx);
+
+        a->bind(div_zero);
     }
 }
 
 /**
 * Translate the REMUW instruction.
-* Description
+* DIVW and DIVUW are RV64 instructions that divide the lower 32 bits of rs1 by the lower 32
+* bits of rs2, treating them as signed and unsigned integers respectively, placing the 32-bit quotient
+* in rd, sign-extended to 64 bits. REMW and REMUW are RV64 instructions that provide the
+* corresponding signed and unsigned remainder operations respectively.
+* For division by zero semantics: see p. 44-45 in the spec.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -334,16 +455,31 @@ void translate_REMUW(t_risc_instr instr, register_info r_info) {
     std::cout << "Translate REMUW…" << std::endl;
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+        //handle division by zero separately
+        const Label &div_zero = a->newLabel();
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+        a->cmp(x86::ecx, 0);
+        a->jz(div_zero);
+
+        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::ecx);
         a->movsx(r_info.map[instr.reg_dest], x86::edx);
+
+        a->bind(div_zero);
     } else {
-        a->mov(x86::eax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        const Label &div_zero = a->newLabel();
+        a->mov(x86::rax, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rax);
+        a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jz(div_zero);
+
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsx(x86::rcx, x86::edx);
         a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), x86::rcx);
+
+        a->bind(div_zero);
     }
 }
