@@ -75,7 +75,7 @@ int transcode_loop() {
         //execute the cached (or now newly generated code) and update the program counter
         pc = execute_cached(cache_loc);
 
-        //tmp
+        //tmp - programm should exit on syscall
         finalize = true;
     }
 
@@ -98,6 +98,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
  * @return the program counter value after execution of the translated basic block
  */
 t_risc_addr execute_cached(t_cache_loc loc) {
+    // execute the function at loc
+    // check pc = pc[register]
     not_yet_implemented("Execute Cached");
     return 0;
 }
