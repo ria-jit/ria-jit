@@ -13,6 +13,8 @@
 #include "translate_m_ext.hpp"
 #include "translate_other.hpp"
 
+//#include <string>
+
 #include "util.h"
 #include "parser.h"
 
@@ -120,8 +122,9 @@ void generate_strlen() {
     t_cache_loc executable = finalize_block();
 
     //call the assembled function on a string
-    std::string hello_world = "Hello, World!"; //len = 13
-    char *string = const_cast<char *>(hello_world.c_str());
+    //Hack to not need to include <string>
+    char const *hello_world = "Hello, World!"; //len = 13
+    char *string = const_cast<char *>(hello_world);
     typedef int (*str_len_asm)(char *);
     int ret = ((str_len_asm) executable)(string);
 

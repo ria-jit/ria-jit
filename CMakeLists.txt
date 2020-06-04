@@ -17,7 +17,10 @@ include_directories(lib/asmjit/src)
 
 add_compile_options(-Wall -Wextra -pedantic)
 add_executable("target" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h src/util.c src/util.h
-        src/cache.c src/cache.h src/translate.cpp src/translate.hpp src/register.c
-        src/register.h src/loadElf.c src/loadElf.h src/translate_arithmetic.cpp src/translate_arithmetic.hpp src/translate_controlflow.cpp src/translate_controlflow.hpp src/translate_csr.cpp src/translate_csr.hpp src/translate_loadstore.cpp src/translate_loadstore.hpp src/translate_m_ext.cpp src/translate_m_ext.hpp src/translate_other.cpp src/translate_other.hpp)
+        src/cache.c src/cache.h src/translate.cpp src/translate.hpp src/register.c src/register.h src/loadElf.c
+        src/loadElf.h src/translate_arithmetic.cpp src/translate_arithmetic.hpp src/translate_controlflow.cpp
+        src/translate_controlflow.hpp src/translate_csr.cpp src/translate_csr.hpp src/translate_loadstore.cpp
+        src/translate_loadstore.hpp src/translate_m_ext.cpp src/translate_m_ext.hpp src/translate_other.cpp
+        src/translate_other.hpp lib/common.h lib/minilibc.c)
 
 target_link_libraries("target" ${ASMJIT_DEPS})

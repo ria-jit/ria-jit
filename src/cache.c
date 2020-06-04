@@ -23,7 +23,7 @@
 #include "../lib/common.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <bits/mman.h>
+#include <linux/mman.h>
 
 #define INITIAL_SIZE 4096
 #define HASH_MASK 0x0000FFF0u
