@@ -255,29 +255,39 @@ inline long syscall(long number, long a1, long a2, long a3, long a4, long a5,
 int getpid(void) {
     return syscall0(__NR_getpid);
 }
-int open(const char* pathname, int flags, int mode) {
+
+int open(const char *pathname, int flags, int mode) {
     return openat(AT_FDCWD, pathname, flags, mode);
 }
-int openat(int dirfd, const char* pathname, int flags, int mode) {
+
+int openat(int dirfd, const char *pathname, int flags, int mode) {
     return syscall4(__NR_openat, dirfd, (size_t) pathname, flags, mode);
 }
+
 off_t lseek(int fd, off_t offset, int whence) {
     return syscall3(__NR_lseek, fd, offset, whence);
 }
-ssize_t read(int fd, void* buf, size_t count) {
+
+ssize_t read(int fd, void *buf, size_t count) {
     return syscall3(__NR_read, fd, (size_t) buf, count);
 }
-ssize_t write(int fd, const void* buf, size_t count) {
+
+ssize_t write(int fd, const void *buf, size_t count) {
     return syscall3(__NR_write, fd, (size_t) buf, count);
 }
+
 int close(int fd) {
     return syscall1(__NR_close, fd);
 }
 
-ssize_t read_full(int fd, void* buf, size_t nbytes) {
+int fstatx(int fd, struct statx *buf) {
+    return syscall2(__NR_statx, fd, (size_t) buf);
+}
+
+ssize_t read_full(int fd, void *buf, size_t nbytes) {
     size_t total_read = 0;
-    uint8_t* buf_cp = buf;
-    while (total_read < nbytes) {
+    uint8_t *buf_cp = buf;
+    while(total_read < nbytes) {
         ssize_t bytes_read = read(fd, buf_cp + total_read, nbytes - total_read);
         if (bytes_read < 0)
             return bytes_read;

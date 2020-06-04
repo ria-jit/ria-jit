@@ -4,17 +4,12 @@
 // ASM file assembled with riscv64-linux-gnu-as, linked with riscv64-linux-gnu-ld
 //
 
-#include <stdio.h>
+#include "../lib/common.h"
 #include <elf.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <stdbool.h>
+#include <linux/mman.h>
 #include "util.h"
 #include "loadElf.h"
+
 //Apparently not included in the headers on my version.
 #ifndef MAP_FIXED_NOREPLACE
 #define MAP_FIXED_NOREPLACE 0x200000
@@ -30,12 +25,12 @@ t_risc_addr mapIntoMemory(char *filePath) {
     printf("Reading %s...\n", filePath);
 
     //get the file descriptor
-    int fd = open(filePath, O_RDONLY);
+    int fd = open(filePath, O_RDONLY, 0);
 
-    //get the size via fstat to map it into memory
-    struct stat statbuf;
-    fstat(fd, &statbuf);
-    __off_t size = statbuf.st_size;
+    //get the size via fstatx to map it into memory
+    struct statx statxbuf;
+    fstatx(fd, &statxbuf);
+    __off_t size = statxbuf.stx_size;
 
     //map the executable file into memory
     //Try putting it closely above TRANSLATOR_BASE so it goes in our address space and the other regions are free for
@@ -112,8 +107,8 @@ t_risc_addr mapIntoMemory(char *filePath) {
                         mmap((void *) vaddr, memory_size, prot, MAP_FIXED_NOREPLACE + MAP_PRIVATE, fd,
                              load_offset);
                 //Failed means that we couldn't get enough memory at the correct address
-                if (segment_in_memory == MAP_FAILED) {
-                    printf("Could not map segment %i because error %i", i, errno);
+                if (BAD_ADDR(segment_in_memory)) {
+                    printf("Could not map segment %i because error %lu", i, (uintptr_t) segment_in_memory);
                     return INVALID_ELF_MAP;
                 }
                 //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.

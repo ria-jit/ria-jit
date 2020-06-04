@@ -11,6 +11,7 @@
 #include <linux/fcntl.h>
 #include <linux/time.h>
 #include <linux/unistd.h>
+#include <linux/stat.h>
 
 #define ssize_t intptr_t
 #define off_t intptr_t
@@ -42,6 +43,8 @@ int close(int fd);
 
 int fcntl(int fd);
 
+int fstatx(int fd, struct statx *buf);
+
 ssize_t read_full(int fd, void *buf, size_t nbytes);
 
 ssize_t write_full(int fd, const void *buf, size_t nbytes);
@@ -71,27 +74,36 @@ int printf(const char *restrict format, ...);
 int puts(const char *s);
 
 // strings.h
-size_t strlen(const char* s);
-int strcmp(const char* s1, const char* s2);
-int strncmp(const char* s1, const char* s2, size_t n);
-char* strchr(const char* s, int c);
-void* memset(void* s, int c, size_t n);
-int memcmp(const void* s1, const void* s2, size_t n);
-void* memcpy(void* dest, const void* src, size_t n);
+size_t strlen(const char *s);
 
-int execve(const char* filename, const char* const argv[], const char* const envp[]);
+int strcmp(const char *s1, const char *s2);
+
+int strncmp(const char *s1, const char *s2, size_t n);
+
+char *strchr(const char *s, int c);
+
+void *memset(void *s, int c, size_t n);
+
+int memcmp(const void *s1, const void *s2, size_t n);
+
+void *memcpy(void *dest, const void *src, size_t n);
+
+int execve(const char *filename, const char *const argv[], const char *const envp[]);
+
 int dup2(int oldfd, int newfd);
+
 int pipe2(int pipefd[2], int flags);
+
 int __clone(int (*func)(void *), void *stack, int flags, void *arg, ...);
 
 #define STRINGIFY_ARG(x) #x
 #define STRINGIFY(x) STRINGIFY_ARG(x)
 
-#define PASTE_ARGS(a,b) a ## b
-#define PASTE(a,b) PASTE_ARGS(a, b)
+#define PASTE_ARGS(a, b) a ## b
+#define PASTE(a, b) PASTE_ARGS(a, b)
 
-#define ALIGN_DOWN(v,a) ((v) & ~((a)-1))
-#define ALIGN_UP(v,a) (((v) + (a - 1)) & ~((a)-1))
+#define ALIGN_DOWN(v, a) ((v) & ~((a)-1))
+#define ALIGN_UP(v, a) (((v) + (a - 1)) & ~((a)-1))
 
 #define LIKELY(x) __builtin_expect((x), 1)
 #define UNLIKELY(x) __builtin_expect((x), 0)
