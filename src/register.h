@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-t_risc_reg_val *get_reg_data();
+t_risc_reg_val *get_reg_data(void);
 
 t_risc_reg_val get_value(t_risc_reg reg);
 

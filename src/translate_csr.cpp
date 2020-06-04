@@ -3,7 +3,6 @@
 //
 
 #include "translate_csr.hpp"
-#include <iostream>
 #include "register.h"
 
 using namespace asmjit;

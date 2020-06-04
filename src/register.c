@@ -12,7 +12,7 @@
  */
 t_risc_reg_val contents[33];
 
-t_risc_reg_val *get_reg_data() {
+t_risc_reg_val *get_reg_data(void) {
     return contents;
 }
 

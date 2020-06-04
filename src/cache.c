@@ -20,9 +20,10 @@
 #include <stddef.h>
 #include "cache.h"
 #include "util.h"
+#include "../lib/common.h"
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <bits/mman.h>
 
 #define INITIAL_SIZE 4096
 #define HASH_MASK 0x0000FFF0u
@@ -30,27 +31,25 @@
 //init table for 2^12 elements (key size is 12 bit)
 t_cache_entry *cache_table = NULL;
 size_t table_size = INITIAL_SIZE;
-int count_entries = 0;
+size_t count_entries = 0;
 
 /**
  * Initializes the hash table array.
  */
-void init_hash_table() {
-    //allocate memory for our table
-    cache_table = malloc(table_size * sizeof(t_cache_entry));
+void init_hash_table(void) {
+    //allocate memory for our table (MAP_ANONYMOUS --> initialize to zero)
+    cache_table = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
+                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     //check for heap memory allocation fail
     if (cache_table == NULL) {
         printf("Bad. Cache memory allocation failed.");
         exit(FAIL_HEAP_ALLOC);
     }
-
-    //initialize memory to 0
-    memset(cache_table, 0, table_size * sizeof(t_cache_entry));
 }
 
-inline unsigned int hash(t_risc_addr risc_addr) {
-    return (risc_addr & HASH_MASK) >> 4;
+inline size_t hash(t_risc_addr risc_addr) {
+    return (risc_addr & HASH_MASK) >> 4u;
 }
 
 /**
@@ -58,8 +57,8 @@ inline unsigned int hash(t_risc_addr risc_addr) {
  * @param risc_addr RISC-V code address to lookup_cache_entry in hash table
  * @return table index for either the address in question or the next available field
  */
-unsigned int find_lin_slot(t_risc_addr risc_addr) {
-    unsigned int index = hash(risc_addr);
+size_t find_lin_slot(t_risc_addr risc_addr) {
+    size_t index = hash(risc_addr);
 
     //linearly probe for key or empty field
     while(cache_table[index].cache_loc != 0 && cache_table[index].risc_addr != risc_addr) {
@@ -76,7 +75,7 @@ unsigned int find_lin_slot(t_risc_addr risc_addr) {
  * @return code cache address of that instruction, or NULL if nonexistent
  */
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
-    unsigned int index = find_lin_slot(risc_addr);
+    size_t index = find_lin_slot(risc_addr);
 
     if (cache_table[index].cache_loc != 0) {
         //value is cached and exists
@@ -88,24 +87,29 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
 }
 
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
-    unsigned int index = find_lin_slot(risc_addr);
+    size_t index = find_lin_slot(risc_addr);
 
     //check for table full before inserting
     if (count_entries >= table_size) {
         //double the table size
-        size_t offset = table_size * sizeof(t_cache_entry);
         table_size <<= 1u;
 
         //allocate new heap space for the cache table and copy over the values we have saved
-        t_cache_entry *copy_buffer = malloc(table_size * sizeof(t_cache_entry));
-        memset(copy_buffer, 0, table_size * sizeof(t_cache_entry));
-        for(int i = 0; i < count_entries; ++i) {
-            copy_buffer[i] = cache_table[i];
+        t_cache_entry *copy_buf = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
+                                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+        //check heap allocation
+        if (copy_buf == NULL) {
+            printf("Bad. Memory allocation failed.\n");
+            exit(FAIL_HEAP_ALLOC);
         }
 
-        //free and reset original allocated space
-        free(cache_table);
-        cache_table = copy_buffer;
+        //copy over the old values
+        memcpy(copy_buf, cache_table, count_entries * sizeof(t_cache_entry));
+
+        //free and reset originally allocated space
+        munmap(cache_table, (table_size >> 1u) * sizeof(t_cache_entry));
+        cache_table = copy_buf;
 
         //find index again
         index = find_lin_slot(risc_addr);
@@ -127,10 +131,10 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 /**
  * Print out the hash table contents.
  */
-void print_values() {
-    for (int i = 0; i < count_entries; ++i) {
+void print_values(void) {
+    for (size_t i = 0; i < count_entries; ++i) {
         if (cache_table[i].cache_loc != 0) {
-            printf("cache_table[%d]: RISC-V addr %lu at cache loc %p\n",
+            printf("cache_table[%zu]: RISC-V addr %lu at cache loc %p\n",
                     i,
                     cache_table[i].risc_addr,
                     cache_table[i].cache_loc);
