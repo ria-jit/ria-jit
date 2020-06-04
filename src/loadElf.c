@@ -139,3 +139,38 @@ t_risc_addr mapIntoMemory(char *filePath) {
     //Entry address for start of translation.
     return header->e_entry;
 }
+
+t_risc_addr createStack() {
+    size_t stackSize = 8 * 1024 * 1024; //Default stack size
+
+    struct rlimit rlimit;
+    //Try to get the stacksize from kernel if unsuccessful or infinite use default
+    //0 return means successful.
+    if (getrlimit(RLIMIT_STACK, &rlimit) == 0 && rlimit.rlim_cur != RLIM_INFINITY) {
+        stackSize = rlimit.rlim_cur; //Stack size from kernel
+    }
+
+    //Add guard page at bottom just in case.
+    size_t guard = 4096;
+
+    uintptr_t stackStart = TRANSLATOR_BASE - (stackSize + guard + 4096);
+    void *bottomOfStack = mmap((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
+                               MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
+
+    //Failed means that we couldn't get enough memory at the correct address
+    if (BAD_ADDR(bottomOfStack)) {
+        printf("Could not map stack because error %lu", (uintptr_t) (bottomOfStack));
+        return INVALID_ELF_MAP;
+    }
+    //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
+    if ((uintptr_t) bottomOfStack != stackStart) {
+        printf("Did not get the correct memory address for stack");
+        return INVALID_ELF_MAP;
+    }
+
+    //Make guard protected
+    mprotect(bottomOfStack, guard, PROT_NONE);
+
+    //Return top of stack
+    return (t_risc_addr) bottomOfStack + guard + stackSize;
+}

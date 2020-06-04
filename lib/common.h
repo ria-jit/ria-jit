@@ -10,6 +10,7 @@
 #include <linux/errno.h>
 #include <linux/fcntl.h>
 #include <linux/time.h>
+#include <linux/resource.h>
 #include <linux/unistd.h>
 #include <linux/stat.h>
 
@@ -48,6 +49,9 @@ int fstatx(int fd, struct statx *buf);
 ssize_t read_full(int fd, void *buf, size_t nbytes);
 
 ssize_t write_full(int fd, const void *buf, size_t nbytes);
+
+//sys/resource.h
+int getrlimit(int resource, struct rlimit *rlimits);
 
 // sys/auxv.h
 unsigned long int getauxval(unsigned long int __type);

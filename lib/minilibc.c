@@ -311,8 +311,12 @@ ssize_t write_full(int fd, const void* buf, size_t nbytes) {
     return total_written;
 }
 
-void*
-mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset) {
+int getrlimit(int resource, struct rlimit *rlimits) {
+    return syscall2(__NR_getrlimit, resource, (size_t) rlimits);
+}
+
+void *
+mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
 #if __SIZEOF_POINTER__ == 8
     return (void *) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
                              offset);
