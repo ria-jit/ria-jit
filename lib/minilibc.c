@@ -1,11 +1,12 @@
 
-#include <common.h>
+#include "common.h"
 
 #include <elf.h>
 
-
+#ifdef NO_STDLIB
 extern int main(int argc, char** argv);
 void __start_main(const size_t* initial_stack, const size_t* dynv);
+#endif
 
 #if UINTPTR_MAX == 0xffffffff
 #define ELF_R_TYPE ELF32_R_TYPE
@@ -17,7 +18,7 @@ void __start_main(const size_t* initial_stack, const size_t* dynv);
 
 #if defined(__x86_64__)
 #define R_RELATIVE R_X86_64_RELATIVE
-
+#ifdef NO_STDLIB
 ASM_BLOCK(
     .intel_syntax noprefix;
     .weak _DYNAMIC;
@@ -64,6 +65,7 @@ __clone:
  1: ret;
     .att_syntax;
 );
+#endif
 
 static size_t syscall0(int syscall_number) {
     size_t retval = syscall_number;
@@ -302,14 +304,15 @@ ssize_t write_full(int fd, const void* buf, size_t nbytes) {
 void*
 mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset) {
 #if __SIZEOF_POINTER__ == 8
-    return (void*) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
-                            offset);
+    return (void *) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
+                             offset);
 #else
     return (void*) syscall6(__NR_mmap2, (size_t) addr, length, prot, flags, fd,
                             offset >> 12);
 #endif
 }
-int mprotect(void* addr, size_t len, int prot) {
+
+int mprotect(void *addr, size_t len, int prot) {
     return syscall3(__NR_mprotect, (size_t) addr, len, prot);
 }
 int munmap(void* addr, size_t length) {
@@ -320,11 +323,13 @@ int clock_gettime(int clk_id, struct timespec* tp) {
     return syscall2(__NR_clock_gettime, clk_id, (size_t) tp);
 }
 
+#ifdef NO_STDLIB
 __attribute__((noreturn))
 void _exit(int status) {
     syscall1(__NR_exit, status);
     __builtin_unreachable();
 }
+#endif
 
 int execve(const char* filename, const char* const argv[], const char* const envp[]) {
     return syscall3(__NR_execve, (uintptr_t) filename, (uintptr_t) argv,
@@ -342,9 +347,12 @@ int pipe2(int pipefd[2], int flags) {
 }
 
 size_t strlen(const char* s) {
-    size_t len = 0;
-    for (; *s != '\0'; ++len, ++s);
-    return len;
+    if (s) {
+        size_t len = 0;
+        for(; *s != '\0'; ++len, ++s);
+        return len;
+    }
+    return -1;
 }
 int strcmp(const char* s1, const char* s2) {
     for (; *s1 && *s1 == *s2; s1++, s2++);
@@ -623,6 +631,7 @@ void* memcpy(void* dest, const void* src, size_t n) {
     return dest;
 }
 
+#ifdef NO_STDLIB
 __attribute__((noreturn))
 __attribute__((externally_visible))
 void
@@ -681,3 +690,4 @@ __start_main(const size_t* initial_stack, const size_t* dynv)
     int retval = main(initial_stack[0], (char**) (initial_stack + 1));
     _exit(retval);
 }
+#endif

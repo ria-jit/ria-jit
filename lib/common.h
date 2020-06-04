@@ -15,41 +15,60 @@
 #define ssize_t intptr_t
 #define off_t intptr_t
 
+#define __timeval_defined
+#define __timespec_defined
+
 extern char **environ;
 
 long syscall(long, long, long, long, long, long, long);
+
 __attribute__((noreturn)) void _exit(int status);
+
 int getpid(void);
 
-int clock_gettime(int clk_id, struct timespec* tp);
+int clock_gettime(int clk_id, struct timespec *tp);
 
-int open(const char* pathname, int flags, int mode);
-int openat(int dirfd, const char* pathname, int flags, int mode);
+int open(const char *pathname, int flags, int mode);
+
+int openat(int dirfd, const char *pathname, int flags, int mode);
+
 off_t lseek(int fd, off_t offset, int whence);
-ssize_t read(int fd, void* buf, size_t count);
-ssize_t write(int fd, const void* buf, size_t count);
+
+ssize_t read(int fd, void *buf, size_t count);
+
+ssize_t write(int fd, const void *buf, size_t count);
+
 int close(int fd);
+
 int fcntl(int fd);
 
-ssize_t read_full(int fd, void* buf, size_t nbytes);
-ssize_t write_full(int fd, const void* buf, size_t nbytes);
+ssize_t read_full(int fd, void *buf, size_t nbytes);
+
+ssize_t write_full(int fd, const void *buf, size_t nbytes);
 
 // sys/auxv.h
 unsigned long int getauxval(unsigned long int __type);
 
 // sys/mman.h
-void* mmap(void* addr, size_t length, int prot, int flags, int fd,
+void *mmap(void *addr, size_t length, int prot, int flags, int fd,
            off_t offset);
-int munmap(void* addr, size_t length);
-int mprotect(void* addr, size_t len, int prot);
+
+int munmap(void *addr, size_t length);
+
+int mprotect(void *addr, size_t len, int prot);
 
 // stdio.h
-int vsnprintf(char* str, size_t size, const char* restrict format, va_list args);
-int snprintf(char* str, size_t size, const char* restrict format, ...);
-int vdprintf(int fd, const char* restrict format, va_list args);
-int dprintf(int fd, const char* restrict format, ...);
-int printf(const char* restrict format, ...);
-int puts(const char* s);
+int vsnprintf(char *str, size_t size, const char *restrict format, va_list args);
+
+int snprintf(char *str, size_t size, const char *restrict format, ...);
+
+int vdprintf(int fd, const char *restrict format, va_list args);
+
+int dprintf(int fd, const char *restrict format, ...);
+
+int printf(const char *restrict format, ...);
+
+int puts(const char *s);
 
 // strings.h
 size_t strlen(const char* s);
