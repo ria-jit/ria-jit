@@ -12,11 +12,18 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include "util.h"
 #include "loadElf.h"
 //Apparently not included in the headers on my version.
 #ifndef MAP_FIXED_NOREPLACE
 #define MAP_FIXED_NOREPLACE 0x200000
+#endif
+#ifndef EF_RISCV_RVE
+#define EF_RISCV_RVE 0x8
+#endif
+#ifndef EF_RISCV_TSO
+#define EF_RISCV_TSO 0x10
 #endif
 
 t_risc_addr mapIntoMemory(char *filePath) {
@@ -33,7 +40,7 @@ t_risc_addr mapIntoMemory(char *filePath) {
     //map the executable file into memory
     //Try putting it closely above TRANSLATOR_BASE so it goes in our address space and the other regions are free for
     // the mapping.
-    char *exec = mmap((void *) TRANSLATOR_BASE + 0x10000000, size, PROT_READ, MAP_SHARED, fd, 0);
+    char *exec = mmap((void *) (TRANSLATOR_BASE + 0x10000000), size, PROT_READ, MAP_SHARED, fd, 0);
 
     //read as elf header
     Elf64_Ehdr *header = (Elf64_Ehdr *) exec;
@@ -42,6 +49,37 @@ t_risc_addr mapIntoMemory(char *filePath) {
     Elf64_Half ph_count = header->e_phnum;
     Elf64_Off ph_offset = header->e_phoff;
     Elf64_Phdr *segments = (Elf64_Phdr *) (exec + ph_offset);
+    Elf64_Word flags = header->e_flags;
+
+    bool incompatible = false;
+
+    if (flags & EF_RISCV_RVC) {
+        not_yet_implemented("C ABI is not yet supported");
+        incompatible = true;
+    }
+    if (flags & EF_RISCV_FLOAT_ABI_SINGLE) {
+        not_yet_implemented("F ABI is not yet supported");
+        incompatible = true;
+    }
+    if (flags & EF_RISCV_FLOAT_ABI_DOUBLE) {
+        not_yet_implemented("D ABI is not yet supported");
+        incompatible = true;
+    }
+    if (flags & EF_RISCV_FLOAT_ABI_QUAD) {
+        not_yet_implemented("Q ABI is not yet supported");
+        incompatible = true;
+    }
+    if (flags & EF_RISCV_RVE) {
+        not_yet_implemented("E ABI is not yet supported");
+        incompatible = true;
+    }
+    if (flags & EF_RISCV_TSO) {
+        not_yet_implemented("TSO ABI is not yet supported");
+        incompatible = true;
+    }
+    if (incompatible) {
+        return INVALID_ELF_MAP;
+    }
 
     for(int i = 0; i < ph_count; i++) {
         Elf64_Phdr segment = segments[i];
