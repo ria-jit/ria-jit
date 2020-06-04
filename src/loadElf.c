@@ -82,13 +82,13 @@ t_risc_addr mapIntoMemory(char *filePath) {
     }
 
     for(int i = 0; i < ph_count; i++) {
-        Elf64_Phdr segment = segments[i];
-        switch(segment.p_type) {
+        Elf64_Phdr *segment = segments + i;
+        switch(segment->p_type) {
             case PT_LOAD: {
-                Elf64_Off load_offset = segment.p_offset;
-                Elf64_Xword memory_size = segment.p_memsz;
-                Elf64_Xword physical_size = segment.p_filesz;
-                Elf64_Addr vaddr = segment.p_vaddr;
+                Elf64_Off load_offset = segment->p_offset;
+                Elf64_Xword memory_size = segment->p_memsz;
+                Elf64_Xword physical_size = segment->p_filesz;
+                Elf64_Addr vaddr = segment->p_vaddr;
                 printf("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
                        "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
                 //Refuse to map to a location in the address space of the translator.
@@ -96,9 +96,20 @@ t_risc_addr mapIntoMemory(char *filePath) {
                     printf("Bad. This segment wants to be in the translators memory region");
                     return INVALID_ELF_MAP;
                 }
+                //Copy flags over
+                int prot = 0;
+                if (segment->p_flags & PF_R) {
+                    prot |= PROT_READ;
+                }
+                if (segment->p_flags & PF_W) {
+                    prot |= PROT_WRITE;
+                }
+                if (segment->p_flags & PF_X) {
+                    prot |= PROT_EXEC; //Probably not even needed
+                }
                 //Allocate memory for the segment at the correct address and map the file segment into that memory
                 void *segment_in_memory =
-                        mmap((void *) vaddr, memory_size, PROT_READ, MAP_FIXED_NOREPLACE + MAP_PRIVATE, fd,
+                        mmap((void *) vaddr, memory_size, prot, MAP_FIXED_NOREPLACE + MAP_PRIVATE, fd,
                              load_offset);
                 //Failed means that we couldn't get enough memory at the correct address
                 if (segment_in_memory == MAP_FAILED) {
