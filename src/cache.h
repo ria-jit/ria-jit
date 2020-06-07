@@ -9,6 +9,10 @@
 
 #include "util.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void *t_cache_loc;
 
 //cache entries for translated code segments
@@ -30,5 +34,9 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr);
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc);
 
 void print_values(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_CACHE_H
