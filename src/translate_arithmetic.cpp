@@ -95,6 +95,7 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
 void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
     log_verbose("Translate AUIPC…\n");
 
+    //TODO Change to use instr.addr instead of pc as pc is only updated on end of basic block AFAIK.
     //add offset to the pc and store in rd
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[pc]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[pc]);

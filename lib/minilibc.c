@@ -361,6 +361,7 @@ int pipe2(int pipefd[2], int flags) {
 }
 
 size_t strlen(const char* s) {
+    //TODO Remove check and give useful return value when printf is fixed as well
     if (s) {
         size_t len = 0;
         for(; *s != '\0'; ++len, ++s);
@@ -397,7 +398,7 @@ size_t
 printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
               va_list args) {
     size_t bytes_written = 0;
-
+    //TODO Proper fix for segfault if arg is null
     char buffer[32] = {0};
     int buflen;
 
@@ -427,6 +428,7 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
         }
 
         format++;
+        //TODO Is this all needed format specifiers?
         if (format_spec == 's') {
             const char* str = va_arg(args, const char*);
             size_t len = strlen(str);
