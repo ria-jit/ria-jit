@@ -25,8 +25,6 @@ using namespace asmjit;
 //instruction translation
 void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info);
 
-void generate_strlen();
-
 /**
  * The AsmJit code holder for our generated x86 machine code.
  */
@@ -36,14 +34,6 @@ CodeHolder *code;
  * The Assembly emitter that writes to the CodeBuffer in the CodeHolder.
  */
 x86::Assembler *a;
-
-/**
- * Quick example to test code generation using AsmJit.
- */
-void test_generation() {
-    log_verbose("Testing code generation with a String length example...\n");
-    generate_strlen();
-}
 
 /**
  * Initializes a new translatable block of code.
@@ -97,44 +87,6 @@ t_cache_loc finalize_block() {
     __builtin___clear_cache(static_cast<char *>(ptr), static_cast<char *>(ptr) + size - 1);
 
     return ptr;
-}
-
-/**
- * Deprecated! Only for example and testing purposes.
- * Generates a basic strlen loop in machine code and executes it
- * by calling the generated code in memory.
- */
-void generate_strlen() {
-    //initialize new block
-    init_block();
-
-    //calling convention: first argument in rdi, ret value in rax
-    x86::Gp str = x86::rdi;
-    x86::Gp len = x86::rax;
-
-    Label loop_cond = a->newLabel();
-    Label loop_end = a->newLabel();
-
-    a->xor_(len, len);
-    a->bind(loop_cond);
-    a->cmp(x86::byte_ptr(str), 0);
-    a->jz(loop_end);
-    a->inc(len);
-    a->inc(str);
-    a->jmp(loop_cond);
-    a->bind(loop_end);
-
-    //finalize block and get cached location
-    t_cache_loc executable = finalize_block();
-
-    //call the assembled function on a string
-    //Hack to not need to include <string>
-    char const *hello_world = "Hello, World!"; //len = 13
-    char *string = const_cast<char *>(hello_world);
-    typedef int (*str_len_asm)(char *);
-    int ret = ((str_len_asm) executable)(string);
-
-    printf("Length of string %s is %d", string, ret);
 }
 
 /**

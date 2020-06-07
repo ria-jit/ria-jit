@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
     printf("Hello World!\n");
     test_parsing();
     transcode_loop();
-    test_generation();
     return 0;
 }
 

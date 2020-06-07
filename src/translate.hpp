@@ -25,8 +25,6 @@ extern asmjit::x86::Assembler *a;
 extern "C" {
 #endif
 
-void test_generation();
-
 //basic block translation management
 void init_block();
 t_cache_loc finalize_block();
