@@ -6,6 +6,9 @@
 #include <cache.h>
 #include <util.h>
 
+/**
+ * Stores some values in the cache and reads them back to verify.
+ */
 TEST(CodeCache, StoresCachedCorrectly) {
     //initialize the cache
     init_hash_table();
@@ -28,6 +31,9 @@ TEST(CodeCache, StoresCachedCorrectly) {
     EXPECT_EQ((void*) 0x300, entryC);
 }
 
+/**
+ * Maxes out the default cache size (4096) in order to trigger a resize, then checks value consistency.
+ */
 TEST(CodeCache, ResizesTableCorrectly) {
     //initialize the cache
     init_hash_table();
