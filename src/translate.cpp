@@ -30,7 +30,7 @@ void generate_strlen();
 /**
  * The AsmJit code holder for our generated x86 machine code.
  */
-CodeHolder code;
+CodeHolder *code;
 
 /**
  * The Assembly emitter that writes to the CodeBuffer in the CodeHolder.
@@ -51,8 +51,14 @@ void test_generation() {
  * (e.g., before translating every basic block).
  */
 void init_block() {
-    code.init(CodeInfo(ArchInfo::kIdHost));
-    a = new x86::Assembler(&code);
+    //delete the last block's CodeHolder and Assembler
+    delete code;
+    delete a;
+
+    //initialize new CodeHolders and Assemblers for each block
+    code = new CodeHolder();
+    code->init(CodeInfo(ArchInfo::kIdHost));
+    a = new x86::Assembler(code);
 }
 
 /**
@@ -66,11 +72,11 @@ t_cache_loc finalize_block() {
     a->ret();
 
     //flatten and resolve open links to prepare for relocation
-    code.flatten();
-    code.resolveUnresolvedLinks();
+    code->flatten();
+    code->resolveUnresolvedLinks();
 
     //get the worst case size estimate for memory allocation
-    size_t size = code.codeSize();
+    size_t size = code->codeSize();
 
     //allocate executable page for determined worst case code size, initialized to 0
     void *ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -80,11 +86,11 @@ t_cache_loc finalize_block() {
     }
 
     //relocate code to allocated memory area, size may have changed
-    code.relocateToBase(reinterpret_cast<uint64_t>(ptr));
-    size = code.codeSize();
+    code->relocateToBase(reinterpret_cast<uint64_t>(ptr));
+    size = code->codeSize();
 
     //copy the .text section to the allocated page
-    CodeBuffer buffer = code.sectionById(0)->buffer();
+    CodeBuffer buffer = code->sectionById(0)->buffer();
     memcpy(ptr, buffer.data(), buffer.size());
 
     //prevents gcc from optimizing the assumed dead store away

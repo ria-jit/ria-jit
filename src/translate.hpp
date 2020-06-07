@@ -19,7 +19,7 @@ struct register_info {
     uint64_t base;
 };
 
-extern asmjit::CodeHolder code;
+extern asmjit::CodeHolder *code;
 extern asmjit::x86::Assembler *a;
 
 extern "C" {
