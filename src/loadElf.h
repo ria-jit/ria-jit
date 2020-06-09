@@ -5,6 +5,7 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOADELF_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOADELF_H
 
+#include <elf.h>
 
 #define INVALID_ELF_MAP (t_risc_elf_map_result){.valid = false}
 #define INVALID_STACK 0
@@ -22,7 +23,7 @@ typedef struct {
 /**
  * Maps all LOAD segments of the ELF file at the given path into the correct memory regions.
  * @param filePath the path to the ELF file.
- * @return the map result containing or INVALID_ELF_MAP if the mapping failed.
+ * @return t_risc_elf_map_result the map result containing or INVALID_ELF_MAP if the mapping failed.
  */
 t_risc_elf_map_result mapIntoMemory(const char *filePath);
 

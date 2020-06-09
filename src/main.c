@@ -8,7 +8,9 @@
 #include "cache.h"
 #include "translate.hpp"
 #include "parser.h"
+#include "loadElf.h"
 #include <getopt.h>
+#include <../test/test.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -22,6 +24,7 @@ t_risc_addr execute_cached(t_cache_loc loc);
 
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
+#ifndef TESTING
 int main(int argc, char *argv[]) {
     int opt_index = 0;
     char *file_path = NULL;
@@ -51,14 +54,27 @@ int main(int argc, char *argv[]) {
         return 2;
     }
 
-    printf("Hello World!\n");
-    test_parsing();
+    printf("Start program!\n");
     transcode_loop();
     return 0;
 }
 
-int transcode_loop() {
-    t_risc_addr pc = init_entry_pc();
+#endif //TESTING
+
+int start_transcode(const char *file_path){
+    printf("extern transcode start!\n");
+    verbose = true;
+    transcode_loop(file_path);
+    return 0;
+}
+
+int transcode_loop(const char *file_path) {
+    t_risc_elf_map_result result = mapIntoMemory(file_path);
+    if(!result.valid){
+        fprintf(stderr, "Bad. Failed to map into memory.\n");
+    }
+
+    t_risc_addr pc = result.entry;
 
     init_hash_table();
 

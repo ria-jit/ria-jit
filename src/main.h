@@ -1,0 +1,9 @@
+//
+// Created by noah on 09.06.20.
+//
+
+#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_MAIN_H
+#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_MAIN_H
+
+extern "C" int start_transcode(const char *file_path);
+#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_MAIN_H
