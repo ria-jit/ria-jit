@@ -5,7 +5,6 @@
 //
 
 #include "../lib/common.h"
-#include <elf.h>
 #include <linux/mman.h>
 #include "util.h"
 #include "loadElf.h"

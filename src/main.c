@@ -8,6 +8,7 @@
 #include "cache.h"
 #include "translate.hpp"
 #include "parser.h"
+#include "loadElf.h"
 #include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
@@ -53,12 +54,13 @@ int main(int argc, char *argv[]) {
 
     printf("Hello World!\n");
     test_parsing();
-    transcode_loop();
+    transcode_loop(file_path);
     return 0;
 }
 
-int transcode_loop() {
-    t_risc_addr pc = init_entry_pc();
+int transcode_loop(char *file_path) {
+    t_risc_elf_map_result result = mapIntoMemory(file_path);
+    t_risc_addr pc = result.entry;
 
     init_hash_table();
 
