@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{fancyhdr}
 \usepackage{extramarks}
@@ -12,6 +13,10 @@
 \usepackage{marvosym}
 \usepackage[plain]{algorithm}
 \usepackage{algpseudocode}
+\usepackage{fancyvrb}
+\usepackage{footnote}
+\usepackage{hyperref}
+\usepackage{graphicx}
 
 \newcommand{\titleOfDocument}[0]{Dynamic Binary Translator: RISC--V \refer x86}
 \renewcommand{\paragraph}[1]{\vspace{7pt}\noindent\textbf{#1}\newline\nopagebreak\vspace{1pt}}
@@ -22,6 +27,8 @@
 \newcommand{\refer}[0]{$\rightarrow$ }
 \renewcommand\headrulewidth{0.4pt}
 \renewcommand\footrulewidth{0.4pt}
+\VerbatimFootnotes
+\makesavenoteenv{tabular}
 
 \topmargin=-0.45in
 \evensidemargin=0in
@@ -58,26 +65,51 @@
 \thispagestyle{empty}
 \pagebreak
 
-\section*{Minimalanteil}
-\begin{itemize}
-	\item Einfache RISC-V-kompilierte Programme ausführen
-	\item Unit-Testing der Systemkomponenten
-	\item Einfache Syscalls unterstützen (\verb!write!, \verb!read!, \verb!printf!, \verb!open!, \verb!close!, \verb!fstat!, \ldots)
-	\item Benchmark GZIP ausführen
-	\item Dokumentation anfertigen
-\end{itemize}
+\section*{Projektspezifikation}
+Im Rahmen dieses Projektes wird ein Übersetzungssystem entwickelt, welches für die RISC-V-ISA kompilierten Code innerhalb einer x86-64-Umgebung lauffähig macht.
 
-\section*{Erweiterungsteil}
-\begin{itemize}
-	\item Benchmarks (Image-Processing) ausführen
-	\item Floating Point Extension
-	\item Optimierungen (\refer Chaining, return address prediction)
-\end{itemize}
+Zu diesem Zwecke soll dynamische Binärübersetzung eingesetzt werden. Die ausführbaren und tatsächlich angesprungenen Programmteile der ELF-Datei sollen also entsprechend eines Mappings einzelner Instruktionen dynamisch in x86-64-Code übersetzt werden. Diese Programmteile werden im Rahmen der Übersetzung zwischengespeichert, was somit sicherstellt, dass ein Ausführungsblock nicht doppelt übersetzt werden muss. Zudem sollen diverse Optimierungsansätze zur Verbesserung der Übersetzungs- und Ausführungsgeschwindigkeit herangezogen werden.
+
+\section*{Minimale Zielsetzung}
+\begin{description}
+	\item[Ausführung einfacher RISC-V-Programme] Wir möchten die Unterstützung von einfachen, für die RISC-V-ISA kompilierten ELF-Dateien ermöglichen. Dies setzt voraus, dass wir in der Lage sind, die grundlegenden Instruktionen des RV32I/RV64I zu übersetzen. Um die ganzzahlige arithmetische Funktionalität der ISA abzurunden, möchten wir auch die M-Erweiterung des Instruktionssatzes (Multiplikations-, wie Divisionsbefehle) unterstützen. Verwendet die ELF-Datei nicht unterstütze Instruktionen, möchten wir entsprechende Ausgaben liefern, die gegebenenfalls auf eine mögliche Kompilierung des Codes unter abgeschalteten Befehlssatzerweiterungen hinweist.
+	\item[Unterstützung von system calls] Im Rahmen der minimalen Zielsetzung möchten wir environment calls via der \verb!ECALL!-Instruktion zu den Linux system calls \verb!write!, \verb!read!, \verb!printf!, \verb!open!, \verb!close! sowie \verb!fstat! anbieten. Dies steht in direkter Verbindung mit der obigen Ausführung einfacher Programme: es gibt schließlich kein \glqq Hello, World!\grqq{} ohne \verb!write!.
+	\item[Benchmark via gzip] Zum Zwecke der Performancemessung des entwickelten Übersetzers sowie zur Quantifizierung potenziell folgender Optimierungen möchten wir die RISC-V-64-Version von gzip als Benchmark heranziehen.
+	\item[Dokumentation anfertigen.]
+\end{description}
+
+\section*{Ausnahmen und Einschränkungen}
+Entgegen des obigen ersten Punktes möchten wir die mit den \verb!CSR!-Registern verbundene Funktionalität nicht unterstützen. Nicht unterstützte Befehlssatzerweiterungen werden vor dem Programmstart abgefangen und an den Benutzer gemeldet.
+
+System calls, die nicht in der obigen Aufzählung enthalten sind, möchten wir vorerst wie \verb!NOP!s behandeln\footnote{Evidenterweise soll die encodierte Version \verb!NOP!-Pseudoinstruktion \verb!ADDI x0, x0, 0! nicht übersetzt werden.}.
+
+
+\section*{Erweiterte Zielsetzung}
+
+\begin{description}
+	\item[Unit-Testing] Um die Korrektheit unseres Systems zu verifizieren, wie auch die interne Fehlersuche zu erleichtern, möchten wir Unit-Tests für unsere verschiedenen Systemkomponenten schreiben. Hierbei geht es vor allem um den Code-Cache, den Parser der RISC-V-Instruktionen sowie die dynamische Codegenerierung, nachdem die einwandfreie Funktionalität hier von zentraler Wichtigkeit ist.
+	\item[Floating Point Extension] Um die arithmetische Funktionalität zu vervollständigen, möchten wir nach Möglichkeit die \glqq F\grqq{} bzw. \glqq D\grqq{}-Standard Extensions zur Gleitkommaarithmetik unterstützen.
+	\item[Weiteres Benchmarking] Die Unterstützung der Fließkommaarithmetik öffnet die Tore zu komplexeren Benchmarkingoptionen -- insbesondere ist hier die Möglichkeit von Image Processing Benchmarks gegeben.
+	\item[Diverse Optimierungen] Im Laufe des Projekts möchten wir alle Programmteile auf Performanz optimieren. Insbesondere die Übersetzungsstrategien sollen hierbei im Mittelpunkt stehen. Als Ansatzpunkte seien an dieser Stelle Konzepte wie Chaining, return address prediction, wie auch das Übersetzen ganzer Schleifen (statt nur einzelner Basisblöcke, die nach jeder Iteration erneut angesprungen werden müssten).
+\end{description}
 
 \section*{Zeitplan}
-\begin{itemize}
-	\item Ausführen eines \emph{Hello-World-Programmes} bis zum 10. Juni 2020
-	\item Abschluss des \emph{Minimalanteils} (s.o.) bis Mitte Juli
-	\item Anfertigung der \emph{Dokumentation} bis Mitte August
-\end{itemize}
+\begin{center}
+	\begin{tabular}{|r|l|}
+		\hline
+		\textbf{April 2020} & Einlesen in die System-V-ABI\footnote{\url{https://github.com/hjl-tools/x86-psABI/wiki/x86-64-psABI-1.0.pdf}, Stand 09.06.2020.} sowie die unpriviligierte RISC-V-Spezifikation\footnote{\url{https://content.riscv.org/wp-content/uploads/2016/06/riscv-spec-v2.1.pdf}, Stand 09.06.2020.};\\
+		& Aufsetzen der Projektstruktur und Einarbeitung in die Systematik\\
+		\hline
+		\textbf{Mai 2020} & Implementierung des Caches, Parsers, ELF-Loaders, Blockloaders sowie der\\
+		& Übersetzungen für die Instruktionen der RV64I\\
+		\hline
+		\textbf{Juni 2020} & Integration der Komponenten, Umsetzung der system calls, erstes Benchmarking\\
+		\hline
+		\textbf{Juli 2020} & Abschluss des obigen Minimalanteils (RV64I, system calls, gzip),\\
+		&Beginn der Dokumentation\\
+		\hline
+		\textbf{August 2020} & Anfertigung der Dokumentation sowie Behandlung der erweiterten Funktionalität\\
+		\hline
+	\end{tabular}
+\end{center}
 \end{document}
