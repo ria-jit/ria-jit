@@ -11,7 +11,6 @@
 #include <register.h>
 #include "loadElf.h"
 #include <getopt.h>
-#include <../test/test.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -82,6 +81,8 @@ int transcode_loop(const char *file_path) {
 
     init_hash_table();
 
+    set_value(pc,next_pc);
+
     while (!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(next_pc);
@@ -93,7 +94,7 @@ int transcode_loop(const char *file_path) {
         }
 
         //execute the cached (or now newly generated code) and update the program counter
-        execute_cached(next_pc);
+        execute_cached(cache_loc);
 
         //store pc from registers in pc
         next_pc = get_value(pc);

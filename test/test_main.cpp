@@ -1,7 +1,6 @@
 //
 // Created by flo on 07.06.20.
 //
-#include "test.h"
 #include <gtest/gtest.h>
 
 #ifdef TESTING
