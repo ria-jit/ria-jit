@@ -27,7 +27,7 @@ add_executable("test" ${ASMJIT_SRC} src/main.c src/main.h test/test_main.cpp src
         src/loadElf.h src/translate_arithmetic.cpp src/translate_arithmetic.hpp src/translate_controlflow.cpp
         src/translate_controlflow.hpp src/translate_csr.cpp src/translate_csr.hpp src/translate_loadstore.cpp
         src/translate_loadstore.hpp src/translate_m_ext.cpp src/translate_m_ext.hpp src/translate_other.cpp
-        src/translate_other.hpp lib/common.h lib/minilibc.c test/test_register.cpp test/test_translate_basic.cpp test/test_parser.cpp test/test_cache.cpp test/test_hello_world.cpp test/test.h)
+        src/translate_other.hpp lib/common.h lib/minilibc.c test/test_register.cpp test/test_loadElf.cpp test/test_translate_basic.cpp test/test_parser.cpp test/test_cache.cpp test/test_hello_world.cpp test/test.h)
 target_link_libraries("test" gtest gtest_main)
 
 #define our translator's target

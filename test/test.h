@@ -6,6 +6,6 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TEST_H
 
 //used to switch between normal program and unit testing
-#define TESTING
+//#define TESTING
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TEST_H

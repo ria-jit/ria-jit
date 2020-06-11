@@ -96,7 +96,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
 
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t*)p_instr_struct->addr; //cast and dereference
-    printf("Parsing: %#010x\n", raw_instr);
+    printf("Parsing: %x\n", raw_instr);
 
     //fill basic struct
     p_instr_struct->reg_dest = extract_rd(raw_instr);

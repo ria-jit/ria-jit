@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Start program!\n");
-    transcode_loop();
+    transcode_loop(file_path);
     return 0;
 }
 
@@ -75,6 +75,9 @@ int transcode_loop(const char *file_path) {
     }
 
     t_risc_addr pc = result.entry;
+
+    //allocate stack
+    createStack(0,"",result);
 
     init_hash_table();
 
@@ -98,14 +101,16 @@ int transcode_loop(const char *file_path) {
 }
 
 /**
+ * Moved to translate.cpp
  * Translate the basic block at the passed RISC-V pc address.
  * @param risc_addr the RISC-V address of the basic block in question
  * @return cache location of the translated code
  */
-t_cache_loc translate_block(t_risc_addr risc_addr) {
+/*t_cache_loc translate_block(t_risc_addr risc_addr) {
     not_yet_implemented("Translate Block");
+
     return 0;
-}
+}*/
 
 /**
  * Execute cached translated code at the passed location.

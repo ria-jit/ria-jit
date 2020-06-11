@@ -30,7 +30,7 @@ void init_block();
 t_cache_loc finalize_block();
 
 ///basic block translation
-//t_cache_loc translate_block(t_risc_addr risc_addr);
+t_cache_loc translate_block(t_risc_addr risc_addr);
 
 #ifdef __cplusplus
 }

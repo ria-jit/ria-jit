@@ -38,8 +38,8 @@ size_t count_entries = 0;
  */
 void init_hash_table(void) {
     //allocate memory for our table (MAP_ANONYMOUS --> initialize to zero)
-    cache_table = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
-                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    cache_table = mmap_mini(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
+                            MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     //check for heap memory allocation fail
     if (cache_table == NULL) {
@@ -95,8 +95,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
         table_size <<= 1u;
 
         //allocate new heap space for the cache table and copy over the values we have saved
-        t_cache_entry *copy_buf = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
-                                       MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+        t_cache_entry *copy_buf = mmap_mini(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
+                                            MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
         //check heap allocation
         if (copy_buf == NULL) {

@@ -6,9 +6,14 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOADELF_H
 
 #include <elf.h>
+#include <util.h>
 
 #define INVALID_ELF_MAP (t_risc_elf_map_result){.valid = false}
 #define INVALID_STACK 0
+
+#ifdef __cplusplus
+extern "C" {
+#endif //__cplusplus
 /**
  * Struct containing map metadata. If valid is false the other values are undefined.
  */
@@ -43,5 +48,9 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath);
  * @return the 16-Byte aligned address of the start stack pointer.
  */
 t_risc_addr createStack(int guestArgc, char *guestArgv[], t_risc_elf_map_result mapInfo);
+
+#ifdef __cplusplus
+}
+#endif //__cplusplus
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOADELF_H

@@ -338,7 +338,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //but that would be less elegant.
     //std::vector<t_risc_instr> block_cache;
 #define BLOCK_CACHE_SIZE 64
-    t_risc_instr *block_cache = (t_risc_instr*) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    t_risc_instr *block_cache = (t_risc_instr*) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr),
+                                                          PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     ///count register usage
     uint32_t reg_count[N_REG];
