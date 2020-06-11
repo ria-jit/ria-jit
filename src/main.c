@@ -89,6 +89,7 @@ int transcode_loop(const char *file_path) {
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
             cache_loc = translate_block(next_pc);
+            set_cache_entry(next_pc,cache_loc);
         }
 
         //execute the cached (or now newly generated code) and update the program counter
