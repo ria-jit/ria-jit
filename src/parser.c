@@ -56,6 +56,7 @@ static inline int32_t extract_imm_B(int32_t instr) {
 }
 
 //function prototypes DEPRECATED
+//function prototypes DEPRECATED
 t_parse_result parse_OP_IMM(int32_t* instruction);
 
 t_parse_result parse_OP_IMM_32(int32_t* instruction);
@@ -211,6 +212,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     break;
                 }
                 default: {
+                    int error = extract_func3(raw_instr);
                     not_yet_implemented("Invalid LOAD Instruction");
                 }
             }

@@ -8,6 +8,7 @@
 #include "cache.h"
 #include "translate.hpp"
 #include "parser.h"
+#include <register.h>
 #include "loadElf.h"
 #include <getopt.h>
 #include <../test/test.h>
@@ -20,7 +21,7 @@ int transcode_loop();
 
 t_risc_addr init_entry_pc();
 
-t_risc_addr execute_cached(t_cache_loc loc);
+void execute_cached(t_cache_loc loc);
 
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
@@ -74,7 +75,7 @@ int transcode_loop(const char *file_path) {
         fprintf(stderr, "Bad. Failed to map into memory.\n");
     }
 
-    t_risc_addr pc = result.entry;
+    t_risc_addr next_pc = result.entry;
 
     //allocate stack
     createStack(0,"",result);
@@ -83,18 +84,21 @@ int transcode_loop(const char *file_path) {
 
     while (!finalize) {
         //check our previously translated code
-        t_cache_loc cache_loc = lookup_cache_entry(pc);
+        t_cache_loc cache_loc = lookup_cache_entry(next_pc);
 
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
-            cache_loc = translate_block(pc);
+            cache_loc = translate_block(next_pc);
         }
 
         //execute the cached (or now newly generated code) and update the program counter
-        pc = execute_cached(cache_loc);
+        execute_cached(next_pc);
+
+        //store pc from registers in pc
+        next_pc = get_value(pc);
 
         //tmp - programm should exit on syscall
-        finalize = true;
+        //finalize = true;
     }
 
     return 0;
@@ -115,13 +119,12 @@ int transcode_loop(const char *file_path) {
 /**
  * Execute cached translated code at the passed location.
  * @param loc the cache address of that code
- * @return the program counter value after execution of the translated basic block
+ * @return
  */
-t_risc_addr execute_cached(t_cache_loc loc) {
-    // execute the function at loc
-    // check pc = pc[register]
-    not_yet_implemented("Execute Cached");
-    return 0;
+void execute_cached(t_cache_loc loc) {
+    printf("Execute Cached");
+    typedef void (*void_asm)(void);
+    ((void_asm)loc)(); //call asm code
 }
 
 t_risc_instr *decode_next() {
