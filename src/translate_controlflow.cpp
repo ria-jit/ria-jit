@@ -30,7 +30,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_src_1]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
     } else {
-        a->mov(x86::rax, x86::ptr_abs(r_info.base + 8 * instr.reg_src_1));
+        a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
     }
 
     ///add immediate to rs1
@@ -44,7 +44,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[t_risc_reg::pc]) {
         a->mov(r_info.map[pc], x86::rax);
     } else {
-        a->mov(x86::ptr_abs(r_info.base + 8 * t_risc_reg::pc), x86::rax);
+        a->mov(x86::ptr(r_info.base + 8 * t_risc_reg::pc), x86::rax);
     }
 
     ///write addr of next instruction in rd
@@ -175,18 +175,18 @@ inline void translate_controlflow_cmp_rs1_rs2(const t_risc_instr& instr, const r
         }
             ///else get rs2 from mem
         else {
-            a->cmp(r_info.map[instr.reg_src_1], x86::ptr_abs(r_info.base + 8 * instr.reg_src_2));
+            a->cmp(r_info.map[instr.reg_src_1], x86::ptr(r_info.base + 8 * instr.reg_src_2));
         }
     }
     else {
         ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
         if(r_info.mapped[instr.reg_src_2] && noOrder) {
-            a->cmp(r_info.map[instr.reg_src_2], x86::ptr_abs(r_info.base + 8 * instr.reg_src_1));
+            a->cmp(r_info.map[instr.reg_src_2], x86::ptr(r_info.base + 8 * instr.reg_src_1));
         }
             ///else get both from mem, rs1 in temp register
         else {
-            a->mov(x86::rax, x86::ptr_abs(r_info.base + 8 * instr.reg_src_1));
-            a->cmp(x86::rax, x86::ptr_abs(r_info.base + 8 * instr.reg_src_2));
+            a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+            a->cmp(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         }
     }
 }

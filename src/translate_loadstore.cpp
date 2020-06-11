@@ -23,9 +23,9 @@ void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::byte_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->movsx(FIRST_REG, x86::byte_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -42,9 +42,9 @@ void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::word_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->movsx(FIRST_REG, x86::word_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -61,9 +61,9 @@ void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::dword_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->movsx(FIRST_REG, x86::dword_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -80,9 +80,9 @@ void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movzx(r_info.map[instr.reg_dest], x86::byte_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->movzx(FIRST_REG, x86::byte_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -99,9 +99,9 @@ void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movzx(r_info.map[instr.reg_dest], x86::word_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->movzx(FIRST_REG, x86::word_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -118,8 +118,8 @@ void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r8());
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_dest));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(FIRST_REG, x86::ptr(r_info.base, 8 * instr.reg_dest));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r8());
     }
 }
@@ -137,8 +137,8 @@ void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r16());
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_dest));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(FIRST_REG, x86::ptr(r_info.base, 8 * instr.reg_dest));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r16());
     }
 }
@@ -156,8 +156,8 @@ void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r32());
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_dest));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(FIRST_REG, x86::ptr(r_info.base, 8 * instr.reg_dest));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r32());
     }
 }
@@ -178,9 +178,9 @@ void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->mov(r_info.map[instr.reg_dest].r32(), x86::dword_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->mov(FIRST_REG.r32(), x86::dword_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -197,9 +197,9 @@ void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->mov(r_info.map[instr.reg_dest], x86::qword_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
         a->mov(FIRST_REG, x86::qword_ptr(SECOND_REG, instr.imm));
-        a->mov(x86::ptr_abs(r_info.base, 8 * instr.reg_dest), FIRST_REG);
+        a->mov(x86::ptr(r_info.base, 8 * instr.reg_dest), FIRST_REG);
     }
 }
 
@@ -216,8 +216,8 @@ void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2]);
     } else {
-        a->mov(SECOND_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr_abs(r_info.base, 8 * instr.reg_dest));
+        a->mov(SECOND_REG, x86::ptr(r_info.base, 8 * instr.reg_src_1));
+        a->mov(FIRST_REG, x86::ptr(r_info.base, 8 * instr.reg_dest));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG);
     }
 }

@@ -69,24 +69,24 @@ t_cache_loc finalize_block() {
     size_t size = code->codeSize();
 
     //allocate executable page for determined worst case code size, initialized to 0
-    void *ptr_abs = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (!ptr_abs) {
+    void *ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    if (!ptr) {
         printf("Bad. Memory allocation fault.\n");
         return nullptr;
     }
 
     //relocate code to allocated memory area, size may have changed
-    code->relocateToBase(reinterpret_cast<uint64_t>(ptr_abs));
+    code->relocateToBase(reinterpret_cast<uint64_t>(ptr));
     size = code->codeSize();
 
     //copy the .text section to the allocated page
     CodeBuffer buffer = code->sectionById(0)->buffer();
-    memcpy(ptr_abs, buffer.data(), buffer.size());
+    memcpy(ptr, buffer.data(), buffer.size());
 
     //prevents gcc from optimizing the assumed dead store away
-    __builtin___clear_cache(static_cast<char *>(ptr_abs), static_cast<char *>(ptr_abs) + size - 1);
+    __builtin___clear_cache(static_cast<char *>(ptr), static_cast<char *>(ptr) + size - 1);
 
-    return ptr_abs;
+    return ptr;
 }
 
 /**
@@ -547,22 +547,16 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
 void load_risc_registers(register_info r_info) {
     for (int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(r_info.map[i], x86::ptr_abs(r_info.base+ 8 * i, 0)); //x86::ptr_abs(r_info.base, 8 * i)
+            a->mov(r_info.map[i], x86::ptr(r_info.base+ 8 * i, 0)); //x86::ptr(r_info.base, 8 * i)
         }
-        a->push(x86::eax);
-        a->pop(x86::eax);
     }
 }
 
 ///saves the Risc V registers into their respective memory fields
 void save_risc_registers(register_info r_info) {
-    a->nop();
-    a->nop();
-    a->nop();
-    a->nop();
     for (int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(x86::ptr_abs(r_info.base, 8 * i), r_info.map[i]);
+            a->mov(x86::ptr(r_info.base, 8 * i), r_info.map[i]);
         }
     }
 }
