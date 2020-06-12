@@ -10,6 +10,6 @@
  */
 TEST(ProgrammExecution, ShouldPrintHelloWorld) {
     //runs the a.out file with main loop
-    const char path[] = "./a.out";
+    const char path[] = "./compiled_hello_world";
     start_transcode(path);
 }
