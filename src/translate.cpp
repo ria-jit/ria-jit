@@ -496,14 +496,21 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     {
         int currMreg = 0;
         for (int i = 0; i < N_REG; i++) {
-            if (indicesRanked[i] != t_risc_reg::x0 && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
+            /*if (indicesRanked[i] != t_risc_reg::x0 && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
             } else {
                 //I'm not sure if it's zero initialized...
                 mapped[indicesRanked[i]] = false;
-            }
+            }*/
+
+            /*
+             * todo ignore the register mapping for now to deal with the other instruction execution issues
+             * This forces all instructions to be translated in their"memory" form and makes debugging them easier.
+             */
+
+            mapped[indicesRanked[i]] = false;
         }
     }
     //notice: risc reg x0 will need special treatment
@@ -523,7 +530,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //???
 
     ///load registers
-    load_risc_registers(r_info);
+    //load_risc_registers(r_info);
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -531,7 +538,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     ///save registers
-    save_risc_registers(r_info);
+    //save_risc_registers(r_info);
 
     ///load the saved x86_64 registers
     //???

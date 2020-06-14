@@ -217,7 +217,7 @@ void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2]);
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest));
+        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest)); //todo shouldn't this be instr.reg_src_2?
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG);
     }
 }
