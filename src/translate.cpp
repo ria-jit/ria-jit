@@ -340,8 +340,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //but that would be less elegant.
     //std::vector<t_risc_instr> block_cache;
 #define BLOCK_CACHE_SIZE 64
-    t_risc_instr *block_cache = (t_risc_instr*) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr),
-                                                          PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr),
+                                                      PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     ///count register usage
     uint32_t reg_count[N_REG];
@@ -349,7 +349,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     int instructions_in_block = 0;
 
     ///parse structs
-    for(int parse_pos = 0; parse_pos < BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
+    for (int parse_pos = 0; parse_pos < BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
 
         risc_instr.addr = risc_addr;
 
@@ -366,9 +366,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
             case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU
                 ///destination address unknown at translate time, stop parsing
                 goto PARSE_DONE;
-            } break;
+            }
+                break;
 
-            ///unconditional jump? -> follow
+                ///unconditional jump? -> follow
             case JUMP : {    ///JAL, JALR
                 switch (block_cache[parse_pos].mnem) {
                     case JAL : {
@@ -395,7 +396,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         ///calculate address of jump destination
                         risc_addr += block_cache[parse_pos].imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
 
-                    } break;
+                    }
+                        break;
 
                     case JALR : {
                         ///destination address unknown at translate time, stop parsing
@@ -407,9 +409,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
                     }
                 }
-            } break;
+            }
+                break;
 
-            ///no jump or branch -> continue fetching
+                ///no jump or branch -> continue fetching
             default: {
                 ///next instruction address
                 risc_addr += 4;
@@ -456,18 +459,18 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     ///rank registers by usage
 
     int indicesRanked[N_REG];
-    for(int i = 0; i < N_REG; i++) {
+    for (int i = 0; i < N_REG; i++) {
         indicesRanked[i] = i;
     }
     ///insertion sort:
     {
         int key, j;
-        for(int i = 1; i < N_REG; i++) {
+        for (int i = 1; i < N_REG; i++) {
             key = indicesRanked[i];
             j = i - 1;
 
             ///move move elements with index < i && element > i one to the left
-            while(j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
+            while (j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
                 indicesRanked[j + 1] = indicesRanked[j];
                 j--;
             }
@@ -547,7 +550,7 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
 void load_risc_registers(register_info r_info) {
     for (int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(r_info.map[i], x86::ptr(r_info.base+ 8 * i, 0)); //x86::ptr(r_info.base, 8 * i)
+            a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
         }
     }
 }
@@ -556,7 +559,7 @@ void load_risc_registers(register_info r_info) {
 void save_risc_registers(register_info r_info) {
     for (int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(x86::ptr(r_info.base, 8 * i), r_info.map[i]);
+            a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
         }
     }
 }
