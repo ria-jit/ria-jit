@@ -21,6 +21,7 @@
 #define __timespec_defined
 
 extern char **environ;
+extern char **__environ;
 
 long syscall(long, long, long, long, long, long, long);
 

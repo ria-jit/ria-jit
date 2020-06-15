@@ -212,7 +212,7 @@ t_risc_addr allocateStack() {
 
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(bottomOfStack)) {
-        printf("Could not map stack because error %li", -(uintptr_t) (bottomOfStack));
+        printf("Could not map stack because error %li", -(intptr_t) (bottomOfStack));
         return INVALID_STACK;
     }
     //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
@@ -238,12 +238,12 @@ mapInfo) {
         *(--stack) = (Elf64_auxv_t) {AT_PHDR, {mapInfo.entry}};
         *(--stack) = (Elf64_auxv_t) {AT_PHNUM, {mapInfo.ph_count}};
         *(--stack) = (Elf64_auxv_t) {AT_PHENT, {mapInfo.ph_entsize}};
-        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
-        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
+//        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}}; //TODO getauxval does not work since
+//        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}}; // auxvptr is not initialized
+//        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
         *(--stack) = (Elf64_auxv_t) {AT_SECURE, {0}};
         *(--stack) = (Elf64_auxv_t) {AT_PAGESZ, {4096}};
         *(--stack) = (Elf64_auxv_t) {AT_HWCAP, {0}}; //Seems to not be defined for RISCV
@@ -255,15 +255,15 @@ mapInfo) {
     ///Copy envp to guest stack
     {
         int envc = 0;
-        for(; environ[envc]; ++envc);
+        for(; __environ[envc]; ++envc);
         char **stack = (char **) stackPos;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
         for(int i = envc; i >= 0; i--) {
-            *(--stack) = environ[i];
+            *(--stack) = __environ[i];
         }
-        for(int i = 0; stack[i] || environ[i]; ++i) {
-            if (stack[i] != environ[i]) {
-                printf("Difference in envp %p and environ %p\n", stack[i], environ[i]);
+        for(int i = 0; stack[i] || __environ[i]; ++i) {
+            if (stack[i] != __environ[i]) {
+                printf("Difference in envp %p and environ %p\n", stack[i], __environ[i]);
             }
         }
         stackPos = (t_risc_addr) stack;
@@ -293,8 +293,8 @@ t_risc_addr createStack(int guestArgc, char **guestArgv, t_risc_elf_map_result m
     if (!stack) {
         return INVALID_STACK;
     }
-    //t_risc_addr argsToStack = copyArgsToStack(stack, guestArgc, guestArgv, mapInfo);
+    t_risc_addr argsToStack = copyArgsToStack(stack, guestArgc, guestArgv, mapInfo);
     ///Stack pointer always needs to be 16-Byte aligned per ABI convention
-    return ALIGN_DOWN(stack, 16u); // normally argsToStack
+    return ALIGN_DOWN(argsToStack, 16lu);
 
 }
