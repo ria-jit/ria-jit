@@ -11,15 +11,15 @@
 #include "loadElf.h"
 
 //Apparently not included in the headers on my version.
-#ifndef MAP_FIXED_NOREPLACE
-#define MAP_FIXED_NOREPLACE 0x200000
-#endif
 #ifndef EF_RISCV_RVE
 #define EF_RISCV_RVE 0x8
 #endif
 #ifndef EF_RISCV_TSO
 #define EF_RISCV_TSO 0x10
 #endif
+
+//TODO Figure out proper offset
+#define STACK_OFFSET 0x10000000
 
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     printf("Reading %s...\n", filePath);
@@ -206,7 +206,8 @@ t_risc_addr allocateStack() {
     //Add guard page at bottom just in case.
     size_t guard = 4096;
 
-    uintptr_t stackStart = TRANSLATOR_BASE - (stackSize + guard + 4096);
+    //Allocate the stack with offset under the translator region where the cached blocks can go.
+    uintptr_t stackStart = TRANSLATOR_BASE - STACK_OFFSET - (stackSize + guard + 4096);
     void *bottomOfStack = mmap_mini((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
                                MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
 

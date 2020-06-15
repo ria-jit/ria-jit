@@ -21,6 +21,7 @@
 
 using namespace asmjit;
 
+t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
 void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info);
@@ -69,12 +70,14 @@ t_cache_loc finalize_block() {
     size_t size = code->codeSize();
 
     //allocate executable page for determined worst case code size, initialized to 0
-    void *ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (!ptr) {
+    void *addr = reinterpret_cast<void *>(ALIGN_DOWN((lastUsedAddress - size), 4096lu));
+    void *ptr = mmap(addr, ALIGN_UP(size, 4096lu), PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE |
+            MAP_FIXED_NOREPLACE, -1, 0);
+    if (!ptr || ptr != addr) {
         printf("Bad. Memory allocation fault.\n");
         return nullptr;
     }
-
+    lastUsedAddress -= ALIGN_UP(size, 4096lu);
     //relocate code to allocated memory area, size may have changed
     code->relocateToBase(reinterpret_cast<uint64_t>(ptr));
     size = code->codeSize();
