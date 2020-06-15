@@ -26,6 +26,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr);
 
 #ifndef TESTING
 int main(int argc, char *argv[]) {
+    //todo run with -v -f ../test/assembly_hello_world for the hello world test
+
     int opt_index = 0;
     char *file_path = NULL;
 
@@ -100,7 +102,7 @@ int transcode_loop(const char *file_path) {
         next_pc = get_value(pc);
 
         //tmp - programm should exit on syscall
-        //finalize = true;
+        finalize = true;
     }
 
     return 0;
@@ -124,7 +126,7 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 void execute_cached(t_cache_loc loc) {
-    printf("Execute Cached");
+    printf("Execute Cached...\n");
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 }
