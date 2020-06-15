@@ -77,7 +77,7 @@ int transcode_loop(const char *file_path) {
     t_risc_addr next_pc = result.entry;
 
     //allocate stack
-    createStack(0,"",result);
+    set_value((t_risc_reg) sp, createStack(0, (char **) "", result));
 
     init_hash_table();
 
