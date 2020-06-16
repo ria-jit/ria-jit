@@ -127,7 +127,7 @@ int parse_jump_immediate(t_risc_instr* instr);
 
 void not_yet_implemented(const char* info);
 
-void log_verbose(const char* message);
+void log_verbose(const char* format, ...);
 
 #ifdef __cplusplus
 }

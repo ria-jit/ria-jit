@@ -545,7 +545,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///load the saved x86_64 registers
     //???
-    printf("Translated block: %d instructions\n", instructions_in_block);
+    log_verbose("Translated block: %d instructions\n", instructions_in_block);
 
     ///finalize block and return cached location
     return finalize_block();

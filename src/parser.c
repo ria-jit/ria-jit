@@ -3,8 +3,6 @@
 // Based on RISC-V-Spec.pdf ../documentation/RISC-V-Spec.pdf
 // For register assembly conventions look at page 137
 //
-#include <stdlib.h>
-#include <stdio.h>
 
 #include "util.h"
 #include "parser.h"
@@ -63,14 +61,14 @@ t_parse_result parse_OP_IMM_32(int32_t* instruction);
 
 t_parse_result parse_LUI(int32_t* instruction);
 
+/* Deprecated! Usage of stdlib. Has since been moved to unit testing.
 void test_parsing(void) {
-    /*
      * dissassembly of li a0, 0xDEADBEEF
      *  00038537                lui     a0,0x38
      *  ab75051b                addiw   a0,a0,-1353
      *  00e51513                slli    a0,a0,0xe
      *  eef50513                addi    a0,a0,-273 # 37eef <__global_pointer$+0x26667>
-     */
+
 
     unsigned int *memory = (unsigned int *) malloc(0x10);
     //fill memory with the data we have little endian so 00038537 should be 37 85 38 00 in memory
@@ -79,14 +77,14 @@ void test_parsing(void) {
     memory[2] = 0xe51513;
     memory[3] = 0xeef50513;
 
-    printf("First line of memory %#010x, first byte: %#x\n", memory[0], ((unsigned char *) memory)[0]);
+    log_verbose("First line of memory %#010x, first byte: %#x\n", memory[0], ((unsigned char *) memory)[0]);
     uint32_t data[32];
     for (int i = 0; i < 4; i++) {
         t_risc_instr instr;
         instr.addr = (uintptr_t)&memory[i];
         parse_instruction(&instr,data);
     }
-}
+}*/
 
 /**
  *
@@ -97,7 +95,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
 
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t*)p_instr_struct->addr; //cast and dereference
-    printf("Parsing: %x\n", raw_instr);
+    log_verbose("Parsing: 0x%x\n", raw_instr);
 
     //fill basic struct
     p_instr_struct->reg_dest = extract_rd(raw_instr);
@@ -489,18 +487,18 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
 t_parse_result parse_LUI(int32_t* instruction) {
     //extract imm [31:12] 20 bits
     // fills rd with the upper 20 bits and fills lower 12 bits with zeros
-    printf("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), extract_imm_U(*instruction));
+    log_verbose("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), extract_imm_U(*instruction));
 }
 
 t_parse_result parse_OP_IMM(int32_t* instruction) {
     switch (extract_func3(*instruction)) {
         case 0: { //ADDI
-            printf("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+            log_verbose("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
                    extract_imm_I(*instruction));
             break;
         }
         case 1: { //SLLI opcode and func3 are unique
-            printf("SLLI rd %d, rs1 %d, shamt %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+            log_verbose("SLLI rd %d, rs1 %d, shamt %d\n", extract_rd(*instruction), extract_rs1(*instruction),
                    extract_big_shamt(*instruction));
             break;
         }
@@ -515,7 +513,7 @@ t_parse_result parse_OP_IMM_32(int32_t* instruction) {
     switch (extract_func3(*instruction)) {
         case 0: {
             //extract imm bits[31:20] 12 bits we need sign extension!
-            printf("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
+            log_verbose("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
                    extract_imm_I(*instruction));
             break;
         }

@@ -20,9 +20,7 @@
 #include <stddef.h>
 #include "cache.h"
 #include "util.h"
-#include "../lib/common.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <common.h>
 #include <linux/mman.h>
 
 #define INITIAL_SIZE 4096
@@ -43,8 +41,8 @@ void init_hash_table(void) {
 
     //check for heap memory allocation fail
     if (cache_table == NULL) {
-        printf("Bad. Cache memory allocation failed.");
-        exit(FAIL_HEAP_ALLOC);
+        dprintf(2, "Bad. Cache memory allocation failed.");
+        _exit(FAIL_HEAP_ALLOC);
     }
 }
 
@@ -100,8 +98,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 
         //check heap allocation
         if (copy_buf == NULL) {
-            printf("Bad. Memory allocation failed.\n");
-            exit(FAIL_HEAP_ALLOC);
+            dprintf(2, "Bad. Memory allocation failed.\n");
+            _exit(FAIL_HEAP_ALLOC);
         }
 
         //copy over the old values

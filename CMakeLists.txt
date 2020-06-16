@@ -11,6 +11,7 @@ link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
 include_directories(src)
+include_directories(lib)
 
 #Include the AsmJit library for x86 code-generation
 set(ASMJIT_EMBED TRUE)

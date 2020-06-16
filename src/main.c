@@ -2,7 +2,7 @@
 // Created by flo on 24.04.20.
 //
 
-#include <stdio.h>
+#include <common.h>
 #include <stdbool.h>
 #include "util.h"
 #include "cache.h"
@@ -43,20 +43,21 @@ int main(int argc, char *argv[]) {
             case ':':
             case 'h':
             default:
-                fprintf(stderr, "Usage: dynamic-translate -f <filename> [-v][…]\n");
+                dprintf(2, "Usage: dynamic-translate -f <filename> [-v][…]\n");
                 return 1;
         }
     }
 
-    printf("Verbose: %d\n", verbose);
-    printf("File path: %s\n", file_path);
+    log_verbose("Command line options:\n");
+    log_verbose("Verbose: %d\n", verbose);
+    log_verbose("File path: %s\n", file_path);
 
     if (file_path == NULL) {
-        fprintf(stderr, "Bad. Invalid file path.\n");
+        dprintf(2, "Bad. Invalid file path.\n");
         return 2;
     }
 
-    printf("Start program!\n");
+    log_verbose("Initializing transcoding...\n");
     transcode_loop(file_path);
     return 0;
 }
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
 #endif //TESTING
 
 int start_transcode(const char *file_path){
-    printf("extern transcode start!\n");
+    log_verbose("extern transcode start!\n");
     verbose = true;
     transcode_loop(file_path);
     return 0;
@@ -73,7 +74,7 @@ int start_transcode(const char *file_path){
 int transcode_loop(const char *file_path) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
     if(!result.valid){
-        fprintf(stderr, "Bad. Failed to map into memory.\n");
+        dprintf(2, "Bad. Failed to map into memory.\n");
     }
 
     t_risc_addr next_pc = result.entry;
@@ -126,7 +127,7 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 void execute_cached(t_cache_loc loc) {
-    printf("Execute Cached...\n");
+    log_verbose("Execute Cached...\n");
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 }
