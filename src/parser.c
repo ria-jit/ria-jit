@@ -480,7 +480,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         default:
-            not_yet_implemented("Opcode Not Implemented");
+            not_yet_implemented("Instruction unknown");
     }
 }
 
@@ -503,7 +503,7 @@ t_parse_result parse_OP_IMM(int32_t* instruction) {
             break;
         }
         default: {
-            not_yet_implemented("Opcode not Implemented");
+            not_yet_implemented("Instruction unknown");
         }
     }
 }
@@ -518,7 +518,7 @@ t_parse_result parse_OP_IMM_32(int32_t* instruction) {
             break;
         }
         default: {
-            not_yet_implemented("Opcode not Implemented");
+            not_yet_implemented("Instruction unknown");
             break;
         }
     }

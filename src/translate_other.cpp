@@ -31,12 +31,12 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
      * As a quick implementation of these system calls, we want to support write(64) and exit(93).
      * For the numbers: see unistd.h in the RISC-V toolchain linux headers.
      * Syscall number from a7 needs to be in rax.
-     * Arguments from a0...a6 need to be in rdi, rsi, rdx, r10, r8, r9
+     * Arguments from a0…a6 need to be in rdi, rsi, rdx, r10, r8, r9
      * Then, syscall is called.
      * This assumes all registers are stored in memory, change for future references.
      */
 
-    //load system call number...
+    //load system call number…
     a->mov(x86::rax, x86::ptr(r_info.base + 8 * a7));
 
     //to handle exit: x86 number 60, so sub 33. This is of course not generalizable and just a temporary test
@@ -56,7 +56,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 
     a->bind(notWrite);
 
-    //...and arguments...
+    //…and arguments…
     a->bind(continueSyscall);
     a->mov(x86::rdi, x86::ptr(r_info.base + 8 * a0));
     a->mov(x86::rsi, x86::ptr(r_info.base + 8 * a1));
@@ -65,7 +65,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     a->mov(x86::r8, x86::ptr(r_info.base + 8 * a4));
     a->mov(x86::r9, x86::ptr(r_info.base + 8 * a5));
 
-    //...and syscall
+    //…and syscall
     a->syscall();
 }
 

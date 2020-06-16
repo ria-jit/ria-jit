@@ -72,7 +72,7 @@ t_cache_loc finalize_block() {
     //allocate executable page for determined worst case code size, initialized to 0
     void *addr = reinterpret_cast<void *>(ALIGN_DOWN((lastUsedAddress - size), 4096lu));
     void *ptr = mmap(addr, ALIGN_UP(size, 4096lu), PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE |
-            MAP_FIXED_NOREPLACE, -1, 0);
+                                                                                       MAP_FIXED_NOREPLACE, -1, 0);
     if (!ptr || ptr != addr) {
         printf("Bad. Memory allocation fault.\n");
         return nullptr;
@@ -318,6 +318,20 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
             translate_FENCE_I(instr, r_info);
             break;
     }
+
+    //log instruction
+    log_verbose(
+            "Instruction %d at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
+            instr.mnem,
+            instr.addr,
+            instr.optype,
+            instr.reg_src_1,
+            instr.reg_src_2,
+            instr.reg_dest,
+            instr.imm
+    );
+
+    //temporary, to make instruction boundaries visible in disassembly
     a->push(x86::eax);
     a->pop(x86::eax);
 }
@@ -504,7 +518,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
             } else {
-                //I'm not sure if it's zero initialized...
+                //I'm not sure if it's zero initialized…
                 mapped[indicesRanked[i]] = false;
             }*/
 

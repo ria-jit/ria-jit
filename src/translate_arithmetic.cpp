@@ -15,7 +15,7 @@ using namespace asmjit;
 void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
     // mov rd, rs1
     // add rd, instr.imm
-    log_verbose("Translate addiw...\n");
+    log_verbose("Translate addiw…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->add(x86::edx, instr.imm);
@@ -36,7 +36,7 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
 void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, rs1
     //shl rd, (instr.imm & 0x3F)
-    log_verbose("Translate slli...\n");
+    log_verbose("Translate slli…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -54,7 +54,7 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, extended
-    log_verbose("Translate lui...\n");
+    log_verbose("Translate lui…\n");
 
     //move into register
     if (r_info.mapped[instr.reg_dest]) {
@@ -71,7 +71,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
  * @param instr
  */
 void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate addi...\n");
+    log_verbose("Translate addi…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
