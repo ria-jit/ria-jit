@@ -103,7 +103,7 @@ int transcode_loop(const char *file_path) {
         next_pc = get_value(pc);
 
         //tmp - programm should exit on syscall
-        finalize = true;
+        //finalize = true;
     }
 
     return 0;
