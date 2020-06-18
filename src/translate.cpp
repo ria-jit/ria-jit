@@ -563,7 +563,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 ///set the pc to next addr after inst
 void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr) {
     ///set pc
-    a->mov(x86::qword_ptr(r_addr + 8 * t_risc_reg::pc), (instr.addr + 4)); //add 4 for next instr
+    a->mov(x86::rax, instr.addr + 4);
+    a->mov(x86::ptr(r_addr + 8 * pc), x86::rax);
 }
 
 ///writes rd but doesn't actually jump
