@@ -380,9 +380,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {
 
-            ///branch?
-            case BRANCH || SYSTEM : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
+            ///branch? or syscall?
+            case SYSTEM : //fallthrough Potential program end stop parsing
+            case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
+                instructions_in_block++;
                 goto PARSE_DONE;
             }
                 break;
