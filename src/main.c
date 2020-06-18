@@ -20,7 +20,7 @@ int transcode_loop();
 
 t_risc_addr init_entry_pc();
 
-void execute_cached(t_cache_loc loc);
+bool execute_cached(t_cache_loc loc);
 
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
@@ -97,7 +97,7 @@ int transcode_loop(const char *file_path) {
         }
 
         //execute the cached (or now newly generated code) and update the program counter
-        execute_cached(cache_loc);
+        if(!execute_cached(cache_loc)) break;
 
         //store pc from registers in pc
         next_pc = get_value(pc);
@@ -126,10 +126,19 @@ int transcode_loop(const char *file_path) {
  * @param loc the cache address of that code
  * @return
  */
-void execute_cached(t_cache_loc loc) {
+bool execute_cached(t_cache_loc loc) {
     log_verbose("Execute Cached...\n");
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
+
+    ///check for illegal x0 values
+    if(*get_reg_data() != 0){
+        printf("riscV register x0 != 0 after executing block\n");
+        printf("Terminating...");
+        return false;
+    }
+
+    return true;
 }
 
 t_risc_instr *decode_next() {
