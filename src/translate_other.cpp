@@ -67,6 +67,9 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 
     //…and syscall
     a->syscall();
+
+    //set pc; temporary
+    a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc), (instr.addr + 4)); //add 4 for next instr
 }
 
 /**

@@ -346,6 +346,7 @@ void load_risc_registers(register_info r_info);
 
 void save_risc_registers(register_info r_info);
 
+void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
 
@@ -380,7 +381,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         switch (block_cache[parse_pos].optype) {
 
             ///branch?
-            case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU
+            case BRANCH || SYSTEM : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
                 goto PARSE_DONE;
             }
@@ -439,19 +440,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     }
 
-    ///loop ended at BLOCK_CACHE_SIZE -> append AUIPC for next instruction
-    block_cache[BLOCK_CACHE_SIZE - 1] = t_risc_instr{
-            risc_addr,
-            AUIPC,
-            IMMEDIATE,
-            x0,
-            x0,
-            block_cache[BLOCK_CACHE_SIZE - 1].reg_dest,
-            4
-    };
+    ///loop ended at BLOCK_CACHE_SIZE -> set pc for next instruction
+    set_pc_next_inst(block_cache[BLOCK_CACHE_SIZE - 1], reinterpret_cast<uint64_t>(get_reg_data()));
     instructions_in_block++;
 
-    ///loop ended at BRANCH: skip appending AUIPC
+    ///loop ended at BRANCH: skip setting pc
     PARSE_DONE:
 
     ///REGISTER ALLOCATION:
@@ -513,7 +506,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     {
         int currMreg = 0;
         for (int i = 0; i < N_REG; i++) {
-            /*if (indicesRanked[i] != t_risc_reg::x0 && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
+            /*if (indicesRanked[i] != t_risc_reg::x0 && indicesRanked[i] != t_risc_reg::pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
@@ -563,6 +556,12 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///finalize block and return cached location
     return finalize_block();
+}
+
+///set the pc to next addr after inst
+void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr) {
+    ///set pc
+    a->mov(x86::qword_ptr(r_addr + 8 * t_risc_reg::pc), (instr.addr + 4)); //add 4 for next instr
 }
 
 ///writes rd but doesn't actually jump
