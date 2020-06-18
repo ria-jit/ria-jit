@@ -7,8 +7,6 @@
 #include "util.h"
 #include "parser.h"
 
-#define N_OPCODE 32 //inst[6:2] 5 bit 2⁵ = 32
-
 typedef void t_parse_result; //maybe some more return information later
 
 // extract rd register number bit[11:7]
@@ -53,39 +51,6 @@ static inline int32_t extract_imm_B(int32_t instr) {
            (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
 }
 
-//function prototypes DEPRECATED
-//function prototypes DEPRECATED
-t_parse_result parse_OP_IMM(int32_t* instruction);
-
-t_parse_result parse_OP_IMM_32(int32_t* instruction);
-
-t_parse_result parse_LUI(int32_t* instruction);
-
-/* Deprecated! Usage of stdlib. Has since been moved to unit testing.
-void test_parsing(void) {
-     * dissassembly of li a0, 0xDEADBEEF
-     *  00038537                lui     a0,0x38
-     *  ab75051b                addiw   a0,a0,-1353
-     *  00e51513                slli    a0,a0,0xe
-     *  eef50513                addi    a0,a0,-273 # 37eef <__global_pointer$+0x26667>
-
-
-    unsigned int *memory = (unsigned int *) malloc(0x10);
-    //fill memory with the data we have little endian so 00038537 should be 37 85 38 00 in memory
-    memory[0] = 0x38537;
-    memory[1] = 0xab75051b;
-    memory[2] = 0xe51513;
-    memory[3] = 0xeef50513;
-
-    log_verbose("First line of memory %#010x, first byte: %#x\n", memory[0], ((unsigned char *) memory)[0]);
-    uint32_t data[32];
-    for (int i = 0; i < 4; i++) {
-        t_risc_instr instr;
-        instr.addr = (uintptr_t)&memory[i];
-        parse_instruction(&instr,data);
-    }
-}*/
-
 /**
  *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
@@ -106,7 +71,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
     t_opcodes opcode = raw_instr >> 2 & 0x1f;
     switch (opcode) {
         case OP_LUI:
-            parse_LUI(&raw_instr);
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
             p_instr_struct->imm = extract_imm_U(raw_instr);
@@ -319,9 +283,9 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             switch(extract_func3(raw_instr)){
                 case 0:
                     if(raw_instr & (1<<20)){
-                        p_instr_struct->mnem = ECALL;
-                    } else {
                         p_instr_struct->mnem = EBREAK;
+                    } else {
+                        p_instr_struct->mnem = ECALL;
                     }
                     break;
                 case 1:
@@ -350,7 +314,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         case OP_OP_IMM_32:
-            parse_OP_IMM_32(&raw_instr);
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
@@ -431,7 +394,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         case OP_OP_IMM:
-            parse_OP_IMM(&raw_instr);
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
@@ -481,45 +443,5 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             break;
         default:
             not_yet_implemented("Instruction unknown");
-    }
-}
-
-t_parse_result parse_LUI(int32_t* instruction) {
-    //extract imm [31:12] 20 bits
-    // fills rd with the upper 20 bits and fills lower 12 bits with zeros
-    log_verbose("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), extract_imm_U(*instruction));
-}
-
-t_parse_result parse_OP_IMM(int32_t* instruction) {
-    switch (extract_func3(*instruction)) {
-        case 0: { //ADDI
-            log_verbose("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_imm_I(*instruction));
-            break;
-        }
-        case 1: { //SLLI opcode and func3 are unique
-            log_verbose("SLLI rd %d, rs1 %d, shamt %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_big_shamt(*instruction));
-            break;
-        }
-        default: {
-            not_yet_implemented("Instruction unknown");
-        }
-    }
-}
-
-t_parse_result parse_OP_IMM_32(int32_t* instruction) {
-    // extract func 3 bits[14:12]
-    switch (extract_func3(*instruction)) {
-        case 0: {
-            //extract imm bits[31:20] 12 bits we need sign extension!
-            log_verbose("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_imm_I(*instruction));
-            break;
-        }
-        default: {
-            not_yet_implemented("Instruction unknown");
-            break;
-        }
     }
 }

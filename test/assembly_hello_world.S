@@ -14,7 +14,7 @@
 
 _start: addi  a0, x0, 1      # 1 = StdOut
         la    a1, helloworld # load address of helloworld
-        addi  a2, x0, 13     # length of our string
+        addi  a2, x0, 14     # length of our string
         addi  a7, x0, 64     # linux write system call
         ecall                # Call linux to output the string
 

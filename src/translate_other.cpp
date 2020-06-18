@@ -80,13 +80,6 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 */
 void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
     log_verbose("Translate EBREAK…\n");
-
-    /**
-     * todo: for me the ECALLS were parsed as EBREAKS
-     * The parser is working correctly there: the ECALL disassembles into 0x73, which is the instruction for EBREAK.
-     * Temporary workaround: call ECALL from here.
-     */
-    translate_ECALL(instr, r_info);
 }
 
 /**
