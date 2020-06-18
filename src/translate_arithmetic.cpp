@@ -95,14 +95,16 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
 void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
     log_verbose("Translate AUIPC…\n");
 
-    //add offset to the pc and store in rd
-    if (r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], instr.addr);
-        a->add(r_info.map[instr.reg_dest], instr.imm);
-    } else {
-        a->mov(x86::rax, instr.addr);
-        a->add(x86::rax, instr.imm);
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
+    if(instr.reg_dest != t_risc_reg::x0) {
+        //add offset to the pc and store in rd
+        if (r_info.mapped[instr.reg_dest]) {
+            a->mov(r_info.map[instr.reg_dest], instr.addr);
+            a->add(r_info.map[instr.reg_dest], instr.imm);
+        } else {
+            a->mov(x86::rax, instr.addr);
+            a->add(x86::rax, instr.imm);
+            a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
+        }
     }
 }
 
