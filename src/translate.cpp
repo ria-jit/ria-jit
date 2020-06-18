@@ -401,6 +401,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         //we can do this here, because the immediate parsing
                         //is done before this step: in parse_instruction()
                         //where AUIPC is parsed as IMMEDIADE instead of UPPER_IMMEDIATE
+
+                        t_risc_imm temp = block_cache[parse_pos].imm;
+
                         block_cache[parse_pos] = t_risc_instr{
                                 risc_addr,
                                 AUIPC,
@@ -414,7 +417,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         instructions_in_block++;
 
                         ///calculate address of jump destination
-                        risc_addr += block_cache[parse_pos].imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
+                        risc_addr += temp;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
 
                     }
                         break;

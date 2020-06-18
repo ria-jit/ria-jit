@@ -38,11 +38,12 @@ static inline int extract_imm_I(int32_t instr) { return instr >> 20; } //sign ex
 static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & 0b1111111) | (instr >> 7 & 0b11111); }
 
 // extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
-// only for jumps so no sign extend?
+// sign extended because jump address is pc relative
 // [20] => [31], [10:1] => [30:21], [11] => [20], [19:12] => [19:12]
+
 static inline int extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-           (instr >> (30 - 10) & 0b11111111110);
+           ((signed)instr >> (30 - 10) & -2);
 }
 
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
