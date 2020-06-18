@@ -6,19 +6,26 @@
 .global _start      # Provide program starting address to linker
 
 _start:
-    addi x10, x0, 10
-    addi x11, x0, 1
+    addi x28, x0, 10
+    addi x29, x0, 1
 
     loop_head:
-    beq x10, x0, loop_end
+    beq x28, x0, loop_end
 
-    sub x10, x10, x11
+    addi  a0, x0, 1      # 1 = StdOut
+    la    a1, helloworld # load address of helloworld
+    addi  a2, x0, 14     # length of our string
+    addi  a7, x0, 64     # linux write system call
+    ecall
+
+    sub x28, x28, x29
 
     j loop_head
     loop_end:
-# Setup the parameters to exit the program
-# and then call Linux to do it.
-
+    # exit
     addi    a0, x0, 0   # Use 0 return code
     addi    a7, x0, 93  # Service command code 93 terminates
     ecall               # Call linux to terminate the program
+
+.data
+helloworld:      .ascii "Hello World!\n"
