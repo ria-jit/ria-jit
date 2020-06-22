@@ -424,6 +424,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                     case JALR : {
                         ///destination address unknown at translate time, stop parsing
+                        instructions_in_block++;
                         goto PARSE_DONE;
                     }
 
