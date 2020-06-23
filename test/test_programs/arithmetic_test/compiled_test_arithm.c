@@ -11,13 +11,13 @@ void check_condition(bool cond);
 
 /**
  * Compile with:
- * riscv64-unknown-linux-gnu-gcc -o arithm compiled_test_arithm.c rv64minilibc.c rv64minilibc.h -fPIE -static -march=rv64i -mabi=lp64 -nostdlib
+ * riscv64-unknown-linux-gnu-gcc -o arithm compiled_test_arithm.c rv64minilibc.c rv64minilibc.h -fPIE -static -march=rv64im -mabi=lp64 -nostdlib -lgcc
  * Reference run: qemu-riscv64 arithm
  * or ./translator -v -f arithm.
  *
  * Makefile for compile:
  * arithmetic: compiled_test_arithm.c rv64minilibc.c rv64minilibc.h
-	riscv64-unknown-linux-gnu-gcc -o arithm compiled_test_arithm.c rv64minilibc.c rv64minilibc.h -fPIE -static -march=rv64i -mabi=lp64 -nostdlib
+	riscv64-unknown-linux-gnu-gcc -o arithm compiled_test_arithm.c rv64minilibc.c rv64minilibc.h -fPIE -static -march=rv64im -mabi=lp64 -nostdlib -lgcc
  * @param argc
  * @param argv
  * @return
@@ -38,14 +38,13 @@ int main(int argc, char **argv) {
     m /= 2;
     check_condition(m == 2);
 
-    //this produces undefined reference to `__udivdi3' during compile because of nostdlib?
-    /*init('4');
+    init('4');
     size_t n = 256;
     size_t o = 128;
     n += o;
     n *= 10;
     n /= 19;
-    check_condition(n == 202);*/
+    check_condition(n == 202);
 
     __exit();
 }
