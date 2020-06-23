@@ -10,6 +10,8 @@ link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
+add_compile_options(-fPIE -Wall -Wextra) ##TODO pedantic removed because ASMJit
+
 include_directories(src)
 include_directories(lib)
 
@@ -44,4 +46,3 @@ add_executable("translator" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h s
 target_link_libraries("translator" ${ASMJIT_DEPS})
 target_link_libraries("test" ${ASMJIT_DEPS})
 
-add_compile_options(-fPIE -Wall -Wextra -pedantic)
