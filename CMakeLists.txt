@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 99)
 #Create CMake Constant TRANSLATOR_BASE
 set(TRANSLATOR_BASE 0x780000000000)
 #Tell compiler and linker that we want to relocate to TRANSLATOR_BASE
-link_libraries("-fPIE -pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
+link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
