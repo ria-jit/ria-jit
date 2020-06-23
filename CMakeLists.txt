@@ -44,4 +44,4 @@ add_executable("translator" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h s
 target_link_libraries("translator" ${ASMJIT_DEPS})
 target_link_libraries("test" ${ASMJIT_DEPS})
 
-add_compile_options(-Wall -Wextra -pedantic)
+add_compile_options(-fPIE -Wall -Wextra -pedantic)
