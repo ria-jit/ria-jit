@@ -259,6 +259,7 @@ mapInfo) {
         int envc = 0;
         for(; __environ[envc]; ++envc);
         char **stack = (char **) stackPos;
+        *(--stack) = NULL;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
         for(int i = envc - 1; i >= 0; i--) {
             *(--stack) = __environ[i];
@@ -273,7 +274,9 @@ mapInfo) {
     ///Copy guestArgv to guest stack
     {
         const char **stack = (const char **) stackPos;
+
         //Zero terminated so guestArgv[guestArgc] will be zero and also needs to be copied
+        *(--stack) = NULL;
         for(int i = guestArgc - 1; i >= 0; i--) {
             *(--stack) = guestArgv[i];
         }

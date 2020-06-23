@@ -145,7 +145,7 @@ bool execute_cached(t_cache_loc loc) {
     dump_registers();
 
     ///check for illegal x0 values
-    if(*get_reg_data() != 0){
+    if (*get_reg_data() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;
