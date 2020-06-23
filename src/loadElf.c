@@ -260,7 +260,7 @@ mapInfo) {
         for(; __environ[envc]; ++envc);
         char **stack = (char **) stackPos;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
-        for(int i = envc; i >= 0; i--) {
+        for(int i = envc - 1; i >= 0; i--) {
             *(--stack) = __environ[i];
         }
         for(int i = 0; stack[i] || __environ[i]; ++i) {
@@ -274,7 +274,7 @@ mapInfo) {
     {
         const char **stack = (const char **) stackPos;
         //Zero terminated so guestArgv[guestArgc] will be zero and also needs to be copied
-        for(int i = guestArgc; i >= 0; i--) {
+        for(int i = guestArgc - 1; i >= 0; i--) {
             *(--stack) = guestArgv[i];
         }
         stackPos = (t_risc_addr) stack;
