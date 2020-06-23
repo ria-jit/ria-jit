@@ -124,18 +124,21 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     cache_table[index].cache_loc = cache_loc;
     cache_table[index].risc_addr = risc_addr;
     count_entries++;
+
+    //print entries
+    print_values();
 }
 
 /**
  * Print out the hash table contents.
  */
 void print_values(void) {
-    for (size_t i = 0; i < count_entries; ++i) {
+    if (!flag_log_cache) return;
+    log_cache("Cache updated. Contents:\n");
+    for (size_t i = 0; i < table_size; ++i) { //potentially better way to do this?
         if (cache_table[i].cache_loc != 0) {
-            printf("cache_table[%zu]: RISC-V addr %lu at cache loc %p\n",
-                    i,
-                    cache_table[i].risc_addr,
-                    cache_table[i].cache_loc);
+            log_cache("cache[%i]: block address %p at cache loc %p\n", i, cache_table[i].risc_addr,
+                      cache_table[i].cache_loc);
         }
     }
 }

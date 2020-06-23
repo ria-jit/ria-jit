@@ -30,10 +30,13 @@ extern "C" {
 #define FAIL_HEAP_ALLOC 0x1000
 
 /**
-* Should log verbosely what the translator is doing.
-* This is used by log_verbose().
+* Verbose logging flags used by the main.c and logging methods.
 */
-extern bool verbose;
+extern bool flag_log_general;
+extern bool flag_log_asm_in;
+extern bool flag_log_asm_out;
+extern bool flag_log_reg_dump;
+extern bool flag_log_cache;
 
 //the RISC-V mnemonic of the instruction
 typedef enum {
@@ -127,7 +130,11 @@ int parse_jump_immediate(t_risc_instr* instr);
 
 void not_yet_implemented(const char* info);
 
-void log_verbose(const char* format, ...);
+void log_general(const char* format, ...);
+void log_asm_in(const char* format, ...);
+void log_asm_out(const char* format, ...);
+void log_reg_dump(const char* format, ...);
+void log_cache(const char* format, ...);
 
 #ifdef __cplusplus
 }

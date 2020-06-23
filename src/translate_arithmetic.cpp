@@ -15,7 +15,7 @@ using namespace asmjit;
 void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
     // mov rd, rs1
     // add rd, instr.imm
-    log_verbose("Translate addiw…\n");
+    log_asm_out("Translate addiw…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->add(x86::edx, instr.imm);
@@ -36,7 +36,7 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
 void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, rs1
     //shl rd, (instr.imm & 0x3F)
-    log_verbose("Translate slli…\n");
+    log_asm_out("Translate slli…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -54,7 +54,7 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
     //mov rd, extended
-    log_verbose("Translate lui…\n");
+    log_asm_out("Translate lui…\n");
 
     //move into register
     if (r_info.mapped[instr.reg_dest]) {
@@ -71,7 +71,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
  * @param instr
  */
 void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate addi…\n");
+    log_asm_out("Translate addi…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -93,7 +93,7 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate AUIPC…\n");
+    log_asm_out("Translate AUIPC…\n");
 
     if(instr.reg_dest != t_risc_reg::x0) {
         //add offset to the pc and store in rd
@@ -116,7 +116,7 @@ void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLTI…\n");
+    log_asm_out("Translate SLTI…\n");
 
     const Label &not_less = a->newLabel();
 
@@ -143,7 +143,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLTIU…\n");
+    log_asm_out("Translate SLTIU…\n");
 
     const Label &not_below = a->newLabel();
 
@@ -170,7 +170,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate XORI…\n");
+    log_asm_out("Translate XORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -190,7 +190,7 @@ void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate ORI…\n");
+    log_asm_out("Translate ORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -210,7 +210,7 @@ void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate ANDI…\n");
+    log_asm_out("Translate ANDI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
@@ -229,7 +229,7 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRLI…\n");
+    log_asm_out("Translate SRLI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -247,7 +247,7 @@ void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRAI…\n");
+    log_asm_out("Translate SRAI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);
@@ -266,7 +266,7 @@ void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate ADD…\n");
+    log_asm_out("Translate ADD…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -286,7 +286,7 @@ void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SUB…\n");
+    log_asm_out("Translate SUB…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -306,7 +306,7 @@ void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLL…\n");
+    log_asm_out("Translate SLL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -329,7 +329,7 @@ void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLT…\n");
+    log_asm_out("Translate SLT…\n");
 
     const Label &not_less = a->newLabel();
 
@@ -356,7 +356,7 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLTU…\n");
+    log_asm_out("Translate SLTU…\n");
 
     const Label &not_below = a->newLabel();
 
@@ -383,7 +383,7 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate XOR…\n");
+    log_asm_out("Translate XOR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -403,7 +403,7 @@ void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRL…\n");
+    log_asm_out("Translate SRL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -427,7 +427,7 @@ void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRA…\n");
+    log_asm_out("Translate SRA…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -450,7 +450,7 @@ void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate OR…\n");
+    log_asm_out("Translate OR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -469,7 +469,7 @@ void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate AND…\n");
+    log_asm_out("Translate AND…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -488,7 +488,7 @@ void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLLIW…\n");
+    log_asm_out("Translate SLLIW…\n");
     //shift left the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -510,7 +510,7 @@ void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRLIW…\n");
+    log_asm_out("Translate SRLIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -532,7 +532,7 @@ void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRAIW…\n");
+    log_asm_out("Translate SRAIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
@@ -556,7 +556,7 @@ void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate ADDW…\n");
+    log_asm_out("Translate ADDW…\n");
     /*
      * todo verify!
      * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
@@ -582,7 +582,7 @@ void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SUBW…\n");
+    log_asm_out("Translate SUBW…\n");
     /*
      * todo verify!
      * Right now, we add in 64-bit registers, take the lower 32-bit and sign extend that to XLEN.
@@ -608,7 +608,7 @@ void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SLLW…\n");
+    log_asm_out("Translate SLLW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -637,7 +637,7 @@ void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRLW…\n");
+    log_asm_out("Translate SRLW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
@@ -666,7 +666,7 @@ void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRAW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SRAW…\n");
+    log_asm_out("Translate SRAW…\n");
 
     //todo verify (see above)
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {

@@ -24,7 +24,7 @@ using namespace asmjit;
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate MUL…\n");
+    log_asm_out("Translate MUL…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
@@ -45,7 +45,7 @@ void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate MULH…\n");
+    log_asm_out("Translate MULH…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -69,7 +69,7 @@ void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate MULHSU…\n");
+    log_asm_out("Translate MULHSU…\n");
 
     /*
      * For signed × unsigned multiplication, we cannot directly use MUL or IMUL (unsigned² and signed², respectively).
@@ -118,7 +118,7 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate MULHU…\n");
+    log_asm_out("Translate MULHU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -142,7 +142,7 @@ void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate DIV…\n");
+    log_asm_out("Translate DIV…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -180,7 +180,7 @@ void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate DIVU…\n");
+    log_asm_out("Translate DIVU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -220,7 +220,7 @@ void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate REM…\n");
+    log_asm_out("Translate REM…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -260,7 +260,7 @@ void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate REMU…\n");
+    log_asm_out("Translate REMU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -298,7 +298,7 @@ void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate MULW…\n");
+    log_asm_out("Translate MULW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         a->mov(x86::rax, r_info.map[instr.reg_src_1]);
@@ -323,7 +323,7 @@ void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate DIVW…\n");
+    log_asm_out("Translate DIVW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -365,7 +365,7 @@ void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate DIVUW…\n");
+    log_asm_out("Translate DIVUW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -408,7 +408,7 @@ void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate REMW…\n");
+    log_asm_out("Translate REMW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately
@@ -451,7 +451,7 @@ void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMUW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate REMUW…\n");
+    log_asm_out("Translate REMUW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
         //handle division by zero separately

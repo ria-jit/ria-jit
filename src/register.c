@@ -42,3 +42,18 @@ void set_value(t_risc_reg reg, t_risc_reg_val val) {
         contents[reg] = val;
     }
 }
+
+/**
+ * Dump the contents of the register file.
+ */
+void dump_registers() {
+    log_reg_dump("Register file contents:\n");
+
+    //dump all registers:
+    for (t_risc_reg i = x0; i < pc; ++i) {
+        log_reg_dump("x%i\t0x%lx\n", i, get_value(i));
+    }
+
+    //nice pc output
+    log_reg_dump("pc\t0x%lx\n", get_value(pc));
+}

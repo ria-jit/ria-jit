@@ -12,7 +12,7 @@ inline void translate_controlflow_set_pc(const t_risc_instr &instr, const regist
 
 
 void translate_JAL(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate JAL should not ever be needed\n");
+    log_asm_out("Translate JAL should not ever be needed\n");
 }
 
 void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
@@ -22,7 +22,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
      * The address of the instruction following the jump (pc+4)is written to register rd.
      * Register x0 can be used as the destination if the result is not required.
      */
-    log_verbose("Translate JALR\n");
+    log_asm_out("Translate JALR\n");
 
     //assuming rax is unused, usage information will probably be added to r_info
 
@@ -59,7 +59,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BEQ(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
     //does "The 12-bit B-immediate encodes signed offsets in multiples of 2" already account for the always-zero LSB????
 
     ///compare registers:
@@ -77,7 +77,7 @@ void translate_BEQ(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BNE(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
     //does "The 12-bit B-immediate encodes signed offsets in multiples of 2" already account for the always-zero LSB????
 
     ///compare registers:
@@ -95,7 +95,7 @@ void translate_BNE(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BLT(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
@@ -112,7 +112,7 @@ void translate_BLT(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BLTU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
@@ -129,7 +129,7 @@ void translate_BLTU(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BGE(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
@@ -146,7 +146,7 @@ void translate_BGE(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BGEU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);

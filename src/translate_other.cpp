@@ -14,7 +14,7 @@ using namespace asmjit;
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate FENCE…\n");
+    log_asm_out("Translate FENCE…\n");
 }
 
 /**
@@ -25,7 +25,7 @@ void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
 */
 void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     //see https://stackoverflow.com/questions/59800430/risc-v-ecall-syscall-calling-convention-on-pk-linux
-    log_verbose("Translate ECALL…\n");
+    log_asm_out("Translate ECALL…\n");
 
     /*
      * As a quick implementation of these system calls, we want to support write(64) and exit(93).
@@ -82,7 +82,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate EBREAK…\n");
+    log_asm_out("Translate EBREAK…\n");
 }
 
 /**
@@ -92,5 +92,5 @@ void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE_I(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate FENCE_I…\n");
+    log_asm_out("Translate FENCE_I…\n");
 }

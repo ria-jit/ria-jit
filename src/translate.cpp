@@ -320,7 +320,7 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
     }
 
     //log instruction
-    log_verbose(
+    log_asm_out(
             "Instruction %d at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
             instr.mnem,
             instr.addr,
@@ -558,7 +558,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///load the saved x86_64 registers
     //???
-    log_verbose("Translated block: %d instructions\n", instructions_in_block);
+    log_asm_out("Translated block: %d instructions\n", instructions_in_block);
 
     ///finalize block and return cached location
     return finalize_block();

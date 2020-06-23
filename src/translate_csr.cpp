@@ -14,7 +14,7 @@ using namespace asmjit;
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRW…\n");
+    log_asm_out("Translate CSRRW…\n");
 }
 
 /**
@@ -24,7 +24,7 @@ void translate_CSRRW(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRS(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRS…\n");
+    log_asm_out("Translate CSRRS…\n");
 }
 
 /**
@@ -34,7 +34,7 @@ void translate_CSRRS(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRC(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRC…\n");
+    log_asm_out("Translate CSRRC…\n");
 }
 
 /**
@@ -44,7 +44,7 @@ void translate_CSRRC(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRWI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRWI…\n");
+    log_asm_out("Translate CSRRWI…\n");
 }
 
 /**
@@ -54,7 +54,7 @@ void translate_CSRRWI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRSI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRSI…\n");
+    log_asm_out("Translate CSRRSI…\n");
 }
 
 /**
@@ -64,5 +64,5 @@ void translate_CSRRSI(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_CSRRCI(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate CSRRCI…\n");
+    log_asm_out("Translate CSRRCI…\n");
 }

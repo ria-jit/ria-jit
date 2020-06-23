@@ -26,10 +26,29 @@ int main(int argc, char *argv[]) {
     char *file_path = NULL;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while ((opt_index = getopt(argc, argv, ":f:vh")) != -1) {
+    while ((opt_index = getopt(argc, argv, ":f:vgiorch")) != -1) {
         switch (opt_index) {
             case 'v':
-                verbose = true;
+                flag_log_general = true;
+                flag_log_asm_in = true;
+                flag_log_asm_out = true;
+                flag_log_reg_dump = false; //don't do register dump with the verbose option by default
+                flag_log_cache = true;
+                break;
+            case 'g':
+                flag_log_general = true;
+                break;
+            case 'i':
+                flag_log_asm_in = true;
+                break;
+            case 'o':
+                flag_log_asm_out = true;
+                break;
+            case 'r':
+                flag_log_reg_dump = true;
+                break;
+            case 'c':
+                flag_log_cache = true;
                 break;
             case 'f':
                 file_path = optarg;
@@ -37,21 +56,27 @@ int main(int argc, char *argv[]) {
             case ':':
             case 'h':
             default:
-                dprintf(2, "Usage: dynamic-translate -f <filename> [-v][…]\n");
+                dprintf(2,
+                        "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump register file. (equivalent to -gioc)\n\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n\t-o\tDisplay translated output x86 assembly\n\t-r\tDump registers on basic block boundaries\n\t-c\tDisplay cache info\n"
+                        );
                 return 1;
         }
     }
 
-    log_verbose("Command line options:\n");
-    log_verbose("Verbose: %d\n", verbose);
-    log_verbose("File path: %s\n", file_path);
+    log_general("Command line options:\n");
+    log_general("General verbose: %d\n", flag_log_general);
+    log_general("Input assembly: %d\n", flag_log_asm_in);
+    log_general("Output assembly: %d\n", flag_log_asm_out);
+    log_general("Register dump: %d\n", flag_log_reg_dump);
+    log_general("Cache info: %d\n", flag_log_cache);
+    log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
         return 2;
     }
 
-    log_verbose("Initializing transcoding...\n");
+    log_general("Initializing transcoding...\n");
     transcode_loop(file_path);
     return 0;
 }
@@ -59,8 +84,7 @@ int main(int argc, char *argv[]) {
 #endif //TESTING
 
 int start_transcode(const char *file_path){
-    log_verbose("extern transcode start!\n");
-    verbose = true;
+    log_general("extern transcode start!\n");
     transcode_loop(file_path);
     return 0;
 }
@@ -80,6 +104,9 @@ int transcode_loop(const char *file_path) {
     init_hash_table();
 
     set_value(pc,next_pc);
+
+    //debugging output
+    dump_registers();
 
     while (!finalize) {
         //check our previously translated code
@@ -110,14 +137,17 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 bool execute_cached(t_cache_loc loc) {
-    log_verbose("Execute Cached at %p\n", get_value(pc));
+    log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 
+    //dump registers to the log
+    dump_registers();
+
     ///check for illegal x0 values
     if(*get_reg_data() != 0){
-        printf("riscV register x0 != 0 after executing block\n");
-        printf("Terminating...");
+        dprintf(2, "riscV register x0 != 0 after executing block\n");
+        dprintf(2, "Terminating...");
         return false;
     }
 

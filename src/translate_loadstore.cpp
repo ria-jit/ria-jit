@@ -18,7 +18,7 @@ using namespace asmjit;
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LB…\n");
+    log_asm_out("Translate LB…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::byte_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -37,7 +37,7 @@ void translate_LB(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LH…\n");
+    log_asm_out("Translate LH…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::word_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -56,7 +56,7 @@ void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LW…\n");
+    log_asm_out("Translate LW…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movsx(r_info.map[instr.reg_dest], x86::dword_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -75,7 +75,7 @@ void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LBU…\n");
+    log_asm_out("Translate LBU…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movzx(r_info.map[instr.reg_dest], x86::byte_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -94,7 +94,7 @@ void translate_LBU(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LHU…\n");
+    log_asm_out("Translate LHU…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->movzx(r_info.map[instr.reg_dest], x86::word_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -113,7 +113,7 @@ void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SB…\n");
+    log_asm_out("Translate SB…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r8());
@@ -132,7 +132,7 @@ void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SH…\n");
+    log_asm_out("Translate SH…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r16());
@@ -151,7 +151,7 @@ void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SW…\n");
+    log_asm_out("Translate SW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r32());
@@ -170,7 +170,7 @@ void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LWU…\n");
+    log_asm_out("Translate LWU…\n");
 
     ///All instructions with 32bit register targets on x86-64 automatically zero extend. Hence there is no movzx r64,
     /// r/m32. Instead you use mov r32, r/m32
@@ -192,7 +192,7 @@ void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate LD…\n");
+    log_asm_out("Translate LD…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
         a->mov(r_info.map[instr.reg_dest], x86::qword_ptr(r_info.map[instr.reg_src_1], instr.imm));
@@ -211,7 +211,7 @@ void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
-    log_verbose("Translate SD…\n");
+    log_asm_out("Translate SD…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2]);

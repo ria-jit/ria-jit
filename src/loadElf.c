@@ -22,7 +22,7 @@
 #define STACK_OFFSET 0x10000000
 
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
-    log_verbose("Reading %s...\n", filePath);
+    log_general("Reading %s...\n", filePath);
 
     //get the file descriptor
     int fd = open(filePath, O_RDONLY, 0);
@@ -96,7 +96,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 Elf64_Xword memory_size = segment.p_memsz;
                 Elf64_Xword physical_size = segment.p_filesz;
                 Elf64_Addr vaddr = segment.p_vaddr;
-                log_verbose("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
+                log_general("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
                             "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
                 //Refuse to map to a location in the address space of the translator.
                 if ((vaddr + memory_size) > TRANSLATOR_BASE) {
@@ -265,7 +265,7 @@ mapInfo) {
         }
         for(int i = 0; stack[i] || __environ[i]; ++i) {
             if (stack[i] != __environ[i]) {
-                log_verbose("Difference in envp %p and environ %p\n", stack[i], __environ[i]);
+                log_general("Difference in envp %p and environ %p\n", stack[i], __environ[i]);
             }
         }
         stackPos = (t_risc_addr) stack;

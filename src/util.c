@@ -6,10 +6,14 @@
 #include <common.h>
 #include <stdbool.h>
 
-bool verbose = false;
+bool flag_log_general = false;
+bool flag_log_asm_in = false;
+bool flag_log_asm_out = false;
+bool flag_log_reg_dump = false;
+bool flag_log_cache = false;
 
 void not_yet_implemented(const char *info) {
-    log_verbose("%s - not yet implemented\n", info);
+    log_general("%s - not yet implemented\n", info);
 }
 
 /**
@@ -17,13 +21,58 @@ void not_yet_implemented(const char *info) {
  * An added benefit here is that this unifies all printf/std::cout calls to one method.
  * Avoiding libc calls is thus easier.
  * Format strings can be used in the same way as they can be when using printf directly.
+ * This is also true for all other logging functions.
  * @param message the message (including newline) to log.
  */
-void log_verbose(const char *format, ...) {
-    if (verbose) {
+void log_general(const char *format, ...) {
+    if (flag_log_general) {
         va_list args;
         va_start(args, format);
-        printf("[verbose] ");
+        printf("[general] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_asm_in(const char* format, ...) {
+    if (flag_log_asm_in) {
+        va_list args;
+        va_start(args, format);
+        printf("[asm-in] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_asm_out(const char* format, ...) {
+    if (flag_log_asm_out) {
+        va_list args;
+        va_start(args, format);
+        printf("[asm-out] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_reg_dump(const char* format, ...) {
+    if (flag_log_reg_dump) {
+        va_list args;
+        va_start(args, format);
+        printf("[reg-dump] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_cache(const char* format, ...) {
+    if (flag_log_cache) {
+        va_list args;
+        va_start(args, format);
+        printf("[cache] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
