@@ -128,7 +128,7 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 bool execute_cached(t_cache_loc loc) {
-    log_verbose("Execute Cached at %p\n", loc);
+    log_verbose("Execute Cached at %p\n", get_value(pc));
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 
