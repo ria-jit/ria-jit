@@ -21,6 +21,7 @@
 
 using namespace asmjit;
 
+t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
 void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info);
@@ -69,12 +70,14 @@ t_cache_loc finalize_block() {
     size_t size = code->codeSize();
 
     //allocate executable page for determined worst case code size, initialized to 0
-    void *ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    if (!ptr) {
+    void *addr = reinterpret_cast<void *>(ALIGN_DOWN((lastUsedAddress - size), 4096lu));
+    void *ptr = mmap(addr, ALIGN_UP(size, 4096lu), PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE |
+                                                                                       MAP_FIXED_NOREPLACE, -1, 0);
+    if (!ptr || ptr != addr) {
         printf("Bad. Memory allocation fault.\n");
         return nullptr;
     }
-
+    lastUsedAddress -= ALIGN_UP(size, 4096lu);
     //relocate code to allocated memory area, size may have changed
     code->relocateToBase(reinterpret_cast<uint64_t>(ptr));
     size = code->codeSize();
@@ -315,6 +318,22 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
             translate_FENCE_I(instr, r_info);
             break;
     }
+
+    //log instruction
+    log_verbose(
+            "Instruction %d at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
+            instr.mnem,
+            instr.addr,
+            instr.optype,
+            instr.reg_src_1,
+            instr.reg_src_2,
+            instr.reg_dest,
+            instr.imm
+    );
+
+    //temporary, to make instruction boundaries visible in disassembly
+    a->push(x86::eax);
+    a->pop(x86::eax);
 }
 
 //NEITHER FINISHED NOR TESTED
@@ -327,6 +346,7 @@ void load_risc_registers(register_info r_info);
 
 void save_risc_registers(register_info r_info);
 
+void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
 
@@ -338,7 +358,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //but that would be less elegant.
     //std::vector<t_risc_instr> block_cache;
 #define BLOCK_CACHE_SIZE 64
-    t_risc_instr *block_cache = (t_risc_instr*) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr),
+                                                      PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     ///count register usage
     uint32_t reg_count[N_REG];
@@ -346,7 +367,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     int instructions_in_block = 0;
 
     ///parse structs
-    for(int parse_pos = 0; parse_pos < BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
+    for (int parse_pos = 0; parse_pos < BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
 
         risc_instr.addr = risc_addr;
 
@@ -359,13 +380,16 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {
 
-            ///branch?
-            case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU
+            ///branch? or syscall?
+            case SYSTEM : //fallthrough Potential program end stop parsing
+            case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
+                instructions_in_block++;
                 goto PARSE_DONE;
-            } break;
+            }
+                break;
 
-            ///unconditional jump? -> follow
+                ///unconditional jump? -> follow
             case JUMP : {    ///JAL, JALR
                 switch (block_cache[parse_pos].mnem) {
                     case JAL : {
@@ -377,6 +401,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         //we can do this here, because the immediate parsing
                         //is done before this step: in parse_instruction()
                         //where AUIPC is parsed as IMMEDIADE instead of UPPER_IMMEDIATE
+
+                        t_risc_imm temp = block_cache[parse_pos].imm;
+
                         block_cache[parse_pos] = t_risc_instr{
                                 risc_addr,
                                 AUIPC,
@@ -390,12 +417,14 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         instructions_in_block++;
 
                         ///calculate address of jump destination
-                        risc_addr += block_cache[parse_pos].imm;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
+                        risc_addr += temp;//(signed long) (parse_jump_immediate(block_cache)); //left shift???
 
-                    } break;
+                    }
+                        break;
 
                     case JALR : {
                         ///destination address unknown at translate time, stop parsing
+                        instructions_in_block++;
                         goto PARSE_DONE;
                     }
 
@@ -404,9 +433,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
                     }
                 }
-            } break;
+            }
+                break;
 
-            ///no jump or branch -> continue fetching
+                ///no jump or branch -> continue fetching
             default: {
                 ///next instruction address
                 risc_addr += 4;
@@ -416,19 +446,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     }
 
-    ///loop ended at BLOCK_CACHE_SIZE -> append AUIPC for next instruction
-    block_cache[BLOCK_CACHE_SIZE - 1] = t_risc_instr{
-            risc_addr,
-            AUIPC,
-            IMMEDIATE,
-            x0,
-            x0,
-            block_cache[BLOCK_CACHE_SIZE - 1].reg_dest,
-            4
-    };
+    ///loop ended at BLOCK_CACHE_SIZE -> set pc for next instruction
+    set_pc_next_inst(block_cache[BLOCK_CACHE_SIZE - 1], reinterpret_cast<uint64_t>(get_reg_data()));
     instructions_in_block++;
 
-    ///loop ended at BRANCH: skip appending AUIPC
+    ///loop ended at BRANCH: skip setting pc
     PARSE_DONE:
 
     ///REGISTER ALLOCATION:
@@ -453,18 +475,18 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     ///rank registers by usage
 
     int indicesRanked[N_REG];
-    for(int i = 0; i < N_REG; i++) {
+    for (int i = 0; i < N_REG; i++) {
         indicesRanked[i] = i;
     }
     ///insertion sort:
     {
         int key, j;
-        for(int i = 1; i < N_REG; i++) {
+        for (int i = 1; i < N_REG; i++) {
             key = indicesRanked[i];
             j = i - 1;
 
             ///move move elements with index < i && element > i one to the left
-            while(j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
+            while (j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
                 indicesRanked[j + 1] = indicesRanked[j];
                 j--;
             }
@@ -490,14 +512,21 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     {
         int currMreg = 0;
         for (int i = 0; i < N_REG; i++) {
-            if (indicesRanked[i] != t_risc_reg::x0 && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
+            /*if (indicesRanked[i] != t_risc_reg::x0 && indicesRanked[i] != t_risc_reg::pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
             } else {
-                //I'm not sure if it's zero initialized...
+                //I'm not sure if it's zero initialized…
                 mapped[indicesRanked[i]] = false;
-            }
+            }*/
+
+            /*
+             * todo ignore the register mapping for now to deal with the other instruction execution issues
+             * This forces all instructions to be translated in their"memory" form and makes debugging them easier.
+             */
+
+            mapped[indicesRanked[i]] = false;
         }
     }
     //notice: risc reg x0 will need special treatment
@@ -517,7 +546,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //???
 
     ///load registers
-    load_risc_registers(r_info);
+    //load_risc_registers(r_info);
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -525,14 +554,21 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     ///save registers
-    save_risc_registers(r_info);
+    //save_risc_registers(r_info);
 
     ///load the saved x86_64 registers
     //???
-    printf("Translated block: %d instructions\n", instructions_in_block);
+    log_verbose("Translated block: %d instructions\n", instructions_in_block);
 
     ///finalize block and return cached location
     return finalize_block();
+}
+
+///set the pc to next addr after inst
+void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr) {
+    ///set pc
+    a->mov(x86::rax, instr.addr + 4);
+    a->mov(x86::ptr(r_addr + 8 * pc), x86::rax);
 }
 
 ///writes rd but doesn't actually jump
@@ -544,7 +580,7 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
 void load_risc_registers(register_info r_info) {
     for (int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i));
+            a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
         }
     }
 }

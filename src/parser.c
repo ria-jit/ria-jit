@@ -3,13 +3,9 @@
 // Based on RISC-V-Spec.pdf ../documentation/RISC-V-Spec.pdf
 // For register assembly conventions look at page 137
 //
-#include <stdlib.h>
-#include <stdio.h>
 
 #include "util.h"
 #include "parser.h"
-
-#define N_OPCODE 32 //inst[6:2] 5 bit 2⁵ = 32
 
 typedef void t_parse_result; //maybe some more return information later
 
@@ -38,53 +34,21 @@ static inline int extract_imm_U(int32_t instr) { return instr & ~(0xfff); }
 static inline int extract_imm_I(int32_t instr) { return instr >> 20; } //sign extend!
 
 // extract S-Type immediate bit[31:25] + [11:7] => 7bits + 5 bits
-// TODO need sign extend?
-static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & 0b1111111) | (instr >> 7 & 0b11111); }
+static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111) | (instr >> 7 & 0b11111); }
 
 // extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
-// only for jumps so no sign extend?
+// sign extended because jump address is pc relative
 // [20] => [31], [10:1] => [30:21], [11] => [20], [19:12] => [19:12]
+
 static inline int extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-           (instr >> (30 - 10) & 0b11111111110);
+           ((signed)instr >> (30 - 10) & -2);
 }
 
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
 static inline int32_t extract_imm_B(int32_t instr) {
     return (instr >> (31 - 12) & 0xfffff000) | (instr << (11 - 7) & (1 << 11)) |
            (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
-}
-
-//function prototypes DEPRECATED
-t_parse_result parse_OP_IMM(int32_t* instruction);
-
-t_parse_result parse_OP_IMM_32(int32_t* instruction);
-
-t_parse_result parse_LUI(int32_t* instruction);
-
-void test_parsing(void) {
-    /*
-     * dissassembly of li a0, 0xDEADBEEF
-     *  00038537                lui     a0,0x38
-     *  ab75051b                addiw   a0,a0,-1353
-     *  00e51513                slli    a0,a0,0xe
-     *  eef50513                addi    a0,a0,-273 # 37eef <__global_pointer$+0x26667>
-     */
-
-    unsigned int *memory = (unsigned int *) malloc(0x10);
-    //fill memory with the data we have little endian so 00038537 should be 37 85 38 00 in memory
-    memory[0] = 0x38537;
-    memory[1] = 0xab75051b;
-    memory[2] = 0xe51513;
-    memory[3] = 0xeef50513;
-
-    printf("First line of memory %#010x, first byte: %#x\n", memory[0], ((unsigned char *) memory)[0]);
-    uint32_t data[32];
-    for (int i = 0; i < 4; i++) {
-        t_risc_instr instr;
-        instr.addr = (uintptr_t)&memory[i];
-        parse_instruction(&instr,data);
-    }
 }
 
 /**
@@ -96,7 +60,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
 
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t*)p_instr_struct->addr; //cast and dereference
-    printf("Parsing: %#010x\n", raw_instr);
+    log_verbose("Parsing: 0x%x\n", raw_instr);
 
     //fill basic struct
     p_instr_struct->reg_dest = extract_rd(raw_instr);
@@ -107,7 +71,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
     t_opcodes opcode = raw_instr >> 2 & 0x1f;
     switch (opcode) {
         case OP_LUI:
-            parse_LUI(&raw_instr);
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
             p_instr_struct->imm = extract_imm_U(raw_instr);
@@ -211,6 +174,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     break;
                 }
                 default: {
+                    int error = extract_func3(raw_instr);
                     not_yet_implemented("Invalid LOAD Instruction");
                 }
             }
@@ -319,9 +283,9 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             switch(extract_func3(raw_instr)){
                 case 0:
                     if(raw_instr & (1<<20)){
-                        p_instr_struct->mnem = ECALL;
-                    } else {
                         p_instr_struct->mnem = EBREAK;
+                    } else {
+                        p_instr_struct->mnem = ECALL;
                     }
                     break;
                 case 1:
@@ -350,7 +314,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         case OP_OP_IMM_32:
-            parse_OP_IMM_32(&raw_instr);
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
@@ -431,7 +394,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         case OP_OP_IMM:
-            parse_OP_IMM(&raw_instr);
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
@@ -480,46 +442,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             }
             break;
         default:
-            not_yet_implemented("Opcode Not Implemented");
-    }
-}
-
-t_parse_result parse_LUI(int32_t* instruction) {
-    //extract imm [31:12] 20 bits
-    // fills rd with the upper 20 bits and fills lower 12 bits with zeros
-    printf("LUI rd: %d, imm32: %#010x\n", extract_rd(*instruction), extract_imm_U(*instruction));
-}
-
-t_parse_result parse_OP_IMM(int32_t* instruction) {
-    switch (extract_func3(*instruction)) {
-        case 0: { //ADDI
-            printf("ADDI rd %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_imm_I(*instruction));
-            break;
-        }
-        case 1: { //SLLI opcode and func3 are unique
-            printf("SLLI rd %d, rs1 %d, shamt %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_big_shamt(*instruction));
-            break;
-        }
-        default: {
-            not_yet_implemented("Opcode not Implemented");
-        }
-    }
-}
-
-t_parse_result parse_OP_IMM_32(int32_t* instruction) {
-    // extract func 3 bits[14:12]
-    switch (extract_func3(*instruction)) {
-        case 0: {
-            //extract imm bits[31:20] 12 bits we need sign extension!
-            printf("ADDIW rd: %d, rs1 %d, imm %d\n", extract_rd(*instruction), extract_rs1(*instruction),
-                   extract_imm_I(*instruction));
-            break;
-        }
-        default: {
-            not_yet_implemented("Opcode not Implemented");
-            break;
-        }
+            not_yet_implemented("Instruction unknown");
     }
 }

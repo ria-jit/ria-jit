@@ -2,12 +2,13 @@
 // Created by flo on 24.04.20.
 //
 
-#include <stdio.h>
+#include <common.h>
 #include <stdbool.h>
 #include "util.h"
 #include "cache.h"
 #include "translate.hpp"
 #include "parser.h"
+#include <register.h>
 #include "loadElf.h"
 #include <getopt.h>
 
@@ -19,11 +20,14 @@ int transcode_loop();
 
 t_risc_addr init_entry_pc();
 
-t_risc_addr execute_cached(t_cache_loc loc);
+bool execute_cached(t_cache_loc loc);
 
 t_cache_loc translate_block(t_risc_addr risc_addr);
 
+#ifndef TESTING
 int main(int argc, char *argv[]) {
+    //todo run with -v -f ../test/assembly_hello_world for the hello world test
+
     int opt_index = 0;
     char *file_path = NULL;
 
@@ -39,70 +43,103 @@ int main(int argc, char *argv[]) {
             case ':':
             case 'h':
             default:
-                fprintf(stderr, "Usage: dynamic-translate -f <filename> [-v][…]\n");
+                dprintf(2, "Usage: dynamic-translate -f <filename> [-v][…]\n");
                 return 1;
         }
     }
 
-    printf("Verbose: %d\n", verbose);
-    printf("File path: %s\n", file_path);
+    log_verbose("Command line options:\n");
+    log_verbose("Verbose: %d\n", verbose);
+    log_verbose("File path: %s\n", file_path);
 
     if (file_path == NULL) {
-        fprintf(stderr, "Bad. Invalid file path.\n");
+        dprintf(2, "Bad. Invalid file path.\n");
         return 2;
     }
 
-    printf("Hello World!\n");
-    test_parsing();
+    log_verbose("Initializing transcoding...\n");
     transcode_loop(file_path);
     return 0;
 }
 
-int transcode_loop(char *file_path) {
+#endif //TESTING
+
+int start_transcode(const char *file_path){
+    log_verbose("extern transcode start!\n");
+    verbose = true;
+    transcode_loop(file_path);
+    return 0;
+}
+
+int transcode_loop(const char *file_path) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
-    t_risc_addr pc = result.entry;
+    if(!result.valid){
+        dprintf(2, "Bad. Failed to map into memory.\n");
+        return 1;
+    }
+
+    t_risc_addr next_pc = result.entry;
+
+    //allocate stack
+    set_value((t_risc_reg) sp, createStack(0, (char **) "", result));
 
     init_hash_table();
 
+    set_value(pc,next_pc);
+
     while (!finalize) {
         //check our previously translated code
-        t_cache_loc cache_loc = lookup_cache_entry(pc);
+        t_cache_loc cache_loc = lookup_cache_entry(next_pc);
 
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
-            cache_loc = translate_block(pc);
+            cache_loc = translate_block(next_pc);
+            set_cache_entry(next_pc,cache_loc);
         }
 
         //execute the cached (or now newly generated code) and update the program counter
-        pc = execute_cached(cache_loc);
+        if(!execute_cached(cache_loc)) break;
+
+        //store pc from registers in pc
+        next_pc = get_value(pc);
 
         //tmp - programm should exit on syscall
-        finalize = true;
+        //finalize = true;
     }
 
     return 0;
 }
 
 /**
+ * Moved to translate.cpp
  * Translate the basic block at the passed RISC-V pc address.
  * @param risc_addr the RISC-V address of the basic block in question
  * @return cache location of the translated code
  */
-t_cache_loc translate_block(t_risc_addr risc_addr) {
+/*t_cache_loc translate_block(t_risc_addr risc_addr) {
     not_yet_implemented("Translate Block");
+
     return 0;
-}
+}*/
 
 /**
  * Execute cached translated code at the passed location.
  * @param loc the cache address of that code
- * @return the program counter value after execution of the translated basic block
+ * @return
  */
-t_risc_addr execute_cached(t_cache_loc loc) {
-    // execute the function at loc
-    // check pc = pc[register]
-    not_yet_implemented("Execute Cached");
-    return 0;
+bool execute_cached(t_cache_loc loc) {
+    log_verbose("Execute Cached at %p\n", get_value(pc));
+    typedef void (*void_asm)(void);
+    ((void_asm)loc)(); //call asm code
+
+    ///check for illegal x0 values
+    if(*get_reg_data() != 0){
+        printf("riscV register x0 != 0 after executing block\n");
+        printf("Terminating...");
+        return false;
+    }
+
+    return true;
 }
 
 t_risc_instr *decode_next() {

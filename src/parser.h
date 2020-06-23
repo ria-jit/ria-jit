@@ -41,7 +41,6 @@ typedef enum {
  * @param reg_count uint32_t[N_REG] structure to count the register use
  */
 void parse_instruction(t_risc_instr *instr_struct, uint32_t* reg_count);
-void test_parsing(void);
 
 #ifdef __cplusplus
 }
