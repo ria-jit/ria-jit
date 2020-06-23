@@ -89,6 +89,12 @@ t_cache_loc finalize_block() {
     //prevents gcc from optimizing the assumed dead store away
     __builtin___clear_cache(static_cast<char *>(ptr), static_cast<char *>(ptr) + size - 1);
 
+    if(flag_log_asm_out) {
+        log_asm_out("generated block code: ");
+        log_print_mem((char*)ptr, buffer.size());
+        printf("\n");
+    }
+
     return ptr;
 }
 

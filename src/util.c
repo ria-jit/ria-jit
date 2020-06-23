@@ -78,3 +78,15 @@ void log_cache(const char* format, ...) {
         return;
     }
 }
+
+void log_print_mem(const char* ptr, int len) {
+    char buffer[2];
+    for (const char *ptri = ptr; ptri < ptr + len; ptri++) {
+
+        buffer[0] = "0123456789abcdef"[((*ptri) >> 4) & 0xf];
+        buffer[1] = "0123456789abcdef"[(*ptri) & 0xf];
+        //buffer[2] = ' ';
+
+        write(1, buffer, 2);
+    }
+}
