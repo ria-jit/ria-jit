@@ -75,6 +75,7 @@ int transcode_loop(const char *file_path) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
     if(!result.valid){
         dprintf(2, "Bad. Failed to map into memory.\n");
+        return 1;
     }
 
     t_risc_addr next_pc = result.entry;

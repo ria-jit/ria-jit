@@ -27,7 +27,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     //get the file descriptor
     int fd = open(filePath, O_RDONLY, 0);
     if(fd<=0){
-        dprintf(2, "Could not open file, error %i", -fd);
+        dprintf(2, "Could not open file, error %i\n", -fd);
         return INVALID_ELF_MAP;
     }
 
@@ -35,7 +35,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     Elf64_Ehdr header;
     ssize_t bytes = read_full(fd, (void *) &header, sizeof(Elf64_Ehdr));
     if(bytes<=0){
-        dprintf(2, "Could not read header, error %i", -bytes);
+        dprintf(2, "Could not read header, error %i\n", -bytes);
         return INVALID_ELF_MAP;
     }
 
