@@ -6,10 +6,11 @@
 #include <stddef.h>
 
 void __exit(void) {
-    asm(
+    asm volatile (
     "addi a0, x0, 0\n\t"
     "addi a7, x0, 93\n\t"
     "ecall"
+    ::: "memory"
     );
 }
 
@@ -31,9 +32,10 @@ void __write(int fd, void *buf, size_t len) {
     register size_t length asm("a2");
     length = len;
 
-    asm(
+    asm volatile (
     "addi a7, x0, 64\n\t"
     "ecall"
+    ::: "memory"
     );
 }
 
