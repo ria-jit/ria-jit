@@ -16,18 +16,12 @@
 bool finalize = false;
 
 //prototypes
-int transcode_loop();
-
-t_risc_addr init_entry_pc();
+int transcode_loop(const char *file_path);
 
 bool execute_cached(t_cache_loc loc);
 
-t_cache_loc translate_block(t_risc_addr risc_addr);
-
 #ifndef TESTING
 int main(int argc, char *argv[]) {
-    //todo run with -v -f ../test/assembly_hello_world for the hello world test
-
     int opt_index = 0;
     char *file_path = NULL;
 
@@ -111,18 +105,6 @@ int transcode_loop(const char *file_path) {
 }
 
 /**
- * Moved to translate.cpp
- * Translate the basic block at the passed RISC-V pc address.
- * @param risc_addr the RISC-V address of the basic block in question
- * @return cache location of the translated code
- */
-/*t_cache_loc translate_block(t_risc_addr risc_addr) {
-    not_yet_implemented("Translate Block");
-
-    return 0;
-}*/
-
-/**
  * Execute cached translated code at the passed location.
  * @param loc the cache address of that code
  * @return
@@ -140,18 +122,4 @@ bool execute_cached(t_cache_loc loc) {
     }
 
     return true;
-}
-
-t_risc_instr *decode_next() {
-    not_yet_implemented("Decode next");
-    return NULL;
-}
-
-/**
- * Initialize the program counter to the program entry point address.
- * @return initial RISC-V program counter value
- */
-t_risc_addr init_entry_pc() {
-    not_yet_implemented("Init entry pc");
-    return 0;
 }
