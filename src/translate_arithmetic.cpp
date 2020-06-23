@@ -60,7 +60,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
     if (r_info.mapped[instr.reg_dest]) {
         a->mov(r_info.map[instr.reg_dest], instr.imm);
     } else {
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), instr.imm);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), instr.imm);
     }
 }
 
