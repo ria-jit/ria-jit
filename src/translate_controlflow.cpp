@@ -37,7 +37,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
     a->add(x86::rax, instr.imm);
 
     ///set last bit to zero
-    //why??? not aligned to 4 bit boundary would throw exception anyway...
+    //why??? not aligned to 4 bit boundary would throw exception anyway…
     a->and_(x86::rax, -2);
 
     ///write target addr to pc

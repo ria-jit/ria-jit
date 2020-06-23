@@ -4,16 +4,13 @@
 // ASM file assembled with riscv64-linux-gnu-as, linked with riscv64-linux-gnu-ld
 //
 
-#include "../lib/common.h"
-#include <elf.h>
+#include <common.h>
 #include <linux/mman.h>
-#include "util.h"
+#include <stdio.h>
+#include <string.h>
 #include "loadElf.h"
 
 //Apparently not included in the headers on my version.
-#ifndef MAP_FIXED_NOREPLACE
-#define MAP_FIXED_NOREPLACE 0x200000
-#endif
 #ifndef EF_RISCV_RVE
 #define EF_RISCV_RVE 0x8
 #endif
@@ -21,34 +18,36 @@
 #define EF_RISCV_TSO 0x10
 #endif
 
+//TODO Figure out proper offset
+#define STACK_OFFSET 0x10000000
+
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
-    printf("Reading %s...\n", filePath);
+    log_verbose("Reading %s...\n", filePath);
 
     //get the file descriptor
     int fd = open(filePath, O_RDONLY, 0);
-
-    //get the size via fstatx to map it into memory
-    struct statx statxbuf;
-    fstatx(fd, &statxbuf);
-    __off_t size = statxbuf.stx_size;
-
-    //map the executable file into memory
-    //Try putting it closely above TRANSLATOR_BASE so it goes in our address space and the other regions are free for
-    // the mapping.
-    char *exec = mmap((void *) (TRANSLATOR_BASE + 0x10000000), size, PROT_READ, MAP_SHARED, fd, 0);
+    if (fd <= 0) {
+        dprintf(2, "Could not open file, error %i\n", -fd);
+        return INVALID_ELF_MAP;
+    }
 
     //read as elf header
-    Elf64_Ehdr *header = (Elf64_Ehdr *) exec;
+    Elf64_Ehdr header;
+    ssize_t bytes = read_full(fd, (void *) &header, sizeof(Elf64_Ehdr));
+    if (bytes <= 0) {
+        dprintf(2, "Could not read header, error %li\n", -bytes);
+        return INVALID_ELF_MAP;
+    }
 
-    //get program headers by offset in file
-    Elf64_Half ph_count = header->e_phnum;
-    Elf64_Off ph_offset = header->e_phoff;
-    Elf64_Phdr *segments = (Elf64_Phdr *) (exec + ph_offset);
-    Elf64_Word flags = header->e_flags;
-    Elf64_Half phentsize = header->e_phentsize;
-    Elf64_Addr entry = header->e_entry;
+
+    Elf64_Half ph_count = header.e_phnum;
+    Elf64_Off ph_offset = header.e_phoff;
+    Elf64_Word flags = header.e_flags;
+    Elf64_Half phentsize = header.e_phentsize;
+    Elf64_Addr entry = header.e_entry;
     bool incompatible = false;
 
+    //Check for not supported ABI Flags
     if (flags & EF_RISCV_RVC) {
         not_yet_implemented("C ABI is not yet supported");
         incompatible = true;
@@ -74,70 +73,123 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         incompatible = true;
     }
     if (incompatible) {
+        //return INVALID_ELF_MAP;
+    }
+
+    Elf64_Addr minAddr = 0, maxAddr = 0;
+    t_risc_addr load_addr = 0;
+    off_t fileOffset = lseek(fd, ph_offset, SEEK_SET);
+    if (fileOffset < 0) {
+        dprintf(2, "Could not seek file, error %li", -fileOffset);
         return INVALID_ELF_MAP;
     }
-    t_risc_addr load_addr = 0;
     for(int i = 0; i < ph_count; i++) {
-        Elf64_Phdr *segment = segments + i;
-        switch(segment->p_type) {
+        Elf64_Phdr segment;
+        ssize_t segmentBytes = read_full(fd, (void *) &segment, sizeof(Elf64_Phdr));
+        if (segmentBytes <= 0) {
+            dprintf(2, "Could not read header for segment %i, error %li", i, -segmentBytes);
+            return INVALID_ELF_MAP;
+        }
+        switch(segment.p_type) {
             case PT_LOAD: {
-                Elf64_Off load_offset = segment->p_offset;
-                Elf64_Xword memory_size = segment->p_memsz;
-                Elf64_Xword physical_size = segment->p_filesz;
-                Elf64_Addr vaddr = segment->p_vaddr;
-                printf("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
-                       "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
+                Elf64_Off load_offset = segment.p_offset;
+                Elf64_Xword memory_size = segment.p_memsz;
+                Elf64_Xword physical_size = segment.p_filesz;
+                Elf64_Addr vaddr = segment.p_vaddr;
+                log_verbose("Found segment at file offset 0x%lx with virtual address 0x%lx (virtual size 0x%lx, "
+                            "physical size 0x%lx).\n", load_offset, vaddr, memory_size, physical_size);
                 //Refuse to map to a location in the address space of the translator.
                 if ((vaddr + memory_size) > TRANSLATOR_BASE) {
-                    printf("Bad. This segment wants to be in the translators memory region");
+                    dprintf(2, "Bad. This segment wants to be in the translators memory region");
                     return INVALID_ELF_MAP;
                 }
                 if (!load_addr) {
                     load_addr = vaddr - load_offset;
                 }
-                //Copy flags over
-                int prot = 0;
-                if (segment->p_flags & PF_R) {
-                    prot |= PROT_READ;
+                //Update min and max addresses.
+                if (!minAddr || minAddr > vaddr) {
+                    minAddr = vaddr;
                 }
-                if (segment->p_flags & PF_W) {
-                    prot |= PROT_WRITE;
-                }
-                if (segment->p_flags & PF_X) {
-                    prot |= PROT_EXEC; //Probably not even needed
-                }
-                //Allocate memory for the segment at the correct address and map the file segment into that memory
-                void *segment_in_memory =
-                        mmap((void *) vaddr, memory_size, prot, MAP_FIXED_NOREPLACE + MAP_PRIVATE, fd,
-                             load_offset);
-                //Failed means that we couldn't get enough memory at the correct address
-                if (BAD_ADDR(segment_in_memory)) {
-                    printf("Could not map segment %i because error %li", i, -(intptr_t) segment_in_memory);
-                    return INVALID_ELF_MAP;
-                }
-                //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
-                if (segment_in_memory != (void *) vaddr) {
-                    printf("Did not get the correct memory address for segment %i.", i);
-                    return INVALID_ELF_MAP;
-                }
-                //Initialize additional memory to 0.
-                if (memory_size > physical_size) {
-                    memset((segment_in_memory + physical_size), 0, memory_size - physical_size);
+                if (!maxAddr || maxAddr < (vaddr + memory_size)) {
+                    maxAddr = vaddr + memory_size;
                 }
                 break;
             }
             case PT_DYNAMIC: //Fallthrough
             case PT_INTERP: {
-                printf("Bad. Got file that needs dynamic linking.");
+                dprintf(2, "Bad. Got file that needs dynamic linking.");
                 return INVALID_ELF_MAP;
             }
 
         }
     }
+    Elf64_Addr startAddr = ALIGN_DOWN(minAddr, 4096);
+    Elf64_Addr endAddr = ALIGN_UP(maxAddr, 4096);
+    //Allocate the whole address space that is needed (Should not be READ/WRITE everywhere but I am too lazy right now).
+    void *elf = mmap_mini((void *) startAddr, endAddr - startAddr, PROT_READ | PROT_WRITE,
+                          MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    //Failed means that we couldn't get enough memory at the correct address
+    if (BAD_ADDR(elf)) {
+        dprintf(2, "Could not map elf because error %s", strerror(-(intptr_t) elf));//-(intptr_t) elf
+        return INVALID_ELF_MAP;
+    }
+    //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
+    if (elf != (void *) startAddr) {
+        dprintf(2, "Did not get the correct memory address for elf");
+        return INVALID_ELF_MAP;
+    }
+
+    fileOffset = lseek(fd, ph_offset, SEEK_SET);
+    if (fileOffset < 0) {
+        dprintf(2, "Could not seek file, error %li", -fileOffset);
+        return INVALID_ELF_MAP;
+    }
+    int fd2 = open(filePath, O_RDONLY, 0);
+    if (fd2 <= 0) {
+        dprintf(2, "Could not open file, error %i", -fd2);
+        return INVALID_ELF_MAP;
+    }
+    for(int i = 0; i < ph_count; i++) {
+        Elf64_Phdr segment;
+        ssize_t segmentBytes = read_full(fd, (void *) &segment, sizeof(Elf64_Phdr));
+        if (segmentBytes <= 0) {
+            dprintf(2, "Could not read header for segment %i, error %li", i, -segmentBytes);
+            return INVALID_ELF_MAP;
+        }
+        switch(segment.p_type) {
+            case PT_LOAD: {
+                Elf64_Off load_offset = segment.p_offset;
+                Elf64_Xword memory_size = segment.p_memsz;
+                Elf64_Xword physical_size = segment.p_filesz;
+                Elf64_Addr vaddr = segment.p_vaddr;
+                //Copy flags over (not used right now to be implemented later)
+                int prot = 0;
+                if (segment.p_flags & PF_R) {
+                    prot |= PROT_READ;
+                }
+                if (segment.p_flags & PF_W) {
+                    prot |= PROT_WRITE;
+                }
+                if (segment.p_flags & PF_X) {
+                    prot |= PROT_EXEC; //Probably not even needed
+                }
+                fileOffset = lseek(fd2, load_offset, SEEK_SET);
+                if (fileOffset < 0) {
+                    dprintf(2, "Could not seek file, error %li", -fileOffset);
+                    return INVALID_ELF_MAP;
+                }
+                ssize_t segmentMemoryBytes = read_full(fd2, (void *) ((void *) vaddr), physical_size);
+                if (segmentBytes <= 0) {
+                    dprintf(2, "Could not load segment %i, error %li", i, -segmentMemoryBytes);
+                    return INVALID_ELF_MAP;
+                }
+                break;
+            }
+        }
+    }
     t_risc_addr phdr = load_addr + ph_offset;
-    //Close and unmap the elf file
-    munmap(exec, size);
     close(fd);
+    close(fd2);
 
     return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize};
 }
@@ -155,18 +207,19 @@ t_risc_addr allocateStack() {
     //Add guard page at bottom just in case.
     size_t guard = 4096;
 
-    uintptr_t stackStart = TRANSLATOR_BASE - (stackSize + guard + 4096);
-    void *bottomOfStack = mmap((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
-                               MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
+    //Allocate the stack with offset under the translator region where the cached blocks can go.
+    uintptr_t stackStart = TRANSLATOR_BASE - STACK_OFFSET - (stackSize + guard + 4096);
+    void *bottomOfStack = mmap_mini((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
+                                    MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
 
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(bottomOfStack)) {
-        printf("Could not map stack because error %li", -(uintptr_t) (bottomOfStack));
+        dprintf(2, "Could not map stack because error %li", -(intptr_t) (bottomOfStack));
         return INVALID_STACK;
     }
     //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
     if ((uintptr_t) bottomOfStack != stackStart) {
-        printf("Did not get the correct memory address for stack");
+        dprintf(2, "Did not get the correct memory address for stack");
         return INVALID_STACK;
     }
 
@@ -187,12 +240,12 @@ mapInfo) {
         *(--stack) = (Elf64_auxv_t) {AT_PHDR, {mapInfo.entry}};
         *(--stack) = (Elf64_auxv_t) {AT_PHNUM, {mapInfo.ph_count}};
         *(--stack) = (Elf64_auxv_t) {AT_PHENT, {mapInfo.ph_entsize}};
-        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
-        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
-        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
+//        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}}; //TODO getauxval does not work since
+//        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}}; // auxvptr is not initialized
+//        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
+//        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
         *(--stack) = (Elf64_auxv_t) {AT_SECURE, {0}};
         *(--stack) = (Elf64_auxv_t) {AT_PAGESZ, {4096}};
         *(--stack) = (Elf64_auxv_t) {AT_HWCAP, {0}}; //Seems to not be defined for RISCV
@@ -204,15 +257,15 @@ mapInfo) {
     ///Copy envp to guest stack
     {
         int envc = 0;
-        for(; environ[envc]; ++envc);
+        for(; __environ[envc]; ++envc);
         char **stack = (char **) stackPos;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
-        for(int i = envc; i >= 0; i--) {
-            *(--stack) = environ[i];
+        for(int i = envc - 1; i >= 0; i--) {
+            *(--stack) = __environ[i];
         }
-        for(int i = 0; stack[i] || environ[i]; ++i) {
-            if (stack[i] != environ[i]) {
-                printf("Difference in envp %p and environ %p\n", stack[i], environ[i]);
+        for(int i = 0; stack[i] || __environ[i]; ++i) {
+            if (stack[i] != __environ[i]) {
+                log_verbose("Difference in envp %p and environ %p\n", stack[i], __environ[i]);
             }
         }
         stackPos = (t_risc_addr) stack;
@@ -221,7 +274,7 @@ mapInfo) {
     {
         const char **stack = (const char **) stackPos;
         //Zero terminated so guestArgv[guestArgc] will be zero and also needs to be copied
-        for(int i = guestArgc; i >= 0; i--) {
+        for(int i = guestArgc - 1; i >= 0; i--) {
             *(--stack) = guestArgv[i];
         }
         stackPos = (t_risc_addr) stack;
@@ -244,6 +297,6 @@ t_risc_addr createStack(int guestArgc, char **guestArgv, t_risc_elf_map_result m
     }
     t_risc_addr argsToStack = copyArgsToStack(stack, guestArgc, guestArgv, mapInfo);
     ///Stack pointer always needs to be 16-Byte aligned per ABI convention
-    return ALIGN_DOWN(argsToStack, 16u);
+    return ALIGN_DOWN(argsToStack, 16lu);
 
 }

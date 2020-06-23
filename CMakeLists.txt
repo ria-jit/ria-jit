@@ -10,7 +10,10 @@ link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
+add_compile_options(-fPIE -Wall -Wextra) ##TODO pedantic removed because ASMJit
+
 include_directories(src)
+include_directories(lib)
 
 #Include the AsmJit library for x86 code-generation
 set(ASMJIT_EMBED TRUE)
@@ -22,13 +25,14 @@ include_directories(lib/asmjit/src)
 add_subdirectory(lib/googletest-master)
 include_directories(lib/googletest-master/googletest/include)
 include_directories(lib/googletest-master/googlemock/include)
-add_executable("test" ${ASMJIT_SRC} test/test_main.cpp src/parser.c src/parser.h src/util.c src/util.h
+add_executable("test" ${ASMJIT_SRC} src/main.c src/main.h test/unit_tests/test_main.cpp src/parser.c src/parser.h src/util.c src/util.h
         src/cache.c src/cache.h src/translate.cpp src/translate.hpp src/register.c src/register.h src/loadElf.c
         src/loadElf.h src/translate_arithmetic.cpp src/translate_arithmetic.hpp src/translate_controlflow.cpp
         src/translate_controlflow.hpp src/translate_csr.cpp src/translate_csr.hpp src/translate_loadstore.cpp
         src/translate_loadstore.hpp src/translate_m_ext.cpp src/translate_m_ext.hpp src/translate_other.cpp
-        src/translate_other.hpp lib/common.h lib/minilibc.c test/test_register.cpp test/test_translate_basic.cpp test/test_parser.cpp test/test_cache.cpp)
+        src/translate_other.hpp lib/common.h lib/minilibc.c test/unit_tests/test_register.cpp test/unit_tests/test_loadElf.cpp test/unit_tests/test_translate_basic.cpp test/unit_tests/test_parser.cpp test/unit_tests/test_cache.cpp test/unit_tests/test_hello_world.cpp test/unit_tests/test_asmjit_ptr.cpp)
 target_link_libraries("test" gtest gtest_main)
+target_compile_definitions(test PUBLIC TESTING)
 
 #define our translator's target
 add_executable("translator" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h src/util.c src/util.h
@@ -42,4 +46,3 @@ add_executable("translator" ${ASMJIT_SRC} src/main.c src/parser.c src/parser.h s
 target_link_libraries("translator" ${ASMJIT_DEPS})
 target_link_libraries("test" ${ASMJIT_DEPS})
 
-add_compile_options(-Wall -Wextra -pedantic)

@@ -1,8 +1,9 @@
 //
 // Created by flo on 07.06.20.
 //
-
 #include <gtest/gtest.h>
+
+#ifdef TESTING
 
 /**
  * Initializes the Googletest framework and runs all corresponding tests.
@@ -14,3 +15,5 @@ int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+#endif //TESTING
