@@ -119,7 +119,7 @@ void translate_SB(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r8());
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest));
+        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r8());
     }
 }
@@ -138,7 +138,7 @@ void translate_SH(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r16());
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest));
+        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r16());
     }
 }
@@ -157,7 +157,7 @@ void translate_SW(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2].r32());
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest));
+        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG.r32());
     }
 }
@@ -217,7 +217,7 @@ void translate_SD(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(x86::ptr(r_info.map[instr.reg_src_1], instr.imm), r_info.map[instr.reg_src_2]);
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_dest)); //todo shouldn't this be instr.reg_src_2?
+        a->mov(FIRST_REG, x86::ptr(r_info.base + 8 * instr.reg_src_2)); //todo shouldn't this be instr.reg_src_2?
         a->mov(x86::ptr(SECOND_REG, instr.imm), FIRST_REG);
     }
 }
