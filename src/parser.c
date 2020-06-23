@@ -34,8 +34,7 @@ static inline int extract_imm_U(int32_t instr) { return instr & ~(0xfff); }
 static inline int extract_imm_I(int32_t instr) { return instr >> 20; } //sign extend!
 
 // extract S-Type immediate bit[31:25] + [11:7] => 7bits + 5 bits
-// TODO need sign extend?
-static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & 0b1111111) | (instr >> 7 & 0b11111); }
+static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111) | (instr >> 7 & 0b11111); }
 
 // extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
 // sign extended because jump address is pc relative
