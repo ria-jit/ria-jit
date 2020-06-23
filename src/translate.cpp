@@ -366,13 +366,17 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     int instructions_in_block = 0;
 
+    bool block_full = false;
+
     ///parse structs
-    for (int parse_pos = 0; parse_pos < BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
+    for (int parse_pos = 0; parse_pos <= BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
 
         risc_instr.addr = risc_addr;
 
         //block_cache.push_back(risc_instr);
         block_cache[parse_pos] = risc_instr;
+
+        //printf("parse at: %p", (void*)block_cache[parse_pos].addr);
 
         //parse_instruction(&block_cache.back(), reg_count);
         parse_instruction(&block_cache[parse_pos], reg_count);
@@ -447,8 +451,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     ///loop ended at BLOCK_CACHE_SIZE -> set pc for next instruction
-    set_pc_next_inst(block_cache[BLOCK_CACHE_SIZE - 1], reinterpret_cast<uint64_t>(get_reg_data()));
+    block_full = true;
     instructions_in_block++;
+
 
     ///loop ended at BRANCH: skip setting pc
     PARSE_DONE:
@@ -551,6 +556,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
         translate_risc_instr(block_cache[i], r_info);
+    }
+
+    if(block_full) {
+        set_pc_next_inst(block_cache[BLOCK_CACHE_SIZE - 2], reinterpret_cast<uint64_t>(get_reg_data()));
     }
 
     ///save registers
