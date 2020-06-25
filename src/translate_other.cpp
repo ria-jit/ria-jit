@@ -4,6 +4,7 @@
 
 #include "translate_other.hpp"
 #include "register.h"
+#include "emulateEcall.hpp"
 
 using namespace asmjit;
 
@@ -27,6 +28,14 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     //see https://stackoverflow.com/questions/59800430/risc-v-ecall-syscall-calling-convention-on-pk-linux
     log_asm_out("Translate ECALL…\n");
 
+    save_risc_registers(r_info);
+    a->mov(x86::rdi, reinterpret_cast<uintptr_t>(&instr));
+    a->mov(x86::rsi, reinterpret_cast<uintptr_t>(&r_info));
+    typedef void emulate(const t_risc_instr &instr, const register_info &r_info);
+    emulate *em = &emulate_ecall;
+    a->call(reinterpret_cast<uintptr_t>(em));
+
+#if FALSE
     /*
      * As a quick implementation of these system calls, we want to support write(64) and exit(93).
      * For the numbers: see unistd.h in the RISC-V toolchain linux headers.
@@ -73,6 +82,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     a->mov(x86::rax, instr.addr + 4);
     a->mov(x86::ptr(r_info.base + 8 * pc), x86::rax); //add 4 for next instr
     a->pop(x86::rax);
+#endif
 }
 
 /**

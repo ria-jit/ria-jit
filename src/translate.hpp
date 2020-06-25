@@ -22,6 +22,9 @@ struct register_info {
 extern asmjit::CodeHolder *code;
 extern asmjit::x86::Assembler *a;
 
+
+void save_risc_registers(register_info r_info);
+
 extern "C" {
 #endif
 

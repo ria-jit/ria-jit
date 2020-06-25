@@ -350,7 +350,6 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr);
 
 void load_risc_registers(register_info r_info);
 
-void save_risc_registers(register_info r_info);
 
 void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr);
 
