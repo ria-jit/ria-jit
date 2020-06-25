@@ -21,6 +21,9 @@
 //TODO Figure out proper offset
 #define STACK_OFFSET 0x10000000
 
+#define AUXC 10
+
+
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     log_general("Reading %s...\n", filePath);
 
@@ -232,12 +235,19 @@ t_risc_addr allocateStack() {
 
 t_risc_addr copyArgsToStack(t_risc_addr stackPos, int guestArgc, char *guestArgv[], t_risc_elf_map_result
 mapInfo) {
+    ///Stack pointer always needs to be 16-Byte aligned per ABI convention
+    int envc = 0;
+    for(; __environ[envc]; ++envc);
+    size_t totalStackSize = sizeof(Elf64_auxv_t) * AUXC + sizeof(char **) * (envc + 1) + sizeof(char **) *
+            (guestArgc + 1) + sizeof(guestArgc);
+    uintptr_t stackOffset = totalStackSize - ALIGN_DOWN(totalStackSize, 16lu);
+    stackPos -= stackOffset;
     ///Add auxv to guest stack
     {
         Elf64_auxv_t *stack = (Elf64_auxv_t *) stackPos;
         *(--stack) = (Elf64_auxv_t) {AT_NULL};
         *(--stack) = (Elf64_auxv_t) {AT_ENTRY, {mapInfo.entry}};
-        *(--stack) = (Elf64_auxv_t) {AT_PHDR, {mapInfo.entry}};
+        *(--stack) = (Elf64_auxv_t) {AT_PHDR, {mapInfo.phdr}};
         *(--stack) = (Elf64_auxv_t) {AT_PHNUM, {mapInfo.ph_count}};
         *(--stack) = (Elf64_auxv_t) {AT_PHENT, {mapInfo.ph_entsize}};
 //        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}}; //TODO getauxval does not work since
@@ -252,12 +262,14 @@ mapInfo) {
         *(--stack) = (Elf64_auxv_t) {AT_HWCAP2, {0}}; //Seems to not be defined for RISCV
 //        *(--stack) = (Elf64_auxv_t) {AT_PLATFORM, {0}}; //Seems to not be defined for RISCV
         *(--stack) = (Elf64_auxv_t) {AT_EXECFN, {(uintptr_t) guestArgv[0]}};
+        if (stackPos - (sizeof(Elf64_auxv_t) * AUXC) != (t_risc_addr) stack) {
+            dprintf(2, "Not the expected number of auxv entries.");
+            return 0;
+        }
         stackPos = (t_risc_addr) stack;
     }
     ///Copy envp to guest stack
     {
-        int envc = 0;
-        for(; __environ[envc]; ++envc);
         char **stack = (char **) stackPos;
         *(--stack) = NULL;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
@@ -284,7 +296,7 @@ mapInfo) {
     }
     ///Copy guestArgc to guest stack
     {
-        int *stack = (int *) stackPos;
+        long *stack = (long *) stackPos;
         *(--stack) = guestArgc;
         stackPos = (t_risc_addr) stack;
     }
@@ -298,8 +310,6 @@ t_risc_addr createStack(int guestArgc, char **guestArgv, t_risc_elf_map_result m
     if (!stack) {
         return INVALID_STACK;
     }
-    t_risc_addr argsToStack = copyArgsToStack(stack, guestArgc, guestArgv, mapInfo);
-    ///Stack pointer always needs to be 16-Byte aligned per ABI convention
-    return ALIGN_DOWN(argsToStack, 16lu);
+    return copyArgsToStack(stack, guestArgc, guestArgv, mapInfo);
 
 }

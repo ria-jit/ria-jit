@@ -91,7 +91,7 @@ int start_transcode(const char *file_path){
 
 int transcode_loop(const char *file_path) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
-    if(!result.valid){
+    if (!result.valid) {
         dprintf(2, "Bad. Failed to map into memory.\n");
         return 1;
     }
@@ -99,7 +99,13 @@ int transcode_loop(const char *file_path) {
     t_risc_addr next_pc = result.entry;
 
     //allocate stack
-    set_value((t_risc_reg) sp, createStack(0, (char **) "", result));
+    char *string = "";
+    t_risc_addr stackAddr = createStack(1, &string, result);
+    if (!stackAddr) {
+        return 1;
+    }
+
+    set_value((t_risc_reg) sp, stackAddr);
 
     init_hash_table();
 
@@ -108,7 +114,7 @@ int transcode_loop(const char *file_path) {
     //debugging output
     dump_registers();
 
-    while (!finalize) {
+    while(!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(next_pc);
 
