@@ -7,6 +7,8 @@
 #include "register.h"
 #include "emulateEcall.hpp"
 
+extern bool finalize;
+
 void emulate_ecall(const t_risc_instr &instr, const register_info &r_info) {
     log_general("Emulate syscall...\n");
     auto *registerValues = reinterpret_cast<t_risc_reg_val *> (r_info.base);
@@ -22,6 +24,11 @@ void emulate_ecall(const t_risc_instr &instr, const register_info &r_info) {
             "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 93: //Exit
+        {
+            finalize = true;
         }
             break;
         default:
