@@ -8,12 +8,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void __putchar(char ch);
+void m_putchar(char ch);
 
-void __write(int fd, void *buf, size_t len);
+void m_write(int fd, void *buf, size_t len);
 
-void __exit(void);
+void m_exit(void);
 
-size_t __strlen(char* str);
+size_t m_strlen(char* str);
+
+void printi(int n);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RV64MINILIBC_H

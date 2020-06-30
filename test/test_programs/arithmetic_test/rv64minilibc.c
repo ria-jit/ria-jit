@@ -5,7 +5,7 @@
 #include "rv64minilibc.h"
 #include <stddef.h>
 
-void __exit(void) {
+void m_exit(void) {
     asm volatile (
     "addi a0, x0, 0\n\t"
     "addi a7, x0, 93\n\t"
@@ -14,7 +14,7 @@ void __exit(void) {
     );
 }
 
-size_t __strlen(char* str) {
+size_t m_strlen(char* str) {
     size_t len;
     for (len = 0; str[len] != '\0'; ++len) {
         ;
@@ -22,7 +22,7 @@ size_t __strlen(char* str) {
     return len;
 }
 
-void __write(int fd, void *buf, size_t len) {
+void m_write(int fd, void *buf, size_t len) {
     register int file asm("a0");
     file = fd;
 
@@ -39,6 +39,16 @@ void __write(int fd, void *buf, size_t len) {
     );
 }
 
-void __putchar(char ch) {
-    __write(1, &ch, 1);
+void m_putchar(char ch) {
+    m_write(1, &ch, 1);
+}
+
+void printi(int i) {
+    if (i > 9) {
+        int rem = i / 10;
+        i -= 10 * rem;
+        printi(rem);
+    }
+
+    m_putchar('0' + i);
 }
