@@ -194,7 +194,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     close(fd);
     close(fd2);
 
-    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize};
+    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize, endAddr};
 }
 
 t_risc_addr allocateStack() {

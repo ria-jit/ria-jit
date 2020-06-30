@@ -10,6 +10,7 @@
 #include "parser.h"
 #include <register.h>
 #include "loadElf.h"
+#include "emulateEcall.hpp"
 #include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
@@ -95,6 +96,8 @@ int transcode_loop(const char *file_path) {
         dprintf(2, "Bad. Failed to map into memory.\n");
         return 1;
     }
+
+    setupBrk(result.dataEnd);
 
     t_risc_addr next_pc = result.entry;
 
