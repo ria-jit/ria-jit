@@ -42,7 +42,7 @@ static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111)
 
 static inline int extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-           ((signed)instr >> (30 - 10) & -2);
+            ((signed) instr >> (30 - 10) & 0xffe007fe);
 }
 
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
