@@ -251,6 +251,8 @@ syscall6(int syscall_number, size_t arg1, size_t arg2, size_t arg3,
 // TODO Reformat later
 char** environ;
 static const size_t* __auxvptr;
+//TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+const size_t *auxvptr_temp;
 
 inline long syscall(long number, long a1, long a2, long a3, long a4, long a5,
                     long a6) {
@@ -660,7 +662,13 @@ printf(const char* format, ...)
 }
 
 unsigned long getauxval(unsigned long type) {
-    for (const size_t* aux = __auxvptr; *aux != 0; aux += 2)
+    //TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+#ifdef NO_STDLIB
+    const size_t *auxvptr = __auxvptr;
+#else
+    const size_t *auxvptr = auxvptr_temp;
+#endif
+    for (const size_t* aux = auxvptr; *aux != 0; aux += 2)
         if (*aux == type)
             return aux[1];
     return 0;

@@ -21,7 +21,7 @@
 //TODO Figure out proper offset
 #define STACK_OFFSET 0x10000000
 
-#define AUXC 10
+#define AUXC 16
 
 
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
@@ -238,6 +238,8 @@ mapInfo) {
     ///Stack pointer always needs to be 16-Byte aligned per ABI convention
     int envc = 0;
     for(; __environ[envc]; ++envc);
+    //TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+    auxvptr_temp = (const size_t *) &__environ[envc + 1];
     size_t totalStackSize = sizeof(Elf64_auxv_t) * AUXC + sizeof(char **) * (envc + 1) + sizeof(char **) *
             (guestArgc + 1) + sizeof(long);
     uintptr_t stackOffset = ALIGN_UP(totalStackSize, 16lu) - totalStackSize;
@@ -250,12 +252,12 @@ mapInfo) {
         *(--stack) = (Elf64_auxv_t) {AT_PHDR, {mapInfo.phdr}};
         *(--stack) = (Elf64_auxv_t) {AT_PHNUM, {mapInfo.ph_count}};
         *(--stack) = (Elf64_auxv_t) {AT_PHENT, {mapInfo.ph_entsize}};
-//        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}}; //TODO getauxval does not work since
-//        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}}; // auxvptr is not initialized
-//        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
-//        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
-//        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
-//        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
+        *(--stack) = (Elf64_auxv_t) {AT_UID, {getauxval(AT_UID)}};
+        *(--stack) = (Elf64_auxv_t) {AT_GID, {getauxval(AT_GID)}};
+        *(--stack) = (Elf64_auxv_t) {AT_EGID, {getauxval(AT_EGID)}};
+        *(--stack) = (Elf64_auxv_t) {AT_EUID, {getauxval(AT_EUID)}};
+        *(--stack) = (Elf64_auxv_t) {AT_CLKTCK, {getauxval(AT_CLKTCK)}};
+        *(--stack) = (Elf64_auxv_t) {AT_RANDOM, {getauxval(AT_RANDOM)}}; //TODO Copy/Generate new one?
         *(--stack) = (Elf64_auxv_t) {AT_SECURE, {0}};
         *(--stack) = (Elf64_auxv_t) {AT_PAGESZ, {4096}};
         *(--stack) = (Elf64_auxv_t) {AT_HWCAP, {0}}; //Seems to not be defined for RISCV

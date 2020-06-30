@@ -23,6 +23,11 @@
 extern char **environ;
 extern char **__environ;
 
+//TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+#ifndef NO_STDLIB
+extern const size_t *auxvptr_temp;
+#endif
+
 long syscall(long, long, long, long, long, long, long);
 
 __attribute__((noreturn)) void _exit(int status);
