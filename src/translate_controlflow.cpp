@@ -59,7 +59,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BEQ(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH BEQ\n");
     //does "The 12-bit B-immediate encodes signed offsets in multiples of 2" already account for the always-zero LSB????
 
     ///compare registers:
@@ -77,7 +77,7 @@ void translate_BEQ(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BNE(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH BNE\n");
     //does "The 12-bit B-immediate encodes signed offsets in multiples of 2" already account for the always-zero LSB????
 
     ///compare registers:
@@ -95,41 +95,7 @@ void translate_BNE(const t_risc_instr &instr, const register_info &r_info) {
 }
 
 void translate_BLT(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
-
-    ///compare registers:
-    translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
-
-    ///"jump":
-    Label END = a->newLabel();
-    Label NOJUMP = a-> newLabel();
-
-    ///skip setting pc if !branch
-    a->jl(NOJUMP);
-
-    ///set pc
-    translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
-}
-
-void translate_BLTU(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
-
-    ///compare registers:
-    translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
-
-    ///"jump":
-    Label END = a->newLabel();
-    Label NOJUMP = a-> newLabel();
-
-    ///skip setting pc if !branch
-    a->jb(NOJUMP);
-
-    ///set pc
-    translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
-}
-
-void translate_BGE(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
+    log_asm_out("Translate BRANCH BLT\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
@@ -145,8 +111,8 @@ void translate_BGE(const t_risc_instr &instr, const register_info &r_info) {
     translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
 }
 
-void translate_BGEU(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate BRANCH\n");
+void translate_BLTU(const t_risc_instr &instr, const register_info &r_info) {
+    log_asm_out("Translate BRANCH BLTU\n");
 
     ///compare registers:
     translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
@@ -157,6 +123,40 @@ void translate_BGEU(const t_risc_instr &instr, const register_info &r_info) {
 
     ///skip setting pc if !branch
     a->jae(NOJUMP);
+
+    ///set pc
+    translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
+}
+
+void translate_BGE(const t_risc_instr &instr, const register_info &r_info) {
+    log_asm_out("Translate BRANCH BGE\n");
+
+    ///compare registers:
+    translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
+
+    ///"jump":
+    Label END = a->newLabel();
+    Label NOJUMP = a-> newLabel();
+
+    ///skip setting pc if !branch
+    a->jl(NOJUMP);
+
+    ///set pc
+    translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
+}
+
+void translate_BGEU(const t_risc_instr &instr, const register_info &r_info) {
+    log_asm_out("Translate BRANCH BGEU\n");
+
+    ///compare registers:
+    translate_controlflow_cmp_rs1_rs2(instr, r_info, false);
+
+    ///"jump":
+    Label END = a->newLabel();
+    Label NOJUMP = a-> newLabel();
+
+    ///skip setting pc if !branch
+    a->jb(NOJUMP);
 
     ///set pc
     translate_controlflow_set_pc(instr, r_info, END, NOJUMP);
