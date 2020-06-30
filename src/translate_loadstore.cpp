@@ -59,10 +59,10 @@ void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate LW…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1]) {
-        a->movsx(r_info.map[instr.reg_dest], x86::dword_ptr(r_info.map[instr.reg_src_1], instr.imm));
+        a->movsxd(r_info.map[instr.reg_dest], x86::dword_ptr(r_info.map[instr.reg_src_1], instr.imm));
     } else {
         a->mov(SECOND_REG, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->movsx(FIRST_REG, x86::dword_ptr(SECOND_REG, instr.imm));
+        a->movsxd(FIRST_REG, x86::dword_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
