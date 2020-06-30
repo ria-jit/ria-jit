@@ -443,5 +443,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             break;
         default:
             not_yet_implemented("Instruction unknown");
+            //TODO Fail here?
     }
 }
