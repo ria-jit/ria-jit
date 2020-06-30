@@ -239,8 +239,8 @@ mapInfo) {
     int envc = 0;
     for(; __environ[envc]; ++envc);
     size_t totalStackSize = sizeof(Elf64_auxv_t) * AUXC + sizeof(char **) * (envc + 1) + sizeof(char **) *
-            (guestArgc + 1) + sizeof(guestArgc);
-    uintptr_t stackOffset = totalStackSize - ALIGN_DOWN(totalStackSize, 16lu);
+            (guestArgc + 1) + sizeof(long);
+    uintptr_t stackOffset = ALIGN_UP(totalStackSize, 16lu) - totalStackSize;
     stackPos -= stackOffset;
     ///Add auxv to guest stack
     {
