@@ -126,9 +126,10 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
 
         }
     }
-    Elf64_Addr startAddr = ALIGN_DOWN(minAddr, 4096);
-    Elf64_Addr endAddr = ALIGN_UP(maxAddr, 4096);
-    //Allocate the whole address space that is needed (Should not be READ/WRITE everywhere but I am too lazy right now).
+    Elf64_Addr startAddr = ALIGN_DOWN(minAddr, 4096lu);
+    Elf64_Addr endAddr = ALIGN_UP(maxAddr, 4096lu);
+    //Allocate the whole address space that is needed (TODO Should not be READ/WRITE everywhere but I am too lazy right
+    // now).
     void *elf = mmap_mini((void *) startAddr, endAddr - startAddr, PROT_READ | PROT_WRITE,
                           MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     //Failed means that we couldn't get enough memory at the correct address
@@ -162,7 +163,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         switch(segment.p_type) {
             case PT_LOAD: {
                 Elf64_Off load_offset = segment.p_offset;
-                Elf64_Xword memory_size = segment.p_memsz;
                 Elf64_Xword physical_size = segment.p_filesz;
                 Elf64_Addr vaddr = segment.p_vaddr;
                 //Copy flags over (not used right now to be implemented later)
