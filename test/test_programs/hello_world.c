@@ -4,12 +4,12 @@
 
 //pls compile with -fpie und -static
 
-//#include "stdio.h"
+#include "stdio.h"
 
 int main() {
-    //printf("Hello World\n");
-    int a = 0;
-    int b = 100;
-    int c = a+b*20;
-    return c;
+    printf("Hello World\n");
+    //int a = 0;
+    //int b = 100;
+    //int c = a+b*20;
+    //return c;
 }

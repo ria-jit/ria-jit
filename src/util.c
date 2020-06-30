@@ -11,9 +11,20 @@ bool flag_log_asm_in = false;
 bool flag_log_asm_out = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
+bool flag_fail_silently = false;
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
+}
+
+void critical_not_yet_implemented(const char* info) {
+    if (flag_fail_silently) {
+        not_yet_implemented(info);
+    } else {
+        //fail fast, so write to stderr, then quit
+        dprintf(2, "Critical: %s - not yet implemented\n", info);
+        _exit(1);
+    }
 }
 
 /**

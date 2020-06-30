@@ -37,6 +37,7 @@ extern bool flag_log_asm_in;
 extern bool flag_log_asm_out;
 extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
+extern bool flag_fail_silently;
 
 //the RISC-V mnemonic of the instruction
 typedef enum {
@@ -127,6 +128,8 @@ typedef struct {
 } t_risc_instr;
 
 int parse_jump_immediate(t_risc_instr* instr);
+
+void critical_not_yet_implemented(const char* info);
 
 void not_yet_implemented(const char* info);
 

@@ -52,31 +52,31 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
 
     //Check for not supported ABI Flags
     if (flags & EF_RISCV_RVC) {
-        not_yet_implemented("C ABI is not yet supported");
+        critical_not_yet_implemented("C ABI is not yet supported");
         incompatible = true;
     }
     if (flags & EF_RISCV_FLOAT_ABI_SINGLE) {
-        not_yet_implemented("F ABI is not yet supported");
+        critical_not_yet_implemented("F ABI is not yet supported");
         incompatible = true;
     }
     if (flags & EF_RISCV_FLOAT_ABI_DOUBLE) {
-        not_yet_implemented("D ABI is not yet supported");
+        critical_not_yet_implemented("D ABI is not yet supported");
         incompatible = true;
     }
     if (flags & EF_RISCV_FLOAT_ABI_QUAD) {
-        not_yet_implemented("Q ABI is not yet supported");
+        critical_not_yet_implemented("Q ABI is not yet supported");
         incompatible = true;
     }
     if (flags & EF_RISCV_RVE) {
-        not_yet_implemented("E ABI is not yet supported");
+        critical_not_yet_implemented("E ABI is not yet supported");
         incompatible = true;
     }
     if (flags & EF_RISCV_TSO) {
-        not_yet_implemented("TSO ABI is not yet supported");
+        critical_not_yet_implemented("TSO ABI is not yet supported");
         incompatible = true;
     }
     if (incompatible) {
-        //return INVALID_ELF_MAP;
+        return INVALID_ELF_MAP;
     }
 
     Elf64_Addr minAddr = 0, maxAddr = 0;

@@ -106,7 +106,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     p_instr_struct->mnem = FENCE_I;
                     break;
                 default:
-                    not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
+                    critical_not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
             }
             break;
         case OP_BRANCH:
@@ -136,7 +136,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     p_instr_struct->mnem = BGEU;
                     break;
                 default:
-                    not_yet_implemented("Invalid func3 for BRANCH Opcode");
+                    critical_not_yet_implemented("Invalid func3 for BRANCH Opcode");
             }
             break;
         case OP_LOAD:
@@ -175,7 +175,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                 }
                 default: {
                     int error = extract_func3(raw_instr);
-                    not_yet_implemented("Invalid LOAD Instruction");
+                    critical_not_yet_implemented("Invalid LOAD Instruction");
                 }
             }
             break;
@@ -199,7 +199,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     p_instr_struct->mnem = SD;
                     break;
                 default:
-                    not_yet_implemented("Invalid OP_STORE Instruction");
+                    critical_not_yet_implemented("Invalid OP_STORE Instruction");
             }
             break;
         case OP_OP:
@@ -310,7 +310,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     p_instr_struct->mnem = CSRRCI;
                     break;
                 default:
-                    not_yet_implemented("Invalid CSSR Instruction");
+                    critical_not_yet_implemented("Invalid CSSR Instruction");
             }
             break;
         case OP_OP_IMM_32:
@@ -336,7 +336,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                         p_instr_struct->mnem = SRLIW;
                     }
                 default:
-                    not_yet_implemented("Invalid OP_IMM_32 Instruction");
+                    critical_not_yet_implemented("Invalid OP_IMM_32 Instruction");
             }
             break;
         case OP_OP_32:
@@ -363,7 +363,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                         p_instr_struct->mnem = REMUW;
                         break;
                     default:
-                        not_yet_implemented("Invalid OP_32 RV64M Instruction");
+                        critical_not_yet_implemented("Invalid OP_32 RV64M Instruction");
                 }
             } else {
                 switch (extract_func3(raw_instr)) {
@@ -389,7 +389,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                         }
                         break;
                     default:
-                        not_yet_implemented("Invalid OP_32 Instruction");
+                        critical_not_yet_implemented("Invalid OP_32 Instruction");
                 }
             }
             break;
@@ -437,12 +437,11 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                     p_instr_struct->imm = extract_imm_I(raw_instr);
                     break;
                 default: {
-                    not_yet_implemented("Invalid OP_IMM Instruction");
+                    critical_not_yet_implemented("Invalid OP_IMM Instruction");
                 }
             }
             break;
         default:
-            not_yet_implemented("Instruction unknown");
-            //TODO Fail here?
+            critical_not_yet_implemented("Instruction unknown");
     }
 }
