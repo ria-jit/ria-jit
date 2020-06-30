@@ -8,6 +8,6 @@
 #include "util.h"
 #include "translate.hpp"
 
-void emulate_ecall(const t_risc_instr &instr, const register_info &r_info);
+void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP

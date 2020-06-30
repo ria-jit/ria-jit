@@ -9,11 +9,10 @@
 
 extern bool finalize;
 
-void emulate_ecall(const t_risc_instr &instr, const register_info &r_info) {
+void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     log_general("Emulate syscall...\n");
-    auto *registerValues = reinterpret_cast<t_risc_reg_val *> (r_info.base);
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
-    registerValues[t_risc_reg::pc] = instr.addr + 4;
+    registerValues[t_risc_reg::pc] = addr + 4;
     switch(registerValues[t_risc_reg_mnem::a7]) {
         case 64: //Write
         {

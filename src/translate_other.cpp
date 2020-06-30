@@ -29,9 +29,9 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ECALL…\n");
 
     save_risc_registers(r_info);
-    a->mov(x86::rdi, reinterpret_cast<uintptr_t>(&instr));
-    a->mov(x86::rsi, reinterpret_cast<uintptr_t>(&r_info));
-    typedef void emulate(const t_risc_instr &instr, const register_info &r_info);
+    a->mov(x86::rdi, instr.addr);
+    a->mov(x86::rsi, r_info.base);
+    typedef void emulate(t_risc_addr addr, t_risc_reg_val *registerValues);
     emulate *em = &emulate_ecall;
     a->call(reinterpret_cast<uintptr_t>(em));
 
