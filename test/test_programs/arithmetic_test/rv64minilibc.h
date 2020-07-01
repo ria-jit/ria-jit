@@ -16,6 +16,8 @@ void m_exit(void);
 
 size_t m_strlen(char* str);
 
-void printi(int n);
+void printi(size_t n);
+
+void print(char* buf);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RV64MINILIBC_H
