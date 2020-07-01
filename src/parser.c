@@ -42,7 +42,7 @@ static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111)
 
 static inline int extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-            ((signed) instr >> (30 - 10) & 0xffe007fe);
+           ((signed) instr >> (30 - 10) & 0xffe007fe);
 }
 
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
@@ -55,11 +55,11 @@ static inline int32_t extract_imm_B(int32_t instr) {
  *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
-void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
+void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
     //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
 
     // print out the line to parse in grouped binary as in the spec
-    int32_t raw_instr = *(int32_t*)p_instr_struct->addr; //cast and dereference
+    int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, p_instr_struct->addr);
 
     //fill basic struct
@@ -98,7 +98,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
         case OP_MISC_MEM:
             p_instr_struct->optype = SYSTEM;
             p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch(extract_func3(raw_instr)){
+            switch (extract_func3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FENCE;
                     break;
@@ -208,7 +208,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
-            if(raw_instr & (1<<25)) {
+            if (raw_instr & (1 << 25)) {
                 switch (extract_func3(raw_instr)) {
                     case 0:
                         p_instr_struct->mnem = MUL;
@@ -280,9 +280,9 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             p_instr_struct->optype = SYSTEM;
             p_instr_struct->imm = extract_imm_I(raw_instr);
             reg_count[p_instr_struct->reg_dest]++;
-            switch(extract_func3(raw_instr)){
+            switch (extract_func3(raw_instr)) {
                 case 0:
-                    if(raw_instr & (1<<20)){
+                    if (raw_instr & (1 << 20)) {
                         p_instr_struct->mnem = EBREAK;
                     } else {
                         p_instr_struct->mnem = ECALL;
@@ -335,8 +335,10 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
                         //SRLI
                         p_instr_struct->mnem = SRLIW;
                     }
-                default:
+                    break;
+                default: {
                     critical_not_yet_implemented("Invalid OP_IMM_32 Instruction");
+                }
             }
             break;
         case OP_OP_32:
@@ -345,7 +347,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t* reg_count) {
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
-            if(raw_instr & (1<<25)){
+            if (raw_instr & (1 << 25)) {
                 switch (extract_func3(raw_instr)) {
                     case 0:
                         p_instr_struct->mnem = MULW;
