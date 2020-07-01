@@ -7,7 +7,9 @@
 
 void init(int number);
 
-void check_condition(bool cond);
+bool check_condition(bool cond);
+
+void assert_equals(size_t expected, size_t actual);
 
 /**
  * Compile with:
@@ -26,24 +28,30 @@ int main(int argc, char **argv) {
     int num = 0;
 
     {
+        init(num);
+        print("This test must fail:\n");
+        assert_equals(1, 0);
+    }
+
+    {
         init(++num);
         size_t i = 4;
         i /= 2;
-        check_condition(i == 2);
+        assert_equals(2, i);
     }
 
     {
         init(++num);
         size_t j = 4;
         j <<= 2;
-        check_condition(j == 16);
+        assert_equals(16, j);
     }
 
     {
         init(++num);
         size_t m = 5;
         m /= 2;
-        check_condition(m == 2);
+        assert_equals(2, m);
     }
 
     {
@@ -53,21 +61,21 @@ int main(int argc, char **argv) {
         n += o;
         n *= 10;
         n /= 19;
-        check_condition(n == 202);
+        assert_equals(202, n);
     }
 
     {
         init(++num);
         size_t n = 3000;
         size_t m = 7;
-        check_condition((n * m) == 21000);
+        assert_equals(21000, (n * m));
     }
 
     {
         init(++num);
         size_t n = 3000;
         size_t m = 7;
-        check_condition((n / m) == 428);
+        assert_equals(428, (n / m));
     }
 
     {
@@ -75,7 +83,7 @@ int main(int argc, char **argv) {
         init(++num);
         size_t n = 256;
         size_t m = 0;
-        check_condition((n / m) == 0xFFFFFFFFFFFFFFFF);
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n/m));
     }
 
     {
@@ -83,13 +91,13 @@ int main(int argc, char **argv) {
         init(++num);
         size_t n = 256;
         size_t m = 0;
-        check_condition((n % m) == 256);
+        assert_equals(256, (n % m));
     }
 
     {
         init(++num);
         size_t res = 1 << 10;
-        check_condition(res == 0b10000000000);
+        assert_equals(0b10000000000, res);
     }
 
     {
@@ -103,7 +111,7 @@ int main(int argc, char **argv) {
         }
 
         size_t gauss = (bound * (bound + 1)) / 2;
-        check_condition(sum == gauss);
+        assert_equals(gauss, sum);
     }
 
     {
@@ -124,7 +132,7 @@ int main(int argc, char **argv) {
                 fact *= i;
             }
 
-            check_condition(fact == expecteds[n - 1]);
+            assert_equals(expecteds[n - 1], fact);
         }
     }
 
@@ -137,10 +145,23 @@ void init(int number) {
     m_write(1, "...\t", 4);
 }
 
-void check_condition(bool cond) {
+bool check_condition(bool cond) {
     if (cond) {
         m_write(1, "PASSED\n", 7);
+        return true;
     } else {
         m_write(1, "FAILED\n", 7);
+        return false;
+    }
+}
+
+void assert_equals(size_t expected, size_t actual) {
+    //check the condition, printout expected but was when false
+    if (!check_condition(expected == actual)) {
+        print("Expected: ");
+        printi(expected);
+        print(" but was: ");
+        printi(actual);
+        print("\n");
     }
 }

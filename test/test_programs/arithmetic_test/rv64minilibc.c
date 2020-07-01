@@ -43,12 +43,16 @@ void m_putchar(char ch) {
     m_write(1, &ch, 1);
 }
 
-void printi(int i) {
+void printi(size_t i) {
     if (i > 9) {
-        int rem = i / 10;
+        size_t rem = i / 10;
         i -= 10 * rem;
         printi(rem);
     }
 
     m_putchar('0' + i);
+}
+
+void print(char* buf) {
+    m_write(1, buf, m_strlen(buf));
 }
