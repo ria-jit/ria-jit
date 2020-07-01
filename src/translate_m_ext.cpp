@@ -54,7 +54,7 @@ void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(r_info.map[instr.reg_dest], x86::rdx);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->imul(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         //we want the upper XLEN bits here
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
     }
@@ -96,7 +96,7 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(r_info.map[instr.reg_dest], x86::rdx);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->imul(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
 
         //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
         a->sar(x86::ptr(r_info.base + 8 * instr.reg_src_2), 63);
@@ -127,7 +127,7 @@ void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(r_info.map[instr.reg_dest], x86::rdx);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-        a->mul(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->mul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         //we want the upper XLEN bits here
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
     }
@@ -160,12 +160,12 @@ void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         const Label &div_zero = a->newLabel();
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->cmp(x86::ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->jz(div_zero);
 
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->idiv(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
 
         a->bind(div_zero);
@@ -198,12 +198,12 @@ void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         const Label &div_zero = a->newLabel();
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->cmp(x86::ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->jz(div_zero);
 
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->div(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
 
         a->bind(div_zero);
@@ -239,11 +239,11 @@ void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
         const Label &div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
-        a->cmp(x86::ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->jz(div_zero);
 
         a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->idiv(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
 
         a->bind(div_zero);
@@ -279,11 +279,11 @@ void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
         const Label &div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
-        a->cmp(x86::ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->jz(div_zero);
 
         a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::ptr(r_info.base + 8 * instr.reg_src_2));
+        a->div(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
 
         a->bind(div_zero);
