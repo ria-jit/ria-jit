@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     }
 
     {
-        //control flow experiment todo unknown opcode?
+        //control flow experiment
         init(++num);
         const int bound = 2048;
 
