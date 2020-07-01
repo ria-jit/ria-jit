@@ -25,6 +25,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     switch(registerValues[t_risc_reg_mnem::a7]) {
         case 64: //Write
         {
+            log_general("Emulate syscall write (64)...\n");
             size_t retval = __NR_write;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
@@ -36,11 +37,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 93: //Exit
         {
+            log_general("Emulate syscall exit (93)...\n");
             finalize = true;
         }
             break;
         case 214: //brk
         {
+            log_general("Emulate syscall brk (214)...\n");
             t_risc_addr brkAddr = registerValues[t_risc_reg_mnem::a0];
             if (brkAddr < initialBrk) {
                 ///Cannot go below initial brk or we would go into ELF territory
