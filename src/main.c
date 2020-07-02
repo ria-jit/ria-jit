@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     log_general("Register dump: %d\n", flag_log_reg_dump);
     log_general("Cache info: %d\n", flag_log_cache);
     log_general("Fail silently: %d\n", flag_fail_silently);
-    log_general("Single stepping: %s\n", flag_single_step);
+    log_general("Single stepping: %d\n", flag_single_step);
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {
