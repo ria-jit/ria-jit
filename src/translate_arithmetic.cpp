@@ -127,7 +127,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
         a->inc(r_info.map[instr.reg_dest]);
         a->bind(not_less);
     } else {
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0);
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), instr.imm);
         a->jnl(not_less);
         a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
@@ -146,19 +146,24 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLTIU…\n");
 
     const Label &not_below = a->newLabel();
+    const Label &below = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->cmp(r_info.map[instr.reg_src_1], instr.imm);
         a->jnb(not_below);
         a->inc(r_info.map[instr.reg_dest]);
+        a->jmp(below);
         a->bind(not_below);
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->bind(below);
     } else {
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0);
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), instr.imm);
         a->jnb(not_below);
-        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1));
+        a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->jmp(below);
         a->bind(not_below);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0);
+        a->bind(below);
     }
 }
 
@@ -173,7 +178,7 @@ void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate XORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->xor_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
@@ -193,7 +198,7 @@ void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->or_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
@@ -213,7 +218,7 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ANDI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.mapped[instr.reg_src_1]);
+        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->and_(r_info.map[instr.reg_dest], instr.imm);
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
@@ -332,20 +337,25 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLT…\n");
 
     const Label &not_less = a->newLabel();
+    const Label &less = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
         a->jnl(not_less);
         a->inc(r_info.map[instr.reg_dest]);
+        a->jmp(less);
         a->bind(not_less);
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->bind(less);
     } else {
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0);
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), x86::rax);
         a->jnl(not_less);
         a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->jmp(less);
         a->bind(not_less);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0);
+        a->bind(less);
     }
 }
 
@@ -359,20 +369,25 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLTU…\n");
 
     const Label &not_below = a->newLabel();
+    const Label &below = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
         a->jnb(not_below);
         a->inc(r_info.map[instr.reg_dest]);
+        a->jmp(below);
         a->bind(not_below);
+        a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
+        a->bind(below);
     } else {
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0);
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_1), x86::rax);
         a->jnb(not_below);
         a->inc(x86::qword_ptr(r_info.base + 8 * instr.reg_dest));
+        a->jmp(below);
         a->bind(not_below);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0);
+        a->bind(below);
     }
 }
 
