@@ -5,7 +5,7 @@
 #include "rv64minilibc.h"
 #include <stdbool.h>
 
-void init(int number);
+void init(int number, char* name);
 
 bool check_condition(bool cond);
 
@@ -28,34 +28,34 @@ int main(int argc, char **argv) {
     int num = 0;
 
     {
-        init(num);
+        init(num, "ShouldFail");
         print("This test must fail:\n");
         assert_equals(1, 0);
     }
 
     {
-        init(++num);
+        init(++num, "4/2");
         size_t i = 4;
         i /= 2;
         assert_equals(2, i);
     }
 
     {
-        init(++num);
+        init(++num, "4<<2");
         size_t j = 4;
         j <<= 2;
         assert_equals(16, j);
     }
 
     {
-        init(++num);
+        init(++num, "5/2");
         size_t m = 5;
         m /= 2;
         assert_equals(2, m);
     }
 
     {
-        init(++num);
+        init(++num, "pdm");
         size_t n = 256;
         size_t o = 128;
         n += o;
@@ -65,14 +65,14 @@ int main(int argc, char **argv) {
     }
 
     {
-        init(++num);
+        init(++num, "3000*7");
         size_t n = 3000;
         size_t m = 7;
         assert_equals(21000, (n * m));
     }
 
     {
-        init(++num);
+        init(++num, "3000/7");
         size_t n = 3000;
         size_t m = 7;
         assert_equals(428, (n / m));
@@ -80,29 +80,29 @@ int main(int argc, char **argv) {
 
     {
         //div-zero quotient should have all bits set
-        init(++num);
+        init(++num, "DivZero");
         size_t n = 256;
         size_t m = 0;
-        assert_equals(0xFFFFFFFFFFFFFFFF, (n/m));
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m));
     }
 
     {
-        //div-zero remainder should equal the dividend todo fix failing test
-        init(++num);
+        //div-zero remainder should equal the dividend
+        init(++num, "RemZero");
         size_t n = 256;
         size_t m = 0;
         assert_equals(256, (n % m));
     }
 
     {
-        init(++num);
+        init(++num, "1<<10");
         size_t res = 1 << 10;
         assert_equals(0b10000000000, res);
     }
 
     {
         //control flow experiment
-        init(++num);
+        init(++num, "SumGauss");
         const int bound = 2048;
 
         size_t sum = 0;
@@ -110,8 +110,17 @@ int main(int argc, char **argv) {
             sum += i;
         }
 
+        assert_equals(2098176, sum);
+    }
+
+    {
+        init(++num, "MulGauss");
+
+        //see above, we just check the gauss formula instead of the sum
+        const int bound = 2048;
+
         size_t gauss = (bound * (bound + 1)) / 2;
-        assert_equals(gauss, sum);
+        assert_equals(2098176, gauss);
     }
 
     {
@@ -123,7 +132,7 @@ int main(int argc, char **argv) {
         };
 
         for (int n = 1; n < len; ++n) {
-            init(++num);
+            init(++num, "Factorial");
 
             //calculate the factorial
             size_t fact = 1;
@@ -139,9 +148,12 @@ int main(int argc, char **argv) {
     m_exit();
 }
 
-void init(int number) {
+void init(int number, char* name) {
     m_write(1, "Test ", 5);
     printi(number);
+    m_write(1, "\t(", 2);
+    print(name);
+    m_write(1, ")", 1);
     m_write(1, "...\t", 4);
 }
 
