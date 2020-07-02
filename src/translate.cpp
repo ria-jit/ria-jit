@@ -355,6 +355,8 @@ void set_pc_next_inst(t_risc_addr addr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
 
+    t_risc_addr orig_risc_addr = risc_addr;
+
     t_risc_instr risc_instr = {};
 
     /// get memory for structs
@@ -575,7 +577,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///load the saved x86_64 registers
     //???
-    log_asm_out("Translated block: %d instructions\n", instructions_in_block);
+    log_asm_out("Translated block at (riscv)%p: %d instructions\n", orig_risc_addr, instructions_in_block);
 
     ///finalize block and return cached location
     return finalize_block();
