@@ -12,12 +12,13 @@ bool flag_log_asm_out = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
 bool flag_fail_silently = false;
+bool flag_single_step = false;
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
 }
 
-void critical_not_yet_implemented(const char* info) {
+void critical_not_yet_implemented(const char *info) {
     if (flag_fail_silently) {
         not_yet_implemented(info);
     } else {

@@ -38,6 +38,7 @@ extern bool flag_log_asm_out;
 extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
 extern bool flag_fail_silently;
+extern bool flag_single_step;
 
 //the RISC-V mnemonic of the instruction
 typedef enum {

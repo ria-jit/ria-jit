@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     char *file_path = NULL;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while ((opt_index = getopt(argc, argv, ":f:vgiorcsh")) != -1) {
-        switch (opt_index) {
+    while((opt_index = getopt(argc, argv, ":f:vgiorcshd")) != -1) {
+        switch(opt_index) {
             case 'v':
                 flag_log_general = true;
                 flag_log_asm_in = true;
@@ -57,12 +57,22 @@ int main(int argc, char *argv[]) {
             case 's':
                 flag_fail_silently = true;
                 break;
+            case 'd':
+                flag_single_step = true;
+                break;
             case ':':
             case 'h':
             default:
                 dprintf(2,
-                        "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump register file. (equivalent to -gioc)\n\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n\t-o\tDisplay translated output x86 assembly\n\t-r\tDump registers on basic block boundaries\n\t-c\tDisplay cache info\n\t-s\tFail silently for some error conditions. Allows continued execution, but the client program may enter undefined states.\n"
-                        );
+                        "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
+                        "register file. (equivalent to -gioc)\n"
+                        "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
+                        "\t-o\tDisplay translated output x86 assembly\n"
+                        "\t-r\tDump registers on basic block boundaries\n"
+                        "\t-c\tDisplay cache info\n"
+                        "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
+                        "program may enter undefined states.\n"
+                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n");
                 return 1;
         }
     }
@@ -74,6 +84,7 @@ int main(int argc, char *argv[]) {
     log_general("Register dump: %d\n", flag_log_reg_dump);
     log_general("Cache info: %d\n", flag_log_cache);
     log_general("Fail silently: %d\n", flag_fail_silently);
+    log_general("Single stepping: %s\n", flag_single_step);
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {

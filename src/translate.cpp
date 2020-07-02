@@ -351,7 +351,7 @@ void translate_risc_JAL_onlylink(t_risc_instr risc_instr);
 void load_risc_registers(register_info r_info);
 
 
-void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr);
+void set_pc_next_inst(t_risc_addr addr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
 
@@ -363,7 +363,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //but that would be less elegant.
     //std::vector<t_risc_instr> block_cache;
 #define BLOCK_CACHE_SIZE 64
-    t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, BLOCK_CACHE_SIZE * sizeof(t_risc_instr),
+    int maxCount = BLOCK_CACHE_SIZE;
+    if (flag_single_step) {
+        maxCount = 2;
+    }
+    t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, maxCount * sizeof(t_risc_instr),
                                                       PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     ///count register usage
@@ -374,7 +378,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     bool block_full = false;
 
     ///parse structs
-    for (int parse_pos = 0; parse_pos <= BLOCK_CACHE_SIZE - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
+    for(int parse_pos = 0; parse_pos <= maxCount - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
 
         risc_instr.addr = risc_addr;
 
@@ -457,7 +461,6 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///loop ended at BLOCK_CACHE_SIZE -> set pc for next instruction
     block_full = true;
-    instructions_in_block++;
 
 
     ///loop ended at BRANCH: skip setting pc
@@ -564,7 +567,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     if(block_full) {
-        set_pc_next_inst(block_cache[BLOCK_CACHE_SIZE - 2], reinterpret_cast<uint64_t>(get_reg_data()));
+        set_pc_next_inst(risc_addr, reinterpret_cast<uint64_t>(get_reg_data()));
     }
 
     ///save registers
@@ -579,9 +582,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 }
 
 ///set the pc to next addr after inst
-void set_pc_next_inst(const t_risc_instr &instr, uint64_t r_addr) {
+void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
     ///set pc
-    a->mov(x86::rax, instr.addr + 4);
+    a->mov(x86::rax, addr);
     a->mov(x86::ptr(r_addr + 8 * pc), x86::rax);
 }
 
