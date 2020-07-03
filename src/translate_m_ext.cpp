@@ -159,9 +159,12 @@ void translate_DIV(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->jnz(not_div_zero);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
         a->jz(div_zero);
+        a->bind(not_div_zero);
 
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
@@ -197,9 +200,12 @@ void translate_DIVU(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->jnz(not_div_zero);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
         a->jz(div_zero);
+        a->bind(not_div_zero);
 
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
@@ -237,11 +243,13 @@ void translate_REM(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jnz(not_div_zero);
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
         a->jz(div_zero);
-
+        a->bind(not_div_zero);
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
@@ -277,13 +285,16 @@ void translate_REMU(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->cmp(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
+        a->jnz(not_div_zero);
 
         //the mov here does not affect the zero-flag, but we need to mov after comparing in case rs2 == rd
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
         a->jz(div_zero);
 
+        a->bind(not_div_zero);
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
@@ -343,10 +354,13 @@ void translate_DIVW(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->jnz(not_div_zero);
+        a->mov(x86::dword_ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
         a->jz(div_zero);
 
+        a->bind(not_div_zero);
         a->mov(x86::eax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
@@ -385,10 +399,13 @@ void translate_DIVUW(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
+        a->jnz(not_div_zero);
+        a->mov(x86::qword_ptr(r_info.base + 8 * instr.reg_dest), 0xFFFFFFFFFFFFFFFF);
         a->jz(div_zero);
 
+        a->bind(not_div_zero);
         a->mov(x86::eax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
@@ -428,11 +445,14 @@ void translate_REMW(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
         a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+        a->jnz(not_div_zero);
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
         a->jz(div_zero);
 
+        a->bind(not_div_zero);
         a->xor_(x86::rdx, x86::rdx);
         a->idiv(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsxd(x86::rcx, x86::edx);
@@ -471,11 +491,15 @@ void translate_REMUW(const t_risc_instr &instr, const register_info &r_info) {
         a->bind(div_zero);
     } else {
         const Label &div_zero = a->newLabel();
+        const Label &not_div_zero = a->newLabel();
+
         a->cmp(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2), 0);
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+        a->jnz(not_div_zero);
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
         a->jz(div_zero);
 
+        a->bind(not_div_zero);
         a->xor_(x86::rdx, x86::rdx);
         a->div(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsxd(x86::rcx, x86::edx);
