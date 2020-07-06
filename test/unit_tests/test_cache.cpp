@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include <cache.h>
-#include <util.h>
+#include <cache/cache.h>
+#include <util/log.h>
 
 /**
  * Stores some values in the cache and reads them back to verify.

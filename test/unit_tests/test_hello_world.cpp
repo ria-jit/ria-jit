@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <main.h>
+#include <main/main.h>
 
 /**
  * Checks the register.c storage by storing and reading back values via get_reg_data() base access.

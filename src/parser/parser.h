@@ -5,7 +5,8 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_PARSER_H
 
-#include <util.h>
+#include <util/log.h>
+#include <util/typedefs.h>
 
 #ifdef __cplusplus
 extern "C" {

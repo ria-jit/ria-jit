@@ -19,7 +19,8 @@
 
 #include <stddef.h>
 #include "cache.h"
-#include "util.h"
+#include <util/log.h>
+#include <util/util.h>
 #include <common.h>
 #include <linux/mman.h>
 

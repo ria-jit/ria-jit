@@ -3,7 +3,7 @@
 //
 
 #include<gtest/gtest.h>
-#include <translate.hpp>
+#include <gen/translate.hpp>
 
 uint64_t numbers[10];
 

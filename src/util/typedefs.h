@@ -1,44 +1,13 @@
 //
-// Created by flo on 02.05.20.
+// Created by flo on 06.07.20.
 //
 
-#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
-#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
-
-//error codes for internal reference
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
+#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
+#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-//Apparently not included in the headers on my version.
-#ifndef MAP_FIXED_NOREPLACE
-#define MAP_FIXED_NOREPLACE 0x200000
-#endif
-
-// TODO Only here because we need it places where common.h can't be included
-#ifndef ALIGN_DOWN
-#define ALIGN_DOWN(v, a) ((v) & ~((a)-1))
-#endif
-#ifndef ALIGN_UP
-#define ALIGN_UP(v, a) (((v) + (a - 1)) & ~((a)-1))
-#endif
-
-#define FAIL_HEAP_ALLOC 0x1000
-
-/**
-* Verbose logging flags used by the main.c and logging methods.
-*/
-extern bool flag_log_general;
-extern bool flag_log_asm_in;
-extern bool flag_log_asm_out;
-extern bool flag_log_reg_dump;
-extern bool flag_log_cache;
-extern bool flag_fail_silently;
-extern bool flag_single_step;
 
 //the RISC-V mnemonic of the instruction
 typedef enum {
@@ -128,21 +97,8 @@ typedef struct {
     t_risc_imm imm;
 } t_risc_instr;
 
-int parse_jump_immediate(t_risc_instr* instr);
-
-void critical_not_yet_implemented(const char* info);
-
-void not_yet_implemented(const char* info);
-
-void log_general(const char* format, ...);
-void log_asm_in(const char* format, ...);
-void log_asm_out(const char* format, ...);
-void log_reg_dump(const char* format, ...);
-void log_cache(const char* format, ...);
-void log_print_mem(const char* ptr, int len);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_UTIL_H
+#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H

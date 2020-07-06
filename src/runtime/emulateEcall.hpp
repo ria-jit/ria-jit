@@ -5,8 +5,10 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
 
-#include "util.h"
-#include "translate.hpp"
+#include "util/log.h"
+#include <util/util.h>
+#include <util/typedefs.h>
+#include "gen/translate.hpp"
 
 #ifdef __cplusplus
 extern "C" {

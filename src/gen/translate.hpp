@@ -5,7 +5,8 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_HPP
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_HPP
 
-#include "cache.h"
+#include "cache/cache.h"
+#include <util/typedefs.h>
 
 #ifdef __cplusplus
 #include <asmjit/asmjit.h>

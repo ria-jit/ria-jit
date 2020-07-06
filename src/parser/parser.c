@@ -4,7 +4,7 @@
 // For register assembly conventions look at page 137
 //
 
-#include "util.h"
+#include "util/log.h"
 #include "parser.h"
 
 typedef void t_parse_result; //maybe some more return information later

@@ -4,13 +4,12 @@
 
 #include <common.h>
 #include <stdbool.h>
-#include "util.h"
-#include "cache.h"
-#include "translate.hpp"
-#include "parser.h"
-#include <register.h>
-#include "loadElf.h"
-#include "emulateEcall.hpp"
+#include "util/log.h"
+#include "cache/cache.h"
+#include "gen/translate.hpp"
+#include <runtime/register.h>
+#include "elf/loadElf.h"
+#include "runtime/emulateEcall.hpp"
 #include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?

@@ -5,8 +5,9 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_CSR_HPP
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_CSR_HPP
 
-#include "util.h"
-#include "translate.hpp"
+#include "util/log.h"
+#include "gen/translate.hpp"
+#include <util/typedefs.h>
 
 void translate_CSRRW(const t_risc_instr &instr, const register_info &r_info);
 

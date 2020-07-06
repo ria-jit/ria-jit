@@ -6,7 +6,8 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOADELF_H
 
 #include <elf.h>
-#include <util.h>
+#include <util/log.h>
+#include <util/util.h>
 
 #define INVALID_ELF_MAP (t_risc_elf_map_result){.valid = false}
 #define INVALID_STACK 0

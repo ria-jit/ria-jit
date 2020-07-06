@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <translate.hpp>
+#include <gen/translate.hpp>
 
 /**
  * Tests AsmJit-based code-generation by emitting a strlen example function.

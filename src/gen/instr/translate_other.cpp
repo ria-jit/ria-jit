@@ -3,8 +3,8 @@
 //
 
 #include "translate_other.hpp"
-#include "register.h"
-#include "emulateEcall.hpp"
+#include "runtime/register.h"
+#include "runtime/emulateEcall.hpp"
 
 using namespace asmjit;
 

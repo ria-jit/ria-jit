@@ -5,18 +5,16 @@
 #include "translate.hpp"
 #include <asmjit/asmjit.h>
 #include <sys/mman.h>
-#include "register.h"
-#include "translate_arithmetic.hpp"
-#include "translate_controlflow.hpp"
-#include "translate_csr.hpp"
-#include "translate_loadstore.hpp"
-#include "translate_m_ext.hpp"
-#include "translate_other.hpp"
-
-//#include <string>
-
-#include "util.h"
-#include "parser.h"
+#include "runtime/register.h"
+#include "instr/translate_arithmetic.hpp"
+#include "instr/translate_controlflow.hpp"
+#include "instr/translate_csr.hpp"
+#include "instr/translate_loadstore.hpp"
+#include "instr/translate_m_ext.hpp"
+#include "instr/translate_other.hpp"
+#include <util/util.h>
+#include "util/log.h"
+#include "parser/parser.h"
 
 
 using namespace asmjit;

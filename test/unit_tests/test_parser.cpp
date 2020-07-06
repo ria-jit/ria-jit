@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include <parser.h>
-#include <util.h>
+#include <parser/parser.h>
+#include <util/log.h>
 
 /**
  * Tests parsing of basic load-immediate as per test_parsing() in parser.c (--> @author Noah)

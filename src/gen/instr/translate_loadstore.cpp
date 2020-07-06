@@ -3,7 +3,7 @@
 //
 
 #include "translate_loadstore.hpp"
-#include "register.h"
+#include "runtime/register.h"
 
 #define FIRST_REG x86::rax
 #define SECOND_REG x86::rdx
