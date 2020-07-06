@@ -54,7 +54,7 @@ add_executable("test" ${ASMJIT_SRC} src/main/main.c src/main/main.h test/unit_te
         src/gen/instr/translate_other.cpp src/gen/instr/translate_other.hpp src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp lib/common.h
         lib/minilibc.c src/util/typedefs.h test/unit_tests/test_register.cpp
         test/unit_tests/test_translate_basic.cpp test/unit_tests/test_parser.cpp test/unit_tests/test_cache.cpp
-        test/unit_tests/test_asmjit_ptr.cpp src/util/typedefs.c)
+        test/unit_tests/test_asmjit_ptr.cpp src/util/typedefs.c test/unit_tests/test_faenc_experiments.cpp)
 target_link_libraries("test" gtest gtest_main)
 target_compile_definitions(test PUBLIC TESTING)
 
