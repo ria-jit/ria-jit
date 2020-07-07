@@ -3,7 +3,7 @@ image: ubuntu
 build:
   stage: build
   before_script:
-    - apt update && DEBIAN_FRONTEND=noninteractive apt -y install gcc cmake make autoconf
+    - apt update && DEBIAN_FRONTEND=noninteractive apt -y install gcc g++ cmake make autoconf
   script:
     - mkdir build && cd build && cmake .. && make
   artifacts:
