@@ -112,13 +112,23 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
             break;
+        case 80: //fstat
+        {
+            log_general("Emulate syscall fstat (80)...\n");
+            size_t retval = __NR_readlinkat;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
         case 88: //utimensat
         {
             log_general("Emulate syscall utimensat (88)...\n");
             size_t retval = __NR_utimensat;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "a"(registerValues[t_risc_reg_mnem::a0]), "b"(registerValues[t_risc_reg_mnem::a1]), "c"
-            (registerValues[t_risc_reg_mnem::a2]), "d"(registerValues[t_risc_reg_mnem::a3])); //TODO add clobbers?
+            "S"(registerValues[t_risc_reg_mnem::a0]), "D"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2]));//, "11"(registerValues[t_risc_reg_mnem::a3])); //TODO add clobbers?
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }

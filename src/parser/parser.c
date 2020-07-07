@@ -444,6 +444,6 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             }
             break;
         default:
-            critical_not_yet_implemented("Instruction unknown");
+            critical_not_yet_implemented("OPCODE unknown");
     }
 }
