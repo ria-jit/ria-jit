@@ -42,6 +42,7 @@ ExternalProject_Add(fadec
         CONFIGURE_COMMAND meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BUILD_COMMAND ninja -v
         INSTALL_COMMAND ""
+        UPDATE_COMMAND "pwd" #dummy so cmake always tries to update the subproject
         TEST_COMMAND meson test -v
         BUILD_BYPRODUCTS ${FADEC_BYPRODUCTS})
 
