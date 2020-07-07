@@ -423,8 +423,9 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
 
         // Skip '%'
         format++;
-
-        char format_spec = *format;
+        char format_spec;
+        PARSE_NEXT:
+        format_spec = *format;
         if (format_spec == '\0') {
             write_func(data, "%", 1);
             bytes_written++;
@@ -557,6 +558,9 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             }
             write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
             bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec >= '0' && format_spec <= '9') {
+            //Ignore specified print widths TODO Maybe figure out a way to respect them.
+            goto PARSE_NEXT;
         }
     }
 

@@ -4,20 +4,26 @@
 
 #include <gtest/gtest.h>
 #include <fadec/fadec-enc.h>
-#include <fadec/fadec.h>
+#include <sys/mman.h>
 
 TEST(FaencExperiment, ShouldEncode) {
     int failed = 0;
-    uint8_t buf[64];
+    void *map = mmap(NULL, 4096, PROT_EXEC | PROT_WRITE | PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    if (map == MAP_FAILED) {
+        GTEST_FATAL_FAILURE_("Could not allocate memory for instructions.");
+    }
+    uint8_t *bufM = static_cast<uint8_t *>(map);
 
-    uint8_t *current = buf;
+    uint8_t *current = bufM;
 
-    //fixme this does not compile yet as the instruction mnemonics are missing?
-    /*failed |= fe_enc64(&current, FE_XOR32rr, FE_AX, FE_AX);
+    *(current++) = 0x90; //Insert NOP at the beginning so the code step in works (The Clion debugger somehow starts
+    // the dissasembly at the address directly after the previous PC. So we insert some one-byte instruction).
+    failed |= fe_enc64(&current, FE_XOR32rr, FE_AX, FE_AX);
     failed |= fe_enc64(&current, FE_ADD64ri, FE_AX, 3);
-    failed |= fe_enc64(&current, FE_RET);*/
+    failed |= fe_enc64(&current, FE_RET);
 
     typedef int (*void_asm)();
-    int retVal = ((void_asm) buf)();
+    int retVal = ((void_asm) bufM)();
+    munmap(map, 4096);
     ASSERT_EQ(retVal, 3);
 }
