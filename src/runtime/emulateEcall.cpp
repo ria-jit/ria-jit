@@ -10,6 +10,8 @@
 
 extern bool finalize;
 
+int guest_exit_status;
+
 t_risc_addr curBrk;
 t_risc_addr initialBrk;
 t_risc_addr mappedBrk;
@@ -38,6 +40,9 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 93: //Exit
         {
             log_general("Emulate syscall exit (93)...\n");
+
+            //note the guest exit code and stop main loop
+            guest_exit_status = (int) get_value(static_cast<t_risc_reg>(a0));
             finalize = true;
         }
             break;

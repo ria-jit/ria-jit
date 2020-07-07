@@ -5,6 +5,7 @@
 #include <common.h>
 #include <stdbool.h>
 #include "util/log.h"
+#include <runtime/emulateEcall.hpp>
 #include "cache/cache.h"
 #include "gen/translate.hpp"
 #include <runtime/register.h>
@@ -92,16 +93,14 @@ int main(int argc, char *argv[]) {
     }
 
     log_general("Initializing transcoding...\n");
-    transcode_loop(file_path);
-    return 0;
+    return transcode_loop(file_path);
 }
 
 #endif //TESTING
 
 int start_transcode(const char *file_path){
     log_general("extern transcode start!\n");
-    transcode_loop(file_path);
-    return 0;
+    return transcode_loop(file_path);
 }
 
 int transcode_loop(const char *file_path) {
@@ -146,12 +145,9 @@ int transcode_loop(const char *file_path) {
 
         //store pc from registers in pc
         next_pc = get_value(pc);
-
-        //tmp - programm should exit on syscall
-        //finalize = true;
     }
 
-    return 0;
+    return guest_exit_status;
 }
 
 /**

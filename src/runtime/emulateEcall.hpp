@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+extern int guest_exit_status;
+
 void setupBrk(int brk);
 #ifdef __cplusplus
 }
