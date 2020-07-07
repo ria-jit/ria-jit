@@ -5,9 +5,11 @@
 #include "rv64minilibc.h"
 #include <stddef.h>
 
-void m_exit(void) {
+void m_exit(int status) {
+    register int code asm("a0");
+    code = status;
+
     asm volatile (
-    "addi a0, x0, 0\n\t"
     "addi a7, x0, 93\n\t"
     "ecall"
     ::: "memory"

@@ -12,7 +12,7 @@ void m_putchar(char ch);
 
 void m_write(int fd, void *buf, size_t len);
 
-void m_exit(void);
+void m_exit(int status);
 
 size_t m_strlen(char* str);
 

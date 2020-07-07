@@ -9,7 +9,7 @@ void init(int number, char* name);
 
 bool check_condition(bool cond);
 
-void assert_equals(size_t expected, size_t actual);
+void assert_equals(size_t expected, size_t actual, int *failed_tests);
 
 /**
  * Compile with:
@@ -26,32 +26,27 @@ void assert_equals(size_t expected, size_t actual);
  */
 int main(int argc, char **argv) {
     int num = 0;
-
-    {
-        init(num, "ShouldFail");
-        print("This test must fail:\n");
-        assert_equals(1, 0);
-    }
+    int failed_tests;
 
     {
         init(++num, "4/2");
         size_t i = 4;
         i /= 2;
-        assert_equals(2, i);
+        assert_equals(2, i, &failed_tests);
     }
 
     {
         init(++num, "4<<2");
         size_t j = 4;
         j <<= 2;
-        assert_equals(16, j);
+        assert_equals(16, j, &failed_tests);
     }
 
     {
         init(++num, "5/2");
         size_t m = 5;
         m /= 2;
-        assert_equals(2, m);
+        assert_equals(2, m, &failed_tests);
     }
 
     {
@@ -61,21 +56,21 @@ int main(int argc, char **argv) {
         n += o;
         n *= 10;
         n /= 19;
-        assert_equals(202, n);
+        assert_equals(202, n, &failed_tests);
     }
 
     {
         init(++num, "3000*7");
         size_t n = 3000;
         size_t m = 7;
-        assert_equals(21000, (n * m));
+        assert_equals(21000, (n * m), &failed_tests);
     }
 
     {
         init(++num, "3000/7");
         size_t n = 3000;
         size_t m = 7;
-        assert_equals(428, (n / m));
+        assert_equals(428, (n / m), &failed_tests);
     }
 
     {
@@ -83,7 +78,7 @@ int main(int argc, char **argv) {
         init(++num, "DivZero");
         size_t n = 256;
         size_t m = 0;
-        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m));
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
     }
 
     {
@@ -91,13 +86,13 @@ int main(int argc, char **argv) {
         init(++num, "RemZero");
         size_t n = 256;
         size_t m = 0;
-        assert_equals(256, (n % m));
+        assert_equals(256, (n % m), &failed_tests);
     }
 
     {
         init(++num, "1<<10");
         size_t res = 1 << 10;
-        assert_equals(0b10000000000, res);
+        assert_equals(0b10000000000, res, &failed_tests);
     }
 
     {
@@ -110,7 +105,7 @@ int main(int argc, char **argv) {
             sum += i;
         }
 
-        assert_equals(2098176, sum);
+        assert_equals(2098176, sum, &failed_tests);
     }
 
     {
@@ -120,7 +115,7 @@ int main(int argc, char **argv) {
         const int bound = 2048;
 
         size_t gauss = (bound * (bound + 1)) / 2;
-        assert_equals(2098176, gauss);
+        assert_equals(2098176, gauss, &failed_tests);
     }
 
     {
@@ -141,11 +136,11 @@ int main(int argc, char **argv) {
                 fact *= i;
             }
 
-            assert_equals(expecteds[n - 1], fact);
+            assert_equals(expecteds[n - 1], fact, &failed_tests);
         }
     }
 
-    m_exit();
+    m_exit(failed_tests);
 }
 
 void init(int number, char* name) {
@@ -167,9 +162,10 @@ bool check_condition(bool cond) {
     }
 }
 
-void assert_equals(size_t expected, size_t actual) {
+void assert_equals(size_t expected, size_t actual, int *failed_tests) {
     //check the condition, printout expected but was when false
     if (!check_condition(expected == actual)) {
+        (*failed_tests)++;
         print("Expected: ");
         printi(expected);
         print(" but was: ");
