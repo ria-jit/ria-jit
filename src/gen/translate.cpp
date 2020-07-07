@@ -336,8 +336,10 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
     );
 
     //temporary, to make instruction boundaries visible in disassembly
-    a->push(x86::eax);
-    a->pop(x86::eax);
+    if(flag_log_asm_out) {
+        a->push(x86::eax);
+        a->pop(x86::eax);
+    }
 }
 
 //NEITHER FINISHED NOR TESTED
