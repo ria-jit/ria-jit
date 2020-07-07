@@ -1,0 +1,17 @@
+image: gcc
+
+build:
+  stage: build
+    before_script:
+        - apt update && apt -y install make cmake autoconf
+  script:
+    - mkdir build; cd build; cmake ..; make
+  artifacts:
+    paths:
+      - translator
+      - test
+
+test:
+  stage: test
+  script:
+    - ./test
