@@ -1,11 +1,11 @@
-image: gcc
+image: ubuntu
 
 build:
   stage: build
   before_script:
-    - apt update && apt -y install make cmake autoconf
+    - apt update && DEBIAN_FRONTEND=noninteractive apt -y install gcc cmake make autoconf
   script:
-    - mkdir build; cd build; cmake ..; make
+    - mkdir build && cd build && cmake .. && make
   artifacts:
     paths:
       - translator
