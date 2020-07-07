@@ -23,18 +23,31 @@ endif ()
 
 include(ExternalProject)
 
+set(FADEC_PATH_PREFIX lib/fadec)
+set(FADEC_GEN_INCLUDES
+        ${FADEC_PATH_PREFIX}/fadec-decode-table.inc
+        ${FADEC_PATH_PREFIX}/fadec-enc-cases.inc
+        ${FADEC_PATH_PREFIX}/fadec-enc-mnems.inc)
+set(FADEC_BYPRODUCTS
+        ${FADEC_PATH_PREFIX}/${CMAKE_STATIC_LIBRARY_PREFIX}fadec${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${FADECLIB_GEN_INCLUDES})
+set(FADECLIB_GEN_INCLUDES ${FADEC_GEN_INCLUDES})
+list(TRANSFORM FADECLIB_GEN_INCLUDES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
+
 #Add fadec as an external target to our project (uses slightly changed versions of the commands from
 #fadec/.github/workflows/ci.yml)
 ExternalProject_Add(fadec
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/lib/fadec
-        BINARY_DIR ${CMAKE_BINARY_DIR}/lib/fadec
-        CONFIGURE_COMMAND meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_SOURCE_DIR}/lib/fadec
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
+        BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX}
+        CONFIGURE_COMMAND meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BUILD_COMMAND ninja -v
         INSTALL_COMMAND ""
-        TEST_COMMAND meson test -v)
+        TEST_COMMAND meson test -v
+        BUILD_BYPRODUCTS ${FADEC_BYPRODUCTS})
 
 include_directories(src)
 include_directories(lib)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX})
 
 #Include the AsmJit library for x86 code-generation
 set(ASMJIT_EMBED TRUE)
@@ -66,15 +79,21 @@ add_executable("translator" ${ASMJIT_SRC} src/main/main.c src/main/main.h src/pa
         src/gen/instr/translate_loadstore.hpp src/gen/instr/translate_m_ext.cpp src/gen/instr/translate_m_ext.hpp src/gen/instr/translate_other.cpp
         src/gen/instr/translate_other.hpp src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp lib/common.h
         lib/minilibc.c src/util/typedefs.h src/util/typedefs.c src/util/analyze.c src/util/analyze.h)
-#Make sure fadec is built before translator or test
-add_dependencies(translator fadec)
-add_dependencies(test fadec)
-#Link to  the built fadec library (Needs to be done like this since external targets are of type UTILITY and so can't
-#be linked as libraries)
+#Link to the built fadec library (Needs to be done like this since external targets are of type UTILITY and so can't
+#be linked as libraries directly)
+add_library(fadecLib IMPORTED STATIC)
 ExternalProject_get_property(fadec BINARY_DIR)
-find_library(FADEC_LIB NAMES fadec PATHS ${BINARY_DIR})
-target_link_libraries("translator" ${FADEC_LIB})
-target_link_libraries("test" ${FADEC_LIB})
+set_target_properties(fadecLib PROPERTIES
+        IMPORTED_LOCATION "${BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}fadec${CMAKE_STATIC_LIBRARY_SUFFIX}")
+add_dependencies(fadecLib fadec)
+
+#Make sure fadecLib is built before translator or test
+add_dependencies(translator fadecLib)
+add_dependencies(test fadecLib)
+
+#find_library(FADEC_LIB NAMES fadec PATHS ${BINARY_DIR})
+target_link_libraries("translator" fadecLib)
+target_link_libraries("test" fadecLib)
 #link our translator with asmjit dependencies
 target_link_libraries("translator" ${ASMJIT_DEPS})
 target_link_libraries("test" ${ASMJIT_DEPS})
