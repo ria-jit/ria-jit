@@ -10,8 +10,6 @@
 #include "gen/translate.hpp"
 #include <runtime/register.h>
 #include "elf/loadElf.h"
-#include "runtime/emulateEcall.hpp"
-#include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
