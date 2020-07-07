@@ -3,7 +3,8 @@ image: ubuntu
 build:
   stage: build
   before_script:
-    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf
+    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson git
+    - git submodule update --init
   script:
     - mkdir build && cd build && cmake .. && make
   artifacts:
