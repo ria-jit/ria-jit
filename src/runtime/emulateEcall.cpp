@@ -24,7 +24,71 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     log_general("Emulate syscall...\n");
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
-    switch(registerValues[t_risc_reg_mnem::a7]) {
+    switch (registerValues[t_risc_reg_mnem::a7]) {
+        case 35: //unlinkat
+        {
+            log_general("Emulate syscall unlinkat (35)...\n");
+            size_t retval = __NR_unlinkat;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 52: //fchmod
+        {
+            log_general("Emulate syscall fchmod (52)...\n");
+            size_t retval = __NR_fchmod;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 55: //fchown
+        {
+            log_general("Emulate syscall fchown (55)...\n");
+            size_t retval = __NR_fchown;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 56: //openat
+        {
+            log_general("Emulate syscall openat (56)...\n");
+            size_t retval = __NR_openat;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 57: //close
+        {
+            log_general("Emulate syscall close (57)...\n");
+            size_t retval = __NR_close;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 63: //read
+        {
+            log_general("Emulate syscall read (63)...\n");
+            size_t retval = __NR_read;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory"); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
         case 64: //Write
         {
             log_general("Emulate syscall write (64)...\n");
@@ -37,6 +101,28 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
             break;
+        case 78: //readlinkat
+        {
+            log_general("Emulate syscall readlinkat (78)...\n");
+            size_t retval = __NR_readlinkat;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 88: //utimensat
+        {
+            log_general("Emulate syscall utimensat (88)...\n");
+            size_t retval = __NR_utimensat;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "a"(registerValues[t_risc_reg_mnem::a0]), "b"(registerValues[t_risc_reg_mnem::a1]), "c"
+            (registerValues[t_risc_reg_mnem::a2]), "d"(registerValues[t_risc_reg_mnem::a3])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
         case 93: //Exit
         {
             log_general("Emulate syscall exit (93)...\n");
@@ -44,6 +130,46 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             //note the guest exit code and stop main loop
             guest_exit_status = (int) get_value(static_cast<t_risc_reg>(a0));
             finalize = true;
+        }
+            break;
+        case 94: //exit_group
+        {
+            log_general("Emulate syscall exit_group (94)...\n");
+            //note the guest exit code and stop main loop
+            guest_exit_status = (int) get_value(static_cast<t_risc_reg>(a0));
+            finalize = true;
+        }
+            break;
+        case 134: //rt_sigaction
+        {
+            log_general("Emulate syscall rt_sigaction (134)...\n");
+            size_t retval = __NR_rt_sigaction;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 135: //rt_sigprocmask
+        {
+            log_general("Emulate syscall rt_sigprocmask (135)...\n");
+            size_t retval = __NR_rt_sigprocmask;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
+        }
+            break;
+        case 160: //uname
+        {
+            log_general("Emulate syscall uname (160)...\n");
+            size_t retval = __NR_uname;
+            __asm__ volatile("syscall" : "+a"(retval) :
+            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+
+            registerValues[t_risc_reg_mnem::a0] = retval;
         }
             break;
         case 214: //brk
@@ -64,7 +190,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                 } else {
                     ///Additional page(s) need to be allocated first
                     t_risc_addr newMappedBrk = ALIGN_UP(brkAddr, 4096lu);
-                    //TODO This not the minilib mmap, switch over when switching from ASMJit and not needing C++ 
+                    //TODO This not the minilib mmap, switch over when switching from ASMJit and not needing C++
                     // anymore.
                     void *map =
                             mmap(reinterpret_cast<void *>(mappedBrk), newMappedBrk - mappedBrk, PROT_READ | PROT_WRITE,
