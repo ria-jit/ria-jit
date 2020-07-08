@@ -321,6 +321,8 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
         case FENCE_I:
             translate_FENCE_I(instr, r_info);
             break;
+        default:
+            critical_not_yet_implemented("UNKNOWN mnemonic");
     }
 
     //log instruction
