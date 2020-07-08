@@ -48,6 +48,10 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     Elf64_Word flags = header.e_flags;
     Elf64_Half phentsize = header.e_phentsize;
     Elf64_Addr entry = header.e_entry;
+
+    Elf64_Off sh_offset = header.e_shoff;
+    Elf64_Half sh_count = header.e_shnum;
+
     bool incompatible = false;
 
     //Check for not supported ABI Flags
@@ -77,6 +81,33 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     }
     if (incompatible) {
         return INVALID_ELF_MAP;
+    }
+
+    off_t offsetSh = lseek(fd, sh_offset, SEEK_SET);
+    if (offsetSh < 0) {
+        dprintf(2, "Could not seek file, error %li", -offsetSh);
+        return INVALID_ELF_MAP;
+    }
+
+    Elf64_Addr minAddrExec = 0, maxAddrExec = 0;
+    for(int i = 0; i < sh_count; i++) {
+        Elf64_Shdr section;
+        ssize_t sectionBytes = read_full(fd, (void *) &section, sizeof(Elf64_Shdr));
+        if (sectionBytes <= 0) {
+            dprintf(2, "Could not read header for segment %i, error %li", i, -sectionBytes);
+            return INVALID_ELF_MAP;
+        }
+        if (section.sh_flags & SHF_EXECINSTR) {
+            Elf64_Addr shAddr = section.sh_addr;
+            Elf64_Xword shSize = section.sh_size;
+            //Update min and max addresses.
+            if (!minAddrExec || minAddrExec > shAddr) {
+                minAddrExec = shAddr;
+            }
+            if (!maxAddrExec || maxAddrExec < (shAddr + shSize)) {
+                maxAddrExec = shAddr + shSize;
+            }
+        }
     }
 
     Elf64_Addr minAddr = 0, maxAddr = 0;
@@ -166,6 +197,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 Elf64_Xword physical_size = segment.p_filesz;
                 Elf64_Addr vaddr = segment.p_vaddr;
                 //Copy flags over (not used right now to be implemented later)
+#if FALSE
                 int prot = 0;
                 if (segment.p_flags & PF_R) {
                     prot |= PROT_READ;
@@ -176,6 +208,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 if (segment.p_flags & PF_X) {
                     prot |= PROT_EXEC; //Probably not even needed
                 }
+#endif
                 fileOffset = lseek(fd2, load_offset, SEEK_SET);
                 if (fileOffset < 0) {
                     dprintf(2, "Could not seek file, error %li", -fileOffset);
@@ -194,7 +227,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     close(fd);
     close(fd2);
 
-    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize, endAddr};
+    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize, endAddr, minAddrExec, maxAddrExec};
 }
 
 t_risc_addr allocateStack() {
