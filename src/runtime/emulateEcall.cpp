@@ -114,6 +114,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_close, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
+        case 62: //lseek
+        {
+            log_general("Emulate syscall lseek (62)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_lseek, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
+        }
         case 63: //read
         {
             log_general("Emulate syscall read (63)...\n");
@@ -240,7 +247,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         }
             break;
         default:
-            dprintf(2, "Syscall 0x%lx is not yet implemented\n", registerValues[t_risc_reg_mnem::a7]);
+            dprintf(2, "Syscall %li is not yet implemented\n", registerValues[t_risc_reg_mnem::a7]);
             registerValues[t_risc_reg_mnem::a0] = -ENOSYS;
             break;
     }
