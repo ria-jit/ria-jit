@@ -30,7 +30,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall unlinkat (35)...\n");
             size_t retval = __NR_unlinkat;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -40,7 +41,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall fchmod (52)...\n");
             size_t retval = __NR_fchmod;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -51,7 +53,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             size_t retval = __NR_fchown;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -62,7 +65,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             size_t retval = __NR_openat;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -72,7 +76,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall close (57)...\n");
             size_t retval = __NR_close;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -84,7 +89,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
             (registerValues[t_risc_reg_mnem::a2]) :
-            "memory"); //TODO add clobbers?
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -107,7 +112,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             size_t retval = __NR_readlinkat;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -117,7 +123,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall fstat (80)...\n");
             size_t retval = __NR_readlinkat;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -126,9 +133,11 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall utimensat (88)...\n");
             size_t retval = __NR_utimensat;
+            register size_t r10 __asm__("r10") = registerValues[t_risc_reg_mnem::a3];
             __asm__ volatile("syscall" : "+a"(retval) :
-            "S"(registerValues[t_risc_reg_mnem::a0]), "D"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]));//, "11"(registerValues[t_risc_reg_mnem::a3])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
+            (registerValues[t_risc_reg_mnem::a2]), "r"(r10) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -156,7 +165,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             size_t retval = __NR_rt_sigaction;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -167,7 +177,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             size_t retval = __NR_rt_sigprocmask;
             __asm__ volatile("syscall" : "+a"(retval) :
             "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2])); //TODO add clobbers?
+            (registerValues[t_risc_reg_mnem::a2]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
@@ -177,7 +188,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall uname (160)...\n");
             size_t retval = __NR_uname;
             __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0])); //TODO add clobbers?
+            "D"(registerValues[t_risc_reg_mnem::a0]) :
+            "memory", "rcx", "r11");
 
             registerValues[t_risc_reg_mnem::a0] = retval;
         }
