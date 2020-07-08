@@ -53,6 +53,7 @@ typedef enum {
     LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD
 
 } t_risc_mnem;
+#define N_MNEM AMOMAXUD + 1
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
