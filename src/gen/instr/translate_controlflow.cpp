@@ -4,6 +4,7 @@
 
 #include "translate_controlflow.hpp"
 #include "runtime/register.h"
+#include "translate_arithmetic.hpp"
 
 using namespace asmjit;
 
@@ -12,7 +13,37 @@ inline void translate_controlflow_set_pc(const t_risc_instr &instr, const regist
 
 
 void translate_JAL(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate JAL should not ever be needed\n");
+    log_asm_out("Translate JAL\n");
+
+    t_risc_instr aupicInstr = t_risc_instr{
+            instr.addr,
+            AUIPC,
+            IMMEDIATE,
+            x0,
+            x0,
+            instr.reg_dest,
+            4
+    };
+
+    translate_AUIPC(aupicInstr, r_info);
+
+    t_risc_addr target = instr.addr + instr.imm;
+
+    t_cache_loc cache_loc = lookup_cache_entry(target);
+
+    if(cache_loc == UNSEEN_CODE) {
+        //afaik the "multiples of two" thing is resolved in parser.c
+        if (r_info.mapped[t_risc_reg::pc]) {
+            a->mov(r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t) (instr.imm)))); //cast to sign extend
+        } else {
+            a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc),
+                   (instr.addr + ((int64_t) (instr.imm)))); //cast to sign extend
+        }
+    }
+    else {
+        log_asm_out("DIRECT JUMP\n");
+        a->jmp((uint64_t)cache_loc);
+    }
 }
 
 void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
