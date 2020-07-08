@@ -408,6 +408,26 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
             case JUMP : {    ///JAL, JALR
                 switch (block_cache[parse_pos].mnem) {
                     case JAL : {
+
+                        if(block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
+                            ///could follow, but cache
+                            instructions_in_block++;
+
+
+                            t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
+
+                            t_cache_loc cache_loc = lookup_cache_entry(target);
+
+                            if (cache_loc == UNSEEN_CODE) {
+                                //set_cache_entry(target, reinterpret_cast<t_cache_loc>(1)); //???????????
+                                cache_loc = translate_block(target);
+                                set_cache_entry(target, cache_loc);
+                            }
+
+
+                            goto PARSE_DONE;
+                        }
+
                         ///link
                         ///replace [JAL rd, offset] with [AUIPC rd, 4]
                         ///(4 because next risc_addr)
