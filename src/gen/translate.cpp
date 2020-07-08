@@ -410,6 +410,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
             case JUMP : {    ///JAL, JALR
                 switch (block_cache[parse_pos].mnem) {
                     case JAL : {
+                        if(!flag_translate_opt) {
+                            ///could follow, but cache
+                            instructions_in_block++;
+                            goto PARSE_DONE;
+                        }
 
                         if(block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
                             ///could follow, but cache

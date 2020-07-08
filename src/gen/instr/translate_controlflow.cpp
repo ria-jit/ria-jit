@@ -5,6 +5,7 @@
 #include "translate_controlflow.hpp"
 #include "runtime/register.h"
 #include "translate_arithmetic.hpp"
+#include "util/log.h"
 
 using namespace asmjit;
 
@@ -31,7 +32,7 @@ void translate_JAL(const t_risc_instr &instr, const register_info &r_info) {
 
     t_cache_loc cache_loc = lookup_cache_entry(target);
 
-    if(cache_loc == UNSEEN_CODE) {
+    if(cache_loc == UNSEEN_CODE || !flag_translate_opt) {
         //afaik the "multiples of two" thing is resolved in parser.c
         if (r_info.mapped[t_risc_reg::pc]) {
             a->mov(r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t) (instr.imm)))); //cast to sign extend

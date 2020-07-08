@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     char *file_path = NULL;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while((opt_index = getopt(argc, argv, ":f:vgiorcshd")) != -1) {
+    while((opt_index = getopt(argc, argv, ":f:mvgiorcshd")) != -1) {
         switch(opt_index) {
             case 'v':
                 flag_log_general = true;
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
                 flag_log_asm_out = true;
                 flag_log_reg_dump = false; //don't do register dump with the verbose option by default
                 flag_log_cache = true;
+                flag_translate_opt = false;
                 break;
             case 'g':
                 flag_log_general = true;
@@ -59,6 +60,9 @@ int main(int argc, char *argv[]) {
                 break;
             case 'd':
                 flag_single_step = true;
+                break;
+            case 'm':
+                flag_translate_opt = true;
                 break;
             case ':':
             case 'h':
@@ -85,6 +89,7 @@ int main(int argc, char *argv[]) {
     log_general("Cache info: %d\n", flag_log_cache);
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
+    log_general("translate opt: %d\n", flag_translate_opt);
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {

@@ -25,6 +25,7 @@ extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
+extern bool flag_translate_opt;
 
 int parse_jump_immediate(t_risc_instr* instr);
 
