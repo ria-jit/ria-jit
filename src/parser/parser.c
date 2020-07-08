@@ -19,7 +19,10 @@ static inline int extract_rs1(int32_t instr) { return instr >> 15 & 0b11111; }
 static inline int extract_rs2(int32_t instr) { return instr >> 20 & 0b11111; }
 
 // extract func3 bit [14:12]
-static inline int extract_func3(int32_t instr) { return instr >> 12 & 0b111; }
+static inline int extract_funct3(int32_t instr) { return instr >> 12 & 0b111; }
+
+// extract func7 bit [31:25]
+static inline int extract_funct7(int32_t instr) { return instr >> 25 & 0b1111111; }
 
 // extract big_shamt bit[25:20]
 static inline int extract_big_shamt(int32_t instr) { return instr >> 20 & 0b111111; }
@@ -98,7 +101,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_MISC_MEM:
             p_instr_struct->optype = SYSTEM;
             p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FENCE;
                     break;
@@ -116,7 +119,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
             p_instr_struct->imm = extract_imm_B(raw_instr);
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = BEQ;
                     break;
@@ -144,7 +147,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->imm = extract_imm_I(raw_instr);
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0: {
                     p_instr_struct->mnem = LB;
                     break;
@@ -174,7 +177,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     break;
                 }
                 default: {
-                    int error = extract_func3(raw_instr);
+                    int error = extract_funct3(raw_instr);
                     critical_not_yet_implemented("Invalid LOAD Instruction");
                 }
             }
@@ -185,7 +188,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = SB;
                     break;
@@ -209,7 +212,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
             if (raw_instr & (1 << 25)) {
-                switch (extract_func3(raw_instr)) {
+                switch (extract_funct3(raw_instr)) {
                     case 0:
                         p_instr_struct->mnem = MUL;
                         break;
@@ -236,7 +239,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         break;
                 }
             } else {
-                switch (extract_func3(raw_instr)) {
+                switch (extract_funct3(raw_instr)) {
                     case 0:
                         if (raw_instr & (1 << 30)) {
                             //SRAI
@@ -280,7 +283,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->optype = SYSTEM;
             p_instr_struct->imm = extract_imm_I(raw_instr);
             reg_count[p_instr_struct->reg_dest]++;
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0:
                     if (raw_instr & (1 << 20)) {
                         p_instr_struct->mnem = EBREAK;
@@ -317,7 +320,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = ADDIW;
                     p_instr_struct->imm = extract_imm_I(raw_instr);
@@ -348,7 +351,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
             if (raw_instr & (1 << 25)) {
-                switch (extract_func3(raw_instr)) {
+                switch (extract_funct3(raw_instr)) {
                     case 0:
                         p_instr_struct->mnem = MULW;
                         break;
@@ -368,7 +371,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         critical_not_yet_implemented("Invalid OP_32 RV64M Instruction");
                 }
             } else {
-                switch (extract_func3(raw_instr)) {
+                switch (extract_funct3(raw_instr)) {
                     case 0:
                         if (raw_instr & (1 << 30)) {
                             //SRAI
@@ -399,7 +402,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->optype = IMMEDIATE;
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
-            switch (extract_func3(raw_instr)) {
+            switch (extract_funct3(raw_instr)) {
                 case 0: //ADDI
                     p_instr_struct->mnem = ADDI;
                     p_instr_struct->imm = extract_imm_I(raw_instr);
@@ -442,6 +445,61 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     critical_not_yet_implemented("Invalid OP_IMM Instruction");
                 }
             }
+            break;
+        case OP_AMO:
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->imm = extract_funct7(raw_instr);
+            // switch between different OP_AMO types, which are decoded in upper bytes of funct7
+            switch (p_instr_struct->imm >> 2) {
+                case 0:
+                    p_instr_struct->mnem = AMOADDW;
+                    break;
+                case 1:
+                    p_instr_struct->mnem = AMOSWAPW;
+                    break;
+                case 2:
+                    p_instr_struct->mnem = LRW;
+                    break;
+                case 3:
+                    p_instr_struct->mnem = SCW;
+                    break;
+                case 4:
+                    p_instr_struct->mnem = AMOXORW;
+                    break;
+                case 8:
+                    p_instr_struct->mnem = AMOORW;
+                    break;
+                case 12:
+                    p_instr_struct->mnem = AMOANDW;
+                    break;
+                case 16:
+                    p_instr_struct->mnem = AMOMINW;
+                    break;
+                case 20:
+                    p_instr_struct->mnem = AMOMAXW;
+                    break;
+                case 24:
+                    p_instr_struct->mnem = AMOMINUW;
+                    break;
+                case 28:
+                    p_instr_struct->mnem = AMOMAXUW;
+                    break;
+                default:
+                    critical_not_yet_implemented("UNKNOWN OP_AMO funct7");
+            }
+            // funct3 differentiates between RV32A and RV64A
+            switch (extract_funct3(raw_instr)) {
+                case 2:
+                    //RV32A
+                    break;
+                case 3:
+                    //RV64A
+                    p_instr_struct->mnem += LRD-LRW;
+                    break;
+                default:
+                    critical_not_yet_implemented("UNKNOWN OP_AMO funct3");
+            }
+
             break;
         default:
             critical_not_yet_implemented("OPCODE unknown");

@@ -20,6 +20,60 @@ void setupBrk(int brk) {
     curBrk = initialBrk = mappedBrk = brk;
 }
 
+
+//@formatter:off
+static size_t syscall0(int syscall_number) {
+    size_t retval = syscall_number;
+    __asm__ volatile("syscall" : "+a"(retval) : : "memory", "rcx", "r11");
+    return retval;
+}
+
+static size_t syscall1(int syscall_number, size_t a1) {
+    size_t retval = syscall_number;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
+static size_t syscall2(int syscall_number, size_t a1, size_t a2) {
+    size_t retval = syscall_number;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
+static size_t syscall3(int syscall_number, size_t a1, size_t a2, size_t a3) {
+    size_t retval = syscall_number;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2), "d"(a3) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
+static size_t syscall4(int syscall_number, size_t a1, size_t a2, size_t a3,
+                       size_t a4) {
+    size_t retval = syscall_number;
+    register size_t r10 __asm__("r10") = a4;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2), "d"(a3), "r"(r10) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
+static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
+                       size_t a4, size_t a5, size_t a6) {
+    size_t retval = syscall_number;
+    register size_t r8 __asm__("r8") = a5;
+    register size_t r9 __asm__("r9") = a6;
+    register size_t r10 __asm__("r10") = a4;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2), "d"(a3), "r"(r8), "r"(r9), "r"(r10) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     log_general("Emulate syscall...\n");
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
@@ -28,118 +82,76 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 35: //unlinkat
         {
             log_general("Emulate syscall unlinkat (35)...\n");
-            size_t retval = __NR_unlinkat;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_unlinkat, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
         case 52: //fchmod
         {
             log_general("Emulate syscall fchmod (52)...\n");
-            size_t retval = __NR_fchmod;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_fchmod, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
         }
             break;
         case 55: //fchown
         {
             log_general("Emulate syscall fchown (55)...\n");
-            size_t retval = __NR_fchown;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_fchown, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 56: //openat
         {
             log_general("Emulate syscall openat (56)...\n");
-            size_t retval = __NR_openat;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_openat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 57: //close
         {
             log_general("Emulate syscall close (57)...\n");
-            size_t retval = __NR_close;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_close, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
         case 63: //read
         {
             log_general("Emulate syscall read (63)...\n");
-            size_t retval = __NR_read;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_read, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 64: //Write
         {
             log_general("Emulate syscall write (64)...\n");
-            size_t retval = __NR_write;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_write, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 78: //readlinkat
         {
             log_general("Emulate syscall readlinkat (78)...\n");
-            size_t retval = __NR_readlinkat;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_readlinkat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 80: //fstat
         {
             log_general("Emulate syscall fstat (80)...\n");
-            size_t retval = __NR_readlinkat;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_fstat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
         }
             break;
         case 88: //utimensat
         {
             log_general("Emulate syscall utimensat (88)...\n");
-            size_t retval = __NR_utimensat;
-            register size_t r10 __asm__("r10") = registerValues[t_risc_reg_mnem::a3];
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]), "r"(r10) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall4(__NR_utimensat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2],
+                                                           registerValues[t_risc_reg_mnem::a3]);
         }
             break;
         case 93: //Exit
@@ -174,24 +186,15 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 135: //rt_sigprocmask
         {
             log_general("Emulate syscall rt_sigprocmask (135)...\n");
-            size_t retval = __NR_rt_sigprocmask;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_rt_sigprocmask, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 160: //uname
         {
             log_general("Emulate syscall uname (160)...\n");
-            size_t retval = __NR_uname;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_uname, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
         case 214: //brk
