@@ -15,7 +15,7 @@ using namespace asmjit;
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate FENCE…\n");
+    critical_not_yet_implemented("Translate FENCE…\n");
 }
 
 /**
@@ -92,7 +92,7 @@ void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate EBREAK…\n");
+    critical_not_yet_implemented("Translate EBREAK…\n");
 }
 
 /**
@@ -102,5 +102,5 @@ void translate_EBREAK(const t_risc_instr &instr, const register_info &r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE_I(const t_risc_instr &instr, const register_info &r_info) {
-    log_asm_out("Translate FENCE_I…\n");
+    critical_not_yet_implemented("Translate FENCE_I…\n");
 }
