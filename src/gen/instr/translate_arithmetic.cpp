@@ -19,6 +19,7 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
     // add rd, instr.imm
     log_asm_out("Translate addiw…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->add(x86::edx, instr.imm);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
@@ -40,6 +41,7 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
     //shl rd, (instr.imm & 0x3F)
     log_asm_out("Translate slli…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
@@ -60,6 +62,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
 
     //move into register
     if (r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         //a->mov(r_info.map[instr.reg_dest], instr.imm);
     } else {
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), instr.imm);
@@ -76,6 +79,7 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate addi…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->add(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
@@ -100,6 +104,7 @@ void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
     if (instr.reg_dest != t_risc_reg::x0) {
         //add offset to the pc and store in rd
         if (r_info.mapped[instr.reg_dest]) {
+            critical_not_yet_implemented("Register mapped instruction type unavailable\n");
             /*a->mov(r_info.map[instr.reg_dest], instr.addr);
             a->add(r_info.map[instr.reg_dest], instr.imm);*/
         } else {
@@ -121,6 +126,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLTI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->cmp(r_info.map[instr.reg_src_1], instr.imm);
         a->jnl(not_less);
@@ -160,6 +166,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
     //const Label &below = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->cmp(r_info.map[instr.reg_src_1], instr.imm);
         a->jnb(not_below);
         a->inc(r_info.map[instr.reg_dest]);
@@ -205,6 +212,7 @@ void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate XORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->xor_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
@@ -225,6 +233,7 @@ void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ORI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->or_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
@@ -245,6 +254,7 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ANDI…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->and_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
@@ -263,6 +273,7 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
 void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRLI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
@@ -281,6 +292,7 @@ void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
 void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRAI…\n");
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
@@ -301,6 +313,7 @@ void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ADD…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->add(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
@@ -321,6 +334,7 @@ void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SUB…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sub(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
@@ -341,6 +355,7 @@ void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
@@ -367,6 +382,7 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
     //const Label &less = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
         a->jnl(not_less);
         a->inc(r_info.map[instr.reg_dest]);
@@ -419,6 +435,7 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
     //const Label &below = a->newLabel();
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->cmp(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
         a->jnb(not_below);
         a->inc(r_info.map[instr.reg_dest]);
@@ -468,6 +485,7 @@ void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate XOR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
@@ -488,6 +506,7 @@ void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRL…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
@@ -512,6 +531,7 @@ void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRA…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
@@ -535,6 +555,7 @@ void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate OR…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->or_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
@@ -554,6 +575,7 @@ void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate AND…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->and_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
@@ -573,6 +595,7 @@ void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLLIW…\n");
     //shift left the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->shl(x86::edx, instr.imm & 0b111111);
         a->movsxd(x86::rax, x86::edx);
@@ -595,6 +618,7 @@ void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRLIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->shr(x86::edx, instr.imm & 0b111111);
         a->movsxd(x86::rax, x86::edx);
@@ -617,6 +641,7 @@ void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRAIW…\n");
     //shift right the 32-bit value
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->sar(x86::edx, instr.imm & 0b111111);
         a->movsxd(x86::rax, x86::edx);
@@ -641,6 +666,7 @@ void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate ADDW…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->add(x86::rdx, r_info.map[instr.reg_src_2]);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
@@ -664,6 +690,7 @@ void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SUBW…\n");
 
     if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->sub(x86::rdx, r_info.map[instr.reg_src_2]);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
@@ -687,6 +714,7 @@ void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SLLW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
@@ -715,6 +743,7 @@ void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRLW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
@@ -743,6 +772,7 @@ void translate_SRAW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SRAW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         /*a->mov(x86::rdx, r_info.map[instr.reg_src_1]);
         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
         a->and_(x86::rcx, 0b11111);
