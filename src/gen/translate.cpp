@@ -79,7 +79,7 @@ void init_block() {
     err = 0;
 
     //insert nop at the beginning so debugger step-into works as expected
-    (*current++) = 0x90;
+    *(current++) = 0x90;
 }
 
 /**
