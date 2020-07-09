@@ -9,6 +9,7 @@
 #include <util/typedefs.h>
 
 #ifdef __cplusplus
+
 #include <asmjit/asmjit.h>
 
 /**
@@ -20,9 +21,12 @@ struct register_info {
     uint64_t base;
 };
 
+//deprecated
 extern asmjit::CodeHolder *code;
 extern asmjit::x86::Assembler *a;
 
+extern uint8_t *current;
+extern int err;
 
 void save_risc_registers(register_info r_info);
 
