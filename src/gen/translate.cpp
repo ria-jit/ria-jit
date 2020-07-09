@@ -30,7 +30,7 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
  * The pointer to the head of the current basic block.
  * Not externed, as this is only used inside of the current file.
  */
-uint8_t *block_head;
+static uint8_t *block_head;
 
 /**
  * The pointer to the current assembly instruction.
