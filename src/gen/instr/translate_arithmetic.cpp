@@ -363,7 +363,6 @@ void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SHL64rr, FE_AX, FE_CX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
@@ -514,7 +513,6 @@ void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SHR64rr, FE_AX, FE_CX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
@@ -539,7 +537,6 @@ void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SAR64rr, FE_AX, FE_CX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
@@ -724,7 +721,6 @@ void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
         //shift in 32-bit register, then write-back
         err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SHL32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
@@ -753,7 +749,6 @@ void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
         //shift in 32-bit register, then write-back
         err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SHR32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
@@ -782,7 +777,6 @@ void translate_SRAW(const t_risc_instr &instr, const register_info &r_info) {
         //shift in 32-bit register, then write-back
         err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_AND64ri, FE_CX, 0b11111);
         err |= fe_enc64(&current, FE_SAR32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
         err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
