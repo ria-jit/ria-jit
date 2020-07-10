@@ -24,10 +24,10 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
         a->add(x86::edx, instr.imm);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM(r_info.base + 8 * instr.reg_src_1, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_ADD32ri, FE_DX, instr.imm);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -45,9 +45,9 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM(r_info.base + 8 * instr.reg_src_1, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHL64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -65,7 +65,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
         critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         //a->mov(r_info.map[instr.reg_dest], instr.imm);
     } else {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), instr.imm);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), instr.imm);
     }
 }
 
@@ -83,9 +83,9 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->add(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM(r_info.base + 8 * instr.reg_src_1, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr.imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -110,7 +110,7 @@ void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
         } else {
             err |= fe_enc64(&current, FE_MOV64ri, FE_AX, instr.addr);
             err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr.imm);
-            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
         }
     }
 }
@@ -277,9 +277,9 @@ void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM(r_info.base + 8 * instr.reg_src_1, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHR64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -296,9 +296,9 @@ void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM(r_info.base + 8 * instr.reg_src_1, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SAR64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(r_info.base + 8 * instr.reg_dest, 0, 0, 0), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
