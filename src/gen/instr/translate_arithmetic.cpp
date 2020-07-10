@@ -6,8 +6,8 @@
 #include "runtime/register.h"
 #include <fadec/fadec-enc.h>
 
-//shortcut for memory operands (this, for now, assumes all register file memory accesses have 32-bit addresses)
-#define FE_MEM_ADDR(offset) FE_MEM(0, 0, 0, offset)
+//shortcut for memory operands
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
