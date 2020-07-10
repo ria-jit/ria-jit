@@ -138,11 +138,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
 
         //insert forward jump here later
         uint8_t *jmp_buf = current;
-        *(current++) = 0x90; //there must be a nicer way to do this :)
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
@@ -177,20 +173,12 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1), instr.imm);
         uint8_t *jnb_buffer = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         uint8_t *jmp_buffer = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JMP | FE_JMPL, (intptr_t) current); //dummy jmp
 
         //not_below <- jnb:
         err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
@@ -395,21 +383,13 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
 
         //jnl not_less
         uint8_t *jnl_buf = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         //jmp less
         uint8_t *jmp_buf = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
         //not_less:
         err |= fe_enc64(&jnl_buf, FE_JGE, (intptr_t) current);
@@ -448,21 +428,13 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
 
         //jnl not_below
         uint8_t *jnb_buf = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         //jmp below
         uint8_t *jmp_buf = current;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
-        *(current++) = 0x90;
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
         //not_below:
         err |= fe_enc64(&jnb_buf, FE_JNC, (intptr_t) current);
