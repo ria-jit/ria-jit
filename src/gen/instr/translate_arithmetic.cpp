@@ -6,8 +6,8 @@
 #include "runtime/register.h"
 #include <fadec/fadec-enc.h>
 
-//shortcut for memory operands
-#define FE_BASE_MEM(base) FE_MEM(base, 0, 0, 0)
+//shortcut for memory operands (this, for now, assumes all register file memory accesses have 32-bit addresses)
+#define FE_MEM_ADDR(offset) FE_MEM(0, 0, 0, offset)
 
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
@@ -24,10 +24,10 @@ void translate_addiw(const t_risc_instr &instr, const register_info &r_info) {
         a->add(x86::edx, instr.imm);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_ADD32ri, FE_DX, instr.imm);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -45,9 +45,9 @@ void translate_slli(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shl(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHL64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -65,7 +65,7 @@ void translate_lui(const t_risc_instr &instr, const register_info &r_info) {
         critical_not_yet_implemented("Register mapped instruction type unavailable\n");
         //a->mov(r_info.map[instr.reg_dest], instr.imm);
     } else {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), instr.imm);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), instr.imm);
     }
 }
 
@@ -83,9 +83,9 @@ void translate_addi(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->add(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr.imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -110,7 +110,7 @@ void translate_AUIPC(const t_risc_instr &instr, const register_info &r_info) {
         } else {
             err |= fe_enc64(&current, FE_MOV64ri, FE_AX, instr.addr);
             err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr.imm);
-            err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
         }
     }
 }
@@ -133,8 +133,8 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
         a->inc(r_info.map[instr.reg_dest]);
         a->bind(not_less);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), 0);
-        err |= fe_enc64(&current, FE_CMP64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1), instr.imm);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
+        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1), instr.imm);
 
         //insert forward jump here later
         uint8_t *jmp_buf = current;
@@ -144,7 +144,7 @@ void translate_SLTI(const t_risc_instr &instr, const register_info &r_info) {
         *(current++) = 0x90;
         *(current++) = 0x90;
 
-        err |= fe_enc64(&current, FE_INC64m, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest));
+        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         //write forward jump target when now known
         auto not_less = (uintptr_t) current;
@@ -175,7 +175,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->bind(below);*/
     } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1), instr.imm);
+        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1), instr.imm);
         uint8_t *jnb_buffer = current;
         *(current++) = 0x90;
         *(current++) = 0x90;
@@ -183,7 +183,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
         *(current++) = 0x90;
         *(current++) = 0x90;
 
-        err |= fe_enc64(&current, FE_INC64m, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest));
+        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         uint8_t *jmp_buffer = current;
         *(current++) = 0x90;
@@ -194,7 +194,7 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
 
         //not_below <- jnb:
         err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
-        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), 0);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 
         //below <- jmp:
         err |= fe_enc64(&jmp_buffer, FE_JMP | FE_JMPL, (intptr_t) current);
@@ -216,9 +216,9 @@ void translate_XORI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->xor_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_XOR64ri, FE_AX, instr.imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -237,9 +237,9 @@ void translate_ORI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->or_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_OR64ri, FE_AX, instr.imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -258,9 +258,9 @@ void translate_ANDI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->and_(r_info.map[instr.reg_dest], instr.imm);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_AND64ri, FE_AX, instr.imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -277,9 +277,9 @@ void translate_SRLI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->shr(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHR64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -296,9 +296,9 @@ void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SAR64ri, FE_AX, instr.imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -317,9 +317,9 @@ void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->add(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_ADD64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_ADD64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -338,9 +338,9 @@ void translate_SUB(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sub(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_SUB64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_SUB64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -361,10 +361,10 @@ void translate_SLL(const t_risc_instr &instr, const register_info &r_info) {
         a->and_(x86::rcx, 0b11111);
         a->shl(r_info.map[instr.reg_dest], x86::cl);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SHL64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -390,8 +390,8 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->bind(less);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_CMP64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1), FE_AX);
 
         //jnl not_less
         uint8_t *jnl_buf = current;
@@ -401,7 +401,7 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
         *(current++) = 0x90;
         *(current++) = 0x90;
 
-        err |= fe_enc64(&current, FE_INC64m, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest));
+        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         //jmp less
         uint8_t *jmp_buf = current;
@@ -414,7 +414,7 @@ void translate_SLT(const t_risc_instr &instr, const register_info &r_info) {
         //not_less:
         err |= fe_enc64(&jnl_buf, FE_JGE, (intptr_t) current);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), 0);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 
         //less:
         err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
@@ -443,8 +443,8 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_dest]);
         a->bind(below);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_CMP64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1), FE_AX);
 
         //jnl not_below
         uint8_t *jnb_buf = current;
@@ -454,7 +454,7 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
         *(current++) = 0x90;
         *(current++) = 0x90;
 
-        err |= fe_enc64(&current, FE_INC64m, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest));
+        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         //jmp below
         uint8_t *jmp_buf = current;
@@ -467,7 +467,7 @@ void translate_SLTU(const t_risc_instr &instr, const register_info &r_info) {
         //not_below:
         err |= fe_enc64(&jnb_buf, FE_JNC, (intptr_t) current);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), 0);
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 
         //below:
         err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
@@ -488,9 +488,9 @@ void translate_XOR(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->xor_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_XOR64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -511,10 +511,10 @@ void translate_SRL(const t_risc_instr &instr, const register_info &r_info) {
         a->and_(x86::rcx, 0b11111);
         a->shr(r_info.map[instr.reg_dest], x86::cl);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SHR64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -535,10 +535,10 @@ void translate_SRA(const t_risc_instr &instr, const register_info &r_info) {
         a->and_(x86::rcx, 0b11111);
         a->sar(r_info.map[instr.reg_dest], x86::cl);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SAR64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -556,9 +556,9 @@ void translate_OR(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->or_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_OR64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_OR64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -576,9 +576,9 @@ void translate_AND(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->and_(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_AND64rm, FE_AX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_AND64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -598,10 +598,10 @@ void translate_SLLIW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHL32ri, FE_DX, instr.imm & 0b111111);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -621,10 +621,10 @@ void translate_SRLIW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SHR32ri, FE_DX, instr.imm & 0b111111);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -644,10 +644,10 @@ void translate_SRAIW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(x86::rax, x86::edx);
         a->mov(r_info.map[instr.reg_dest], x86::rax);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SAR32ri, FE_DX, instr.imm & 0b111111);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -668,10 +668,10 @@ void translate_ADDW(const t_risc_instr &instr, const register_info &r_info) {
         a->add(x86::rdx, r_info.map[instr.reg_src_2]);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_ADD32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_ADD32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -692,10 +692,10 @@ void translate_SUBW(const t_risc_instr &instr, const register_info &r_info) {
         a->sub(x86::rdx, r_info.map[instr.reg_src_2]);
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_SUB32rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_SUB32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -719,11 +719,11 @@ void translate_SLLW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
         //shift in 32-bit register, then write-back
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SHL32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -747,11 +747,11 @@ void translate_SRLW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
         //shift in 32-bit register, then write-back
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SHR32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
 
@@ -775,10 +775,10 @@ void translate_SRAW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(r_info.map[instr.reg_dest], x86::edx);*/
     } else {
         //shift in 32-bit register, then write-back
-        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_BASE_MEM(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         err |= fe_enc64(&current, FE_SAR32rr, FE_DX, FE_CX);
         err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_BASE_MEM(r_info.base + 8 * instr.reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
 }
