@@ -13,7 +13,10 @@
 \usepackage{siunitx}
 \usepackage{multicol}
 \usepackage[german]{varioref}
+\usepackage{listings}
+\usepackage{color}
 
+% setup commands
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
 \newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
 \newcommand{\define}[2]{\item \textbf{#1}\\#2}
@@ -22,8 +25,23 @@
 \sisetup{range-phrase=--,range-units=single}
 \MakeOuterQuote{"}
 
+% config for source code listings
+\lstset{
+	language=C++,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\ttfamily},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+% bibliography
 \addbibresource{literature.bib}
 
+% document properties
 \title[Binary Translation: RISC--V \refer x86--64]{Dynamische Binärübersetzung: RISC--V \refer x86--64}
 \subtitle{Zwischenpräsentation}
 \author[Dormann, Kammermeier, Pfannschmidt, Schmidt]{Noah Dormann\inst{1}, Simon Kammermeier\inst{1},\\Johannes Pfannschmidt\inst{1}, Florian Schmidt\inst{1}}
@@ -31,8 +49,8 @@
   Technische Universität München (TUM)}
 \date{21. Juli 2020}
 
+% beamer setup
 \footline{\insertshortauthor~|~\insertshorttitle}
-
 \setbeamertemplate{section in toc}[sections numbered]
 \setbeamertemplate{subsection in toc}[subsections numbered]
 
@@ -54,16 +72,305 @@
 \subsection{Angebot}
 
 \section{Systemarchitektur}
-\subsection{ELF-Loader} % Simon
-\subsection{Parser} % Noah
-\subsection{Block loader} % Johannes
-\subsection{Code generator} % Flo
-\subsection{Code cache} % Flo
+\begin{frame}
+	\frametitle{Systemarchitektur}
+	\begin{figure}
+		\includegraphics[width=0.75\textwidth]{diagrams/structure}
+	\end{figure}
+\end{frame}
 
 \begin{frame}
-	\frametitle{Folie}
-	Hier könnte Ihre Werbung stehen\footfullcite{riscv-spec}
+	\frametitle{Vorgehen}
+	\begin{figure}
+		\includegraphics[width=0.6\textwidth]{diagrams/strategy}
+	\end{figure}
 \end{frame}
+
+\subsection{ELF-Loader} % Simon
+\subsection{Parser} % Noah
+
+\subsection{Register File} % Flo
+\begin{frame}[fragile]
+	\frametitle{Register File}
+	\textbf{Ziel:} Speicherung der Registerinhalte des RISC-V-Programmes
+	
+	\vspace{1cm}
+	\pause
+	Emulieren der Register \verb!x0! bis \verb!x31! sowie \verb!pc! in
+	\begin{lstlisting}
+		t_risc_reg_val contents[33];
+	\end{lstlisting}
+	
+	\pause
+	und Zugriff via Startpointer und den convenience methods:
+	
+	\begin{lstlisting}
+		t_risc_reg_val *get_reg_data(void);
+		t_risc_reg_val get_value(t_risc_reg reg);
+		void set_value(t_risc_reg reg, t_risc_reg_val val);
+	\end{lstlisting}
+	
+	z.T.: Caching der Inhalte in Hardware-x86-Registern je nach Registermapping für die Basic Blocks.
+\end{frame}
+
+\subsection{Block Loader} % Johannes
+
+
+\subsection{Code Generator} % Flo
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Überblick}
+	
+	\textbf{Input:} geparste RISC-V-Instruktionen eines Basic Blocks\\
+	\textbf{Output:} übersetzte x86-Instruktionen für dienen Block
+	
+	\pause
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\vspace{0.25cm}
+			\begin{itemize}
+				\item Nutzen der Instruction-Structs des Parsers
+				\item Instruktionsmapping RISC-V \refer x86
+				\item einzelne Übersetzungsfunktionen für jede Instruktion
+				
+				\vspace{1cm}
+				
+				\item allokierte Speicherseite für die x86-Assembly
+				\item Encoding der Instruktionen in den Speicherbereich
+			\end{itemize}
+		\end{column}
+		
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}
+				typedef struct {
+				    t_risc_addr addr;
+				    t_risc_mnem mnem;
+				    t_risc_optype optype;
+				    t_risc_reg reg_src_1;
+				    t_risc_reg reg_src_2;
+				    t_risc_reg reg_dest;
+				    t_risc_imm imm;
+				} t_risc_instr;
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Ansatz}
+	
+	Übersetzung aller Instruktionen im Basic Block in einen x86-Buffer,
+	\begin{lstlisting}
+		//aus translate_block(t_risc_addr), translate.cpp
+		init_block();
+		
+		for (int i = 0; i < instructions_in_block; i++) {
+			translate_risc_instr(block_cache[i], r_info);
+    	}
+    	
+		return finalize_block();
+	\end{lstlisting}
+	
+	anschließend
+	\begin{itemize}
+		\item Finalisieren des Blocks (\verb!ret! anhängen, etc.)
+		\item Rückgabe des Blocks an den Cache (später).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Metadaten}
+	
+	Register-Mapping als Parameter für die Übersetzerfunktionen, basierend auf Zuteilung des Block Loaders:
+	\begin{lstlisting}
+		/**
+		 * Register information for the translator functions.
+		 */
+		struct register_info {
+			asmjit::x86::Gp *map;
+			bool *mapped;
+			uint64_t base;
+		};
+	\end{lstlisting}
+	
+	\pause
+	\begin{itemize}
+		\item Synchronisierung der zugewiesenen Register mit register file
+		\item Lesen/Schreiben an Basic-Block-Grenzen
+		\item Unterschiedliche Instruktionsübersetzungen je nach Mapping
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Dispatch}
+	
+	Verteilung der Übersetzung auf einzelne Funktionen für jede Instruktion:
+	
+	\begin{lstlisting}
+		//aus translate.cpp
+		void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info) {
+			switch (instr.mnem) {
+				//...
+				case OR:
+					translate_OR(instr, r_info);
+					break;
+				case AND:
+					translate_AND(instr, r_info);
+					break;
+				case SLLIW:
+					translate_SLLIW(instr, r_info);
+					break;
+				//...
+		}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Übersetzerfunktionen (1)}
+	
+	Realisierung der RISC-V-Instruktionen mit x86-64-Assembly.
+	
+	\pause
+	\vspace{0.3cm}
+	Einfache Instruktionen, z.B. \verb!ADD!:
+	\begin{lstlisting}
+		//aus translate_arithmetic.cpp
+		void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
+			if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+				//...
+			} else {
+				a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+				a->add(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
+				a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
+			}
+		}
+	\end{lstlisting}
+	
+	\pause
+	\refer Load-Store-Architektur vs. Register-Memory-Architecture
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Übersetzerfunktionen (2)}
+	
+	Realisierung der RISC-V-Instruktionen mit x86-64-Assembly.
+	
+	\vspace{0.3cm}
+	Notwendigkeit von Fallunterscheidungen, z.B. \verb!REM!: (Semantik nach \footfullcite{riscv-spec}, S. 44f.)
+	\pause
+	\begin{lstlisting}
+		mov rax, [r_info.base + 8 * instr.reg_src_1]
+		cmp qword ptr [r_info.base + 8 * instr.reg_src_2], 0
+		jnz not_div_zero
+		mov [r_info.base + 8 * instr.reg_dest], rax
+		jz div_zero
+		
+		not_div_zero:
+		xor rdx, rdx
+		idiv qword ptr [r_info.base + 8 * instr.reg_src_2]
+		mov [r_info.base + 8 * instr.reg_dest], rdx
+		
+		div_zero:
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Dynamische Codegenerierung}
+	\framesubtitle{Übersetzerfunktionen (3)}
+	
+	Realisierung der RISC-V-Instruktionen mit x86-64-Assembly.
+	
+	\vspace{0.3cm}
+	Emulierung der system calls für \verb!ECALL!:
+	\pause
+	\begin{lstlisting}
+		void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
+			save_risc_registers(r_info);
+			a->mov(x86::rdi, instr.addr);
+			a->mov(x86::rsi, r_info.base);
+			typedef void emulate(t_risc_addr addr, t_risc_reg_val *registerValues);
+			emulate *em = &emulate_ecall;
+			a->call(reinterpret_cast<uintptr_t>(em));
+		}
+	\end{lstlisting}
+	
+	\pause
+	\begin{itemize}
+		\item Behandlung von system calls zur Laufzeit
+		\item Übersetzung, Adaptieren bzw. Emulieren der benötigten Funktionalität
+	\end{itemize}
+\end{frame}
+
+\subsection{Code Cache} % Flo
+\begin{frame}
+	\frametitle{Code Cache}
+	\framesubtitle{Überblick}
+	
+	\textbf{Ziel:} Caching bereits übersetzter Basic Blocks für nochmalige Ausführung (teure Übersetzung nur einfach)
+	
+	\pause
+	\begin{figure}
+		\includegraphics[width=0.28\textwidth]{diagrams/cache-flow}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Code Cache}
+	\framesubtitle{Ansatz}
+	
+	\textbf{Ziel:} Caching bereits übersetzter Basic Blocks für nochmalige Ausführung (teure Übersetzung nur einfach)
+	
+	\textbf{Idee:} Hashtable für schnellen Lookup der Blöcke, Startadresse des RISC-V-Blocks als Key
+	
+	\vspace{0.5cm}
+	\pause
+	Einträge speichern RISC-V-Blockstartadresse sowie die Adresse des übersetzten Blocks:
+	\begin{lstlisting}
+		typedef struct {
+			t_risc_addr risc_addr;
+			t_cache_loc cache_loc;
+		} t_cache_entry;
+	\end{lstlisting}
+	
+	\pause
+	Lookup als Open Hashing mit linearem Sondieren, via
+	\begin{lstlisting}
+		inline size_t hash(t_risc_addr risc_addr) {
+			return (risc_addr & 0x0000FFF0u) >> 4u;
+		}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Code Cache}
+	\framesubtitle{Einsatz im System}
+	
+	Zugriff auf den Cache von außen via
+	\begin{lstlisting}
+		t_cache_loc lookup_cache_entry(t_risc_addr risc_addr);
+		void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc);
+	\end{lstlisting}
+	
+	wobei \verb!UNSEEN_CODE! von \verb!lookup_cache_entry(...)! einen nicht im Cache enthaltenen Block anzeigt.
+	
+	\vspace{0.5cm}
+	\pause
+	\refer Dynamische Reallokation der Größe bei Kapazitätsgrenzen
+	
+	\vspace{0.5cm}
+	\pause
+	Ausführung bereits übersetzter Blöcke via
+	\begin{lstlisting}
+		typedef void (*blk)(void);
+		((blk) loc)();
+	\end{lstlisting}
+\end{frame}
+
 
 \section{Anhang}
 \begin{frame}
