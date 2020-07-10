@@ -27,8 +27,6 @@ extern bool flag_fail_silently;
 extern bool flag_single_step;
 extern bool flag_translate_opt;
 
-int parse_jump_immediate(t_risc_instr* instr);
-
 void critical_not_yet_implemented(const char* info);
 
 void not_yet_implemented(const char* info);
