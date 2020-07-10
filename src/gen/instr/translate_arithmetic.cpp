@@ -178,14 +178,14 @@ void translate_SLTIU(const t_risc_instr &instr, const register_info &r_info) {
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest));
 
         uint8_t *jmp_buffer = current;
-        err |= fe_enc64(&current, FE_JMP | FE_JMPL, (intptr_t) current); //dummy jmp
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
         //not_below <- jnb:
         err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 
         //below <- jmp:
-        err |= fe_enc64(&jmp_buffer, FE_JMP | FE_JMPL, (intptr_t) current);
+        err |= fe_enc64(&jmp_buffer, FE_JMP, (intptr_t) current);
     }
 }
 
