@@ -9,13 +9,32 @@
 
 #include <common.h>
 #include <stdbool.h>
+#include <elf/loadElf.h>
 
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count);
 
-void analyze(t_risc_addr startAddr, t_risc_addr endAddr){
+void analyze(const char *file_path){
+
+    if (file_path == NULL) {
+        dprintf(2, "Bad. Invalid file path.\n");
+        _exit(2);
+    }
+
+    t_risc_elf_map_result result = mapIntoMemory(file_path);
+    if (!result.valid) {
+        dprintf(2, "Bad. Failed to map into memory.\n");
+        _exit(1);
+    }
+
+    t_risc_addr startAddr = result.execStart;
+    t_risc_addr endAddr = result.execEnd;
+
     //create array for mnemomics
     uint64_t mnem[N_MNEM];
+    for(int i = 0;i<N_MNEM;i++){
+        mnem[i] = 0;
+    }
     //loop over full segment
     for(t_risc_addr addr = startAddr;addr<endAddr;addr+=4){
         add_instruction(addr,mnem);
@@ -45,7 +64,10 @@ void analyze(t_risc_addr startAddr, t_risc_addr endAddr){
         }
     }
 
-    /// TODO output
+    for(int i = 0;i<N_MNEM;i++){
+        if(mnem[indicesRanked[i]] == 0) break;
+        log_analyze("Mnem %d is used %li times.\n", indicesRanked[i],mnem[indicesRanked[i]]);
+    }
 }
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {

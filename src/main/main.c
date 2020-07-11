@@ -10,6 +10,7 @@
 #include "gen/translate.hpp"
 #include <runtime/register.h>
 #include "elf/loadElf.h"
+#include "util/analyze.h"
 #include "runtime/emulateEcall.hpp"
 #include <getopt.h>
 
@@ -25,10 +26,14 @@ bool execute_cached(t_cache_loc loc);
 int main(int argc, char *argv[]) {
     int opt_index = 0;
     char *file_path = NULL;
+    bool doAnalyze = false;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while((opt_index = getopt(argc, argv, ":f:mvgiorcshd")) != -1) {
+    while((opt_index = getopt(argc, argv, ":f:mavgiorcshd")) != -1) {
         switch(opt_index) {
+            case 'a':
+                doAnalyze = true;
+                break;
             case 'v':
                 flag_log_general = true;
                 flag_log_asm_in = true;
@@ -79,6 +84,11 @@ int main(int argc, char *argv[]) {
                         "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n");
                 return 1;
         }
+    }
+
+    if(doAnalyze){
+        analyze(file_path);
+        return 0;
     }
 
     log_general("Command line options:\n");
