@@ -327,8 +327,8 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 
     //log instruction
     log_asm_out(
-            "Instruction %d at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
-            instr.mnem,
+            "Instruction %s at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
+            mnem_to_string(instr.mnem),
             instr.addr,
             instr.optype,
             instr.reg_src_1,
