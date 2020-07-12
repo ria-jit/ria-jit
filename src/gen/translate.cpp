@@ -14,6 +14,7 @@
 #include "instr/translate_other.hpp"
 #include <util/util.h>
 #include "util/log.h"
+#include "util/typedefs.h"
 #include "parser/parser.h"
 
 
