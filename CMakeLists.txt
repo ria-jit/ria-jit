@@ -43,7 +43,8 @@ add_executable("translator" ${ASMJIT_SRC} src/main/main.c src/main/main.h src/pa
         src/elf/loadElf.h src/gen/instr/translate_arithmetic.cpp src/gen/instr/translate_arithmetic.hpp src/gen/instr/translate_controlflow.cpp
         src/gen/instr/translate_controlflow.hpp src/gen/instr/translate_csr.cpp src/gen/instr/translate_csr.hpp src/gen/instr/translate_loadstore.cpp
         src/gen/instr/translate_loadstore.hpp src/gen/instr/translate_m_ext.cpp src/gen/instr/translate_m_ext.hpp src/gen/instr/translate_other.cpp
-        src/gen/instr/translate_other.hpp src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp lib/common.h lib/minilibc.c src/util/typedefs.h src/util/analyze.c src/util/analyze.h)
+        src/gen/instr/translate_other.hpp src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp lib/common.h
+        lib/minilibc.c src/util/typedefs.h src/util/typedefs.c src/util/analyze.c src/util/analyze.h)
 
 #link our translator with asmjit dependencies
 target_link_libraries("translator" ${ASMJIT_DEPS})
