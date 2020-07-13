@@ -181,13 +181,9 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 134: //rt_sigaction
         {
             log_general("Emulate syscall rt_sigaction (134)...\n");
-            size_t retval = __NR_rt_sigaction;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_rt_sigaction, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 135: //rt_sigprocmask
@@ -204,6 +200,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_uname, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
+        case 169: //gettimeofday
+        {
+            log_general("Emulate syscall gettimeofday (169)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_gettimeofday, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+        break;
         case 214: //brk
         {
             log_general("Emulate syscall brk (214)...\n");
