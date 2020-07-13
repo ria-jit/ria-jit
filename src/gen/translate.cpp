@@ -363,10 +363,6 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     t_risc_instr risc_instr = {};
 
     /// get memory for structs
-    //what was the problem with 2 standard libraries again?
-    //I could use a custom class or arrays instead,
-    //but that would be less elegant.
-    //std::vector<t_risc_instr> block_cache;
 #define BLOCK_CACHE_SIZE 64
     int maxCount = BLOCK_CACHE_SIZE;
     if (flag_single_step) {
@@ -377,6 +373,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///count register usage
     uint32_t reg_count[N_REG];
+    for(int i = 0; i < N_REG; i++) {
+        reg_count[i] = 0;
+    }
 
     int instructions_in_block = 0;
 
