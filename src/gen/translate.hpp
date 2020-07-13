@@ -11,12 +11,13 @@
 #ifdef __cplusplus
 
 #include <asmjit/asmjit.h>
+#include <fadec/fadec-enc.h>
 
 /**
  * Register information for the translator functions.
  */
 struct register_info {
-    asmjit::x86::Gp *map;
+    FeReg *map;
     bool *mapped;
     uint64_t base;
 };

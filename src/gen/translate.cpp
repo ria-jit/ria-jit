@@ -18,6 +18,8 @@
 #include "util/typedefs.h"
 #include "parser/parser.h"
 
+//shortcut for memory operands
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
 using namespace asmjit;
 
@@ -361,9 +363,6 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 //NEITHER FINISHED NOR TESTED
 
 
-
-void translate_risc_JAL_onlylink(t_risc_instr risc_instr);
-
 void load_risc_registers(register_info r_info);
 
 
@@ -552,17 +551,17 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     ///create allocation MAPping
-    asmjit::x86::Gp register_map[N_REG];
+    FeReg register_map[N_REG];
     bool mapped[N_REG];
 
 
 
     //insert register pairs here, example:
 #define USED_X86_REGS 8
-    asmjit::x86::Gp x86_64_registers[] = {asmjit::x86::r8, asmjit::x86::r9,
-            asmjit::x86::r10, asmjit::x86::r11,
-            asmjit::x86::r12, asmjit::x86::r13,
-            asmjit::x86::r14, asmjit::x86::r15};
+    FeReg x86_64_registers[] = {FE_R8, FE_R9,
+            FE_R10, FE_R11,
+            FE_R12, FE_R13,
+            FE_R14, FE_R15};
 
     {
         int currMreg = 0;
@@ -630,16 +629,12 @@ void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
     a->mov(x86::ptr(r_addr + 8 * pc), x86::rax);
 }
 
-///writes rd but doesn't actually jump
-void translate_risc_JAL_onlylink(t_risc_instr risc_instr) {
-    not_yet_implemented("single-instruction JAL onlylink translator not implemented yet");
-}
-
 ///loads the Risc V registers into their allocated x86_64 registers
 void load_risc_registers(register_info r_info) {
     for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
+            //a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
+            err |= fe_enc64(&current, FE_MOV64rm, r_info.map[i], FE_MEM_ADDR(r_info.base + 8 * i));
         }
     }
 }
@@ -648,7 +643,8 @@ void load_risc_registers(register_info r_info) {
 void save_risc_registers(register_info r_info) {
     for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
         if (r_info.mapped[i]) {
-            a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
+            //a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * i), r_info.map[i]);
         }
     }
 }
