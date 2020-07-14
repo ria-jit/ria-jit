@@ -462,6 +462,21 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
             ///branch? or syscall?
             case SYSTEM : //fallthrough Potential program end stop parsing
+            {
+                switch(block_cache[parse_pos].mnem){
+                    case ECALL:
+                        ///Potential program end stop parsing
+                        instructions_in_block++;
+                        goto PARSE_DONE;
+                    case FENCE:
+                    case FENCE_I:
+                        ///ignore get next instruction address
+                        risc_addr += 4;
+                        instructions_in_block++;
+                        break;
+                }
+            }
+                break;
             case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
                 instructions_in_block++;
