@@ -13,6 +13,8 @@
 #include "instr/translate_other.hpp"
 #include <util/util.h>
 #include <fadec/fadec-enc.h>
+#include <cstdio>
+#include <cstdlib>
 #include "util/log.h"
 #include "util/typedefs.h"
 #include "parser/parser.h"
