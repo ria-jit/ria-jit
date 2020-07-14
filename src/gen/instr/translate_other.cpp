@@ -13,7 +13,7 @@
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE(const t_risc_instr &instr, const register_info &r_info) {
-    critical_not_yet_implemented("Translate FENCE…\n");
+    log_general("Ignored FENCE…\n"); //just ignore for now
 }
 
 /**
