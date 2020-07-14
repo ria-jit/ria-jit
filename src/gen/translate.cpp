@@ -472,7 +472,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                     case FENCE_I:
                         ///ignore get next instruction address
                         risc_addr += 4;
-                        instructions_in_block++;
+                        parse_pos--; //decrement for next loop cycle
                         break;
                 }
             }
