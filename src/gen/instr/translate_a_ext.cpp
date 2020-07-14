@@ -37,7 +37,23 @@ void translate_SCW(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_AMOSWAPW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate AMOSWAPW…\n");
-    critical_not_yet_implemented("AMOSWAPW not yet implemented.\n");
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM(FE_DX, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_AX);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_CX);
+
+    //load rs2 into AX
+    err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+
+    //lower 32bit of FE_CX still hold information from reg_src_1
+    //swap is implemented by storing FE_CX in reg_src_2 and FE_AX into location at DX
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2), FE_CX);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(FE_DX, 0, 0, 0), FE_AX);
 }
 
 /**
@@ -207,7 +223,22 @@ void translate_SCD(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_AMOSWAPD(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate AMOSWAPD…\n");
-    critical_not_yet_implemented("AMOSWAPD not yet implemented.\n");
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd and store in CX
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_DX, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_CX);
+
+    //load rs2 into AX
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+
+    //lower FE_CX still hold information from reg_src_1
+    //swap is implemented by storing FE_CX in reg_src_2 and FE_AX into location at DX
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2), FE_CX);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_DX, 0, 0, 0), FE_AX);
 }
 
 /**
