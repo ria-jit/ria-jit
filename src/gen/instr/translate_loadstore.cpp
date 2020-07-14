@@ -49,7 +49,7 @@ void translate_LH(const t_risc_instr &instr, const register_info &r_info) {
         a->movsx(FIRST_REG, x86::word_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);*/
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOVSXr64m16, SECOND_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
+        err |= fe_enc64(&current, FE_MOVSXr64m16, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
@@ -72,7 +72,7 @@ void translate_LW(const t_risc_instr &instr, const register_info &r_info) {
         a->movsxd(FIRST_REG, x86::dword_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);*/
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOVSXr64m32, SECOND_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
+        err |= fe_enc64(&current, FE_MOVSXr64m32, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
@@ -118,7 +118,7 @@ void translate_LHU(const t_risc_instr &instr, const register_info &r_info) {
         a->movzx(FIRST_REG, x86::word_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);*/
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOVZXr64m16, SECOND_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
+        err |= fe_enc64(&current, FE_MOVZXr64m16, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
@@ -213,7 +213,7 @@ void translate_LWU(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(FIRST_REG.r32(), x86::dword_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);*/
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV32rm, SECOND_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
+        err |= fe_enc64(&current, FE_MOV32rm, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
@@ -236,7 +236,7 @@ void translate_LD(const t_risc_instr &instr, const register_info &r_info) {
         a->mov(FIRST_REG, x86::qword_ptr(SECOND_REG, instr.imm));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), FIRST_REG);*/
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
+        err |= fe_enc64(&current, FE_MOV64rm, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr.imm));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FIRST_REG);
     }
 }
