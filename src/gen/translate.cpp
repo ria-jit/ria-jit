@@ -64,13 +64,13 @@ x86::Assembler *a;
  * (e.g., before translating every basic block).
  */
 void init_block() {
+    auto addr = reinterpret_cast<void *>(lastUsedAddress - 4096lu);
     //allocate a memory page for the next basic block that will be translated
-    void *buf = mmap(nullptr, 4096,
-                     PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE,
+    void *buf = mmap(addr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
                      -1, 0);
-
+    lastUsedAddress -= 4096lu;
     //check for mmap fault and terminate
-    if (buf == MAP_FAILED) {
+    if (buf != addr) {
         dprintf(2, "Memory allocation fault in assembly.\n");
         exit(-1);
     }
