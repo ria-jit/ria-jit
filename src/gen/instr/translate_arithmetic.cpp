@@ -281,7 +281,7 @@ void translate_SRAI(const t_risc_instr &instr, const register_info &r_info) {
         /*a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
         a->sar(r_info.map[instr.reg_dest], instr.imm & 0b111111);*/
     } else {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_SAR64ri, FE_AX, instr.imm & 0b111111);
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
     }
