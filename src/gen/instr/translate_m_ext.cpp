@@ -5,7 +5,8 @@
 #include "translate_m_ext.hpp"
 #include "runtime/register.h"
 
-using namespace asmjit;
+//shortcut for memory operands
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
 /**
  * see p. 44 of the RISC-V-Spec
@@ -27,12 +28,16 @@ void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate MUL…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
-        a->imul(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
+        /* a->mov(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_1]);
+         a->imul(r_info.map[instr.reg_dest], r_info.map[instr.reg_src_2]);*/
     } else {
-        a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_IMUL64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2), FE_AX);
+        /*a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
+        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);*/
     }
 }
 
@@ -48,10 +53,11 @@ void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate MULH…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->imul(r_info.map[instr.reg_src_2]);
-        //we want the upper XLEN bits here
-        a->mov(r_info.map[instr.reg_dest], x86::rdx);
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
+        /* a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+         a->imul(r_info.map[instr.reg_src_2]);
+         //we want the upper XLEN bits here
+         a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
@@ -84,16 +90,17 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
      * by treating rs2 as unsigned.
      */
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->imul(r_info.map[instr.reg_src_2]);
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
+        /* a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+         a->imul(r_info.map[instr.reg_src_2]);
 
-        //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
-        a->sar(r_info.map[instr.reg_src_2], 63);
-        a->and_(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
-        a->add(x86::rdx, r_info.map[instr.reg_src_1]);
+         //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
+         a->sar(r_info.map[instr.reg_src_2], 63);
+         a->and_(r_info.map[instr.reg_src_1], r_info.map[instr.reg_src_2]);
+         a->add(x86::rdx, r_info.map[instr.reg_src_1]);
 
-        //we want the upper XLEN bits here
-        a->mov(r_info.map[instr.reg_dest], x86::rdx);
+         //we want the upper XLEN bits here
+         a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
@@ -121,10 +128,11 @@ void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate MULHU…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->mul(r_info.map[instr.reg_src_2]);
-        //we want the upper XLEN bits here
-        a->mov(r_info.map[instr.reg_dest], x86::rdx);
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
+        /* a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+         a->mul(r_info.map[instr.reg_src_2]);
+         //we want the upper XLEN bits here
+         a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->mul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
@@ -314,10 +322,11 @@ void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate MULW…\n");
 
     if (r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2] && r_info.mapped[instr.reg_dest]) {
-        a->mov(x86::rax, r_info.map[instr.reg_src_1]);
-        a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
-        a->imul(x86::ecx);
-        a->movsxd(r_info.map[instr.reg_dest], x86::eax);
+        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
+        /* a->mov(x86::rax, r_info.map[instr.reg_src_1]);
+         a->mov(x86::rcx, r_info.map[instr.reg_src_2]);
+         a->imul(x86::ecx);
+         a->movsxd(r_info.map[instr.reg_dest], x86::eax);*/
     } else {
         a->mov(x86::eax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
