@@ -269,7 +269,7 @@ inline void translate_controlflow_cmp_rs1_rs2(const t_risc_instr& instr, const r
             //a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
             //a->cmp(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
             err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
-            err |= fe_enc64(&current, FE_CMP64rm, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+            err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
         }
     }
 }
