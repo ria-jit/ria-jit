@@ -17,7 +17,12 @@
  */
 void translate_LRW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate LRW…\n");
-    critical_not_yet_implemented("LRW not yet implemented.\n");
+
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOVSXr64m32, FE_DX, FE_MEM(FE_AX, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_DX);
+
+    //not doing anything for fencing yet
 }
 
 /**
@@ -27,7 +32,15 @@ void translate_LRW(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_SCW(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SCW…\n");
-    critical_not_yet_implemented("SCW not yet implemented.\n");
+
+    // rs2 -> [rs1] 0 in rd if succeed
+
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(FE_AX, 0, 0, 0), FE_DX);
+
+    // we are not using any memory fences here, just simulate a successfull write (0 in rd)
+    err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 }
 
 /**
@@ -203,7 +216,12 @@ void translate_AMOMAXUW(const t_risc_instr &instr, const register_info &r_info) 
  */
 void translate_LRD(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate LRD…\n");
-    critical_not_yet_implemented("LRD not yet implemented.\n");
+
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM(FE_AX, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_DX);
+
+    //not doing anything for fencing yet
 }
 
 /**
@@ -213,7 +231,14 @@ void translate_LRD(const t_risc_instr &instr, const register_info &r_info) {
  */
 void translate_SCD(const t_risc_instr &instr, const register_info &r_info) {
     log_asm_out("Translate SCD…\n");
-    critical_not_yet_implemented("SCD not yet implemented.\n");
+    // rs2 -> [rs1] 0 in rd if succeed
+
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_AX, 0, 0, 0), FE_DX);
+
+    // we are not using any memory fences here, just simulate a successfull write (0 in rd)
+    err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), 0);
 }
 
 /**
