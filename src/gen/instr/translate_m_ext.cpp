@@ -34,7 +34,7 @@ void translate_MUL(const t_risc_instr &instr, const register_info &r_info) {
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
         err |= fe_enc64(&current, FE_IMUL64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2), FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
         /*a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);*/
@@ -59,10 +59,15 @@ void translate_MULH(const t_risc_instr &instr, const register_info &r_info) {
          //we want the upper XLEN bits here
          a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
+
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_IMUL64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_DX);
+        /*
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         //we want the upper XLEN bits here
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
+        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);*/
     }
 }
 
@@ -102,6 +107,20 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
          //we want the upper XLEN bits here
          a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
+
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_IMUL64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+
+        //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
+        err |= fe_enc64(&current, FE_SAR64mi, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2), 63);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_AND64rm, FE_CX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_ADD64rr, FE_DX, FE_CX);
+
+        //we want the upper XLEN bits here
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_DX);
+
+        /*
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
 
@@ -113,6 +132,7 @@ void translate_MULHSU(const t_risc_instr &instr, const register_info &r_info) {
 
         //we want the upper XLEN bits here
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
+         */
     }
 }
 
@@ -134,10 +154,15 @@ void translate_MULHU(const t_risc_instr &instr, const register_info &r_info) {
          //we want the upper XLEN bits here
          a->mov(r_info.map[instr.reg_dest], x86::rdx);*/
     } else {
+
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_MUL64m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_DX);
+/*
         a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->mul(x86::qword_ptr(r_info.base + 8 * instr.reg_src_2));
         //we want the upper XLEN bits here
-        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);
+        a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rdx);*/
     }
 }
 
@@ -328,10 +353,17 @@ void translate_MULW(const t_risc_instr &instr, const register_info &r_info) {
          a->imul(x86::ecx);
          a->movsxd(r_info.map[instr.reg_dest], x86::eax);*/
     } else {
+
+        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+        err |= fe_enc64(&current, FE_IMUL32m, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_AX);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_CX);
+        /*
         a->mov(x86::eax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
         a->imul(x86::dword_ptr(r_info.base + 8 * instr.reg_src_2));
         a->movsxd(x86::rcx, x86::eax);
         a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rcx);
+        */
     }
 }
 
