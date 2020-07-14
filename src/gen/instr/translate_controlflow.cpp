@@ -8,9 +8,6 @@
 #include "util/log.h"
 #include <fadec/fadec-enc.h>
 
-//shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
-
 using namespace asmjit;
 
 inline void translate_controlflow_cmp_rs1_rs2(const t_risc_instr &instr, const register_info &r_info, bool noOrder);

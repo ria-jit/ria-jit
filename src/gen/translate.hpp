@@ -13,6 +13,9 @@
 #include <asmjit/asmjit.h>
 #include <fadec/fadec-enc.h>
 
+//shortcut for memory operands
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
+
 /**
  * Register information for the translator functions.
  */

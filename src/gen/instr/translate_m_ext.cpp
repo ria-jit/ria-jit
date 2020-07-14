@@ -5,9 +5,6 @@
 #include "translate_m_ext.hpp"
 #include "runtime/register.h"
 
-//shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
-
 /**
  * see p. 44 of the RISC-V-Spec
  * The semantics for division by zero and division overflow are summarized in Table 7.1. The quotient

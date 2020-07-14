@@ -6,9 +6,6 @@
 #include "runtime/register.h"
 #include <fadec/fadec-enc.h>
 
-//shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
-
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
  * proper sign-extension of a 32-bit result in rd.

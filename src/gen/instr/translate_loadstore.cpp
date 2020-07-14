@@ -8,10 +8,6 @@
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
 
-
-//shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
-
 /**
  * Translate the LB instruction.
  * The LB instruction loads a 8-bit value from memory and sign extends it before storing it in register rd. The

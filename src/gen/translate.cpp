@@ -18,8 +18,6 @@
 #include "util/typedefs.h"
 #include "parser/parser.h"
 
-//shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
 using namespace asmjit;
 
