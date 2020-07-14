@@ -10,7 +10,6 @@
 
 #ifdef __cplusplus
 
-#include <asmjit/asmjit.h>
 #include <fadec/fadec-enc.h>
 
 //shortcut for memory operands
@@ -24,10 +23,6 @@ struct register_info {
     bool *mapped;
     uint64_t base;
 };
-
-//deprecated
-extern asmjit::CodeHolder *code;
-extern asmjit::x86::Assembler *a;
 
 extern uint8_t *current;
 extern int err;

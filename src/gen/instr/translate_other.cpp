@@ -6,8 +6,6 @@
 #include "runtime/register.h"
 #include "runtime/emulateEcall.hpp"
 
-using namespace asmjit;
-
 /**
 * Translate the FENCE instruction.
 * Description

@@ -8,8 +8,6 @@
 #include "util/log.h"
 #include <fadec/fadec-enc.h>
 
-using namespace asmjit;
-
 inline void translate_controlflow_cmp_rs1_rs2(const t_risc_instr &instr, const register_info &r_info, bool noOrder);
 //inline void translate_controlflow_set_pc(const t_risc_instr &instr, const register_info &r_info, Label END, Label NOJUMP);
 inline void translate_controlflow_set_pc2(const t_risc_instr &instr, const register_info &r_info, uint8_t *jmpLoc, uint64_t mnem);

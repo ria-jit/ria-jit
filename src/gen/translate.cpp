@@ -3,7 +3,6 @@
 //
 
 #include "translate.hpp"
-#include <asmjit/asmjit.h>
 #include <sys/mman.h>
 #include "runtime/register.h"
 #include "instr/translate_arithmetic.hpp"
@@ -18,8 +17,6 @@
 #include "util/typedefs.h"
 #include "parser/parser.h"
 
-
-using namespace asmjit;
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -43,18 +40,6 @@ uint8_t *current;
  * Best checked at least every block (i.e., in finalize_block() or equivalent).
  */
 int err;
-
-/**
- * The AsmJit code holder for our generated x86 machine code.
- */
-//todo deprecated. Not removed yet as we want to at least retain compilation
-CodeHolder *code;
-
-/**
- * The Assembly emitter that writes to the CodeBuffer in the CodeHolder.
- */
-//todo deprecated. Not removed yet as we want to at least retain compilation
-x86::Assembler *a;
 
 /**
  * Initializes a new translatable block of code.
@@ -102,7 +87,6 @@ t_cache_loc finalize_block() {
     if (flag_log_asm_out) {
         log_asm_out("Generated block code: ");
 
-        //todo is this the correct way to determine block length?
         log_print_mem((char *) block_head, current - block_head);
         printf("\n");
     }
@@ -353,8 +337,9 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 
     //temporary, to make instruction boundaries visible in disassembly
     if (flag_log_asm_out) {
-        a->push(x86::eax);
-        a->pop(x86::eax);
+        err |= fe_enc64(&current, FE_NOP);
+        err |= fe_enc64(&current, FE_NOP);
+        err |= fe_enc64(&current, FE_NOP);
     }
 }
 
@@ -623,8 +608,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 ///set the pc to next addr after inst
 void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
     ///set pc
-    a->mov(x86::rax, addr);
-    a->mov(x86::ptr(r_addr + 8 * pc), x86::rax);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, addr);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_addr + 8 * pc), FE_AX);
 }
 
 ///loads the Risc V registers into their allocated x86_64 registers
