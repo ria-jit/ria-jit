@@ -11,6 +11,7 @@
 #include "instr/translate_loadstore.hpp"
 #include "instr/translate_m_ext.hpp"
 #include "instr/translate_other.hpp"
+#include "instr/translate_a_ext.hpp"
 #include <util/util.h>
 #include <fadec/fadec-enc.h>
 #include <cstdio>
@@ -18,7 +19,6 @@
 #include "util/log.h"
 #include "util/typedefs.h"
 #include "parser/parser.h"
-
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -320,6 +320,72 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
             break;
         case FENCE_I:
             translate_FENCE_I(instr, r_info);
+            break;
+        case LRW:
+            translate_LRW(instr, r_info);
+            break;
+        case SCW:
+            translate_SCW(instr, r_info);
+            break;
+        case AMOSWAPW:
+            translate_AMOSWAPW(instr, r_info);
+            break;
+        case AMOADDW:
+            translate_AMOADDW(instr, r_info);
+            break;
+        case AMOXORW:
+            translate_AMOXORW(instr, r_info);
+            break;
+        case AMOANDW:
+            translate_AMOANDW(instr, r_info);
+            break;
+        case AMOORW:
+            translate_AMOORW(instr, r_info);
+            break;
+        case AMOMINW:
+            translate_AMOMINW(instr, r_info);
+            break;
+        case AMOMAXW:
+            translate_AMOMAXW(instr, r_info);
+            break;
+        case AMOMINUW:
+            translate_AMOMINUW(instr, r_info);
+            break;
+        case AMOMAXUW:
+            translate_AMOMAXUW(instr, r_info);
+            break;
+        case LRD:
+            translate_LRD(instr, r_info);
+            break;
+        case SCD:
+            translate_SCD(instr, r_info);
+            break;
+        case AMOSWAPD:
+            translate_AMOSWAPD(instr, r_info);
+            break;
+        case AMOADDD:
+            translate_AMOADDD(instr, r_info);
+            break;
+        case AMOXORD:
+            translate_AMOXORD(instr, r_info);
+            break;
+        case AMOANDD:
+            translate_AMOANDD(instr, r_info);
+            break;
+        case AMOORD:
+            translate_AMOORD(instr, r_info);
+            break;
+        case AMOMIND:
+            translate_AMOMIND(instr, r_info);
+            break;
+        case AMOMAXD:
+            translate_AMOMAXD(instr, r_info);
+            break;
+        case AMOMINUD:
+            translate_AMOMINUD(instr, r_info);
+            break;
+        case AMOMAXUD:
+            translate_AMOMAXUD(instr, r_info);
             break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
