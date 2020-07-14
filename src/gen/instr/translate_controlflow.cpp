@@ -76,7 +76,7 @@ void translate_JALR(const t_risc_instr &instr, const register_info &r_info) {
     ///set last bit to zero
     //why??? not aligned to 4 bit boundary would throw exception anyway…
     //a->and_(x86::rax, -2);
-    err |= fe_enc64(&current, FE_AND64ri, -2);
+    err |= fe_enc64(&current, FE_AND64ri, FE_AX, -2);
 
     ///write target addr to pc
     if (r_info.mapped[t_risc_reg::pc]) {
