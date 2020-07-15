@@ -81,6 +81,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
     switch (registerValues[t_risc_reg_mnem::a7]) {
+        case 29: //ioctl
+        {
+            log_general("Emulate syscall ioctl (29)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+            break;
         case 35: //unlinkat
         {
             log_general("Emulate syscall unlinkat (35)...\n");
@@ -190,9 +197,10 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 134: //rt_sigaction
         {
-            log_general("Emulate syscall rt_sigaction (134)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_rt_sigaction, registerValues[t_risc_reg_mnem::a0],
-                                                           registerValues[t_risc_reg_mnem::a1]);
+            log_general("Ignore syscall rt_sigaction (134) return sucess...\n");
+            //registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_rt_sigaction, registerValues[t_risc_reg_mnem::a0],
+            //                                               registerValues[t_risc_reg_mnem::a1]);
+            registerValues[t_risc_reg_mnem::a0] = 0;
         }
             break;
         case 135: //rt_sigprocmask
