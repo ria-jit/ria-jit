@@ -58,3 +58,12 @@ void printi(size_t i) {
 void print(char* buf) {
     m_write(1, buf, m_strlen(buf));
 }
+
+void print_arr(int* buf, size_t len) {
+    print("[");
+    for(size_t i = 0; i < len; ++i) {
+        printi(buf[i]);
+        if (i != len - 1) print(", ");
+    }
+    print("]\n");
+}
