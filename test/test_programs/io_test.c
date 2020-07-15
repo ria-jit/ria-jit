@@ -1,24 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
-int main()
-{
+int main() {
     int num;
     FILE *fptr;
 
     // use appropriate location if you are using MacOS or Linux
-    fptr = fopen("program.txt","w");
+    fptr = fopen("program.txt", "w");
 
-    if(fptr == NULL)
-    {
-        printf("Error!");
+    if (fptr == NULL) {
+        printf("Error! %s (%li)\n", strerror(errno), errno);
         exit(1);
     }
 
-    printf("Enter num: ");
-    scanf("%d",&num);
+    printf("Enter num: \n");
+    scanf("%d", &num);
 
-    fprintf(fptr,"%d",num);
+    fprintf(fptr, "%d\n", num);
     fclose(fptr);
 
     return 0;
