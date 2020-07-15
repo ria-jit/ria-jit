@@ -111,9 +111,9 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 56: //openat
         {
             log_general("Emulate syscall openat (56)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_openat, registerValues[t_risc_reg_mnem::a0],
+            registerValues[t_risc_reg_mnem::a0] = syscall4(__NR_openat, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1],
-                                                           registerValues[t_risc_reg_mnem::a2]);
+                                                           registerValues[t_risc_reg_mnem::a2],registerValues[t_risc_reg_mnem::a3]);
         }
             break;
         case 57: //close
