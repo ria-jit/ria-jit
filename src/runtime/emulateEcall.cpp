@@ -77,7 +77,6 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
 }
 
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
-    log_general("Emulate syscall...\n");
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
     switch (registerValues[t_risc_reg_mnem::a7]) {
