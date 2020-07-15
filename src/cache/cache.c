@@ -89,7 +89,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     size_t index = find_lin_slot(risc_addr);
 
     //check for table full before inserting
-    if (count_entries >= table_size) {
+    if (count_entries >= table_size - 1) {
         //double the table size
         table_size <<= 1u;
 
