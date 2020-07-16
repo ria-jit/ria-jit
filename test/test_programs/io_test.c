@@ -11,11 +11,12 @@ int main() {
     fptr = fopen("program.txt", "w");
 
     if (fptr == NULL) {
-        printf("Error! %s (%li)\n", strerror(errno), errno);
+        printf("Error! %s (%i)\n", strerror(errno), errno);
         exit(1);
     }
 
     printf("Enter num: \n");
+    fflush(stdout);
     scanf("%d", &num);
 
     fprintf(fptr, "%d\n", num);
