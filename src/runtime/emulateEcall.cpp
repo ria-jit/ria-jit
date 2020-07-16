@@ -194,6 +194,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                                                            registerValues[t_risc_reg_mnem::a1]);
         }
             break;
+        case 113: //clock_gettime
+        {
+            log_general("Emulate syscall clock_gettime (98)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_clock_gettime, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+            break;
         case 134: //rt_sigaction
         {
             log_general("Ignore syscall rt_sigaction (134) return sucess...\n");
