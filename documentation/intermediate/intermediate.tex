@@ -1,7 +1,8 @@
 \documentclass[german]{tum-presentation}
 
 \usepackage[utf8]{inputenc}
-\usepackage{csquotes}
+\usepackage[ngerman]{babel}
+\usepackage[autostyle]{csquotes}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -90,35 +91,92 @@
 \end{frame}
 
 \subsection{ELF-Loader} % Simon
+\begin{frame}[fragile]
+	\frametitle{ELF-Loader}
+	\framesubtitle{Memory mapping}
+	\textbf{Ziel:} Die Binärdatei einlesen und alle Segmente, die als "load" gekennzeichnet sind, an die korrekten Orte im Speicher laden.
+
+	\vspace{0.25cm}
+	\textbf{Input:} String des Pfads der Binärdatei.
+
+	\textbf{Output:} Einsprungadresse des geladenen RISCV-Programms (plus einige Metadaten) in einem \verb!t_risc_elf_map_result! struct.
+
+	\vspace{0.25cm}
+	\pause
+
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item Laden des ELF-Headers vom Anfang der Datei.
+				\item Checken der Flags auf nicht unterstüzte RISCV ABIs
+				\item Iterieren über alle Segment-Header um den Addressbereich des Binarys zu erhalten
+				\item Allozieren des gesamten benötigten Addressbereichs an der nativen Addresse
+				\item Laden aller "load" Segmente an die richtigen Speicheradressen
+			\end{itemize}
+
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}
+				typedef struct {
+   					bool valid;
+    					t_risc_addr entry;
+    					t_risc_addr phdr;
+    					Elf64_Half ph_count;
+    					Elf64_Half ph_entsize;
+    					t_risc_addr dataEnd;
+				} t_risc_elf_map_result;
+			\end{lstlisting}
+		\end{column}
+
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{ELF-Loader}
+	\framesubtitle{Stack Allocation}
+	\textbf{Ziel:} Stack für das Gastprogramm allozieren und mit den üblichen Daten initialisieren.
+
+	\vspace{0.25cm}
+	\textbf{Input:} Argumentanzahl des Gastprogramms, Argumentarray des Gastprogramms, den Output des memory mappings
+
+	\textbf{Output:} Die Adresse des Stackpointers nach dem Initialisieren
+
+	\vspace{0.25cm}
+	\pause
+
+	Erklärung des Stack erstellen folgt...
+
+\end{frame}
+
 \subsection{Parser} % Noah
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Überblick}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei. 
-	
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+
 	\refer (Zählen der Anzahl von Zugriffen auf einzelne Register für spätere Optimierungen.)
-	
+
 	\vspace{0.25cm}
 	\textbf{Input:} Zeiger auf RISCV-Befehl im Speicher
-	
+
 	\textbf{Output:} Ausgefüllte \verb!t_risc_instr! Struktur mit allen relevanten Informationen
-	
+
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
 			\vspace{0.25cm}
 			\begin{itemize}
-				\item 
+				\item
 				\item Ausfüllen der \verb!t_risc_instr! struct mit den Informationen
 				\item Instruktionsmapping RISC-V \refer x86
 				\item einzelne Übersetzungsfunktionen für jede Instruktion
-				
+
 				\vspace{1cm}
-				
+
 				\item allokierte Speicherseite für die x86-Assembly
 				\item Encoding der Instruktionen in den Speicherbereich
 			\end{itemize}
 		\end{column}
-		
+
 		\begin{column}{0.5\textwidth}
 			\begin{lstlisting}
 				typedef struct {
@@ -133,21 +191,23 @@
 			\end{lstlisting}
 		\end{column}
 	\end{columns}
-	
-	
+
+
 \end{frame}
+
+\subsection{Parser} % Noah
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Ansatz}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei. 
-	
-	
-			\begin{lstlisting}
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+
+
+	\begin{lstlisting}
 				void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
-			\end{lstlisting}
+	\end{lstlisting}
 	\pause
-			\includegraphics[width=\textwidth]{diagrams/optypes}
-			\begin{lstlisting}
+	\includegraphics[width=\textwidth]{diagrams/optypes}
+	\begin{lstlisting}
 				typedef struct {
 				    t_risc_addr addr;
 				    t_risc_mnem mnem;
@@ -157,14 +217,14 @@
 				    t_risc_reg reg_dest;
 				    t_risc_imm imm;
 				} t_risc_instr;
-			\end{lstlisting}
+	\end{lstlisting}
 	\begin{columns}
-		\begin{column}{0.5\textwidth}		
-		\end{column}		
 		\begin{column}{0.5\textwidth}
-			
 		\end{column}
-	\end{columns}	
+		\begin{column}{0.5\textwidth}
+
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \subsection{Register File} % Flo
@@ -198,10 +258,10 @@
 \begin{frame}[fragile]
 	\frametitle{Dynamische Codegenerierung}
 	\framesubtitle{Überblick}
-	
+
 	\textbf{Input:} geparste RISC-V-Instruktionen eines Basic Blocks\\
-	\textbf{Output:} übersetzte x86-Instruktionen für dienen Block
-	
+	\textbf{Output:} übersetzte x86-Instruktionen für diesen Block
+
 	\pause
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
