@@ -67,6 +67,9 @@
 
 % selbstverständlich sample-Gliederung
 \section{Einführung} % Noah
+\begin{frame}
+	\frametitle{Einführung}
+\end{frame}
 \subsection{Dynamische Binärübersetzung}
 \subsection{Grobüberblick über die RISC--V ISA}
 \subsection{Angebot}
@@ -88,6 +91,81 @@
 
 \subsection{ELF-Loader} % Simon
 \subsection{Parser} % Noah
+\begin{frame}[fragile]
+	\frametitle{Parser}
+	\framesubtitle{Überblick}
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei. 
+	
+	\refer (Zählen der Anzahl von Zugriffen auf einzelne Register für spätere Optimierungen.)
+	
+	\vspace{0.25cm}
+	\textbf{Input:} Zeiger auf RISCV-Befehl im Speicher
+	
+	\textbf{Output:} Ausgefüllte \verb!t_risc_instr! Struktur mit allen relevanten Informationen
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\vspace{0.25cm}
+			\begin{itemize}
+				\item 
+				\item Ausfüllen der \verb!t_risc_instr! struct mit den Informationen
+				\item Instruktionsmapping RISC-V \refer x86
+				\item einzelne Übersetzungsfunktionen für jede Instruktion
+				
+				\vspace{1cm}
+				
+				\item allokierte Speicherseite für die x86-Assembly
+				\item Encoding der Instruktionen in den Speicherbereich
+			\end{itemize}
+		\end{column}
+		
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}
+				typedef struct {
+				    t_risc_addr addr;
+				    t_risc_mnem mnem;
+				    t_risc_optype optype;
+				    t_risc_reg reg_src_1;
+				    t_risc_reg reg_src_2;
+				    t_risc_reg reg_dest;
+				    t_risc_imm imm;
+				} t_risc_instr;
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+	
+	
+\end{frame}
+\begin{frame}[fragile]
+	\frametitle{Parser}
+	\framesubtitle{Ansatz}
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei. 
+	
+	
+			\begin{lstlisting}
+				void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
+			\end{lstlisting}
+	\pause
+			\includegraphics[width=\textwidth]{diagrams/optypes}
+			\begin{lstlisting}
+				typedef struct {
+				    t_risc_addr addr;
+				    t_risc_mnem mnem;
+				    t_risc_optype optype;
+				    t_risc_reg reg_src_1;
+				    t_risc_reg reg_src_2;
+				    t_risc_reg reg_dest;
+				    t_risc_imm imm;
+				} t_risc_instr;
+			\end{lstlisting}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}		
+		\end{column}		
+		\begin{column}{0.5\textwidth}
+			
+		\end{column}
+	\end{columns}	
+\end{frame}
 
 \subsection{Register File} % Flo
 \begin{frame}[fragile]
