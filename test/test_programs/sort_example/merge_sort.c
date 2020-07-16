@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void init_values(int* values);
 void sort(int numbers[], size_t len);
 void sort_internal(int numbers[], int buf[], size_t len, int l, int r);
 void merge(int numbers[], int buf[], size_t len, int l, int m, int r);
