@@ -143,7 +143,9 @@ int transcode_loop(const char *file_path) {
     set_value(pc,next_pc);
 
     //debugging output
-    dump_registers();
+    if (flag_log_reg_dump) {
+        dump_registers();
+    }
 
     while(!finalize) {
         //check our previously translated code
