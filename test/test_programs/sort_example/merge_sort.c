@@ -2,8 +2,9 @@
 // Created by flo on 15.07.20.
 //
 
-#include "../riscvminilib/rv64minilibc.h"
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void init_values(int* values);
 void sort(int numbers[], size_t len);
@@ -16,9 +17,7 @@ int main(int argc, char **argv) {
     const size_t runs = 1000;
     double total = 0;
     for(size_t run = 0; run < runs; run++) {
-        print("Iteration ");
-        printi(run + 1);
-        print("... ");
+        printf("Iteration %d... ", run + 1);
 
         //assign to the same random array (sorted in-place so every run needs a new array)
         int values[] = {14572, 15091, 2584, 18031, 11033, 2240, 17112, 15761, 13323, 13972, 18924, 13893, 6174, 19723, 14444, 7251,
@@ -46,19 +45,15 @@ int main(int argc, char **argv) {
 
         double nanos = 1e9 * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
-        print("\twith execution time ");
-        printi((size_t) nanos);
-        print(" nanoseconds\n");
+        printf("\twith executuon time %f nanoseconds\n", nanos);
         total += nanos;
     }
 
     double avg = total / (double) runs;
 
-    print("Average execution time: ");
-    printi((size_t) avg);
-    print(" nanoseconds.\n");
+    printf("Average execution time: %f nanoseconds.\n", avg);
 
-    m_exit(0);
+    exit(0);
 }
 
 void sort(int numbers[], size_t len) {
