@@ -178,7 +178,9 @@ bool execute_cached(t_cache_loc loc) {
     ((void_asm)loc)(); //call asm code
 
     //dump registers to the log
-    dump_registers();
+    if (flag_log_reg_dump) {
+        dump_registers();
+    }
 
     ///check for illegal x0 values
     if (*get_reg_data() != 0) {
