@@ -680,7 +680,7 @@ unsigned long getauxval(unsigned long type) {
 
 __attribute__((externally_visible))
 void* memset(void* s, int c, size_t n) {
-    unsigned char* sptr = s;
+    volatile unsigned char* sptr = s;
     for (; n > 0; n--, sptr++)
         *sptr = c;
     return s;
