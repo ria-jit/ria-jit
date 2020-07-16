@@ -30,9 +30,9 @@ void translate_JAL(const t_risc_instr &instr, const register_info &r_info) {
 
     t_risc_addr target = instr.addr + instr.imm;
 
-    t_cache_loc cache_loc = lookup_cache_entry(target);
+    t_cache_loc cache_loc;
 
-    if(cache_loc == UNSEEN_CODE || !flag_translate_opt) {
+    if(!flag_translate_opt || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE) {
         //afaik the "multiples of two" thing is resolved in parser.c
         if (r_info.mapped[t_risc_reg::pc]) {
             //a->mov(r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t) (instr.imm)))); //cast to sign extend
