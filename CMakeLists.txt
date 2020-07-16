@@ -10,7 +10,7 @@ link_libraries("-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE}")
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
-add_compile_options(-fPIE -Wall -Wextra -Wpedantic)
+add_compile_options(-fPIE -fno-builtin -Wall -Wextra -Wpedantic)
 
 #Get a variable containing the meson build type corresponding to the CMake Build type
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
