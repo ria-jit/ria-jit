@@ -173,7 +173,10 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 bool execute_cached(t_cache_loc loc) {
-    log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+    if (flag_log_cache) {
+        log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+    }
+
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 

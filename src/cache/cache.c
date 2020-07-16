@@ -127,7 +127,9 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     count_entries++;
 
     //print entries
-    print_values();
+    if (flag_log_cache) {
+        print_values();
+    }
 }
 
 /**
