@@ -679,6 +679,7 @@ unsigned long getauxval(unsigned long type) {
 }
 
 __attribute__((externally_visible))
+__attribute__((optimize("-fno-tree-loop-distribute-patterns")))
 void* memset(void* s, int c, size_t n) {
     unsigned char* sptr = s;
     for (; n > 0; n--, sptr++)
