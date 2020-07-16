@@ -43,7 +43,7 @@ void translate_JAL(const t_risc_instr &instr, const register_info &r_info) {
         }
     }
     else {
-        log_asm_out("DIRECT JUMP\n");
+        log_asm_out("DIRECT JUMP JAL\n");
         //a->jmp((uint64_t)cache_loc);
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     }
@@ -302,14 +302,20 @@ inline void translate_controlflow_set_pc(const t_risc_instr &instr, const regist
 
 inline void translate_controlflow_set_pc2(const t_risc_instr &instr, const register_info &r_info, uint8_t *noJmpLoc, uint64_t jmpMnem) {
     ///set pc: BRANCH
-    //afaik the "multiples of two" thing is resolved in parser.c
-    if(r_info.mapped[t_risc_reg::pc]) {
-        //a->mov(r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t)(instr.imm)))); //cast to sign extend
-        err |= fe_enc64(&current, FE_MOV64ri, r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t)(instr.imm))));
-    }
-    else {
-        //a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc), (instr.addr + ((int64_t)(instr.imm)))); //cast to sign extend
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * t_risc_reg::pc), (instr.addr + ((int64_t)(instr.imm))));
+    t_risc_addr target = instr.addr + instr.imm;
+    t_cache_loc cache_loc;
+    if(flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE) {
+        log_asm_out("DIRECT JUMP BRANCH 1\n");
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
+    } else {
+        if (r_info.mapped[t_risc_reg::pc]) {
+            //a->mov(r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t)(instr.imm)))); //cast to sign extend
+            err |= fe_enc64(&current, FE_MOV64ri, r_info.map[t_risc_reg::pc], (instr.addr + ((int64_t) (instr.imm))));
+        } else {
+            //a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc), (instr.addr + ((int64_t)(instr.imm)))); //cast to sign extend
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * t_risc_reg::pc),
+                            (instr.addr + ((int64_t) (instr.imm))));
+        }
     }
 
     //a->jmp(END);
@@ -320,13 +326,18 @@ inline void translate_controlflow_set_pc2(const t_risc_instr &instr, const regis
     err |= fe_enc64(&noJmpLoc, jmpMnem, (intptr_t) current); //replace dummy
 
     ///set pc: NO BRANCH
-    if(r_info.mapped[t_risc_reg::pc]) {
-        //a->mov(r_info.map[t_risc_reg::pc], (instr.addr + 4)); //add 4 for next instr
-        err |= fe_enc64(&current, FE_MOV64ri, r_info.map[t_risc_reg::pc], (instr.addr + 4));
-    }
-    else {
-        //a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc), (instr.addr + 4)); //add 4 for next instr
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * t_risc_reg::pc), (instr.addr + 4));
+    target = instr.addr + 4;
+    if(flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE) {
+        log_asm_out("DIRECT JUMP BRANCH 2\n");
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
+    } else {
+        if (r_info.mapped[t_risc_reg::pc]) {
+            //a->mov(r_info.map[t_risc_reg::pc], (instr.addr + 4)); //add 4 for next instr
+            err |= fe_enc64(&current, FE_MOV64ri, r_info.map[t_risc_reg::pc], (instr.addr + 4));
+        } else {
+            //a->mov(x86::qword_ptr(r_info.base + 8 * t_risc_reg::pc), (instr.addr + 4)); //add 4 for next instr
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info.base + 8 * t_risc_reg::pc), (instr.addr + 4));
+        }
     }
 
     //a->bind(END);
