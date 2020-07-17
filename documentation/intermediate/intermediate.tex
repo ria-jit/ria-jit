@@ -327,7 +327,7 @@
 		 * Register information for the translator functions.
 		 */
 		struct register_info {
-			asmjit::x86::Gp *map;
+			FeReg *map;
 			bool *mapped;
 			uint64_t base;
 		};
@@ -381,9 +381,9 @@
 			if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
 				//...
 			} else {
-				a->mov(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_1));
-				a->add(x86::rax, x86::ptr(r_info.base + 8 * instr.reg_src_2));
-				a->mov(x86::ptr(r_info.base + 8 * instr.reg_dest), x86::rax);
+				err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+				err |= fe_enc64(&current, FE_ADD64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
+				err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
 			}
 		}
 	\end{lstlisting}
@@ -401,7 +401,7 @@
 	\vspace{0.3cm}
 	Notwendigkeit von Fallunterscheidungen, z.B. \verb!REM!: (Semantik nach \footfullcite{riscv-spec}, S. 44f.)
 	\pause
-	\begin{lstlisting}
+	\begin{verbatim}
 		mov rax, [r_info.base + 8 * instr.reg_src_1]
 		cmp qword ptr [r_info.base + 8 * instr.reg_src_2], 0
 		jnz not_div_zero
@@ -414,7 +414,7 @@
 		mov [r_info.base + 8 * instr.reg_dest], rdx
 		
 		div_zero:
-	\end{lstlisting}
+	\end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -429,11 +429,11 @@
 	\begin{lstlisting}
 		void translate_ECALL(const t_risc_instr &instr, const register_info &r_info) {
 			save_risc_registers(r_info);
-			a->mov(x86::rdi, instr.addr);
-			a->mov(x86::rsi, r_info.base);
+			err |= fe_enc64(&current, FE_MOV64ri, FE_DI, instr.addr);
+			err |= fe_enc64(&current, FE_MOV64ri, FE_SI, r_info.base);
 			typedef void emulate(t_risc_addr addr, t_risc_reg_val *registerValues);
 			emulate *em = &emulate_ecall;
-			a->call(reinterpret_cast<uintptr_t>(em));
+			err |= fe_enc64(&current, FE_CALL, reinterpret_cast<uintptr_t>(em));
 		}
 	\end{lstlisting}
 	
@@ -498,15 +498,15 @@
 	
 	\vspace{0.5cm}
 	\pause
-	\refer Dynamische Reallokation der Größe bei Kapazitätsgrenzen
-	
-	\vspace{0.5cm}
-	\pause
 	Ausführung bereits übersetzter Blöcke via
 	\begin{lstlisting}
 		typedef void (*blk)(void);
 		((blk) loc)();
 	\end{lstlisting}
+	
+	\vspace{0.1cm}
+	\pause
+	\refer Dynamische Reallokation der Größe bei Kapazitätsgrenzen
 \end{frame}
 
 
