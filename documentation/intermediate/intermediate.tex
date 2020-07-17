@@ -91,10 +91,24 @@
 \end{frame}
 
 \subsection{ELF-Loader} % Simon
+\begin{frame}
+	\frametitle{ELF-Loader}
+	\framesubtitle{Überblick}
+	\textbf{Aufgabe:} Speicher für das Gastprogramm anlegen und mit Startwerten, Instruktionen, etc. befüllen
+
+	\vspace{0.25cm}
+	Aufgeteilt in:
+	\begin{itemize}
+		\item Memory mapping
+		\item Stack Allocation
+	\end{itemize}
+\end{frame}
+
+
 \begin{frame}[fragile]
 	\frametitle{ELF-Loader}
 	\framesubtitle{Memory mapping}
-	\textbf{Ziel:} Die Binärdatei einlesen und alle Segmente, die als "load" gekennzeichnet sind, an die korrekten Orte im Speicher laden.
+	\textbf{Ziel:} Die Binärdatei einlesen und alle Segmente, die mit "load" gekennzeichnet sind, an die korrekten Orte im Speicher laden.
 
 	\vspace{0.25cm}
 	\textbf{Input:} String des Pfads der Binärdatei.
@@ -102,10 +116,11 @@
 	\textbf{Output:} Einsprungadresse des geladenen RISCV-Programms (plus einige Metadaten) in einem \verb!t_risc_elf_map_result! struct.
 
 	\vspace{0.25cm}
-	\pause
 
-	\begin{columns}
-		\begin{column}{0.5\textwidth}
+	\begin{columns}[onlytextwidth]
+
+		\onslide<2->
+		\begin{column}{0.49\textwidth}
 			\begin{itemize}
 				\item Laden des ELF-Headers vom Anfang der Datei.
 				\item Checken der Flags auf nicht unterstüzte RISCV ABIs
@@ -113,9 +128,9 @@
 				\item Allozieren des gesamten benötigten Addressbereichs an der nativen Addresse
 				\item Laden aller "load" Segmente an die richtigen Speicheradressen
 			\end{itemize}
-
 		\end{column}
-		\begin{column}{0.5\textwidth}
+		\onslide<1->
+		\begin{column}{0.49\textwidth}
 			\begin{lstlisting}
 				typedef struct {
    					bool valid;
@@ -127,7 +142,6 @@
 				} t_risc_elf_map_result;
 			\end{lstlisting}
 		\end{column}
-
 	\end{columns}
 \end{frame}
 
@@ -137,15 +151,50 @@
 	\textbf{Ziel:} Stack für das Gastprogramm allozieren und mit den üblichen Daten initialisieren.
 
 	\vspace{0.25cm}
-	\textbf{Input:} Argumentanzahl des Gastprogramms, Argumentarray des Gastprogramms, den Output des memory mappings
+	\textbf{Input:} Argumentanzahl des Gastprogramms, Argumentarray des Gastprogramms, der Output des memory mappings
 
 	\textbf{Output:} Die Adresse des Stackpointers nach dem Initialisieren
 
-	\vspace{0.25cm}
 	\pause
+	%\vspace{0.5cm}
+	\begin{columns}[c, onlytextwidth]
+		\begin{column}{0.49\textwidth}
+			\begin{itemize}
+				\only<2>{\item Allozieren von Speicher für das Stack entsprechend des stack limits des Kernels (oder 8 MiB als Standardwert)}
+				\item<3-> Guard page am unteren Ende des Stacks um Overflow abzufangen.
+				\item<3-> Alignment, damit der resultierende Stack Pointer die ABI erfüllt (16 Byte aligned)
+				\item<3-> Kopieren der Werte des auxiliary vectors (aus Resultat des memory mappings bzw. Daten des Hostprogramms)
+				\item<3-> Kopieren des enviroment vectors des Hostprogramms
+				\item<3-> Kopieren des Argumentarrays und der Argumentanzahl
+			\end{itemize}
+		\end{column}
 
-	Erklärung des Stack erstellen folgt...
+		\begin{column}{0.49\textwidth}
 
+			\centering
+			\onslide<3->
+			\begin{tabular}{|c|}
+				\hline
+				\rule[-1ex]{0pt}{3ex} \vdots                                      \\
+				(Nicht Teil des Stacks)                                               \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Stack Alignment                                 \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Null terminierter auxiliary vector              \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Null terminierter enviroment vector             \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Null terminierter Argumentarray                 \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Argumentanzahl (Stack Pointer am Ende auf hier) \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} \vdots                                          \\
+				\hline
+				\rule[-1ex]{0pt}{3ex} Guard page                                      \\
+				\hline
+			\end{tabular}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \subsection{Parser} % Noah
