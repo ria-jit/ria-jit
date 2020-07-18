@@ -354,12 +354,12 @@
 \begin{frame}[fragile]
 	\frametitle{Block Translator}
 	\framesubtitle{Überblick}
-	\textbf{Aufgabe:}	Basic Blocks parsen, übersetzen, und im Cache ablegen
+	\textbf{Aufgabe:}    Basic Blocks parsen, übersetzen, und im Cache ablegen
 	\begin{lstlisting}
 	t_cache_loc translate_block(t_risc_addr risc_addr)
 	\end{lstlisting}
 	\pause
-	\includegraphics[width=\textwidth]{diagrams/blocktranslate}
+	\includegraphics[width=0.17\textwidth]{diagrams/blocktranslate}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -368,10 +368,10 @@
 	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup
 	\pause
 	Ohne Chaning:
-	\includegraphics[width=\textwidth]{diagrams/unchained}
+	\includegraphics[width=0.5\textwidth]{diagrams/unchained}\\
 	\pause
-	Mit Chaining:
-	\includegraphics[width=\textwidth]{diagrams/chained}
+	Mit Chaining:\\
+	\includegraphics[width=0.5\textwidth]{diagrams/chained}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -392,9 +392,11 @@
 				\item direkter Sprung im Branch wenn Ziel bereits im Cache
 			\end{itemize}
 		\end{column}
-		
+
 		\begin{column}{0.5\textwidth}
-			\begin{lstlisting}
+			\begin{onlyenv}
+				<2>
+				\begin{lstlisting}
 			 if (block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
 			 	instructions_in_block++;
 				t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
@@ -406,18 +408,19 @@
 				}
 				goto PARSE_DONE;
 			}
-			\end{lstlisting}
-			
-			\vspace{1cm}
-			
-			\begin{lstlisting}
+				\end{lstlisting}
+			\end{onlyenv}
+			\begin{onlyenv}
+				<3>
+				\begin{lstlisting}
 			t_risc_addr target = instr.addr + instr.imm;
 			t_cache_loc cache_loc;
 			if(flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE) {
 				err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
 			}
 			else {[...]}
-			\end{lstlisting}
+				\end{lstlisting}
+			\end{onlyenv}
 		\end{column}
 	\end{columns}
 	
