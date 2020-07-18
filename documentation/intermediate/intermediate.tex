@@ -86,11 +86,14 @@
 		\begin{itemize}
 			\item Register-Memory-Architektur 
 			\item 16 GPRs
+			\item 2-Adressform
 		\end{itemize}
 		\item RISC-V: RISC \refer reduced instruction set
 		\begin{itemize}
 			\item Load-Store-Architektur 
 			\item 31 GPRs
+			\item 3-Adressform
+			\item spezielles Zero-Register
 		\end{itemize}
 	\end{itemize}
 
@@ -223,12 +226,12 @@
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Überblick}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\textbf{Ziel:} Dekodieren der 4 Byte großen kodierten RISC-V-Befehle aus der geladenen ELF-Datei.
 
 	\refer (Zählen der Anzahl von Zugriffen auf einzelne Register für spätere Optimierungen.)
 
 	\vspace{0.25cm}
-	\textbf{Input:} Zeiger auf RISCV-Befehl im Speicher
+	\textbf{Input:} Zeiger auf RISC-V-Befehl im Speicher
 
 	\textbf{Output:} Ausgefüllte \verb!t_risc_instr! Struktur mit allen relevanten Informationen
 	
@@ -252,9 +255,9 @@
 			\vspace{0.25cm}
 			\begin{itemize}
 				\item \verb!addr! \refer Addresse des originalen riscv-Befehls im Speicher				
-				\item \verb!mnem! \refer Mnemonic der Instruction (Zusammengesetzt aus Opcode und weiteren \textit{funct} Blöcken
-				\item \verb!optype! \refer Optype (Kategorie der Instruction)
-				\item \verb!reg_(dest/src1/scr2)! \refer Registernummern der Quell- und Ziel Register
+				\item \verb!mnem! \refer Mnemonic der Instruktion (Zusammengesetzt aus Opcode und weiteren \textit{funct} Blöcken)
+				\item \verb!optype! \refer Optype (Kategorie der Instruktion)
+				\item \verb!reg_(dest/src1/src2)! \refer Registernummern der Quell- und Ziel Register
 				\item \verb!imm! \refer Immediate der Instruktion
 			\end{itemize}
 		\end{column}
@@ -266,7 +269,7 @@
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Extrahieren der Blöcke}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\textbf{Ziel:} Dekodieren der 4 Byte großen kodierten RISC-V-Befehle aus der geladenen ELF-Datei.
 	\includegraphics[width=0.99\textwidth]{diagrams/optypes}
 	\pause
 	Um die einzelnen Teile der Instruktion zu extrahieren verwenden wir kompakte inline Funktionen. 
@@ -279,32 +282,32 @@
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Umsetzung}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\textbf{Ziel:} Dekodieren der 4 Byte großen kodierten RISC-V-Befehle aus der geladenen ELF-Datei.
 	\begin{lstlisting}
 	void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
 	\end{lstlisting}
-	Zunächst wird der Opcode extrahieren, dieser legt das Format (R/I/S/B/U/J) fest.
+	Zunächst wird der Opcode extrahiert, dieser legt das Format (R/I/S/B/U/J-type) fest.
 	
-	Teilweise lässt sich die Mnemonic schon exakt aus dem Opcode auslesen. (J/U-type)
+	Teilweise lässt sich die Mnemonic schon exakt aus dem Opcode auslesen (U/J-type).
 	\begin{lstlisting}
     int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
-    //fill basic struct
-    p_instr_struct->reg_dest = extract_rd(raw_instr);
-    //extract opcode bits[6:2]
-    t_opcodes opcode = raw_instr >> 2 & 0x1f;
+    p_instr_struct->reg_dest = extract_rd(raw_instr);      //fill basic struct
+    t_opcodes opcode = raw_instr >> 2 & 0x1f;				//extract opcode bits[6:2]
     switch (opcode) {
         case OP_LUI:
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
             p_instr_struct->imm = extract_imm_U(raw_instr);
             break;
+        //...
+    }
 	\end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Parser}
 	\framesubtitle{Umsetzung}
-	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\textbf{Ziel:} Dekodieren der 4 Byte großen kodierten RISC-V-Befehle aus der geladenen ELF-Datei.
 	\begin{lstlisting}
 	void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
 	\end{lstlisting}
@@ -317,10 +320,9 @@
                     p_instr_struct->mnem = ADDIW;
                     p_instr_struct->imm = extract_imm_I(raw_instr);
                     break;
-                case 1: //SLLIW opcode and func3 are unique
-                    p_instr_struct->mnem = SLLIW;
-                    p_instr_struct->imm = extract_small_shamt(raw_instr);
-                    break;
+                //...
+            }
+            break;
 	\end{lstlisting}
 \end{frame}
 
