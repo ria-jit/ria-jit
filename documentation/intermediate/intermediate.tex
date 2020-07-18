@@ -265,6 +265,9 @@
 	
 	Teilweise lässt sich die Mnemonic schon exakt aus dem Opcode auslesen. (J/U-type)
 	\begin{lstlisting}
+    int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
+    //fill basic struct
+    p_instr_struct->reg_dest = extract_rd(raw_instr);
     //extract opcode bits[6:2]
     t_opcodes opcode = raw_instr >> 2 & 0x1f;
     switch (opcode) {
@@ -272,7 +275,6 @@
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
             p_instr_struct->imm = extract_imm_U(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
             break;
 	\end{lstlisting}
 \end{frame}
