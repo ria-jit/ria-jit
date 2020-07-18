@@ -68,11 +68,33 @@
 
 % selbstverständlich sample-Gliederung
 \section{Einführung} % Noah
+\subsection{Dynamische Binärübersetzung}
 \begin{frame}
 	\frametitle{Einführung}
+	\framesubtitle{Dynamische Binärübersetzung}
+	Ideen:
+	- warum dynamic?
+	- vorteil
+	- nachteil
 \end{frame}
-\subsection{Dynamische Binärübersetzung}
 \subsection{Grobüberblick über die RISC--V ISA}
+\begin{frame}
+	\frametitle{Einführung}
+	\framesubtitle{Grobüberblick über die RISC--V ISA}
+	\begin{itemize}
+		\item x86-64: CISC \refer complex instruction set
+		\begin{itemize}
+			\item Register-Memory-Architektur 
+			\item 16 GPRs
+		\end{itemize}
+		\item RISC-V: RISC \refer reduced instruction set
+		\begin{itemize}
+			\item Load-Store-Architektur 
+			\item 31 GPRs
+		\end{itemize}
+	\end{itemize}
+
+\end{frame}
 \subsection{Angebot}
 
 \section{Systemarchitektur}
@@ -209,24 +231,11 @@
 	\textbf{Input:} Zeiger auf RISCV-Befehl im Speicher
 
 	\textbf{Output:} Ausgefüllte \verb!t_risc_instr! Struktur mit allen relevanten Informationen
+	
+	\pause
 
 	\begin{columns}
-		\begin{column}{0.5\textwidth}
-			\vspace{0.25cm}
-			\begin{itemize}
-				\item
-				\item Ausfüllen der \verb!t_risc_instr! struct mit den Informationen
-				\item Instruktionsmapping RISC-V \refer x86
-				\item einzelne Übersetzungsfunktionen für jede Instruktion
-
-				\vspace{1cm}
-
-				\item allokierte Speicherseite für die x86-Assembly
-				\item Encoding der Instruktionen in den Speicherbereich
-			\end{itemize}
-		\end{column}
-
-		\begin{column}{0.5\textwidth}
+		\begin{column}{0.4\textwidth}
 			\begin{lstlisting}
 				typedef struct {
 				    t_risc_addr addr;
@@ -239,42 +248,83 @@
 				} t_risc_instr;
 			\end{lstlisting}
 		\end{column}
+		\begin{column}{0.6\textwidth}
+			\vspace{0.25cm}
+			\begin{itemize}
+				\item \verb!addr! \refer Addresse des originalen riscv-Befehls im Speicher				
+				\item \verb!mnem! \refer Mnemonic der Instruction (Zusammengesetzt aus Opcode und weiteren \textit{funct} Blöcken
+				\item \verb!optype! \refer Optype (Kategorie der Instruction)
+				\item \verb!reg_(dest/src1/scr2)! \refer Registernummern der Quell- und Ziel Register
+				\item \verb!imm! \refer Immediate der Instruktion
+			\end{itemize}
+		\end{column}
 	\end{columns}
 
 
 \end{frame}
 
-\subsection{Parser} % Noah
 \begin{frame}[fragile]
 	\frametitle{Parser}
-	\framesubtitle{Ansatz}
+	\framesubtitle{Extrahieren der Blöcke}
 	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
-
-
-	\begin{lstlisting}
-				void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
-	\end{lstlisting}
+	\includegraphics[width=0.99\textwidth]{diagrams/optypes}
 	\pause
-	\includegraphics[width=\textwidth]{diagrams/optypes}
+	Um die einzelnen Teile der Instruktion zu extrahieren verwenden wir kompakte inline Funktionen. 
 	\begin{lstlisting}
-				typedef struct {
-				    t_risc_addr addr;
-				    t_risc_mnem mnem;
-				    t_risc_optype optype;
-				    t_risc_reg reg_src_1;
-				    t_risc_reg reg_src_2;
-				    t_risc_reg reg_dest;
-				    t_risc_imm imm;
-				} t_risc_instr;
+	// extract U-Type immediate bit[31:12] -> mask lower 12 bit [11:0] with zeros
+	static inline int extract_imm_U(int32_t instr) { return instr & ~(0xfff); }
 	\end{lstlisting}
-	\begin{columns}
-		\begin{column}{0.5\textwidth}
-		\end{column}
-		\begin{column}{0.5\textwidth}
-
-		\end{column}
-	\end{columns}
 \end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Parser}
+	\framesubtitle{Umsetzung}
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\begin{lstlisting}
+	void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
+	\end{lstlisting}
+	Zunächst wird der Opcode extrahieren, dieser legt das Format (R/I/S/B/U/J) fest.
+	
+	Teilweise lässt sich die Mnemonic schon exakt aus dem Opcode auslesen. (J/U-type)
+	\begin{lstlisting}
+    int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
+    //fill basic struct
+    p_instr_struct->reg_dest = extract_rd(raw_instr);
+    //extract opcode bits[6:2]
+    t_opcodes opcode = raw_instr >> 2 & 0x1f;
+    switch (opcode) {
+        case OP_LUI:
+            p_instr_struct->optype = UPPER_IMMEDIATE;
+            p_instr_struct->mnem = LUI;
+            p_instr_struct->imm = extract_imm_U(raw_instr);
+            break;
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Parser}
+	\framesubtitle{Umsetzung}
+	\textbf{Ziel:} Decodieren der 4 byte großen codierten RISCV-Befehle aus der geladenen elf-Datei.
+	\begin{lstlisting}
+	void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count);
+	\end{lstlisting}
+	Bei einigen Instruktionen muss zusätzlich zwischen den \textit{funct} Codes unterschieden werden.
+	\begin{lstlisting}
+    case OP_OP_IMM_32:
+            p_instr_struct->optype = IMMEDIATE;
+            switch (extract_funct3(raw_instr)) {
+                case 0:
+                    p_instr_struct->mnem = ADDIW;
+                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    break;
+                case 1: //SLLIW opcode and func3 are unique
+                    p_instr_struct->mnem = SLLIW;
+                    p_instr_struct->imm = extract_small_shamt(raw_instr);
+                    break;
+	\end{lstlisting}
+\end{frame}
+
+
 
 \subsection{Register File} % Flo
 \begin{frame}[fragile]
