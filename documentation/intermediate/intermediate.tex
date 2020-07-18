@@ -627,7 +627,7 @@
 	
 	\pause
 	\begin{figure}
-		\includegraphics[width=0.28\textwidth]{diagrams/cache-flow}
+		\includegraphics[width=0.95\textwidth]{diagrams/cache-flow}
 	\end{figure}
 \end{frame}
 
@@ -653,7 +653,7 @@
 	Lookup als Open Hashing mit linearem Sondieren, via
 	\begin{lstlisting}
 		inline size_t hash(t_risc_addr risc_addr) {
-			return (risc_addr & 0x0000FFF0u) >> 4u;
+			return (risc_addr & 0x00003FFCu) >> 2u;
 		}
 	\end{lstlisting}
 \end{frame}
@@ -670,6 +670,8 @@
 	
 	wobei \verb!UNSEEN_CODE! von \verb!lookup_cache_entry(...)! einen nicht im Cache enthaltenen Block anzeigt.
 	
+	\refer Dynamische Reallokation der Größe bei Kapazitätsgrenzen
+	
 	\vspace{0.5cm}
 	\pause
 	Ausführung bereits übersetzter Blöcke via
@@ -677,10 +679,6 @@
 		typedef void (*blk)(void);
 		((blk) loc)();
 	\end{lstlisting}
-	
-	\vspace{0.1cm}
-	\pause
-	\refer Dynamische Reallokation der Größe bei Kapazitätsgrenzen
 \end{frame}
 
 
