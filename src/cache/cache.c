@@ -25,7 +25,7 @@
 #include <linux/mman.h>
 
 #define INITIAL_SIZE 4096
-#define HASH_MASK 0x0000FFF0u
+#define HASH_MASK 0x00003FFCu
 
 //init table for 2^12 elements (key size is 12 bit)
 t_cache_entry *cache_table = NULL;
@@ -48,7 +48,7 @@ void init_hash_table(void) {
 }
 
 inline size_t hash(t_risc_addr risc_addr) {
-    return (risc_addr & HASH_MASK) >> 4u;
+    return (risc_addr & HASH_MASK) >> 2u;
 }
 
 /**
