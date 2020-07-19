@@ -393,7 +393,7 @@
 		\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
 		\onslide<2->
 		\vspace{0.5cm}
-		\textbf{Ansatz 1:} Jumps beim Parsen folgen \\
+		\textbf{Ansatz 1:} Jumps beim Parsen folgen: \\		Zieladresse auswerten und weiter parsen \\
 		\onslide<3->
 		\vspace{0.5cm}
 		\textbf{Vorher:} \\
@@ -418,7 +418,7 @@
 	\framesubtitle{Optimierungen}
 	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
 	\vspace{0.5cm}
-	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\textbf{Ansatz 2:} Basic Blocks verketten: \\ Direkt zum nächsten Block springen \\
 	\onslide<2>
 	\vspace{0.5cm}
 	\includegraphics[width=0.7\textwidth]{diagrams/chained}
@@ -429,7 +429,7 @@
 	\framesubtitle{Optimierungen}
 	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
 	\vspace{0.5cm}
-	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\textbf{Ansatz 2:} Basic Blocks verketten: \\ Direkt zum nächsten Block springen \\
 	\vspace{0.5cm}
 	\textbf{Voraussetzungen:}\\
 	\begin{itemize}
@@ -443,16 +443,19 @@
 	\framesubtitle{Optimierungen}
 	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
 	\vspace{0.5cm}
-	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\textbf{Ansatz 2:} Basic Blocks verketten: \\ Direkt zum nächsten Block springen \\
 	\vspace{0.5cm}
 	\textbf{Was tun wenn 2. Block nicht im Cache?}\\
 	\begin{itemize}
-		\item RET anhängen $\rightarrow$ main loop
+		\onslide<2->
 		\item rekursives Übersetzen des Sprungziels beim Parsen
 		\begin{itemize}
 			\item[$\rightarrow$] Sprungziel ist beim Übersetzen im Cache
 			\item[-] mögliche Rekursionsschleife $\rightarrow$ "translation started"-Flag im Cache benötigt
 		\end{itemize}
+		\onslide<3->
+		\item RET anhängen $\rightarrow$ main loop
+		\onslide<4->
 		\item nachträgliches Verketten im main loop
 		\begin{itemize}
 			\item[-] zusätzlicher Pointer auf Ende des Blocks im Cache-Eintrag benötigt
