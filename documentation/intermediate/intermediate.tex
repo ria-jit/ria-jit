@@ -355,80 +355,110 @@
 
 \subsection{Block Loader} % Johannes
 \begin{frame}[fragile]
-	\frametitle{Block Translator}
-	\framesubtitle{Überblick}
-	\textbf{Aufgabe:}    Basic Blocks parsen, übersetzen, und im Cache ablegen
-	\begin{lstlisting}
-	t_cache_loc translate_block(t_risc_addr risc_addr)
-	\end{lstlisting}
-	\pause
-	\includegraphics[width=0.17\textwidth]{diagrams/blocktranslate}
+\frametitle{Block Translator}
+\framesubtitle{Vorgehen}
+\begin{columns}[T]
+	\begin{column}{0.7\textwidth}
+		\textbf{Aufgabe:}    Basic Blocks parsen, übersetzen, und im Cache ablegen
+		\begin{lstlisting}
+		t_cache_loc translate_block(t_risc_addr risc_addr)
+		\end{lstlisting}
+		\vspace{1cm}
+		\pause
+		\begin{itemize}
+			\setlength{\itemindent}{2cm}
+			\item[Schritt 1:] Parsen
+			\item[Schritt 2:] Übersetzen
+		\end{itemize}
+	\end{column}
+	\begin{column}{0.29\textwidth}
+		\includegraphics[width=0.7\textwidth]{diagrams/blocktranslate}
+	\end{column}
+\end{columns}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Block Translator}
-	\framesubtitle{Chaining}
-	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup
-	\pause
-	Ohne Chaning:
-	\includegraphics[width=0.5\textwidth]{diagrams/unchained}\\
-	\pause
-	Mit Chaining:\\
-	\includegraphics[width=0.5\textwidth]{diagrams/chained}
+	\framesubtitle{Ausführung}
+	\includegraphics[width=0.99\textwidth]{diagrams/unchained}\\
+	\vspace{1cm}
+	\textbf{$\Rightarrow$} Overhead durch Rücksprung zu main
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Block Translator}
-	\framesubtitle{Chaining durch recursive block translation}
-	
-	\pause
+	\framesubtitle{Optimierungen}
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
-			\vspace{0.25cm}
-			\begin{itemize}
-				\item Bereits beim Parsen die Sprungziele rekursiv übersetzen
-				\item und in den Cache legen.
-				\item Bis jetzt nur für JAL
-				
-				\vspace{1cm}
-				
-				\item direkter Sprung im Branch wenn Ziel bereits im Cache
-			\end{itemize}
+		\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
+		\onslide<2->
+		\vspace{0.5cm}
+		\textbf{Ansatz 1:} Jumps beim Parsen folgen \\
+		\onslide<3->
+		\vspace{0.5cm}
+		\textbf{Vorher:} \\
+		\includegraphics[width=0.99\textwidth]{diagrams/unchained}\\
+		\onslide<5->
+		\vspace{1cm}
+		\textbf{Nachteil:} Mehrfachübersetzung von z.B. Funktionen \\
+		\onslide<6->
+		\textbf{$\Rightarrow$} nur für Jumps, nicht für Calls
 		\end{column}
-
 		\begin{column}{0.5\textwidth}
-			\begin{onlyenv}
-				<2>
-				\begin{lstlisting}
-			 if (block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
-			 	instructions_in_block++;
-				t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
-				t_cache_loc cache_loc = lookup_cache_entry(target);
-				if (cache_loc == UNSEEN_CODE) {
-					//flag?
-					cache_loc = translate_block(target);
-					set_cache_entry(target, cache_loc);
-				}
-				goto PARSE_DONE;
-			}
-				\end{lstlisting}
-			\end{onlyenv}
-			\begin{onlyenv}
-				<3>
-				\begin{lstlisting}
-			t_risc_addr target = instr.addr + instr.imm;
-			t_cache_loc cache_loc;
-			if(flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE) {
-				err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
-			}
-			else {[...]}
-				\end{lstlisting}
-			\end{onlyenv}
+		\onslide<4->
+		\textbf{Nachher:}\\
+		\vspace{0.5cm}
+		\includegraphics[width=0.78\textwidth]{diagrams/jal_follow}
 		\end{column}
 	\end{columns}
-	
 \end{frame}
 
+\begin{frame}[fragile]
+	\frametitle{Block Translator}
+	\framesubtitle{Optimierungen}
+	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
+	\vspace{0.5cm}
+	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\onslide<2>
+	\vspace{0.5cm}
+	\includegraphics[width=0.7\textwidth]{diagrams/chained}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Block Translator}
+	\framesubtitle{Optimierungen}
+	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
+	\vspace{0.5cm}
+	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\vspace{0.5cm}
+	\textbf{Voraussetzungen:}\\
+	\begin{itemize}
+		\item Statisches Sprungziel
+		\item 2. Block bei Übersetzen von Block 1 bereits im Cache
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Block Translator}
+	\framesubtitle{Optimierungen}
+	\textbf{Ziel:} weniger Overhead durch main loop und Cache Lookup \\
+	\vspace{0.5cm}
+	\textbf{Ansatz 2:} Basic Blocks verketten\\
+	\vspace{0.5cm}
+	\textbf{Was tun wenn 2. Block nicht im Cache?}\\
+	\begin{itemize}
+		\item RET anhängen $\rightarrow$ main loop
+		\item rekursives Übersetzen des Sprungziels beim Parsen
+		\begin{itemize}
+			\item[$\rightarrow$] Sprungziel ist beim Übersetzen im Cache
+			\item[-] mögliche Rekursionsschleife $\rightarrow$ "translation started"-Flag im Cache benötigt
+		\end{itemize}
+		\item nachträgliches Verketten im main loop
+		\begin{itemize}
+			\item[-] zusätzlicher Pointer auf Ende des Blocks im Cache-Eintrag benötigt
+		\end{itemize}
+	\end{itemize}
+\end{frame}
 
 
 \subsection{Code Generator} % Flo
