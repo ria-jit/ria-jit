@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 
         double nanos = 1e9 * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
-        printf("\twith executuon time %f nanoseconds\n", nanos);
+        printf("\twith execution time %f nanoseconds\n", nanos);
         total += nanos;
     }
 
