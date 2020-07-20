@@ -75,7 +75,7 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
     "memory", "rcx", "r11");
     return retval;
 }
-
+__attribute__((force_align_arg_pointer))
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
