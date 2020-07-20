@@ -72,10 +72,11 @@
 \begin{frame}
 	\frametitle{Einführung}
 	\framesubtitle{Dynamische Binärübersetzung}
-	Ideen:
-	- warum dynamic?
-	- vorteil
-	- nachteil
+	Was ist dynamische Binärübersetzung?
+	\begin{itemize}
+			\item lazy - Befehle werden erst übersetzt, wenn sie tatsächlich ausgeführt werden sollen
+			\item manche Teile des Codes werden möglicherweise gar nicht übersetzt
+	\end{itemize}	
 \end{frame}
 \subsection{Grobüberblick über die RISC--V ISA}
 \begin{frame}
@@ -271,7 +272,7 @@
 	\framesubtitle{Extrahieren der Blöcke}
 	\textbf{Ziel:} Dekodieren der 4 Byte großen kodierten RISC-V-Befehle aus der geladenen ELF-Datei.
 	\includegraphics[width=0.99\textwidth]{diagrams/optypes}
-	\footfullcite{The RISC-V Instruction Set Manual, Volume I: Unprivileged ISA, Document Version 20191213, S. 130}
+	\footfullcite{riscv-spec}
 	\pause
 	Um die einzelnen Teile der Instruktion zu extrahieren verwenden wir kompakte inline Funktionen. 
 	\begin{lstlisting}
