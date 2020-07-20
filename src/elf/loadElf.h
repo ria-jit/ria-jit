@@ -25,6 +25,8 @@ typedef struct {
     Elf64_Half ph_count;
     Elf64_Half ph_entsize;
     t_risc_addr dataEnd;
+    t_risc_addr execStart;
+    t_risc_addr execEnd;
 } t_risc_elf_map_result;
 
 /**

@@ -48,7 +48,16 @@ void log_general(const char *format, ...) {
     }
 }
 
-void log_asm_in(const char* format, ...) {
+void log_analyze(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    printf("[mnemonic] ");
+    vdprintf(1, format, args);
+    va_end(args);
+    return;
+}
+
+void log_asm_in(const char *format, ...) {
     if (flag_log_asm_in) {
         va_list args;
         va_start(args, format);
@@ -59,7 +68,7 @@ void log_asm_in(const char* format, ...) {
     }
 }
 
-void log_asm_out(const char* format, ...) {
+void log_asm_out(const char *format, ...) {
     if (flag_log_asm_out) {
         va_list args;
         va_start(args, format);
@@ -70,7 +79,7 @@ void log_asm_out(const char* format, ...) {
     }
 }
 
-void log_reg_dump(const char* format, ...) {
+void log_reg_dump(const char *format, ...) {
     if (flag_log_reg_dump) {
         va_list args;
         va_start(args, format);
@@ -81,7 +90,7 @@ void log_reg_dump(const char* format, ...) {
     }
 }
 
-void log_cache(const char* format, ...) {
+void log_cache(const char *format, ...) {
     if (flag_log_cache) {
         va_list args;
         va_start(args, format);
@@ -92,9 +101,9 @@ void log_cache(const char* format, ...) {
     }
 }
 
-void log_print_mem(const char* ptr, int len) {
+void log_print_mem(const char *ptr, int len) {
     char buffer[2];
-    for (const char *ptri = ptr; ptri < ptr + len; ptri++) {
+    for(const char *ptri = ptr; ptri < ptr + len; ptri++) {
 
         buffer[0] = "0123456789abcdef"[((*ptri) >> 4) & 0xf];
         buffer[1] = "0123456789abcdef"[(*ptri) & 0xf];

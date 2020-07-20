@@ -5,6 +5,8 @@
 #include <linux/unistd.h>
 #include <cerrno>
 #include <sys/mman.h>
+#include <cstring>
+#include <stdio.h>
 #include "register.h"
 #include "emulateEcall.hpp"
 
@@ -75,10 +77,16 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
 }
 
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
-    log_general("Emulate syscall...\n");
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
     switch (registerValues[t_risc_reg_mnem::a7]) {
+        case 29: //ioctl
+        {
+            log_general("Emulate syscall ioctl (29)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+            break;
         case 35: //unlinkat
         {
             log_general("Emulate syscall unlinkat (35)...\n");
@@ -103,9 +111,9 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 56: //openat
         {
             log_general("Emulate syscall openat (56)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_openat, registerValues[t_risc_reg_mnem::a0],
+            registerValues[t_risc_reg_mnem::a0] = syscall4(__NR_openat, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1],
-                                                           registerValues[t_risc_reg_mnem::a2]);
+                                                           registerValues[t_risc_reg_mnem::a2],registerValues[t_risc_reg_mnem::a3]);
         }
             break;
         case 57: //close
@@ -121,6 +129,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                                                            registerValues[t_risc_reg_mnem::a1],
                                                            registerValues[t_risc_reg_mnem::a2]);
         }
+            break;
         case 63: //read
         {
             log_general("Emulate syscall read (63)...\n");
@@ -178,16 +187,26 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             finalize = true;
         }
             break;
+        case 98: //futex
+        {
+            log_general("Emulate syscall futex (98)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_futex, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+            break;
+        case 113: //clock_gettime
+        {
+            log_general("Emulate syscall clock_gettime (98)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_clock_gettime, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+            break;
         case 134: //rt_sigaction
         {
-            log_general("Emulate syscall rt_sigaction (134)...\n");
-            size_t retval = __NR_rt_sigaction;
-            __asm__ volatile("syscall" : "+a"(retval) :
-            "D"(registerValues[t_risc_reg_mnem::a0]), "S"(registerValues[t_risc_reg_mnem::a1]), "d"
-            (registerValues[t_risc_reg_mnem::a2]) :
-            "memory", "rcx", "r11");
-
-            registerValues[t_risc_reg_mnem::a0] = retval;
+            log_general("Ignore syscall rt_sigaction (134) return sucess...\n");
+            //registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_rt_sigaction, registerValues[t_risc_reg_mnem::a0],
+            //                                               registerValues[t_risc_reg_mnem::a1]);
+            registerValues[t_risc_reg_mnem::a0] = 0;
         }
             break;
         case 135: //rt_sigprocmask
@@ -204,6 +223,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_uname, registerValues[t_risc_reg_mnem::a0]);
         }
             break;
+        case 169: //gettimeofday
+        {
+            log_general("Emulate syscall gettimeofday (169)...\n");
+            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_gettimeofday, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1]);
+        }
+        break;
         case 214: //brk
         {
             log_general("Emulate syscall brk (214)...\n");
@@ -222,8 +248,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                 } else {
                     ///Additional page(s) need to be allocated first
                     t_risc_addr newMappedBrk = ALIGN_UP(brkAddr, 4096lu);
-                    //TODO This not the minilib mmap, switch over when switching from ASMJit and not needing C++
-                    // anymore.
+                    //TODO This not the minilib mmap, switch over when not needing C++ anymore.
                     void *map =
                             mmap(reinterpret_cast<void *>(mappedBrk), newMappedBrk - mappedBrk, PROT_READ | PROT_WRITE,
                                  MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE, 0, 0);

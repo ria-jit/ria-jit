@@ -5,11 +5,15 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //the RISC-V mnemonic of the instruction
+char *mnem_to_string(int mnem);
+
 typedef enum {
     //---RV32I---
     LUI, //load upper Imm
@@ -53,6 +57,7 @@ typedef enum {
     LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD
 
 } t_risc_mnem;
+#define N_MNEM AMOMAXUD + 1
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
@@ -88,7 +93,7 @@ typedef int32_t t_risc_imm;
 typedef uintptr_t t_risc_addr;
 
 // Idea
-typedef struct{
+typedef struct {
     uint32_t reg_count[N_REG];
     uint32_t reg_map[N_REG];
 } t_register_allocation;

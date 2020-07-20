@@ -9,20 +9,23 @@
 #include <util/typedefs.h>
 
 #ifdef __cplusplus
-#include <asmjit/asmjit.h>
+
+#include <fadec/fadec-enc.h>
+
+//shortcut for memory operands
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
 /**
  * Register information for the translator functions.
  */
 struct register_info {
-    asmjit::x86::Gp *map;
+    FeReg *map;
     bool *mapped;
     uint64_t base;
 };
 
-extern asmjit::CodeHolder *code;
-extern asmjit::x86::Assembler *a;
-
+extern uint8_t *current;
+extern int err;
 
 void save_risc_registers(register_info r_info);
 
