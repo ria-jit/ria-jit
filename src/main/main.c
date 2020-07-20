@@ -143,7 +143,9 @@ int transcode_loop(const char *file_path) {
     set_value(pc,next_pc);
 
     //debugging output
-    dump_registers();
+    if (flag_log_reg_dump) {
+        dump_registers();
+    }
 
     while(!finalize) {
         //check our previously translated code
@@ -171,12 +173,17 @@ int transcode_loop(const char *file_path) {
  * @return
  */
 bool execute_cached(t_cache_loc loc) {
-    log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+    if (flag_log_cache) {
+        log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+    }
+
     typedef void (*void_asm)(void);
     ((void_asm)loc)(); //call asm code
 
     //dump registers to the log
-    dump_registers();
+    if (flag_log_reg_dump) {
+        dump_registers();
+    }
 
     ///check for illegal x0 values
     if (*get_reg_data() != 0) {

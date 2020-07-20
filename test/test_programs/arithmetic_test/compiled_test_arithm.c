@@ -2,7 +2,7 @@
 // Created by flo on 23.06.20.
 //
 
-#include "rv64minilibc.h"
+#include "../riscvminilib/rv64minilibc.h"
 #include <stdbool.h>
 
 void init(int number, char* name);

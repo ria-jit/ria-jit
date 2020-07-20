@@ -5,8 +5,6 @@
 #include "translate_csr.hpp"
 #include "runtime/register.h"
 
-using namespace asmjit;
-
 /**
 * Translate the CSRRW instruction.
 * Description
