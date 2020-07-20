@@ -7,7 +7,6 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <stdio.h>
-#include <linux/time.h>
 #include <sys/stat.h>
 #include "register.h"
 #include "emulateEcall.hpp"
