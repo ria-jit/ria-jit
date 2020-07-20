@@ -112,46 +112,33 @@
 \end{frame}
 
 \subsection{ELF-Loader} % Simon
-\begin{frame}
-	\frametitle{ELF-Loader}
-	\framesubtitle{Überblick}
-	\textbf{Aufgabe:} Speicher für das Gastprogramm anlegen und mit Startwerten, Instruktionen, etc. befüllen
-
-	\vspace{0.25cm}
-	Aufgeteilt in:
-	\begin{itemize}
-		\item Memory mapping
-		\item Stack Allocation
-	\end{itemize}
-\end{frame}
-
 
 \begin{frame}[fragile]
 	\frametitle{ELF-Loader}
 	\framesubtitle{Memory mapping}
-	\textbf{Ziel:} Die Binärdatei einlesen und alle Segmente, die mit "load" gekennzeichnet sind, an die korrekten Orte im Speicher laden.
+	\textbf{Ziel:} Die Binärdatei einlesen und alle Segmente, die als \verb!PT_LOAD! gekennzeichnet sind, an die korrekten Orte im Speicher laden.
 
 	\vspace{0.25cm}
 	\textbf{Input:} String des Pfads der Binärdatei.
 
-	\textbf{Output:} Einsprungadresse des geladenen RISCV-Programms (plus einige Metadaten) in einem \verb!t_risc_elf_map_result! struct.
+	\textbf{Output:} Einsprungadresse des geladenen RISC-V-Programms (plus einige Metadaten) in einem \verb!t_risc_elf_map_result! struct.
 
 	\vspace{0.25cm}
 
 	\begin{columns}[onlytextwidth]
 
 		\onslide<2->
-		\begin{column}{0.49\textwidth}
+		\begin{column}{0.59\textwidth}
 			\begin{itemize}
-				\item Laden des ELF-Headers vom Anfang der Datei.
-				\item Checken der Flags auf nicht unterstüzte RISCV ABIs
-				\item Iterieren über alle Segment-Header um den Addressbereich des Binarys zu erhalten
+				\item Laden des ELF-Headers vom Anfang der Datei
+				\item Checken der Flags auf nicht unterstüzte RISC-V ABIs
+				\item Addressbereich des Binarys bestimmen
 				\item Allozieren des gesamten benötigten Addressbereichs an der nativen Addresse
-				\item Laden aller "load" Segmente an die richtigen Speicheradressen
+				\item Laden aller \verb!PT_LOAD! Segmente aus der Datei an die richtigen Speicheradressen
 			\end{itemize}
 		\end{column}
 		\onslide<1->
-		\begin{column}{0.49\textwidth}
+		\begin{column}{0.39\textwidth}
 			\begin{lstlisting}
 				typedef struct {
    					bool valid;
@@ -167,8 +154,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{ELF-Loader}
-	\framesubtitle{Stack Allocation}
+	\frametitle{Stack Allocation}
 	\textbf{Ziel:} Stack für das Gastprogramm allozieren und mit den üblichen Daten initialisieren.
 
 	\vspace{0.25cm}
@@ -183,7 +169,7 @@
 			\begin{itemize}
 				\only<2>{\item Allozieren von Speicher für das Stack entsprechend des stack limits des Kernels (oder 8 MiB als Standardwert)}
 				\item<3-> Guard page am unteren Ende des Stacks um Overflow abzufangen.
-				\item<3-> Alignment, damit der resultierende Stack Pointer die ABI erfüllt (16 Byte aligned)
+				\item<3-> Alignment, damit der resultierende Stack Pointer die ABI erfüllt
 				\item<3-> Kopieren der Werte des auxiliary vectors (aus Resultat des memory mappings bzw. Daten des Hostprogramms)
 				\item<3-> Kopieren des enviroment vectors des Hostprogramms
 				\item<3-> Kopieren des Argumentarrays und der Argumentanzahl
@@ -198,7 +184,7 @@
 				\hline
 				\rule[-1ex]{0pt}{3ex} \vdots                                      \\
 				(Nicht Teil des Stacks)                                               \\
-				\hline
+				\hline \hline
 				\rule[-1ex]{0pt}{3ex} Stack Alignment                                 \\
 				\hline
 				\rule[-1ex]{0pt}{3ex} Null terminierter auxiliary vector              \\
@@ -207,7 +193,7 @@
 				\hline
 				\rule[-1ex]{0pt}{3ex} Null terminierter Argumentarray                 \\
 				\hline
-				\rule[-1ex]{0pt}{3ex} Argumentanzahl (Stack Pointer am Ende auf hier) \\
+				\rule[-1ex]{0pt}{3ex} Argumentanzahl (Stack Pointer am Ende hier) \\
 				\hline
 				\rule[-1ex]{0pt}{3ex} \vdots                                          \\
 				\hline
