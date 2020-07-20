@@ -7,8 +7,47 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <stdio.h>
+#include <linux/time.h>
+#include <sys/stat.h>
 #include "register.h"
 #include "emulateEcall.hpp"
+
+struct statRiscV {
+    __dev_t st_dev;        /* Device.  */
+    __ino64_t st_ino;  /* File serial number. */
+    __mode_t st_mode;        /* File mode.  */
+    __nlink_t st_nlink;        /* Link count.  */
+    __uid_t st_uid;        /* User ID of the file's owner.	*/
+    __gid_t st_gid;        /* Group ID of the file's group.*/
+    __dev_t st_rdev;        /* Device number, if device.  */
+    __dev_t __pad1;
+    __off64_t st_size;  /* Size of file, in bytes. */
+    __blksize_t st_blksize;    /* Optimal block size for I/O.  */
+    int __pad2;
+    __blkcnt64_t st_blocks;  /* 512-byte blocks */
+#ifdef __USE_XOPEN2K8
+    /* Nanosecond resolution timestamps are stored in a format
+       equivalent to 'struct timespec'.  This is the type used
+       whenever possible but the Unix namespace rules do not allow the
+       identifier 'timespec' to appear in the <sys/stat.h> header.
+       Therefore we have to handle the use of this header in strictly
+       standard-compliant sources special.  */
+    struct timespec st_atim;        /* Time of last access.  */
+    struct timespec st_mtim;        /* Time of last modification.  */
+    struct timespec st_ctim;        /* Time of last status change.  */
+# define st_atime st_atim.tv_sec    /* Backward compatibility.  */
+# define st_mtime st_mtim.tv_sec
+# define st_ctime st_ctim.tv_sec
+#else
+    __time_t st_atime;			/* Time of last access.  */
+    unsigned long int st_atimensec;	/* Nscecs of last access.  */
+    __time_t st_mtime;			/* Time of last modification.  */
+    unsigned long int st_mtimensec;	/* Nsecs of last modification.  */
+    __time_t st_ctime;			/* Time of last status change.  */
+    unsigned long int st_ctimensec;	/* Nsecs of last status change.  */
+#endif
+    int __glibc_reserved[2];
+};
 
 extern bool finalize;
 
@@ -75,7 +114,7 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
     "memory", "rcx", "r11");
     return retval;
 }
-
+__attribute__((force_align_arg_pointer))
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
@@ -157,8 +196,23 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 80: //fstat
         {
             log_general("Emulate syscall fstat (80)...\n");
+            auto *pStatRiscV = reinterpret_cast<statRiscV *>(registerValues[t_risc_reg_mnem::a1]);
+            struct stat buf {};
             registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_fstat, registerValues[t_risc_reg_mnem::a0],
-                                                           registerValues[t_risc_reg_mnem::a1]);
+                                                           reinterpret_cast<size_t>(&buf));
+            pStatRiscV->st_blksize=buf.st_blksize;
+            pStatRiscV->st_size=buf.st_size;
+            pStatRiscV->st_atim=buf.st_atim;
+            pStatRiscV->st_blocks=buf.st_blocks;
+            pStatRiscV->st_ctim=buf.st_ctim;
+            pStatRiscV->st_dev=buf.st_dev;
+            pStatRiscV->st_gid=buf.st_gid;
+            pStatRiscV->st_ino=buf.st_ino;
+            pStatRiscV->st_mode=buf.st_mode;
+            pStatRiscV->st_mtim=buf.st_mtim;
+            pStatRiscV->st_nlink=buf.st_nlink;
+            pStatRiscV->st_rdev=buf.st_rdev;
+            pStatRiscV->st_uid=buf.st_uid;
         }
             break;
         case 88: //utimensat
@@ -229,7 +283,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_gettimeofday, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1]);
         }
-        break;
+            break;
         case 214: //brk
         {
             log_general("Emulate syscall brk (214)...\n");
