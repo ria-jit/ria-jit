@@ -11,14 +11,13 @@
 #include <runtime/register.h>
 #include "elf/loadElf.h"
 #include "util/analyze.h"
-#include "runtime/emulateEcall.hpp"
 #include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
 
 //prototypes
-int transcode_loop(const char *file_path);
+int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
 bool execute_cached(t_cache_loc loc);
 
@@ -27,6 +26,7 @@ int main(int argc, char *argv[]) {
     int opt_index = 0;
     char *file_path = NULL;
     bool doAnalyze = false;
+    int fileIndex;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
     while((opt_index = getopt(argc, argv, ":f:mavgiorcshd")) != -1) {
@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'f':
                 file_path = optarg;
+                fileIndex = optind - 1;
                 break;
             case 's':
                 flag_fail_silently = true;
@@ -108,17 +109,25 @@ int main(int argc, char *argv[]) {
     }
 
     log_general("Initializing transcoding...\n");
-    return transcode_loop(file_path);
+
+    char *temp = argv[optind - 1];
+    argv[optind - 1] = file_path;
+    argv[fileIndex] = temp;
+
+    int guestArgc = argc - optind + 1;
+    char **guestArgv = argv + (optind - 1);
+    return transcode_loop(file_path, guestArgc, guestArgv);
+
 }
 
 #endif //TESTING
 
-int start_transcode(const char *file_path){
+int start_transcode(const char *file_path) {
     log_general("extern transcode start!\n");
-    return transcode_loop(file_path);
+    return transcode_loop(file_path, 0, NULL);
 }
 
-int transcode_loop(const char *file_path) {
+int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
     if (!result.valid) {
         dprintf(2, "Bad. Failed to map into memory.\n");
@@ -131,7 +140,7 @@ int transcode_loop(const char *file_path) {
 
     //allocate stack
     char *string = "";
-    t_risc_addr stackAddr = createStack(1, &string, result);
+    t_risc_addr stackAddr = createStack(guestArgc, guestArgv, result);
     if (!stackAddr) {
         return 1;
     }
