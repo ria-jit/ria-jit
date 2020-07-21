@@ -12,26 +12,26 @@
 #include "emulateEcall.hpp"
 
 struct statRiscV {
-    unsigned long	st_dev;		/* Device.  */
-    unsigned long	st_ino;		/* File serial number.  */
-    unsigned int	st_mode;	/* File mode.  */
-    unsigned int	st_nlink;	/* Link count.  */
-    unsigned int	st_uid;		/* User ID of the file's owner.  */
-    unsigned int	st_gid;		/* Group ID of the file's group. */
-    unsigned long	st_rdev;	/* Device number, if device.  */
-    unsigned long	__pad1;
-    long		st_size;	/* Size of file, in bytes.  */
-    int		st_blksize;	/* Optimal block size for I/O.  */
-    int		__pad2;
-    long		st_blocks;	/* Number 512-byte blocks allocated. */
-    long		st_atim;	/* Time of last access.  */
-    unsigned long	st_atime_nsec;
-    long		st_mtim;	/* Time of last modification.  */
-    unsigned long	st_mtime_nsec;
-    long		st_ctim;	/* Time of last status change.  */
-    unsigned long	st_ctime_nsec;
-    unsigned int	__unused4;
-    unsigned int	__unused5;
+    unsigned long st_dev;        /* Device.  */
+    unsigned long st_ino;        /* File serial number.  */
+    unsigned int st_mode;    /* File mode.  */
+    unsigned int st_nlink;    /* Link count.  */
+    unsigned int st_uid;        /* User ID of the file's owner.  */
+    unsigned int st_gid;        /* Group ID of the file's group. */
+    unsigned long st_rdev;    /* Device number, if device.  */
+    unsigned long __pad1;
+    long st_size;    /* Size of file, in bytes.  */
+    int st_blksize;    /* Optimal block size for I/O.  */
+    int __pad2;
+    long st_blocks;    /* Number 512-byte blocks allocated. */
+    long st_atim;    /* Time of last access.  */
+    unsigned long st_atime_nsec;
+    long st_mtim;    /* Time of last modification.  */
+    unsigned long st_mtime_nsec;
+    long st_ctim;    /* Time of last status change.  */
+    unsigned long st_ctime_nsec;
+    unsigned int __unused4;
+    unsigned int __unused5;
 };
 
 extern bool finalize;
@@ -107,14 +107,17 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 29: //ioctl
         {
             log_general("Emulate syscall ioctl (29)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
-                                                           registerValues[t_risc_reg_mnem::a1]);
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 35: //unlinkat
         {
             log_general("Emulate syscall unlinkat (35)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_unlinkat, registerValues[t_risc_reg_mnem::a0]);
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_unlinkat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 52: //fchmod
@@ -137,7 +140,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall openat (56)...\n");
             registerValues[t_risc_reg_mnem::a0] = syscall4(__NR_openat, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1],
-                                                           registerValues[t_risc_reg_mnem::a2],registerValues[t_risc_reg_mnem::a3]);
+                                                           registerValues[t_risc_reg_mnem::a2],
+                                                           registerValues[t_risc_reg_mnem::a3]);
         }
             break;
         case 57: //close
