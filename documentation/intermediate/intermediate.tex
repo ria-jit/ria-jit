@@ -165,17 +165,18 @@
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Stack Allocation}
-	\textbf{Ziel:} Stack für das Gastprogramm allozieren und mit den üblichen Daten initialisieren.
+    \frametitle{ELF-Loader}
+    \framesubtitle{Stack Allocation}
+    \textbf{Ziel:} Stack für das Gastprogramm allozieren und mit den üblichen Daten initialisieren.
 
-	\vspace{0.25cm}
-	\textbf{Input:} Argumentanzahl des Gastprogramms, Argumentarray des Gastprogramms, der Output des memory mappings
+    \vspace{0.25cm}
+    \textbf{Input:} Argumentanzahl des Gastprogramms, Argumentarray des Gastprogramms, der Output des memory mappings
 
-	\textbf{Output:} Die Adresse des Stackpointers nach dem Initialisieren
+    \textbf{Output:} Die Adresse des Stackpointers nach dem Initialisieren
 
-	\pause
-	%\vspace{0.5cm}
-	\begin{columns}[c, onlytextwidth]
+    \pause
+    %\vspace{0.5cm}
+    \begin{columns}[c, onlytextwidth]
 		\begin{column}{0.49\textwidth}
 			\begin{itemize}
 				\only<2>{\item Allozieren von Speicher für das Stack entsprechend des stack limits des Kernels (oder 8 MiB als Standardwert)}
