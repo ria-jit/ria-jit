@@ -1,9 +1,11 @@
 image: ubuntu
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
 
 build:
   stage: build
   before_script:
-    - apt update && DEBIAN_FRONTEND=noninteractive apt -y install gcc g++ cmake make autoconf
+    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson
   script:
     - mkdir build && cd build && cmake .. && make
   artifacts:
