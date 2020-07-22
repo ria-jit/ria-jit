@@ -1,0 +1,122 @@
+%%
+% TUM Corporate Design Base
+% Michael Riesch (michael.riesch@tum.de)
+% Based on the templates from https://www.tum.de/cd
+%
+% Provides the common base for all documents.
+%
+%%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tum-base}[2018/10/08 TUM Corporate Design Base v0.3]
+
+% load packages
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{calc}
+\RequirePackage[ngerman,english]{babel}
+\RequirePackage[export]{adjustbox}
+\RequirePackage[absolute, overlay]{textpos}
+\RequirePackage[gen]{eurosym}
+\DeclareUnicodeCharacter{20AC}{\euro{}}
+\RequirePackage{graphicx}
+\RequirePackage{tabularx}
+\RequirePackage{multicol}
+\RequirePackage{hyphenat}
+\def\UrlBreaks{\do\/\do-}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\RequirePackage[hidelinks,breaklinks]{hyperref}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows, shapes, shapes.multipart, trees, positioning,
+  backgrounds, fit, matrix}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=default}
+
+% font switch
+\newif\ifusetimes
+\usetimesfalse
+
+% process options
+\DeclareOption{times}{\usetimestrue}
+\DeclareOption{german}{\AtBeginDocument{\selectlanguage{ngerman}}}
+\DeclareOption{english}{\AtBeginDocument{\selectlanguage{english}}}
+\ExecuteOptions{english}
+\ProcessOptions\relax
+
+% font packages and selection
+\RequirePackage[scaled]{helvet}
+
+\ifusetimes
+\RequirePackage{newtxtext,newtxmath,courier}
+\renewcommand{\familydefault}{\rmdefault}
+\else
+\RequirePackage{sansmath}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\rmdefault}{\sfdefault}
+%\fontfamily{phv}\selectfont
+\fi
+
+% handle widows and orphans
+\widowpenalty=10000     % Hurenkinder
+\clubpenalty=10000      % Schusterjungen
+\displaywidowpenalty=10000
+
+% Blautöne:
+\definecolor{TUMBlau}{RGB}{0,101,189} % Pantone 300
+\definecolor{TUMBlauDunkel}{RGB}{0,82,147} % Pantone 301
+\definecolor{TUMBlauHell}{RGB}{152,198,234} % Pantone 283
+\definecolor{TUMBlauMittel}{RGB}{100,160,200} % Pantone 542
+
+% Hervorhebung:
+\definecolor{TUMElfenbein}{RGB}{218,215,203} % Pantone 7527 -Elfenbein
+\definecolor{TUMGruen}{RGB}{162,173,0} % Pantone 383 - Grün
+\definecolor{TUMOrange}{RGB}{227,114,34} % Pantone 158 - Orange
+\definecolor{TUMGrau}{gray}{0.6} % Grau 60%
+
+% university information
+\newcommand{\theuniversity}{Technical University of Munich}
+\addto\captionsenglish{%
+  \renewcommand{\theuniversity}{Technical University of Munich}
+}
+\addto\captionsngerman{%
+  \renewcommand{\theuniversity}{Technische Universität München}
+}
+\newcommand{\UniversitaetAbkuerzung}{TUM}
+\newcommand{\UniversitaetWebseite}{www.tum.de}
+\newcommand{\UniversitaetAdresse}{%
+    Arcisstraße~21\\%
+    80333~München%
+}
+
+\newcommand{\EinstellungBankName}{Bayerische Landesbank}
+\newcommand{\EinstellungBankIBAN}{DE10700500000000024866}
+\newcommand{\EinstellungBankBIC}{BYLADEMM}
+\newcommand{\EinstellungSteuernummer}{143/241/80037}
+\newcommand{\EinstellungUmsatzsteuerIdentifikationsnummer}{DE811193231}
+
+% department information
+\newcommand{\thedepartment}{\strut}
+
+% group information
+\newcommand{\thegroup}{\strut}
+\newcommand{\thecontactperson}{\strut}
+
+% user information
+
+% custom listings
+\usepackage{listings}
+\lstset{
+%  numbers=left,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{TUMBlau}\ttfamily,
+  stringstyle=\color{TUMOrange}\ttfamily,
+  commentstyle=\color{TUMGruen}\ttfamily,
+%  aboveskip=0cm,
+%  belowskip=0cm,
+  morecomment=[l][\color{TUMElfenbein}]{\#},
+}
+
+% personalization
+\IfFileExists{tum-user.sty}{\RequirePackage{tum-user}}{}
