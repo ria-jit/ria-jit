@@ -1,0 +1,28 @@
+image: ubuntu
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build:
+  stage: build
+  before_script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson
+  script:
+    - mkdir build && cd build && cmake .. && make
+  artifacts:
+    paths:
+      - build/translator
+      - build/test
+
+gtest:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/test
+
+arithmtest:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/arithmetic_test/arithm

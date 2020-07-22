@@ -1,11 +1,12 @@
 
-#include <common.h>
+#include "common.h"
 
 #include <elf.h>
 
-
+#ifdef NO_STDLIB
 extern int main(int argc, char** argv);
 void __start_main(const size_t* initial_stack, const size_t* dynv);
+#endif
 
 #if UINTPTR_MAX == 0xffffffff
 #define ELF_R_TYPE ELF32_R_TYPE
@@ -17,7 +18,7 @@ void __start_main(const size_t* initial_stack, const size_t* dynv);
 
 #if defined(__x86_64__)
 #define R_RELATIVE R_X86_64_RELATIVE
-
+#ifdef NO_STDLIB
 ASM_BLOCK(
     .intel_syntax noprefix;
     .weak _DYNAMIC;
@@ -64,7 +65,9 @@ __clone:
  1: ret;
     .att_syntax;
 );
+#endif
 
+//@formatter:off
 static size_t syscall0(int syscall_number) {
     size_t retval = syscall_number;
     __asm__ volatile("syscall" : "+a"(retval) : : "memory", "rcx", "r11");
@@ -242,8 +245,14 @@ syscall6(int syscall_number, size_t arg1, size_t arg2, size_t arg3,
 #error
 #endif
 
+//@formatter:on
+
+//@formatter:off
+// TODO Reformat later
 char** environ;
 static const size_t* __auxvptr;
+//TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+const size_t *auxvptr_temp;
 
 inline long syscall(long number, long a1, long a2, long a3, long a4, long a5,
                     long a6) {
@@ -253,29 +262,39 @@ inline long syscall(long number, long a1, long a2, long a3, long a4, long a5,
 int getpid(void) {
     return syscall0(__NR_getpid);
 }
-int open(const char* pathname, int flags, int mode) {
+
+int open(const char *pathname, int flags, int mode) {
     return openat(AT_FDCWD, pathname, flags, mode);
 }
-int openat(int dirfd, const char* pathname, int flags, int mode) {
+
+int openat(int dirfd, const char *pathname, int flags, int mode) {
     return syscall4(__NR_openat, dirfd, (size_t) pathname, flags, mode);
 }
+
 off_t lseek(int fd, off_t offset, int whence) {
     return syscall3(__NR_lseek, fd, offset, whence);
 }
-ssize_t read(int fd, void* buf, size_t count) {
+
+ssize_t read(int fd, void *buf, size_t count) {
     return syscall3(__NR_read, fd, (size_t) buf, count);
 }
-ssize_t write(int fd, const void* buf, size_t count) {
+
+ssize_t write(int fd, const void *buf, size_t count) {
     return syscall3(__NR_write, fd, (size_t) buf, count);
 }
+
 int close(int fd) {
     return syscall1(__NR_close, fd);
 }
 
-ssize_t read_full(int fd, void* buf, size_t nbytes) {
+int fstatx(int fd, struct statx *buf) {
+    return syscall2(__NR_statx, fd, (size_t) buf);
+}
+
+ssize_t read_full(int fd, void *buf, size_t nbytes) {
     size_t total_read = 0;
-    uint8_t* buf_cp = buf;
-    while (total_read < nbytes) {
+    uint8_t *buf_cp = buf;
+    while(total_read < nbytes) {
         ssize_t bytes_read = read(fd, buf_cp + total_read, nbytes - total_read);
         if (bytes_read < 0)
             return bytes_read;
@@ -299,17 +318,22 @@ ssize_t write_full(int fd, const void* buf, size_t nbytes) {
     return total_written;
 }
 
-void*
-mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset) {
+int getrlimit(int resource, struct rlimit *rlimits) {
+    return syscall2(__NR_getrlimit, resource, (size_t) rlimits);
+}
+
+void *
+mmap_mini(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
 #if __SIZEOF_POINTER__ == 8
-    return (void*) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
-                            offset);
+    return (void *) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
+                             offset);
 #else
     return (void*) syscall6(__NR_mmap2, (size_t) addr, length, prot, flags, fd,
                             offset >> 12);
 #endif
 }
-int mprotect(void* addr, size_t len, int prot) {
+
+int mprotect(void *addr, size_t len, int prot) {
     return syscall3(__NR_mprotect, (size_t) addr, len, prot);
 }
 int munmap(void* addr, size_t length) {
@@ -320,11 +344,13 @@ int clock_gettime(int clk_id, struct timespec* tp) {
     return syscall2(__NR_clock_gettime, clk_id, (size_t) tp);
 }
 
+#ifdef NO_STDLIB
 __attribute__((noreturn))
 void _exit(int status) {
     syscall1(__NR_exit, status);
     __builtin_unreachable();
 }
+#endif
 
 int execve(const char* filename, const char* const argv[], const char* const envp[]) {
     return syscall3(__NR_execve, (uintptr_t) filename, (uintptr_t) argv,
@@ -340,12 +366,14 @@ int dup2(int oldfd, int newfd) {
 int pipe2(int pipefd[2], int flags) {
     return syscall2(__NR_pipe2, (uintptr_t) pipefd, flags);
 }
-
-size_t strlen(const char* s) {
+//@formatter:on
+size_t strlen(const char *s) {
     size_t len = 0;
-    for (; *s != '\0'; ++len, ++s);
+    for(; *s != '\0'; ++len, ++s);
     return len;
 }
+//@formatter:off
+
 int strcmp(const char* s1, const char* s2) {
     for (; *s1 && *s1 == *s2; s1++, s2++);
     return *(const unsigned char*) s1 - *(const unsigned char*) s2;
@@ -369,26 +397,25 @@ int puts(const char* s) {
 }
 
 typedef void (*PrintfWriteFunc)(void*, const char*, size_t);
-
+//@formatter:on
+// TODO Reformat later
 static
 size_t
-printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
+printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
               va_list args) {
     size_t bytes_written = 0;
-
+    //TODO Proper fix for segfault if arg is null
     char buffer[32] = {0};
     int buflen;
 
-    while (*format != '\0') {
-        char* next_format = strchr(format, '%');
+    while(*format != '\0') {
+        char *next_format = strchr(format, '%');
         if (next_format == NULL) {
-            int len = strlen(format);
+            size_t len = strlen(format);
             write_func(data, format, len);
             bytes_written += len;
-            format += len;
             break;
-        }
-        else if (next_format != format) {
+        } else if (next_format != format) {
             write_func(data, format, next_format - format);
             bytes_written += next_format - format;
             format = next_format;
@@ -396,8 +423,9 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
 
         // Skip '%'
         format++;
-
-        char format_spec = *format;
+        char format_spec;
+        PARSE_NEXT:
+        format_spec = *format;
         if (format_spec == '\0') {
             write_func(data, "%", 1);
             bytes_written++;
@@ -405,18 +433,20 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
         }
 
         format++;
+        //TODO Is this all needed format specifiers?
         if (format_spec == 's') {
-            const char* str = va_arg(args, const char*);
+            const char *str = va_arg(args, const char*);
+            if (str == NULL) {
+                str = "[null]";
+            }
             size_t len = strlen(str);
             write_func(data, str, len);
             bytes_written += len;
-        }
-        else if (format_spec == 'c') {
+        } else if (format_spec == 'c') {
             int chr = va_arg(args, int);
-            write_func(data, (char*) &chr, 1);
+            write_func(data, (char *) &chr, 1);
             bytes_written += 1;
-        }
-        else if (format_spec == 'p') {
+        } else if (format_spec == 'p') {
             uintptr_t value = va_arg(args, uintptr_t);
             if (value == 0) {
                 write_func(data, "(nil)", 5);
@@ -430,22 +460,41 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
 
             int highest_bit = 8 * sizeof(uintptr_t) - __builtin_clzl(value);
             int nibbles = (highest_bit + 3) >> 2;
-            for (int i = nibbles - 1; i >= 0; i--) {
+            for(int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
 
             write_func(data, buffer, buflen);
             bytes_written += buflen;
-        }
-        else if (format_spec == 'u') {
+        } else if (format_spec == 'd' || format_spec == 'i') {
+            int32_t arg = va_arg(args, int32_t);
+            size_t buf_idx = sizeof(buffer) - 1;
+            uint32_t value = arg;
+            if (arg < 0) {
+                write_func(data, "-", 1);
+                bytes_written++;
+                value = -arg;
+            }
+            if (value == 0) {
+                buffer[buf_idx] = '0';
+            } else {
+                while(value > 0) {
+                    int32_t digit = value % 10;
+                    buffer[buf_idx--] = '0' + digit;
+                    value /= 10;
+                }
+                buf_idx++;
+            }
+            write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
+            bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec == 'u') {
             uint32_t value = va_arg(args, uint32_t);
             size_t buf_idx = sizeof(buffer) - 1;
             if (value == 0) {
                 buffer[buf_idx] = '0';
-            }
-            else {
-                while (value > 0) {
+            } else {
+                while(value > 0) {
                     uint32_t digit = value % 10;
                     buffer[buf_idx--] = '0' + digit;
                     value /= 10;
@@ -454,8 +503,7 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
             }
             write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
             bytes_written += sizeof(buffer) - buf_idx;
-        }
-        else if (format_spec == 'x') {
+        } else if (format_spec == 'x') {
             uint32_t value = va_arg(args, uint32_t);
             int nibbles = 1;
             if (value != 0) {
@@ -463,15 +511,14 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
                 nibbles = (highest_bit + 3) >> 2;
             }
             buflen = 0;
-            for (int i = nibbles - 1; i >= 0; i--) {
+            for(int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
 
             write_func(data, buffer, buflen);
             bytes_written += buflen;
-        }
-        else if (format_spec == 'l' && *format == 'x') {
+        } else if (format_spec == 'l' && *format == 'x') {
             format++;
 
             size_t value = va_arg(args, size_t);
@@ -481,13 +528,39 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
                 nibbles = (highest_bit + 3) >> 2;
             }
             buflen = 0;
-            for (int i = nibbles - 1; i >= 0; i--) {
+            for(int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
 
             write_func(data, buffer, buflen);
             bytes_written += buflen;
+        } else if (format_spec == 'l' && (*format == 'i' || *format == 'd')) {
+            format++;
+
+            int64_t arg = va_arg(args, int64_t);
+            size_t buf_idx = sizeof(buffer) - 1;
+            uint64_t value = arg;
+            if (arg < 0) {
+                write_func(data, "-", 1);
+                bytes_written++;
+                value = -arg;
+            }
+            if (value == 0) {
+                buffer[buf_idx] = '0';
+            } else {
+                while(value > 0) {
+                    size_t digit = value % 10;
+                    buffer[buf_idx--] = '0' + digit;
+                    value /= 10;
+                }
+                buf_idx++;
+            }
+            write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
+            bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec >= '0' && format_spec <= '9') {
+            //Ignore specified print widths TODO Maybe figure out a way to respect them.
+            goto PARSE_NEXT;
         }
     }
 
@@ -495,6 +568,8 @@ printf_driver(PrintfWriteFunc write_func, void* data, const char* format,
 
 }
 
+//@formatter:off
+// TODO Reformat later
 struct SPrintfHelperData {
     char* buf;
     size_t len;
@@ -591,13 +666,20 @@ printf(const char* format, ...)
 }
 
 unsigned long getauxval(unsigned long type) {
-    for (const size_t* aux = __auxvptr; *aux != 0; aux += 2)
+    //TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
+#ifdef NO_STDLIB
+    const size_t *auxvptr = __auxvptr;
+#else
+    const size_t *auxvptr = auxvptr_temp;
+#endif
+    for (const size_t* aux = auxvptr; *aux != 0; aux += 2)
         if (*aux == type)
             return aux[1];
     return 0;
 }
 
 __attribute__((externally_visible))
+__attribute__((optimize("-fno-tree-loop-distribute-patterns")))
 void* memset(void* s, int c, size_t n) {
     unsigned char* sptr = s;
     for (; n > 0; n--, sptr++)
@@ -623,6 +705,7 @@ void* memcpy(void* dest, const void* src, size_t n) {
     return dest;
 }
 
+#ifdef NO_STDLIB
 __attribute__((noreturn))
 __attribute__((externally_visible))
 void
@@ -681,3 +764,6 @@ __start_main(const size_t* initial_stack, const size_t* dynv)
     int retval = main(initial_stack[0], (char**) (initial_stack + 1));
     _exit(retval);
 }
+#endif
+//formatter:on
+// TODO Reformat later
