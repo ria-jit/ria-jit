@@ -1,0 +1,7 @@
+
+.PHONY: all paper.pdf clean
+all: paper.pdf
+paper.pdf:
+	TEXINPUTS=:. latexmk -pdf -silent paper.tex
+clean:
+	rm -f *.aux *.bbl *.blg *.fls *.fdb_latexmk *.log *.pdf *~ paper.out
