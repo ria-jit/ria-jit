@@ -7,8 +7,32 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <stdio.h>
+#include <sys/stat.h>
 #include "register.h"
 #include "emulateEcall.hpp"
+
+struct statRiscV {
+    unsigned long st_dev;        /* Device.  */
+    unsigned long st_ino;        /* File serial number.  */
+    unsigned int st_mode;    /* File mode.  */
+    unsigned int st_nlink;    /* Link count.  */
+    unsigned int st_uid;        /* User ID of the file's owner.  */
+    unsigned int st_gid;        /* Group ID of the file's group. */
+    unsigned long st_rdev;    /* Device number, if device.  */
+    unsigned long __pad1;
+    long st_size;    /* Size of file, in bytes.  */
+    int st_blksize;    /* Optimal block size for I/O.  */
+    int __pad2;
+    long st_blocks;    /* Number 512-byte blocks allocated. */
+    long st_atim;    /* Time of last access.  */
+    unsigned long st_atime_nsec;
+    long st_mtim;    /* Time of last modification.  */
+    unsigned long st_mtime_nsec;
+    long st_ctim;    /* Time of last status change.  */
+    unsigned long st_ctime_nsec;
+    unsigned int __unused4;
+    unsigned int __unused5;
+};
 
 extern bool finalize;
 
@@ -83,14 +107,17 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 29: //ioctl
         {
             log_general("Emulate syscall ioctl (29)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
-                                                           registerValues[t_risc_reg_mnem::a1]);
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_ioctl, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 35: //unlinkat
         {
             log_general("Emulate syscall unlinkat (35)...\n");
-            registerValues[t_risc_reg_mnem::a0] = syscall1(__NR_unlinkat, registerValues[t_risc_reg_mnem::a0]);
+            registerValues[t_risc_reg_mnem::a0] = syscall3(__NR_unlinkat, registerValues[t_risc_reg_mnem::a0],
+                                                           registerValues[t_risc_reg_mnem::a1],
+                                                           registerValues[t_risc_reg_mnem::a2]);
         }
             break;
         case 52: //fchmod
@@ -113,7 +140,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall openat (56)...\n");
             registerValues[t_risc_reg_mnem::a0] = syscall4(__NR_openat, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1],
-                                                           registerValues[t_risc_reg_mnem::a2],registerValues[t_risc_reg_mnem::a3]);
+                                                           registerValues[t_risc_reg_mnem::a2],
+                                                           registerValues[t_risc_reg_mnem::a3]);
         }
             break;
         case 57: //close
@@ -157,8 +185,26 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 80: //fstat
         {
             log_general("Emulate syscall fstat (80)...\n");
+            auto *pStatRiscV = reinterpret_cast<statRiscV *>(registerValues[t_risc_reg_mnem::a1]);
+            struct stat buf {};
             registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_fstat, registerValues[t_risc_reg_mnem::a0],
-                                                           registerValues[t_risc_reg_mnem::a1]);
+                                                           reinterpret_cast<size_t>(&buf));
+            pStatRiscV->st_blksize=buf.st_blksize;
+            pStatRiscV->st_size=buf.st_size;
+            pStatRiscV->st_atim=buf.st_atime;
+            pStatRiscV->st_atime_nsec=buf.st_atim.tv_nsec;
+            pStatRiscV->st_blocks=buf.st_blocks;
+            pStatRiscV->st_ctim=buf.st_ctime;
+            pStatRiscV->st_ctime_nsec=buf.st_ctim.tv_nsec;
+            pStatRiscV->st_dev=buf.st_dev;
+            pStatRiscV->st_gid=buf.st_gid;
+            pStatRiscV->st_ino=buf.st_ino;
+            pStatRiscV->st_mode=buf.st_mode;
+            pStatRiscV->st_mtim=buf.st_mtime;
+            pStatRiscV->st_mtime_nsec=buf.st_mtim.tv_nsec;
+            pStatRiscV->st_nlink=buf.st_nlink;
+            pStatRiscV->st_rdev=buf.st_rdev;
+            pStatRiscV->st_uid=buf.st_uid;
         }
             break;
         case 88: //utimensat
@@ -229,7 +275,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_gettimeofday, registerValues[t_risc_reg_mnem::a0],
                                                            registerValues[t_risc_reg_mnem::a1]);
         }
-        break;
+            break;
         case 214: //brk
         {
             log_general("Emulate syscall brk (214)...\n");
