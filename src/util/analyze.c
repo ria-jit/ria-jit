@@ -105,13 +105,12 @@ void analyze(const char *file_path){
         }
     }
 
-    if(usesCSRR) log_analyze("Achtung: CSSR wird von diesem Programm genutzt!\n");
-    if(usesRV32A) log_analyze("Achtung: RV32A wird von diesem Programm genutzt!\n");
-    if(usesRV64A) log_analyze("Achtung: RV64A wird von diesem Programm genutzt!");
+    if(usesCSRR) log_analyze("Warning: Guest binary uses CSSR!\n");
+    if(usesRV32A) log_analyze("Warning: Guest binary uses RV32A!\n");
+    if(usesRV64A) log_analyze("Warning: Guest binary uses RV64A!\n");
 }
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {
-    int32_t raw_instr = *(int32_t *) addr; //cast and dereference
     t_risc_instr risc_instr = {};
     risc_instr.addr = addr;
 

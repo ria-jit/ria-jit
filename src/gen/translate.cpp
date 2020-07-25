@@ -474,6 +474,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         risc_addr += 4;
                         parse_pos--; //decrement for next loop cycle
                         break;
+                    default:
+                        break;
                 }
             }
                 break;
@@ -482,7 +484,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                 instructions_in_block++;
                 goto PARSE_DONE;
             }
-                break;
+                //break; (not required, goto above)
 
                 ///unconditional jump? -> follow
             case JUMP : {    ///JAL, JALR

@@ -249,7 +249,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 134: //rt_sigaction
         {
-            log_general("Ignore syscall rt_sigaction (134) return sucess...\n");
+            log_general("Ignore syscall rt_sigaction (134) return success...\n");
             //registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_rt_sigaction, registerValues[t_risc_reg_mnem::a0],
             //                                               registerValues[t_risc_reg_mnem::a1]);
             registerValues[t_risc_reg_mnem::a0] = 0;

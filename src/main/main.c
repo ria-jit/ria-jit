@@ -23,7 +23,7 @@ bool execute_cached(t_cache_loc loc);
 
 #ifndef TESTING
 int main(int argc, char *argv[]) {
-    int opt_index = 0;
+    int opt_index;
     char *file_path = NULL;
     bool doAnalyze = false;
     int fileIndex;
@@ -139,7 +139,6 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     t_risc_addr next_pc = result.entry;
 
     //allocate stack
-    char *string = "";
     t_risc_addr stackAddr = createStack(guestArgc, guestArgv, result);
     if (!stackAddr) {
         return 1;
