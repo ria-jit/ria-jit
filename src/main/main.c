@@ -28,6 +28,9 @@ int main(int argc, char *argv[]) {
     bool doAnalyze = false;
     int fileIndex;
 
+    //handle no arguments passed
+    if (argc <= 1) goto HELP;
+
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
     while((opt_index = getopt(argc, argv, ":f:mavgiorcshd")) != -1) {
         switch(opt_index) {
@@ -73,7 +76,8 @@ int main(int argc, char *argv[]) {
             case ':':
             case 'h':
             default:
-                dprintf(2,
+            HELP:
+                dprintf(1,
                         "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
                         "register file. (equivalent to -gioc)\n"
                         "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
@@ -82,7 +86,11 @@ int main(int argc, char *argv[]) {
                         "\t-c\tDisplay cache info\n"
                         "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
                         "program may enter undefined states.\n"
-                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n");
+                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
+                        "\t-m\tOptimize block translation.\n"
+                        "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
+                        "\t-h\tShow this help.\n"
+                        );
                 return 1;
         }
     }
