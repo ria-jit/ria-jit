@@ -66,12 +66,12 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, p_instr_struct->addr);
 
     //fill basic struct
-    p_instr_struct->reg_dest = extract_rd(raw_instr);
-    p_instr_struct->reg_src_1 = extract_rs1(raw_instr);
+    p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
+    p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
     //p_instr_struct->reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
 
     //extract opcode bits[6:2]
-    t_opcodes opcode = raw_instr >> 2 & 0x1f;
+    t_opcodes opcode = (t_opcodes) (raw_instr >> 2 & 0x1f);
     switch (opcode) {
         case OP_LUI:
             p_instr_struct->optype = UPPER_IMMEDIATE;
@@ -115,7 +115,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_BRANCH:
             // BEQ, BNE...
             p_instr_struct->optype = BRANCH;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
             p_instr_struct->imm = extract_imm_B(raw_instr);
@@ -177,7 +177,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     break;
                 }
                 default: {
-                    int error = extract_funct3(raw_instr);
+                    //int error = extract_funct3(raw_instr); (could potentially output this?)
                     critical_not_yet_implemented("Invalid LOAD Instruction");
                 }
             }
@@ -185,7 +185,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_STORE:
             p_instr_struct->optype = STORE;
             p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
             switch (extract_funct3(raw_instr)) {
@@ -207,7 +207,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             break;
         case OP_OP:
             p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
@@ -236,6 +236,9 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         break;
                     case 7:
                         p_instr_struct->mnem = REMU;
+                        break;
+                    default:
+                        critical_not_yet_implemented("Invalid OP_OP Instruction");
                         break;
                 }
             } else {
@@ -275,6 +278,9 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         break;
                     case 7:
                         p_instr_struct->mnem = AND;
+                        break;
+                    default:
+                        critical_not_yet_implemented("Invalid OP_OP Instruction");
                         break;
                 }
             }
@@ -346,7 +352,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             break;
         case OP_OP_32:
             p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             reg_count[p_instr_struct->reg_dest]++;
             reg_count[p_instr_struct->reg_src_1]++;
             reg_count[p_instr_struct->reg_src_2]++;
@@ -447,7 +453,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             }
             break;
         case OP_AMO:
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             p_instr_struct->imm = extract_funct7(raw_instr);
             // switch between different OP_AMO types, which are decoded in upper bytes of funct7
             switch (p_instr_struct->imm >> 2) {

@@ -154,7 +154,8 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 dprintf(2, "Bad. Got file that needs dynamic linking.");
                 return INVALID_ELF_MAP;
             }
-
+            default:
+                break;
         }
     }
     Elf64_Addr startAddr = ALIGN_DOWN(minAddr, 4096lu);
@@ -214,7 +215,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                     dprintf(2, "Could not seek file, error %li", -fileOffset);
                     return INVALID_ELF_MAP;
                 }
-                ssize_t segmentMemoryBytes = read_full(fd2, (void *) ((void *) vaddr), physical_size);
+                ssize_t segmentMemoryBytes = read_full(fd2, (void *) vaddr, physical_size);
                 if (segmentBytes <= 0) {
                     dprintf(2, "Could not load segment %i, error %li", i, -segmentMemoryBytes);
                     return INVALID_ELF_MAP;

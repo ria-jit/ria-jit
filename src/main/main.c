@@ -11,22 +11,25 @@
 #include <runtime/register.h>
 #include "elf/loadElf.h"
 #include "util/analyze.h"
-#include "runtime/emulateEcall.hpp"
 #include <getopt.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
 
 //prototypes
-int transcode_loop(const char *file_path);
+int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
 bool execute_cached(t_cache_loc loc);
 
 #ifndef TESTING
 int main(int argc, char *argv[]) {
-    int opt_index = 0;
+    int opt_index;
     char *file_path = NULL;
     bool doAnalyze = false;
+    int fileIndex;
+
+    //handle no arguments passed
+    if (argc <= 1) goto HELP;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
     while((opt_index = getopt(argc, argv, ":f:mavgiorcshd")) != -1) {
@@ -59,6 +62,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'f':
                 file_path = optarg;
+                fileIndex = optind - 1;
                 break;
             case 's':
                 flag_fail_silently = true;
@@ -72,7 +76,8 @@ int main(int argc, char *argv[]) {
             case ':':
             case 'h':
             default:
-                dprintf(2,
+            HELP:
+                dprintf(1,
                         "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
                         "register file. (equivalent to -gioc)\n"
                         "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
@@ -81,7 +86,11 @@ int main(int argc, char *argv[]) {
                         "\t-c\tDisplay cache info\n"
                         "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
                         "program may enter undefined states.\n"
-                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n");
+                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
+                        "\t-m\tOptimize block translation.\n"
+                        "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
+                        "\t-h\tShow this help.\n"
+                        );
                 return 1;
         }
     }
@@ -108,17 +117,25 @@ int main(int argc, char *argv[]) {
     }
 
     log_general("Initializing transcoding...\n");
-    return transcode_loop(file_path);
+
+    char *temp = argv[optind - 1];
+    argv[optind - 1] = file_path;
+    argv[fileIndex] = temp;
+
+    int guestArgc = argc - optind + 1;
+    char **guestArgv = argv + (optind - 1);
+    return transcode_loop(file_path, guestArgc, guestArgv);
+
 }
 
 #endif //TESTING
 
-int start_transcode(const char *file_path){
+int start_transcode(const char *file_path) {
     log_general("extern transcode start!\n");
-    return transcode_loop(file_path);
+    return transcode_loop(file_path, 0, NULL);
 }
 
-int transcode_loop(const char *file_path) {
+int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);
     if (!result.valid) {
         dprintf(2, "Bad. Failed to map into memory.\n");
@@ -130,8 +147,7 @@ int transcode_loop(const char *file_path) {
     t_risc_addr next_pc = result.entry;
 
     //allocate stack
-    char *string = "";
-    t_risc_addr stackAddr = createStack(1, &string, result);
+    t_risc_addr stackAddr = createStack(guestArgc, guestArgv, result);
     if (!stackAddr) {
         return 1;
     }
