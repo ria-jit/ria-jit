@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+extern const char *translator_version;
+
 /**
 * Verbose logging flags used by the main.c and logging methods.
 */
@@ -26,6 +28,7 @@ extern bool flag_log_cache;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
 extern bool flag_translate_opt;
+extern bool flag_do_analyze;
 
 void critical_not_yet_implemented(const char* info);
 

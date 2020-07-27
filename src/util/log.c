@@ -14,6 +14,12 @@ bool flag_log_cache = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
 bool flag_translate_opt = false;
+bool flag_do_analyze = false;
+
+/**
+ * Version number of our translator. Keep up to date - see GitLab releases.
+ */
+const char *translator_version = "1.0.1";
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
