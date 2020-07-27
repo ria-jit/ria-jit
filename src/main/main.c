@@ -12,6 +12,7 @@
 #include "elf/loadElf.h"
 #include "util/analyze.h"
 #include <env/opt.h>
+#include <runtime/perf.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -69,11 +70,17 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
 
     init_hash_table();
 
-    set_value(pc,next_pc);
+    set_value(pc, next_pc);
 
     //debugging output
     if (flag_log_reg_dump) {
         dump_registers();
+    }
+
+    //benchmark if necessary
+    struct timespec begin;
+    if (flag_do_benchmark) {
+        begin = begin_measure();
     }
 
     while(!finalize) {
@@ -83,14 +90,19 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
             cache_loc = translate_block(next_pc);
-            set_cache_entry(next_pc,cache_loc);
+            set_cache_entry(next_pc, cache_loc);
         }
 
         //execute the cached (or now newly generated code) and update the program counter
-        if(!execute_cached(cache_loc)) break;
+        if (!execute_cached(cache_loc)) break;
 
         //store pc from registers in pc
         next_pc = get_value(pc);
+    }
+
+    //finalize benchmark if necessary
+    if (flag_do_benchmark) {
+        end_display_measure(&begin);
     }
 
     return guest_exit_status;
@@ -107,7 +119,7 @@ bool execute_cached(t_cache_loc loc) {
     }
 
     typedef void (*void_asm)(void);
-    ((void_asm)loc)(); //call asm code
+    ((void_asm) loc)(); //call asm code
 
     //dump registers to the log
     if (flag_log_reg_dump) {

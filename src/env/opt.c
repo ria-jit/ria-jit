@@ -19,7 +19,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     if (argc <= 1) goto HELP;
 
     //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while((opt_index = getopt(argc, argv, ":f:mavgiorcshd")) != -1) {
+    while((opt_index = getopt(argc, argv, ":f:mavgiorcshdb")) != -1) {
         switch(opt_index) {
             case 'a':
                 flag_do_analyze = true;
@@ -60,6 +60,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
             case 'm':
                 flag_translate_opt = true;
                 break;
+            case 'b':
+                flag_do_benchmark = true;
+                break;
             case ':':
             case 'h':
             default:
@@ -76,6 +79,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                         "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
                         "\t-m\tOptimize block translation.\n"
                         "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
+                        "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
                         "\t-h\tShow this help.\n"
                 );
                 parse_result.status = 1;
@@ -93,6 +97,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
     log_general("Translate opt: %d\n", flag_translate_opt);
+    log_general("Do analyze: %d\n", flag_do_analyze);
+    log_general("Do benchmarking: %d\n", flag_do_benchmark);
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {
