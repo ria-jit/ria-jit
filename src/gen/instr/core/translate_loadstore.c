@@ -7,6 +7,14 @@
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
 
+static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
+
+static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
+
+static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
+
+static inline void storeRd(const t_risc_instr *instr, const register_info *r_info, FeReg regDest);
+
 /**
  * Translate the LB instruction.
  * The LB instruction loads a 8-bit value from memory and sign extends it before storing it in register rd. The
@@ -17,17 +25,13 @@
 void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LB…\n");
 
-    if (r_info->mapped[instr->reg_dest] || r_info->mapped[instr->reg_src_1]) {
-//        a->movsx(r_info->map[instr->reg_dest], x86::byte_ptr(r_info->map[instr->reg_src_1], instr->imm));
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-    } else {
-        /*a->mov(SECOND_REG, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->movsx(FIRST_REG, x86::byte_ptr(SECOND_REG, instr->imm));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), FIRST_REG);*/
-        err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_MOVSXr64m8, FIRST_REG, FE_MEM(SECOND_REG, 0, 0, instr->imm));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FIRST_REG);
-    }
+    ///Can use same reg since temporary rs1 is not needed afterwards.
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -260,5 +264,43 @@ void translate_SD(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rm, SECOND_REG, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
         err |= fe_enc64(&current, FE_MOV64rm, FIRST_REG, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(SECOND_REG, 0, 0, instr->imm), FIRST_REG);
+    }
+}
+
+static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    //No need to load the zero from memory, just create the zero in replacement register and move on.
+    if (instr->reg_src_1 == x0) {
+        err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
+        return replacement;
+    }
+    if (!r_info->mapped[instr->reg_src_1]) {
+        err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+        return replacement;
+    } else {
+        return r_info->map[instr->reg_src_1];
+    }
+}
+
+static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    //No need to load the zero from memory, just create the zero in replacement register and move on.
+    if (instr->reg_src_2 == x0) {
+        err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
+        return replacement;
+    }
+    if (!r_info->mapped[instr->reg_src_2]) {
+        err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+        return replacement;
+    } else {
+        return r_info->map[instr->reg_src_2];
+    }
+}
+
+static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    return !r_info->mapped[instr->reg_dest] ? replacement : r_info->map[instr->reg_dest];
+}
+
+static inline void storeRd(const t_risc_instr *instr, const register_info *r_info, const FeReg regDest) {
+    if (instr->reg_dest != x0 && !r_info->mapped[instr->reg_dest]) {
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), regDest);
     }
 }
