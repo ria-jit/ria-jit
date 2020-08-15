@@ -11,9 +11,7 @@
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count);
 
-char* to_mnem(int mnem);
-
-void analyze(const char *file_path){
+void analyze(const char *file_path) {
 
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
