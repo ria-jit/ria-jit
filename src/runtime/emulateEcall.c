@@ -2,12 +2,9 @@
 // Created by simon on 25.06.20.
 //
 
-#include <linux/unistd.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include <string.h>
-#include <stdio.h>
-#include <sys/stat.h>
+#include <asm/stat.h>
+#include <linux/mman.h>
+#include <common.h>
 #include <runtime/register.h>
 #include "emulateEcall.h"
 
@@ -173,16 +170,16 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             pStatRiscV->st_blksize = buf.st_blksize;
             pStatRiscV->st_size = buf.st_size;
             pStatRiscV->st_atim = buf.st_atime;
-            pStatRiscV->st_atime_nsec = buf.st_atim.tv_nsec;
+            pStatRiscV->st_atime_nsec = buf.st_atime_nsec;
             pStatRiscV->st_blocks = buf.st_blocks;
             pStatRiscV->st_ctim = buf.st_ctime;
-            pStatRiscV->st_ctime_nsec = buf.st_ctim.tv_nsec;
+            pStatRiscV->st_ctime_nsec = buf.st_ctime_nsec;
             pStatRiscV->st_dev = buf.st_dev;
             pStatRiscV->st_gid = buf.st_gid;
             pStatRiscV->st_ino = buf.st_ino;
             pStatRiscV->st_mode = buf.st_mode;
             pStatRiscV->st_mtim = buf.st_mtime;
-            pStatRiscV->st_mtime_nsec = buf.st_mtim.tv_nsec;
+            pStatRiscV->st_mtime_nsec = buf.st_mtime_nsec;
             pStatRiscV->st_nlink = buf.st_nlink;
             pStatRiscV->st_rdev = buf.st_rdev;
             pStatRiscV->st_uid = buf.st_uid;
@@ -271,7 +268,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                     void *map = mmap((void *) mappedBrk, newMappedBrk - mappedBrk, PROT_READ | PROT_WRITE,
                                      MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE, 0, 0);
 
-                    if (map != MAP_FAILED) {
+                    if (!BAD_ADDR(map)) {
                         if ((t_risc_addr) map != mappedBrk) {
                             //Did not get right address and not a mapping fault (Possible if MAP_FIXED_NOREPLACE is not
                             // supported). Unmap the mappings at the wrong address.

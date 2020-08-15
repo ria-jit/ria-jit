@@ -3,7 +3,6 @@
 //
 
 #include "translate.h"
-#include <sys/mman.h>
 #include <runtime/register.h>
 #include <gen/instr/translate_arithmetic.h>
 #include <gen/instr/translate_controlflow.h>
@@ -13,8 +12,8 @@
 #include <gen/instr/translate_other.h>
 #include <gen/instr/translate_a_ext.h>
 #include <fadec/fadec-enc.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <common.h>
+#include <linux/mman.h>
 #include <util/util.h>
 #include <util/log.h>
 #include <util/typedefs.h>
@@ -57,7 +56,7 @@ void init_block() {
     //check for mmap fault and terminate
     if (buf != addr) {
         dprintf(2, "Memory allocation fault in assembly.\n");
-        exit(-1);
+        _exit(-1);
     }
 
     //set the block_head and current pointer and the failed status
@@ -88,7 +87,7 @@ t_cache_loc finalize_block(int chainLinkOp) {
     if (err != 0) {
         //terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error after generating basic block.\n");
-        exit(-1);
+        _exit(-1);
     }
 
     //if that's fine, then we log and return
@@ -769,6 +768,6 @@ void chain(t_cache_loc target) {
     if (err != 0) {
         ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error in chain, exiting...\n");
-        exit(-1);
+        _exit(-1);
     }
 }

@@ -10,7 +10,7 @@ add_link_options(-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE})
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
-add_compile_options(-fPIE -Wall -Wextra -Wpedantic)
+add_compile_options(-fno-stack-protector -fPIE -Wall -Wextra -Wpedantic)
 
 #Get a variable containing the meson build type corresponding to the CMake Build type
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
@@ -39,7 +39,7 @@ list(TRANSFORM FADECLIB_GEN_INCLUDES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
 ExternalProject_Add(fadec
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX}
-        CONFIGURE_COMMAND meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
+        CONFIGURE_COMMAND CFLAGS=-fno-stack-protector meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BUILD_COMMAND ninja -v
         INSTALL_COMMAND ""
         UPDATE_COMMAND "pwd" #dummy so cmake always tries to update the subproject
@@ -111,3 +111,7 @@ add_dependencies(test fadecLib)
 
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)
+
+#Only use no stdlib in the actual translator since gtest needs it.
+target_link_options(translator PRIVATE -nostdlib -lgcc -static-pie)
+target_compile_definitions(translator PRIVATE -DNO_STDLIB)

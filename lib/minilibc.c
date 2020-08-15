@@ -4,6 +4,7 @@
 #include <elf.h>
 #include <ryu/ryu.h>
 
+//@formatter:off
 #ifdef NO_STDLIB
 extern int main(int argc, char** argv);
 void __start_main(const size_t* initial_stack, const size_t* dynv);
@@ -67,6 +68,7 @@ __clone:
     .att_syntax;
 );
 #endif
+//@formatter:on
 
 //@formatter:off
 static size_t syscall0(int syscall_number) {
@@ -396,10 +398,15 @@ int puts(const char* s) {
     write(1, "\n", 1);
     return 0;
 }
-
-typedef void (*PrintfWriteFunc)(void*, const char*, size_t);
 //@formatter:on
 // TODO Reformat later
+int putchar(int c) {
+    write(1, (char *) &c, 1);
+    return c;
+}
+
+typedef void (*PrintfWriteFunc)(void *, const char *, size_t);
+
 static
 size_t
 printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
@@ -778,3 +785,8 @@ __start_main(const size_t* initial_stack, const size_t* dynv)
 #endif
 //formatter:on
 // TODO Reformat later
+
+int __dprintf_chk (int d, int flags, const char *format, ...){
+    //TODO Should not ignore flags
+    return dprintf(d, format);
+}

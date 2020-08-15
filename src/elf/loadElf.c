@@ -6,8 +6,7 @@
 
 #include <common.h>
 #include <linux/mman.h>
-#include <stdio.h>
-#include <string.h>
+#include <linux/fs.h>
 #include "loadElf.h"
 
 //Apparently not included in the headers on my version.
@@ -23,6 +22,11 @@
 
 #define AUXC 16
 
+#ifdef NO_STDLIB
+#define envp environ
+#else
+#define envp __environ
+#endif
 
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     log_general("Reading %s...\n", filePath);
@@ -166,7 +170,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                      MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(elf)) {
-        dprintf(2, "Could not map elf because error %s", strerror(-(intptr_t) elf));//-(intptr_t) elf
+        dprintf(2, "Could not map elf because error %s", -(intptr_t) elf);//-(intptr_t) elf
         return INVALID_ELF_MAP;
     }
     //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
@@ -274,9 +278,11 @@ t_risc_addr copyArgsToStack(t_risc_addr stackPos, int guestArgc, char *guestArgv
 mapInfo) {
     ///Stack pointer always needs to be 16-Byte aligned per ABI convention
     int envc = 0;
-    for(; __environ[envc]; ++envc);
+    for(; envp[envc]; ++envc);
+#ifndef NO_STDLIB
     //TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
     auxvptr_temp = (const size_t *) &__environ[envc + 1];
+#endif
     size_t totalStackSize = sizeof(Elf64_auxv_t) * AUXC + sizeof(char **) * (envc + 1) + sizeof(char **) *
             (guestArgc + 1) + sizeof(long);
     uintptr_t stackOffset = ALIGN_UP(totalStackSize, 16lu) - totalStackSize;
@@ -313,11 +319,11 @@ mapInfo) {
         *(--stack) = NULL;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
         for(int i = envc - 1; i >= 0; i--) {
-            *(--stack) = __environ[i];
+            *(--stack) = envp[i];
         }
-        for(int i = 0; stack[i] || __environ[i]; ++i) {
-            if (stack[i] != __environ[i]) {
-                log_general("Difference in envp %p and environ %p\n", stack[i], __environ[i]);
+        for(int i = 0; stack[i] || envp[i]; ++i) {
+            if (stack[i] != envp[i]) {
+                log_general("Difference in envp %p and environ %p\n", stack[i], envp[i]);
             }
         }
         stackPos = (t_risc_addr) stack;
