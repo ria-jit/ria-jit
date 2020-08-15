@@ -55,16 +55,16 @@ set(TRANSLATOR_SOURCES
         src/parser/parser.c src/parser/parser.h
         src/cache/cache.c src/cache/cache.h
         src/runtime/register.c src/runtime/register.h
-        src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp
+        src/runtime/emulateEcall.c src/runtime/emulateEcall.h
         src/elf/loadElf.c src/elf/loadElf.h
-        src/gen/translate.cpp src/gen/translate.hpp
-        src/gen/instr/translate_a_ext.cpp src/gen/instr/translate_a_ext.hpp
-        src/gen/instr/translate_arithmetic.cpp src/gen/instr/translate_arithmetic.hpp
-        src/gen/instr/translate_controlflow.cpp src/gen/instr/translate_controlflow.hpp
-        src/gen/instr/translate_csr.cpp src/gen/instr/translate_csr.hpp
-        src/gen/instr/translate_loadstore.cpp src/gen/instr/translate_loadstore.hpp
-        src/gen/instr/translate_m_ext.cpp src/gen/instr/translate_m_ext.hpp
-        src/gen/instr/translate_other.cpp src/gen/instr/translate_other.hpp
+        src/gen/translate.c src/gen/translate.h
+        src/gen/instr/translate_a_ext.c src/gen/instr/translate_a_ext.h
+        src/gen/instr/translate_arithmetic.c src/gen/instr/translate_arithmetic.h
+        src/gen/instr/translate_controlflow.c src/gen/instr/translate_controlflow.h
+        src/gen/instr/translate_csr.c src/gen/instr/translate_csr.h
+        src/gen/instr/translate_loadstore.c src/gen/instr/translate_loadstore.h
+        src/gen/instr/translate_m_ext.c src/gen/instr/translate_m_ext.h
+        src/gen/instr/translate_other.c src/gen/instr/translate_other.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
         src/util/tools/analyze.c src/util/tools/analyze.h

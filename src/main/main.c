@@ -5,9 +5,9 @@
 #include <common.h>
 #include <stdbool.h>
 #include <util/log.h>
-#include <runtime/emulateEcall.hpp>
+#include <runtime/emulateEcall.h>
 #include <cache/cache.h>
-#include <gen/translate.hpp>
+#include <gen/translate.h>
 #include <runtime/register.h>
 #include <elf/loadElf.h>
 #include <util/tools/analyze.h>

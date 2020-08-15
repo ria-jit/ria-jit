@@ -2,19 +2,19 @@
 // Created by flo on 09.05.20.
 //
 
-#include "translate.hpp"
+#include "translate.h"
 #include <sys/mman.h>
 #include <runtime/register.h>
-#include <gen/instr/translate_arithmetic.hpp>
-#include <gen/instr/translate_controlflow.hpp>
-#include <gen/instr/translate_csr.hpp>
-#include <gen/instr/translate_loadstore.hpp>
-#include <gen/instr/translate_m_ext.hpp>
-#include <gen/instr/translate_other.hpp>
-#include <gen/instr/translate_a_ext.hpp>
+#include <gen/instr/translate_arithmetic.h>
+#include <gen/instr/translate_controlflow.h>
+#include <gen/instr/translate_csr.h>
+#include <gen/instr/translate_loadstore.h>
+#include <gen/instr/translate_m_ext.h>
+#include <gen/instr/translate_other.h>
+#include <gen/instr/translate_a_ext.h>
 #include <fadec/fadec-enc.h>
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include <util/util.h>
 #include <util/log.h>
 #include <util/typedefs.h>
@@ -23,7 +23,7 @@
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
-void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info);
+void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info);
 
 /**
  * The pointer to the head of the current basic block.
@@ -49,7 +49,7 @@ int err;
  * (e.g., before translating every basic block).
  */
 void init_block() {
-    auto addr = reinterpret_cast<void *>(lastUsedAddress - 4096lu);
+    void *addr = (void *) (lastUsedAddress - 4096lu);
     //allocate a memory page for the next basic block that will be translated
     void *buf = mmap(addr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
                      -1, 0);
@@ -61,7 +61,7 @@ void init_block() {
     }
 
     //set the block_head and current pointer and the failed status
-    block_head = static_cast<uint8_t *>(buf);
+    block_head = (uint8_t *) buf;
     current = block_head;
     err = 0;
 
@@ -107,10 +107,10 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info) {
+void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info) {
     //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
 
-    switch(instr.mnem) {
+    switch(instr->mnem) {
         case LUI:
             translate_lui(instr, r_info);
             break;
@@ -400,13 +400,13 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
     //log instruction
     log_asm_out(
             "Instruction %s at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
-            mnem_to_string(instr.mnem),
-            instr.addr,
-            instr.optype,
-            instr.reg_src_1,
-            instr.reg_src_2,
-            instr.reg_dest,
-            instr.imm
+            mnem_to_string(instr->mnem),
+            instr->addr,
+            instr->optype,
+            instr->reg_src_1,
+            instr->reg_src_2,
+            instr->reg_dest,
+            instr->imm
     );
 
     //temporary, to make instruction boundaries visible in disassembly
@@ -429,7 +429,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     t_risc_addr orig_risc_addr = risc_addr;
     log_asm_out("Start translating block at (riscv)%p...\n", orig_risc_addr);
 
-    t_risc_instr risc_instr = {};
+    t_risc_instr risc_instr = {0};
 
     /// get memory for structs
 #define BLOCK_CACHE_SIZE 64
@@ -511,14 +511,14 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                 if (cache_loc_cm == UNSEEN_CODE) {
                     log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cm);
-                    set_cache_entry(target_cm, reinterpret_cast<t_cache_loc>(1)); //translation-started-flag
+                    set_cache_entry(target_cm, (t_cache_loc) 1); //translation-started-flag
                     cache_loc_cm = translate_block(target_cm);
                     set_cache_entry(target_cm, cache_loc_cm);
                 }
 
                 if (cache_loc_cnm == UNSEEN_CODE) {
                     log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cnm);
-                    set_cache_entry(target_cnm, reinterpret_cast<t_cache_loc>(1)); //translation-started-flag
+                    set_cache_entry(target_cnm, (t_cache_loc) 1); //translation-started-flag
                     cache_loc_cnm = translate_block(target_cnm);
                     set_cache_entry(target_cnm, cache_loc_cnm);
                 }
@@ -539,7 +539,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                             goto PARSE_DONE;
                         }
 
-                        if (block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
+                        if (block_cache[parse_pos].reg_dest != x0) {
                             ///could follow, but cache
                             instructions_in_block++;
 
@@ -550,7 +550,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                             if (cache_loc == UNSEEN_CODE) {
                                 log_asm_out("Reursion f from (riscv)%p to (riscv)%p\n", risc_addr, target);
-                                set_cache_entry(target, reinterpret_cast<t_cache_loc>(1)); //???????????
+                                set_cache_entry(target, (t_cache_loc) 1); //???????????
                                 cache_loc = translate_block(target);
                                 set_cache_entry(target, cache_loc);
                             }
@@ -570,7 +570,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                         t_risc_imm temp = block_cache[parse_pos].imm;
 
-                        block_cache[parse_pos] = t_risc_instr{
+                        block_cache[parse_pos] = (t_risc_instr) {
                                 risc_addr,
                                 AUIPC,
                                 IMMEDIATE,
@@ -617,7 +617,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
 
     ///loop ended at BRANCH: skip setting pc
-    PARSE_DONE:
+    PARSE_DONE:;
 
 
     ///REGISTER ALLOCATION:
@@ -663,7 +663,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     {
         int currMreg = 0;
         for(int i = 0; i < N_REG; i++) {
-            /*if (indicesRanked[i] != t_risc_reg::x0 && indicesRanked[i] != t_risc_reg::pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
+            /*if (indicesRanked[i] != x0 && indicesRanked[i] != pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
@@ -686,7 +686,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     register_info r_info = {
             register_map,
             mapped,
-            reinterpret_cast<uint64_t>(get_reg_data())
+            (uint64_t) get_reg_data()
     };
 
 
@@ -701,11 +701,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     /// translate structs
     for(int i = 0; i < instructions_in_block; i++) {
-        translate_risc_instr(block_cache[i], r_info);
+        translate_risc_instr(&block_cache[i], &r_info);
     }
 
     if (block_full) {
-        set_pc_next_inst(risc_addr, reinterpret_cast<uint64_t>(get_reg_data()));
+        set_pc_next_inst(risc_addr, (uint64_t) get_reg_data());
     }
 
     ///save registers
@@ -731,7 +731,7 @@ void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
 
 ///loads the Risc V registers into their allocated x86_64 registers
 void load_risc_registers(register_info r_info) {
-    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
+    for(int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
             err |= fe_enc64(&current, FE_MOV64rm, r_info.map[i], FE_MEM_ADDR(r_info.base + 8 * i));
@@ -741,7 +741,7 @@ void load_risc_registers(register_info r_info) {
 
 ///saves the Risc V registers into their respective memory fields
 void save_risc_registers(register_info r_info) {
-    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
+    for(int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * i), r_info.map[i]);
