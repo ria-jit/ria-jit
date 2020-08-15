@@ -421,7 +421,6 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 
 void load_risc_registers(register_info r_info);
 
-
 void set_pc_next_inst(t_risc_addr addr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
