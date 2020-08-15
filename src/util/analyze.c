@@ -108,7 +108,7 @@ void analyze(const char *file_path){
 }
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {
-    t_risc_instr risc_instr = {};
+    t_risc_instr risc_instr = {0};
     risc_instr.addr = addr;
 
     uint32_t reg_count[N_REG]; //dont care

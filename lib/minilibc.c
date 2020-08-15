@@ -352,7 +352,7 @@ void _exit(int status) {
 }
 #endif
 
-int execve(const char* filename, const char* const argv[], const char* const envp[]) {
+int execve(const char* filename, char* const argv[], char* const envp[]) {
     return syscall3(__NR_execve, (uintptr_t) filename, (uintptr_t) argv,
                     (uintptr_t) envp);
 }

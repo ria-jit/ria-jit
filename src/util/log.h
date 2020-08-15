@@ -49,7 +49,7 @@ void log_cache(const char *format, ...);
 
 void log_benchmark(const char *format, ...);
 
-void log_print_mem(const char *ptr, int len);
+void log_print_mem(const char *ptr, long int len);
 
 #ifdef __cplusplus
 }
