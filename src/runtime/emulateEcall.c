@@ -268,10 +268,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                 } else {
                     ///Additional page(s) need to be allocated first
                     t_risc_addr newMappedBrk = ALIGN_UP(brkAddr, 4096lu);
-                    //TODO This not the minilib mmap, switch over when not needing C++ anymore.
-                    void *map =
-                            mmap((void *) mappedBrk, newMappedBrk - mappedBrk, PROT_READ | PROT_WRITE,
-                                 MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE, 0, 0);
+                    void *map = mmap((void *) mappedBrk, newMappedBrk - mappedBrk, PROT_READ | PROT_WRITE,
+                                     MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE, 0, 0);
 
                     if (map != MAP_FAILED) {
                         if ((t_risc_addr) map != mappedBrk) {

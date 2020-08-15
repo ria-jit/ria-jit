@@ -324,7 +324,7 @@ int getrlimit(int resource, struct rlimit *rlimits) {
 }
 
 void *
-mmap_mini(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
+mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
 #if __SIZEOF_POINTER__ == 8
     return (void *) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
                              offset);

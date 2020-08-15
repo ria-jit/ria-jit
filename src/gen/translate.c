@@ -440,6 +440,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, maxCount * sizeof(t_risc_instr),
                                                       PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
+    if (BAD_ADDR(block_cache)) {
+        dprintf(2, "Failed to allocate cache for parsing instructions");
+        _exit(FAIL_HEAP_ALLOC);
+    }
+
     ///count register usage
     uint32_t reg_count[N_REG];
     for(int i = 0; i < N_REG; i++) {

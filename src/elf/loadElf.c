@@ -162,8 +162,8 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     Elf64_Addr endAddr = ALIGN_UP(maxAddr, 4096lu);
     //Allocate the whole address space that is needed (TODO Should not be READ/WRITE everywhere but I am too lazy right
     // now).
-    void *elf = mmap_mini((void *) startAddr, endAddr - startAddr, PROT_READ | PROT_WRITE,
-                          MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void *elf = mmap((void *) startAddr, endAddr - startAddr, PROT_READ | PROT_WRITE,
+                     MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(elf)) {
         dprintf(2, "Could not map elf because error %s", strerror(-(intptr_t) elf));//-(intptr_t) elf
@@ -249,8 +249,8 @@ t_risc_addr allocateStack() {
 
     //Allocate the stack with offset under the translator region where the cached blocks can go.
     uintptr_t stackStart = TRANSLATOR_BASE - STACK_OFFSET - (stackSize + guard + 4096);
-    void *bottomOfStack = mmap_mini((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
-                                    MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
+    void *bottomOfStack = mmap((void *) stackStart, stackSize + guard, PROT_WRITE | PROT_READ,
+                               MAP_ANONYMOUS | MAP_STACK | MAP_PRIVATE | MAP_FIXED_NOREPLACE, -1, 0);
 
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(bottomOfStack)) {
