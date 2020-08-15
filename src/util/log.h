@@ -31,18 +31,25 @@ extern bool flag_translate_opt;
 extern bool flag_do_benchmark;
 extern bool flag_do_analyze;
 
-void critical_not_yet_implemented(const char* info);
+void critical_not_yet_implemented(const char *info);
 
-void not_yet_implemented(const char* info);
+void not_yet_implemented(const char *info);
 
-void log_general(const char* format, ...);
+void log_general(const char *format, ...);
+
 void log_analyze(const char *format, ...);
-void log_asm_in(const char* format, ...);
-void log_asm_out(const char* format, ...);
-void log_reg_dump(const char* format, ...);
-void log_cache(const char* format, ...);
-void log_benchmark(const char* format, ...);
-void log_print_mem(const char* ptr, int len);
+
+void log_asm_in(const char *format, ...);
+
+void log_asm_out(const char *format, ...);
+
+void log_reg_dump(const char *format, ...);
+
+void log_cache(const char *format, ...);
+
+void log_benchmark(const char *format, ...);
+
+void log_print_mem(const char *ptr, int len);
 
 #ifdef __cplusplus
 }
