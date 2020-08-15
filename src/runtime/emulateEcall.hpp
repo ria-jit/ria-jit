@@ -16,7 +16,7 @@ extern "C" {
 
 extern int guest_exit_status;
 
-void setupBrk(int brk);
+void setupBrk(t_risc_addr brk);
 #ifdef __cplusplus
 }
 

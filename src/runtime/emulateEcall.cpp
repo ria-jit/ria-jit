@@ -42,7 +42,7 @@ t_risc_addr curBrk;
 t_risc_addr initialBrk;
 t_risc_addr mappedBrk;
 
-void setupBrk(int brk) {
+void setupBrk(t_risc_addr brk) {
     curBrk = initialBrk = mappedBrk = brk;
 }
 
