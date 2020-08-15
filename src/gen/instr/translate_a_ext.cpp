@@ -3,7 +3,6 @@
 //
 
 #include "translate_a_ext.hpp"
-#include "runtime/register.h"
 #include <fadec/fadec-enc.h>
 
 /*

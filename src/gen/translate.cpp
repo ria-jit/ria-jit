@@ -4,21 +4,20 @@
 
 #include "translate.hpp"
 #include <sys/mman.h>
-#include "runtime/register.h"
-#include "instr/translate_arithmetic.hpp"
-#include "instr/translate_controlflow.hpp"
-#include "instr/translate_csr.hpp"
-#include "instr/translate_loadstore.hpp"
-#include "instr/translate_m_ext.hpp"
-#include "instr/translate_other.hpp"
-#include "instr/translate_a_ext.hpp"
-#include <util/util.h>
+#include <runtime/register.h>
+#include <gen/instr/translate_arithmetic.hpp>
+#include <gen/instr/translate_controlflow.hpp>
+#include <gen/instr/translate_csr.hpp>
+#include <gen/instr/translate_loadstore.hpp>
+#include <gen/instr/translate_m_ext.hpp>
+#include <gen/instr/translate_other.hpp>
+#include <gen/instr/translate_a_ext.hpp>
 #include <fadec/fadec-enc.h>
 #include <cstdio>
 #include <cstdlib>
-#include "util/log.h"
-#include "util/typedefs.h"
-#include "parser/parser.h"
+#include <util/log.h>
+#include <util/typedefs.h>
+#include <parser/parser.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 

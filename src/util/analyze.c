@@ -2,15 +2,12 @@
 // Created by noah on 08.07.20.
 //
 
-
-#include "log.h"
-#include "typedefs.h"
-#include "parser/parser.h"
-
+#include <util/log.h>
+#include <util/typedefs.h>
+#include <parser/parser.h>
+#include <elf/loadElf.h>
 #include <common.h>
 #include <stdbool.h>
-#include <elf/loadElf.h>
-
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count);
 

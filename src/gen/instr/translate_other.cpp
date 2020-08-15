@@ -3,8 +3,7 @@
 //
 
 #include "translate_other.hpp"
-#include "runtime/register.h"
-#include "runtime/emulateEcall.hpp"
+#include <runtime/emulateEcall.hpp>
 
 /**
 * Translate the FENCE instruction.

@@ -4,13 +4,13 @@
 
 #include <common.h>
 #include <stdbool.h>
-#include "util/log.h"
+#include <util/log.h>
 #include <runtime/emulateEcall.hpp>
-#include "cache/cache.h"
-#include "gen/translate.hpp"
+#include <cache/cache.h>
+#include <gen/translate.hpp>
 #include <runtime/register.h>
-#include "elf/loadElf.h"
-#include "util/analyze.h"
+#include <elf/loadElf.h>
+#include <util/analyze.h>
 #include <env/opt.h>
 #include <runtime/perf.h>
 

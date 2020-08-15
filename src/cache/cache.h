@@ -7,7 +7,7 @@
 
 #define UNSEEN_CODE (void*) 0
 
-#include "util/log.h"
+#include <util/log.h>
 
 #ifdef __cplusplus
 extern "C" {

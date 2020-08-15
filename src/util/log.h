@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "typedefs.h"
+#include <util/typedefs.h>
 
 #ifdef __cplusplus
 extern "C" {

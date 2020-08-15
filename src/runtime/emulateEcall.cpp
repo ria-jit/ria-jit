@@ -6,9 +6,9 @@
 #include <cerrno>
 #include <sys/mman.h>
 #include <cstring>
-#include <stdio.h>
+#include <cstdio>
 #include <sys/stat.h>
-#include "register.h"
+#include <runtime/register.h>
 #include "emulateEcall.hpp"
 
 struct statRiscV {

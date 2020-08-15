@@ -3,9 +3,8 @@
 //
 
 #include "translate_controlflow.hpp"
-#include "runtime/register.h"
-#include "translate_arithmetic.hpp"
-#include "util/log.h"
+#include <gen/instr/translate_arithmetic.hpp>
+#include <util/log.h>
 #include <fadec/fadec-enc.h>
 
 inline void translate_controlflow_cmp_rs1_rs2(const t_risc_instr &instr, const register_info &r_info, bool noOrder);

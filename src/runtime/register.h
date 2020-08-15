@@ -5,7 +5,7 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_REGISTER_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_REGISTER_H
 
-#include "util/log.h"
+#include <util/log.h>
 #include <util/typedefs.h>
 
 #ifdef __cplusplus

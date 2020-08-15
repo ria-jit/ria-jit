@@ -3,7 +3,6 @@
 //
 
 #include "translate_csr.hpp"
-#include "runtime/register.h"
 
 /**
 * Translate the CSRRW instruction.

@@ -5,8 +5,8 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_A_EXT_HPP
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_A_EXT_HPP
 
-#include "util/log.h"
-#include "gen/translate.hpp"
+#include <util/log.h>
+#include <gen/translate.hpp>
 #include <util/typedefs.h>
 
 void translate_LRW(const t_risc_instr &instr, const register_info &r_info);
