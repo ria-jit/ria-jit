@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-extern const char *translator_version;
+extern const char *const translator_version;
 
 /**
 * Verbose logging flags used by the main.c and logging methods.
