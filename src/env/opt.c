@@ -3,13 +3,13 @@
 //
 
 #include <stddef.h>
-#include <getopt.h>
 #include <util/log.h>
 #include <common.h>
 #include "opt.h"
 
 t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
-    int opt_index;
+    char opt_char;
+    int optind = 1;
     char *file_path = NULL;
     int fileIndex = 0;
 
@@ -18,72 +18,81 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     //handle no arguments passed
     if (argc <= 1) goto HELP;
 
-    //read command line options (ex. -f for executable file, -v for verbose logging, etc.)
-    while((opt_index = getopt(argc, argv, ":f:mavgiorcshdb")) != -1) {
-        switch(opt_index) {
-            case 'a':
-                flag_do_analyze = true;
-                break;
-            case 'v':
-                flag_log_general = true;
-                flag_log_asm_in = true;
-                flag_log_asm_out = true;
-                flag_log_reg_dump = false; //don't do register dump with the verbose option by default
-                flag_log_cache = true;
-                flag_translate_opt = false;
-                break;
-            case 'g':
-                flag_log_general = true;
-                break;
-            case 'i':
-                flag_log_asm_in = true;
-                break;
-            case 'o':
-                flag_log_asm_out = true;
-                break;
-            case 'r':
-                flag_log_reg_dump = true;
-                break;
-            case 'c':
-                flag_log_cache = true;
-                break;
-            case 'f':
-                file_path = optarg;
-                fileIndex = optind - 1;
-                break;
-            case 's':
-                flag_fail_silently = true;
-                break;
-            case 'd':
-                flag_single_step = true;
-                break;
-            case 'm':
-                flag_translate_opt = true;
-                break;
-            case 'b':
-                flag_do_benchmark = true;
-                break;
-            case ':':
-            case 'h':
-            default:
-            HELP:
-                dprintf(1,
-                        "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
-                        "register file. (equivalent to -gioc)\n"
-                        "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
-                        "\t-o\tDisplay translated output x86 assembly\n"
-                        "\t-r\tDump registers on basic block boundaries\n"
-                        "\t-c\tDisplay cache info\n"
-                        "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
-                        "program may enter undefined states.\n"
-                        "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
-                        "\t-m\tOptimize block translation.\n"
-                        "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
-                        "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
-                        "\t-h\tShow this help.\n"
-                );
-                parse_result.status = 1;
-                return parse_result;
+    NEXT:
+    while(argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
+        //Argument not an option string (not starting with '-' or only '-'
+        if (strncmp(argv[optind], "-", 1) != 0 || strlen(argv[optind]) < 2) {
+            goto HELP;
+        }
+        optind++;
+        int opt_str_index = 1;
+        while((opt_char = argv[optind - 1][opt_str_index]) != '\0') {
+            switch(opt_char) {
+                case 'a':
+                    flag_do_analyze = true;
+                    break;
+                case 'v':
+                    flag_log_general = true;
+                    flag_log_asm_in = true;
+                    flag_log_asm_out = true;
+                    flag_log_reg_dump = false; //don't do register dump with the verbose option by default
+                    flag_log_cache = true;
+                    flag_translate_opt = false;
+                    break;
+                case 'g':
+                    flag_log_general = true;
+                    break;
+                case 'i':
+                    flag_log_asm_in = true;
+                    break;
+                case 'o':
+                    flag_log_asm_out = true;
+                    break;
+                case 'r':
+                    flag_log_reg_dump = true;
+                    break;
+                case 'c':
+                    flag_log_cache = true;
+                    break;
+                case 'f':
+                    file_path = argv[optind++];
+                    fileIndex = optind - 1;
+                    goto NEXT;
+                case 's':
+                    flag_fail_silently = true;
+                    break;
+                case 'd':
+                    flag_single_step = true;
+                    break;
+                case 'm':
+                    flag_translate_opt = true;
+                    break;
+                case 'b':
+                    flag_do_benchmark = true;
+                    break;
+                case ':':
+                case 'h':
+                default:
+                HELP:
+                    dprintf(1,
+                            "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
+                            "register file. (equivalent to -gioc)\n"
+                            "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
+                            "\t-o\tDisplay translated output x86 assembly\n"
+                            "\t-r\tDump registers on basic block boundaries\n"
+                            "\t-c\tDisplay cache info\n"
+                            "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
+                            "program may enter undefined states.\n"
+                            "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
+                            "\t-m\tOptimize block translation.\n"
+                            "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
+                            "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
+                            "\t-h\tShow this help.\n"
+                    );
+                    parse_result.status = 1;
+                    return parse_result;
+            }
+            opt_str_index++;
         }
     }
 
