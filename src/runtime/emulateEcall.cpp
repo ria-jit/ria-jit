@@ -46,8 +46,6 @@ void setupBrk(int brk) {
     curBrk = initialBrk = mappedBrk = brk;
 }
 
-
-//@formatter:off
 static size_t syscall0(int syscall_number) {
     size_t retval = syscall_number;
     __asm__ volatile("syscall" : "+a"(retval) : : "memory", "rcx", "r11");
@@ -99,11 +97,12 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
     "memory", "rcx", "r11");
     return retval;
 }
+
 __attribute__((force_align_arg_pointer))
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[t_risc_reg::pc] = addr + 4;
-    switch (registerValues[t_risc_reg_mnem::a7]) {
+    switch(registerValues[t_risc_reg_mnem::a7]) {
         case 29: //ioctl
         {
             log_general("Emulate syscall ioctl (29)...\n");
@@ -186,25 +185,25 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall fstat (80)...\n");
             auto *pStatRiscV = reinterpret_cast<statRiscV *>(registerValues[t_risc_reg_mnem::a1]);
-            struct stat buf {};
+            struct stat buf{};
             registerValues[t_risc_reg_mnem::a0] = syscall2(__NR_fstat, registerValues[t_risc_reg_mnem::a0],
                                                            reinterpret_cast<size_t>(&buf));
-            pStatRiscV->st_blksize=buf.st_blksize;
-            pStatRiscV->st_size=buf.st_size;
-            pStatRiscV->st_atim=buf.st_atime;
-            pStatRiscV->st_atime_nsec=buf.st_atim.tv_nsec;
-            pStatRiscV->st_blocks=buf.st_blocks;
-            pStatRiscV->st_ctim=buf.st_ctime;
-            pStatRiscV->st_ctime_nsec=buf.st_ctim.tv_nsec;
-            pStatRiscV->st_dev=buf.st_dev;
-            pStatRiscV->st_gid=buf.st_gid;
-            pStatRiscV->st_ino=buf.st_ino;
-            pStatRiscV->st_mode=buf.st_mode;
-            pStatRiscV->st_mtim=buf.st_mtime;
-            pStatRiscV->st_mtime_nsec=buf.st_mtim.tv_nsec;
-            pStatRiscV->st_nlink=buf.st_nlink;
-            pStatRiscV->st_rdev=buf.st_rdev;
-            pStatRiscV->st_uid=buf.st_uid;
+            pStatRiscV->st_blksize = buf.st_blksize;
+            pStatRiscV->st_size = buf.st_size;
+            pStatRiscV->st_atim = buf.st_atime;
+            pStatRiscV->st_atime_nsec = buf.st_atim.tv_nsec;
+            pStatRiscV->st_blocks = buf.st_blocks;
+            pStatRiscV->st_ctim = buf.st_ctime;
+            pStatRiscV->st_ctime_nsec = buf.st_ctim.tv_nsec;
+            pStatRiscV->st_dev = buf.st_dev;
+            pStatRiscV->st_gid = buf.st_gid;
+            pStatRiscV->st_ino = buf.st_ino;
+            pStatRiscV->st_mode = buf.st_mode;
+            pStatRiscV->st_mtim = buf.st_mtime;
+            pStatRiscV->st_mtime_nsec = buf.st_mtim.tv_nsec;
+            pStatRiscV->st_nlink = buf.st_nlink;
+            pStatRiscV->st_rdev = buf.st_rdev;
+            pStatRiscV->st_uid = buf.st_uid;
         }
             break;
         case 88: //utimensat
