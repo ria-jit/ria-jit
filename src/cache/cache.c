@@ -27,6 +27,9 @@
 #define INITIAL_SIZE 4096
 #define HASH_MASK 0x00003FFCu
 
+///position where direct jump to next block can be inserted
+uint8_t *chain_end = NULL;
+
 //init table for 2^12 elements (key size is 12 bit)
 t_cache_entry *cache_table = NULL;
 size_t table_size = INITIAL_SIZE;

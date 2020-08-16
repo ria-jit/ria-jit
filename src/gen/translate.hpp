@@ -15,6 +15,11 @@
 //shortcut for memory operands
 #define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
 
+///chainLink options
+#define LINK_NULL 0
+#define LINK_ADDR 1
+#define DONT_LINK 2
+
 /**
  * Register information for the translator functions.
  */
@@ -34,10 +39,13 @@ extern "C" {
 
 //basic block translation management
 void init_block();
-t_cache_loc finalize_block();
+t_cache_loc finalize_block(int chainLinkOp);
 
 ///basic block translation
 t_cache_loc translate_block(t_risc_addr risc_addr);
+
+///chaining
+void chain(t_cache_loc target);
 
 #ifdef __cplusplus
 }

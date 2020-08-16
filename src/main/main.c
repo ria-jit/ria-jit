@@ -93,8 +93,12 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
             set_cache_entry(next_pc, cache_loc);
         }
 
+        ///chain last block to current (if chainable)
+        chain(cache_loc);
+
         //execute the cached (or now newly generated code) and update the program counter
         if (!execute_cached(cache_loc)) break;
+        //printf("chain_end: %p\ncache_loc: %p\n\n", chain_end, cache_loc);
 
         //store pc from registers in pc
         next_pc = get_value(pc);

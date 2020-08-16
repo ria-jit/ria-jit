@@ -15,6 +15,8 @@ extern "C" {
 
 typedef void *t_cache_loc;
 
+extern uint8_t *chain_end;
+
 //cache entries for translated code segments
 typedef struct {
     //the full RISC-V pc address
