@@ -15,6 +15,7 @@
 #include <fadec/fadec-enc.h>
 #include <cstdio>
 #include <cstdlib>
+#include <util/util.h>
 #include <util/log.h>
 #include <util/typedefs.h>
 #include <parser/parser.h>
