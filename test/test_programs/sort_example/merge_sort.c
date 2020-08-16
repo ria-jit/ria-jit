@@ -8,7 +8,7 @@
 
 void sort(int numbers[], size_t len);
 void sort_internal(int numbers[], int buf[], size_t len, int l, int r);
-void merge(int numbers[], int buf[], size_t len, int l, int m, int r);
+void merge(int numbers[], int buf[], int l, int m, int r);
 int chk_sort(int numbers[], size_t len);
 
 int main(int argc, char **argv) {
