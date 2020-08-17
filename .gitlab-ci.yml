@@ -20,9 +20,16 @@ gtest:
   script:
     - ./build/test
 
-arithmtest:
+arithm-regular:
   stage: test
   dependencies:
     - build
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm
+
+arithm-optimized:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/arithmetic_test/arithm -m
