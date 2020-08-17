@@ -471,11 +471,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
         } else if (format_spec == 'd' || format_spec == 'i') {
             int32_t arg = va_arg(args, int32_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint32_t value = arg;
+            uint32_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint32_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
@@ -541,11 +543,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
 
             int64_t arg = va_arg(args, int64_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint64_t value = arg;
+            uint64_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint64_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
