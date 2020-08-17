@@ -22,6 +22,7 @@ else ()
 endif ()
 
 include(ExternalProject)
+include(CheckCCompilerFlag)
 
 set(FADEC_PATH_PREFIX lib/fadec)
 set(FADEC_GEN_INCLUDES
@@ -112,6 +113,15 @@ add_dependencies(test fadecLib)
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)
 
+check_c_compiler_flag(-static-pie HAS_STATIC_PIE)
+
 #Only use no stdlib in the actual translator since gtest needs it.
-target_link_options(translator PRIVATE -nostdlib -lgcc -static-pie)
+target_link_options(translator PRIVATE -nostdlib -lgcc)
+
+if (HAS_STATIC_PIE)
+    target_link_options(translator PRIVATE -static-pie)
+else ()
+    target_link_options(translator PRIVATE -Wl,-static -Wl,-pie -Wl,--no-dynamic-linker -Wl,-z,text)
+endif ()
+
 target_compile_definitions(translator PRIVATE -DNO_STDLIB)
