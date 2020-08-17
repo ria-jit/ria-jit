@@ -14,22 +14,36 @@ build:
       - build/test
 
 gtest:
-  stage: test
+  stage: unit tests
   dependencies:
     - build
   script:
     - ./build/test
 
 arithm-regular:
-  stage: test
+  stage: arithmetic tests
   dependencies:
     - build
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm
 
 arithm-optimized:
-  stage: test
+  stage: arithmetic tests
   dependencies:
     - build
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm -m
+
+sort-regular:
+  stage: sorting test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/sort_example/sort
+
+sort-optimized:
+  stage: sorting test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/sort_example/sort -m
