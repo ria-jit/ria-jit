@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include <elf.h>
+#include <ryu/ryu.h>
 
 #ifdef NO_STDLIB
 extern int main(int argc, char** argv);
@@ -558,6 +559,12 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             }
             write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
             bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec == 'f') {
+            double value = va_arg(args, double);
+            char doubleBuf[2000];
+            int len = d2fixed_buffered_n(value, 6, doubleBuf);
+            write_func(data, doubleBuf, len);
+            bytes_written += len;
         } else if (format_spec >= '0' && format_spec <= '9') {
             //Ignore specified print widths TODO Maybe figure out a way to respect them.
             goto PARSE_NEXT;

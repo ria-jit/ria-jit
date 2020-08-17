@@ -71,7 +71,13 @@ set(TRANSLATOR_SOURCES
         src/util/util.h
         src/util/typedefs.c src/util/typedefs.h
         src/env/opt.c src/env/opt.h
-        src/runtime/perf.c src/runtime/perf.h)
+        src/runtime/perf.c src/runtime/perf.h
+        lib/ryu/ryucommon.h
+        lib/ryu/d2fixed.c
+        lib/ryu/d2fixed_full_table.h
+        lib/ryu/d2s_intrinsics.h
+        lib/ryu/digit_table.h
+        lib/ryu/ryu.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
