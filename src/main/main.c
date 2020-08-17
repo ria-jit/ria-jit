@@ -10,9 +10,9 @@
 #include <gen/translate.hpp>
 #include <runtime/register.h>
 #include <elf/loadElf.h>
-#include <util/analyze.h>
+#include <util/tools/analyze.h>
 #include <env/opt.h>
-#include <runtime/perf.h>
+#include <util/tools/perf.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;

@@ -67,11 +67,11 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/translate_other.cpp src/gen/instr/translate_other.hpp
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
-        src/util/analyze.c src/util/analyze.h
+        src/util/tools/analyze.c src/util/tools/analyze.h
         src/util/util.h
         src/util/typedefs.c src/util/typedefs.h
         src/env/opt.c src/env/opt.h
-        src/runtime/perf.c src/runtime/perf.h
+        src/util/tools/perf.c src/util/tools/perf.h
         lib/ryu/ryucommon.h
         lib/ryu/d2fixed.c
         lib/ryu/d2fixed_full_table.h
