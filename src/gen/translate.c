@@ -11,6 +11,7 @@
 #include <gen/instr/ext/translate_m_ext.h>
 #include <gen/instr/core/translate_other.h>
 #include <gen/instr/ext/translate_a_ext.h>
+#include <gen/instr/ext/translate_f_ext.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>
 #include <linux/mman.h>
@@ -107,8 +108,6 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * @param instr the RISC instruction to translate
  */
 void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info) {
-    //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
-
     switch (instr->mnem) {
         case LUI:
             translate_lui(instr, r_info);
@@ -391,6 +390,96 @@ void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info
             break;
         case AMOMAXUD:
             translate_AMOMAXUD(instr, r_info);
+            break;
+        case FLW:
+            translate_FLW(instr, r_info);
+            break;
+        case FSW:
+            translate_FSW(instr, r_info);
+            break;
+        case FMADDS:
+            translate_FMADDS(instr, r_info);
+            break;
+        case FMSUBS:
+            translate_FMSUBS(instr, r_info);
+            break;
+        case FNMSUBS:
+            translate_FNMSUBS(instr, r_info);
+            break;
+        case FNMADDS:
+            translate_FNMADDS(instr, r_info);
+            break;
+        case FADDS:
+            translate_FADDS(instr, r_info);
+            break;
+        case FSUBS:
+            translate_FSUBS(instr, r_info);
+            break;
+        case FMULS:
+            translate_FMULS(instr, r_info);
+            break;
+        case FDIVS:
+            translate_FDIVS(instr, r_info);
+            break;
+        case FSQRTS:
+            translate_FSQRTS(instr, r_info);
+            break;
+        case FSGNJS:
+            translate_FSGNJS(instr, r_info);
+            break;
+        case FSGNJNS:
+            translate_FSGNJNS(instr, r_info);
+            break;
+        case FSGNJXS:
+            translate_FSGNJXS(instr, r_info);
+            break;
+        case FMINS:
+            translate_FMINS(instr, r_info);
+            break;
+        case FMAXS:
+            translate_FMAXS(instr, r_info);
+            break;
+        case FCVTWS:
+            translate_FCVTWS(instr, r_info);
+            break;
+        case FCVTWUS:
+            translate_FCVTWUS(instr, r_info);
+            break;
+        case FMVXW:
+            translate_FMVXW(instr, r_info);
+            break;
+        case FEQS:
+            translate_FEQS(instr, r_info);
+            break;
+        case FLTS:
+            translate_FLTS(instr, r_info);
+            break;
+        case FLES:
+            translate_FLES(instr, r_info);
+            break;
+        case FCLASSS:
+            translate_FCLASSS(instr, r_info);
+            break;
+        case FCVTSW:
+            translate_FCVTSW(instr, r_info);
+            break;
+        case FCVTSWU:
+            translate_FCVTSWU(instr, r_info);
+            break;
+        case FMVWX:
+            translate_FMVWX(instr, r_info);
+            break;
+        case FCVTLS:
+            translate_FCVTLS(instr, r_info);
+            break;
+        case FCVTLUS:
+            translate_FCVTLUS(instr, r_info);
+            break;
+        case FCVTSL:
+            translate_FCVTSL(instr, r_info);
+            break;
+        case FCVTSLU:
+            translate_FCVTSLU(instr, r_info);
             break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
