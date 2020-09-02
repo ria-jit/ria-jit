@@ -139,7 +139,7 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest));
 
         //write forward jump target when now known
-        uintptr_t not_less = (uintptr_t) current; //TODO But why double cast and store as var
+        uint8_t *not_less = current;
         err |= fe_enc64(&jmp_buf, FE_JGE, (intptr_t) not_less);
     }
 }
