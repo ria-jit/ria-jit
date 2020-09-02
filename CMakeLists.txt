@@ -59,13 +59,15 @@ set(TRANSLATOR_SOURCES
         src/runtime/emulateEcall.c src/runtime/emulateEcall.h
         src/elf/loadElf.c src/elf/loadElf.h
         src/gen/translate.c src/gen/translate.h
-        src/gen/instr/translate_a_ext.c src/gen/instr/translate_a_ext.h
-        src/gen/instr/translate_arithmetic.c src/gen/instr/translate_arithmetic.h
-        src/gen/instr/translate_controlflow.c src/gen/instr/translate_controlflow.h
-        src/gen/instr/translate_csr.c src/gen/instr/translate_csr.h
-        src/gen/instr/translate_loadstore.c src/gen/instr/translate_loadstore.h
-        src/gen/instr/translate_m_ext.c src/gen/instr/translate_m_ext.h
-        src/gen/instr/translate_other.c src/gen/instr/translate_other.h
+        src/gen/instr/ext/translate_a_ext.c src/gen/instr/ext/translate_a_ext.h
+        src/gen/instr/core/translate_arithmetic.c src/gen/instr/core/translate_arithmetic.h
+        src/gen/instr/core/translate_controlflow.c src/gen/instr/core/translate_controlflow.h
+        src/gen/instr/core/translate_csr.c src/gen/instr/core/translate_csr.h
+        src/gen/instr/core/translate_loadstore.c src/gen/instr/core/translate_loadstore.h
+        src/gen/instr/ext/translate_m_ext.c src/gen/instr/ext/translate_m_ext.h
+        src/gen/instr/core/translate_other.c src/gen/instr/core/translate_other.h
+        src/gen/instr/ext/translate_f_ext.c src/gen/instr/ext/translate_f_ext.h
+        src/gen/instr/ext/translate_d_ext.c src/gen/instr/ext/translate_d_ext.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
         src/util/tools/analyze.c src/util/tools/analyze.h
@@ -78,7 +80,7 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2fixed_full_table.h
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
-        lib/ryu/ryu.h src/gen/instr/translate_f_ext.c src/gen/instr/translate_f_ext.h src/gen/instr/translate_d_ext.c src/gen/instr/translate_d_ext.h)
+        lib/ryu/ryu.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp

@@ -4,13 +4,13 @@
 
 #include "translate.h"
 #include <runtime/register.h>
-#include <gen/instr/translate_arithmetic.h>
-#include <gen/instr/translate_controlflow.h>
-#include <gen/instr/translate_csr.h>
-#include <gen/instr/translate_loadstore.h>
-#include <gen/instr/translate_m_ext.h>
-#include <gen/instr/translate_other.h>
-#include <gen/instr/translate_a_ext.h>
+#include <gen/instr/core/translate_arithmetic.h>
+#include <gen/instr/core/translate_controlflow.h>
+#include <gen/instr/core/translate_csr.h>
+#include <gen/instr/core/translate_loadstore.h>
+#include <gen/instr/ext/translate_m_ext.h>
+#include <gen/instr/core/translate_other.h>
+#include <gen/instr/ext/translate_a_ext.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>
 #include <linux/mman.h>
