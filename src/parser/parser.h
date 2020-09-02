@@ -41,7 +41,7 @@ typedef enum {
  * @param instr_struct a pointer to the struct with a raw address to be filled
  * @param reg_count uint32_t[N_REG] structure to count the register use
  */
-void parse_instruction(t_risc_instr *instr_struct, uint32_t* reg_count);
+void parse_instruction(t_risc_instr *instr_struct, uint32_t *reg_count);
 
 #ifdef __cplusplus
 }

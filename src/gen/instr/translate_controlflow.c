@@ -35,13 +35,14 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
 
     t_cache_loc cache_loc;
 
-    if (!flag_translate_opt || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
+    if (!flag_translate_opt || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
+            cache_loc == (t_cache_loc) 1) {
         //afaik the "multiples of two" thing is resolved in parser.c
 
         ///write chainEnd to be chained by chainer
-        if(flag_translate_opt) {
+        if (flag_translate_opt) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
-            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t)&chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
 
         if (r_info->mapped[pc]) {
@@ -322,10 +323,10 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
         log_asm_out("DIRECT JUMP BRANCH 1\n");
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     } else {
-       ///write chainEnd to be chained by chainer
-        if(flag_translate_opt) {
+        ///write chainEnd to be chained by chainer
+        if (flag_translate_opt) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
-            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t)&chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
 
         if (r_info->mapped[pc]) {
@@ -350,9 +351,9 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     } else {
         ///write chainEnd to be chained by chainer
-        if(flag_translate_opt) {
+        if (flag_translate_opt) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
-            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t)&chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
 
         if (r_info->mapped[pc]) {

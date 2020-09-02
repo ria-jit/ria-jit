@@ -23,6 +23,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 bool execute_cached(t_cache_loc loc);
 
 #ifndef TESTING
+
 int main(int argc, char *argv[]) {
     t_opt_parse_result options = parse_cmd_arguments(argc, argv);
 
@@ -78,7 +79,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         begin = begin_measure();
     }
 
-    while(!finalize) {
+    while (!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(next_pc);
 

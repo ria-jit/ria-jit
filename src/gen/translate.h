@@ -38,6 +38,7 @@ void save_risc_registers(register_info r_info);
 
 //basic block translation management
 void init_block();
+
 t_cache_loc finalize_block(int chainLinkOp);
 
 ///basic block translation

@@ -7,7 +7,7 @@
 
 typedef struct {
     int status;
-    char* file_path;
+    char *file_path;
     int file_index;
     int last_optind;
 } t_opt_parse_result;

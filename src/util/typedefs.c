@@ -6,7 +6,7 @@
 
 
 char *mnem_to_string(int mnem) {
-    switch(mnem) {
+    switch (mnem) {
         case LUI:
             return "LUI";
         case AUIPC:

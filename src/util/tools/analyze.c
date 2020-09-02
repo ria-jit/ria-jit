@@ -29,29 +29,29 @@ void analyze(const char *file_path) {
 
     //create array for mnemomics
     uint64_t mnem[N_MNEM];
-    for(int i = 0;i<N_MNEM;i++){
+    for (int i = 0; i < N_MNEM; i++) {
         mnem[i] = 0;
     }
     //loop over full segment
-    for(t_risc_addr addr = startAddr; addr < endAddr; addr += 4) {
+    for (t_risc_addr addr = startAddr; addr < endAddr; addr += 4) {
         add_instruction(addr, mnem);
     }
 
     ///rank mnem by usage
 
     int indicesRanked[N_MNEM];
-    for(int i = 0; i < N_MNEM; i++) {
+    for (int i = 0; i < N_MNEM; i++) {
         indicesRanked[i] = i;
     }
     ///insertion sort:
     {
         int key, j;
-        for(int i = 1; i < N_MNEM; i++) {
+        for (int i = 1; i < N_MNEM; i++) {
             key = indicesRanked[i];
             j = i - 1;
 
             ///move move elements with index < i && element > i one to the left
-            while(j >= 0 && mnem[indicesRanked[j]] < mnem[key]) {
+            while (j >= 0 && mnem[indicesRanked[j]] < mnem[key]) {
                 indicesRanked[j + 1] = indicesRanked[j];
                 j--;
             }
@@ -61,7 +61,7 @@ void analyze(const char *file_path) {
         }
     }
 
-    for(int i = 0; i < N_MNEM; i++) {
+    for (int i = 0; i < N_MNEM; i++) {
         if (mnem[indicesRanked[i]] == 0) break;
         log_analyze("Mnem %s is used %li times.\n", mnem_to_string(indicesRanked[i]), mnem[indicesRanked[i]]);
     }
@@ -71,7 +71,7 @@ void analyze(const char *file_path) {
     //CSRR
     //CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI,
     bool usesCSRR = false;
-    for(int i = CSRRW; i <= CSRRCI; i++) {
+    for (int i = CSRRW; i <= CSRRCI; i++) {
         if (mnem[i] != 0) {
             usesCSRR = true;
             break;
@@ -83,7 +83,7 @@ void analyze(const char *file_path) {
     //---RV32A---
     //LRW, SCW, AMOSWAPW, AMOADDW, AMOXORW, AMOANDW, AMOORW, AMOMINW, AMOMAXW, AMOMINUW, AMOMAXUW,
     bool usesRV32A = false;
-    for(int i = LRW; i <= AMOMAXUW; i++) {
+    for (int i = LRW; i <= AMOMAXUW; i++) {
         if (mnem[i] != 0) {
             usesRV32A = true;
             break;
@@ -93,16 +93,16 @@ void analyze(const char *file_path) {
     //---RV64A---
     //LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD
     bool usesRV64A = false;
-    for(int i = LRD; i <= AMOMAXUD; i++) {
+    for (int i = LRD; i <= AMOMAXUD; i++) {
         if (mnem[i] != 0) {
             usesRV64A = true;
             break;
         }
     }
 
-    if(usesCSRR) log_analyze("Warning: Guest binary uses CSSR!\n");
-    if(usesRV32A) log_analyze("Warning: Guest binary uses RV32A!\n");
-    if(usesRV64A) log_analyze("Warning: Guest binary uses RV64A!\n");
+    if (usesCSRR) log_analyze("Warning: Guest binary uses CSSR!\n");
+    if (usesRV32A) log_analyze("Warning: Guest binary uses RV32A!\n");
+    if (usesRV64A) log_analyze("Warning: Guest binary uses RV64A!\n");
 }
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {

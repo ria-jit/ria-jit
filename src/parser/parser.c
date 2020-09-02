@@ -10,34 +10,34 @@
 typedef void t_parse_result; //maybe some more return information later
 
 // extract rd register number bit[11:7]
-static inline int extract_rd(int32_t instr) { return instr >> 7 & 0b11111; }
+static inline int extract_rd(int32_t instr) {return instr >> 7 & 0b11111;}
 
 // extract rs1 register number bit[19:15]
-static inline int extract_rs1(int32_t instr) { return instr >> 15 & 0b11111; }
+static inline int extract_rs1(int32_t instr) {return instr >> 15 & 0b11111;}
 
 // extract rs2 register number bit[24:20]
-static inline int extract_rs2(int32_t instr) { return instr >> 20 & 0b11111; }
+static inline int extract_rs2(int32_t instr) {return instr >> 20 & 0b11111;}
 
 // extract func3 bit [14:12]
-static inline int extract_funct3(int32_t instr) { return instr >> 12 & 0b111; }
+static inline int extract_funct3(int32_t instr) {return instr >> 12 & 0b111;}
 
 // extract func7 bit [31:25]
-static inline int extract_funct7(int32_t instr) { return instr >> 25 & 0b1111111; }
+static inline int extract_funct7(int32_t instr) {return instr >> 25 & 0b1111111;}
 
 // extract big_shamt bit[25:20]
-static inline int extract_big_shamt(int32_t instr) { return instr >> 20 & 0b111111; }
+static inline int extract_big_shamt(int32_t instr) {return instr >> 20 & 0b111111;}
 
 // extract small_shamt bit[24:20] -> basically the same as rs2
-static inline int extract_small_shamt(int32_t instr) { return instr >> 20 & 0b11111; }
+static inline int extract_small_shamt(int32_t instr) {return instr >> 20 & 0b11111;}
 
 // extract U-Type immediate bit[31:12] -> mask lower 12 bit [11:0] with zeros
-static inline int extract_imm_U(int32_t instr) { return instr & ~(0xfff); }
+static inline int extract_imm_U(int32_t instr) {return instr & ~(0xfff);}
 
 // extract I-Type immediate bit[31:20]
-static inline int extract_imm_I(int32_t instr) { return instr >> 20; } //sign extend!
+static inline int extract_imm_I(int32_t instr) {return instr >> 20;} //sign extend!
 
 // extract S-Type immediate bit[31:25] + [11:7] => 7bits + 5 bits
-static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111) | (instr >> 7 & 0b11111); }
+static inline int extract_imm_S(int32_t instr) {return (instr >> 20 & ~0b11111) | (instr >> 7 & 0b11111);}
 
 // extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
 // sign extended because jump address is pc relative
@@ -45,13 +45,13 @@ static inline int extract_imm_S(int32_t instr) { return (instr >> 20 & ~0b11111)
 
 static inline int extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-           ((signed) instr >> (30 - 10) & 0xffe007fe);
+            ((signed) instr >> (30 - 10) & 0xffe007fe);
 }
 
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
 static inline int32_t extract_imm_B(int32_t instr) {
     return (instr >> (31 - 12) & 0xfffff000) | (instr << (11 - 7) & (1 << 11)) |
-           (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
+            (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
 }
 
 /**
@@ -500,7 +500,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     break;
                 case 3:
                     //RV64A
-                    p_instr_struct->mnem += LRD-LRW;
+                    p_instr_struct->mnem += LRD - LRW;
                     break;
                 default:
                     critical_not_yet_implemented("UNKNOWN OP_AMO funct3");

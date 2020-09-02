@@ -99,7 +99,7 @@ __attribute__((force_align_arg_pointer))
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
     registerValues[pc] = addr + 4;
-    switch(registerValues[a7]) {
+    switch (registerValues[a7]) {
         case 29: //ioctl
         {
             log_general("Emulate syscall ioctl (29)...\n");
@@ -165,7 +165,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall fstat (80)...\n");
             statRiscV *pStatRiscV = (statRiscV *) registerValues[a1];
-            struct stat buf= {0};
+            struct stat buf = {0};
             registerValues[a0] = syscall2(__NR_fstat, registerValues[a0], (size_t) &buf);
             pStatRiscV->st_blksize = buf.st_blksize;
             pStatRiscV->st_size = buf.st_size;
