@@ -68,6 +68,7 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/core/translate_other.c src/gen/instr/core/translate_other.h
         src/gen/instr/ext/translate_f_ext.c src/gen/instr/ext/translate_f_ext.h
         src/gen/instr/ext/translate_d_ext.c src/gen/instr/ext/translate_d_ext.h
+        src/gen/dispatch.c src/gen/dispatch.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
         src/util/tools/analyze.c src/util/tools/analyze.h
