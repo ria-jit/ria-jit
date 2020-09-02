@@ -3,7 +3,6 @@
 //
 
 #include "translate_arithmetic.hpp"
-#include "runtime/register.h"
 #include <fadec/fadec-enc.h>
 
 /**

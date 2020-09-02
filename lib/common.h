@@ -98,7 +98,7 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 void *memcpy(void *dest, const void *src, size_t n);
 
-int execve(const char *filename, const char *const argv[], const char *const envp[]);
+int execve(const char *filename, char *const argv[], char *const envp[]);
 
 int dup2(int oldfd, int newfd);
 

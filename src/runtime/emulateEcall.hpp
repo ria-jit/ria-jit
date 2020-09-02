@@ -5,7 +5,7 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
 
-#include "util/log.h"
+#include <util/log.h>
 #include <util/util.h>
 #include <util/typedefs.h>
 #include "gen/translate.hpp"
@@ -16,7 +16,7 @@ extern "C" {
 
 extern int guest_exit_status;
 
-void setupBrk(int brk);
+void setupBrk(t_risc_addr brk);
 #ifdef __cplusplus
 }
 

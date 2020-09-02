@@ -11,7 +11,7 @@
 t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     int opt_index;
     char *file_path = NULL;
-    int fileIndex;
+    int fileIndex = 0;
 
     t_opt_parse_result parse_result;
 

@@ -4,21 +4,21 @@
 
 #include "translate.hpp"
 #include <sys/mman.h>
-#include "runtime/register.h"
-#include "instr/translate_arithmetic.hpp"
-#include "instr/translate_controlflow.hpp"
-#include "instr/translate_csr.hpp"
-#include "instr/translate_loadstore.hpp"
-#include "instr/translate_m_ext.hpp"
-#include "instr/translate_other.hpp"
-#include "instr/translate_a_ext.hpp"
-#include <util/util.h>
+#include <runtime/register.h>
+#include <gen/instr/translate_arithmetic.hpp>
+#include <gen/instr/translate_controlflow.hpp>
+#include <gen/instr/translate_csr.hpp>
+#include <gen/instr/translate_loadstore.hpp>
+#include <gen/instr/translate_m_ext.hpp>
+#include <gen/instr/translate_other.hpp>
+#include <gen/instr/translate_a_ext.hpp>
 #include <fadec/fadec-enc.h>
 #include <cstdio>
 #include <cstdlib>
-#include "util/log.h"
-#include "util/typedefs.h"
-#include "parser/parser.h"
+#include <util/util.h>
+#include <util/log.h>
+#include <util/typedefs.h>
+#include <parser/parser.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -421,7 +421,6 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 
 
 void load_risc_registers(register_info r_info);
-
 
 void set_pc_next_inst(t_risc_addr addr, uint64_t r_addr);
 

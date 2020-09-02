@@ -4,15 +4,15 @@
 
 #include <common.h>
 #include <stdbool.h>
-#include "util/log.h"
+#include <util/log.h>
 #include <runtime/emulateEcall.hpp>
-#include "cache/cache.h"
-#include "gen/translate.hpp"
+#include <cache/cache.h>
+#include <gen/translate.hpp>
 #include <runtime/register.h>
-#include "elf/loadElf.h"
-#include "util/analyze.h"
+#include <elf/loadElf.h>
+#include <util/tools/analyze.h>
 #include <env/opt.h>
-#include <runtime/perf.h>
+#include <util/tools/perf.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -43,11 +43,6 @@ int main(int argc, char *argv[]) {
 }
 
 #endif //TESTING
-
-int start_transcode(const char *file_path) {
-    log_general("extern transcode start!\n");
-    return transcode_loop(file_path, 0, NULL);
-}
 
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     t_risc_elf_map_result result = mapIntoMemory(file_path);

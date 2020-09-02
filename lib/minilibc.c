@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include <elf.h>
+#include <ryu/ryu.h>
 
 #ifdef NO_STDLIB
 extern int main(int argc, char** argv);
@@ -352,7 +353,7 @@ void _exit(int status) {
 }
 #endif
 
-int execve(const char* filename, const char* const argv[], const char* const envp[]) {
+int execve(const char* filename, char* const argv[], char* const envp[]) {
     return syscall3(__NR_execve, (uintptr_t) filename, (uintptr_t) argv,
                     (uintptr_t) envp);
 }
@@ -470,11 +471,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
         } else if (format_spec == 'd' || format_spec == 'i') {
             int32_t arg = va_arg(args, int32_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint32_t value = arg;
+            uint32_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint32_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
@@ -540,11 +543,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
 
             int64_t arg = va_arg(args, int64_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint64_t value = arg;
+            uint64_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint64_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
@@ -558,6 +563,12 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             }
             write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
             bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec == 'f') {
+            double value = va_arg(args, double);
+            char doubleBuf[2000];
+            int len = d2fixed_buffered_n(value, 6, doubleBuf);
+            write_func(data, doubleBuf, len);
+            bytes_written += len;
         } else if (format_spec >= '0' && format_spec <= '9') {
             //Ignore specified print widths TODO Maybe figure out a way to respect them.
             goto PARSE_NEXT;

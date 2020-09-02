@@ -3,7 +3,6 @@
 //
 
 #include "translate_loadstore.hpp"
-#include "runtime/register.h"
 
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX

@@ -222,6 +222,9 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 }
                 break;
             }
+            default: {
+                break;
+            }
         }
     }
     t_risc_addr phdr = load_addr + ph_offset;

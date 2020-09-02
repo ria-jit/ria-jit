@@ -3,7 +3,6 @@
 //
 
 #include "translate_m_ext.hpp"
-#include "runtime/register.h"
 
 /**
  * see p. 44 of the RISC-V-Spec

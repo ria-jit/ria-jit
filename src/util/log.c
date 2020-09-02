@@ -20,7 +20,7 @@ bool flag_do_benchmark = false;
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
-const char *translator_version = "1.0.1";
+const char *const translator_version = "1.0.1";
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
@@ -61,7 +61,6 @@ void log_analyze(const char *format, ...) {
     printf("[mnemonic] ");
     vdprintf(1, format, args);
     va_end(args);
-    return;
 }
 
 void log_asm_in(const char *format, ...) {
@@ -119,7 +118,7 @@ void log_benchmark(const char *format, ...) {
     }
 }
 
-void log_print_mem(const char *ptr, int len) {
+void log_print_mem(const char *ptr, long int len) {
     char buffer[2];
     for(const char *ptri = ptr; ptri < ptr + len; ptri++) {
 
