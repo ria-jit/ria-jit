@@ -63,7 +63,7 @@ size_t find_lin_slot(t_risc_addr risc_addr) {
     size_t index = hash(risc_addr);
 
     //linearly probe for key or empty field
-    while(cache_table[index].cache_loc != 0 && cache_table[index].risc_addr != risc_addr) {
+    while (cache_table[index].cache_loc != 0 && cache_table[index].risc_addr != risc_addr) {
         //cyclically increment to find available slots
         index = (index + 1) % table_size;
     }

@@ -19,15 +19,15 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     if (argc <= 1) goto HELP;
 
     NEXT:
-    while(argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
+    while (argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
         //Argument not an option string (not starting with '-' or only '-'
         if (strncmp(argv[optind], "-", 1) != 0 || strlen(argv[optind]) < 2) {
             goto HELP;
         }
         optind++;
         int opt_str_index = 1;
-        while((opt_char = argv[optind - 1][opt_str_index]) != '\0') {
-            switch(opt_char) {
+        while ((opt_char = argv[optind - 1][opt_str_index]) != '\0') {
+            switch (opt_char) {
                 case 'a':
                     flag_do_analyze = true;
                     break;

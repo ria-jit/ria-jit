@@ -120,7 +120,7 @@ void log_benchmark(const char *format, ...) {
 
 void log_print_mem(const char *ptr, long int len) {
     char buffer[2];
-    for(const char *ptri = ptr; ptri < ptr + len; ptri++) {
+    for (const char *ptri = ptr; ptri < ptr + len; ptri++) {
 
         buffer[0] = "0123456789abcdef"[((*ptri) >> 4) & 0xf];
         buffer[1] = "0123456789abcdef"[(*ptri) & 0xf];

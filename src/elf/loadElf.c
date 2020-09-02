@@ -94,7 +94,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     }
 
     Elf64_Addr minAddrExec = 0, maxAddrExec = 0;
-    for(int i = 0; i < sh_count; i++) {
+    for (int i = 0; i < sh_count; i++) {
         Elf64_Shdr section;
         ssize_t sectionBytes = read_full(fd, (void *) &section, sizeof(Elf64_Shdr));
         if (sectionBytes <= 0) {
@@ -121,14 +121,14 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         dprintf(2, "Could not seek file, error %li", -fileOffset);
         return INVALID_ELF_MAP;
     }
-    for(int i = 0; i < ph_count; i++) {
+    for (int i = 0; i < ph_count; i++) {
         Elf64_Phdr segment;
         ssize_t segmentBytes = read_full(fd, (void *) &segment, sizeof(Elf64_Phdr));
         if (segmentBytes <= 0) {
             dprintf(2, "Could not read header for segment %i, error %li", i, -segmentBytes);
             return INVALID_ELF_MAP;
         }
-        switch(segment.p_type) {
+        switch (segment.p_type) {
             case PT_LOAD: {
                 Elf64_Off load_offset = segment.p_offset;
                 Elf64_Xword memory_size = segment.p_memsz;
@@ -189,14 +189,14 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         dprintf(2, "Could not open file, error %i", -fd2);
         return INVALID_ELF_MAP;
     }
-    for(int i = 0; i < ph_count; i++) {
+    for (int i = 0; i < ph_count; i++) {
         Elf64_Phdr segment;
         ssize_t segmentBytes = read_full(fd, (void *) &segment, sizeof(Elf64_Phdr));
         if (segmentBytes <= 0) {
             dprintf(2, "Could not read header for segment %i, error %li", i, -segmentBytes);
             return INVALID_ELF_MAP;
         }
-        switch(segment.p_type) {
+        switch (segment.p_type) {
             case PT_LOAD: {
                 Elf64_Off load_offset = segment.p_offset;
                 Elf64_Xword physical_size = segment.p_filesz;
@@ -278,7 +278,7 @@ t_risc_addr copyArgsToStack(t_risc_addr stackPos, int guestArgc, char *guestArgv
 mapInfo) {
     ///Stack pointer always needs to be 16-Byte aligned per ABI convention
     int envc = 0;
-    for(; envp[envc]; ++envc);
+    for (; envp[envc]; ++envc);
 #ifndef NO_STDLIB
     //TODO This is a very temporary solution since the actual startup routine of minilib is not yet used.
     auxvptr_temp = (const size_t *) &__environ[envc + 1];
@@ -318,10 +318,10 @@ mapInfo) {
         char **stack = (char **) stackPos;
         *(--stack) = NULL;
         //Zero terminated so environ[envc] will be zero and also needs to be copied
-        for(int i = envc - 1; i >= 0; i--) {
+        for (int i = envc - 1; i >= 0; i--) {
             *(--stack) = envp[i];
         }
-        for(int i = 0; stack[i] || envp[i]; ++i) {
+        for (int i = 0; stack[i] || envp[i]; ++i) {
             if (stack[i] != envp[i]) {
                 log_general("Difference in envp %p and environ %p\n", stack[i], envp[i]);
             }
@@ -334,7 +334,7 @@ mapInfo) {
 
         //Zero terminated so guestArgv[guestArgc] will be zero and also needs to be copied
         *(--stack) = NULL;
-        for(int i = guestArgc - 1; i >= 0; i--) {
+        for (int i = guestArgc - 1; i >= 0; i--) {
             *(--stack) = guestArgv[i];
         }
         stackPos = (t_risc_addr) stack;

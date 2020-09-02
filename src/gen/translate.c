@@ -76,8 +76,8 @@ void init_block() {
 t_cache_loc finalize_block(int chainLinkOp) {
 
     ///write chainEnd to be chained by chainer
-    if(flag_translate_opt && chainLinkOp == LINK_NULL) {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t)&chain_end), 0);
+    if (flag_translate_opt && chainLinkOp == LINK_NULL) {
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
     }
 
     //emit the ret instruction as the final instruction in the block
@@ -109,7 +109,7 @@ t_cache_loc finalize_block(int chainLinkOp) {
 void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info) {
     //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
 
-    switch(instr->mnem) {
+    switch (instr->mnem) {
         case LUI:
             translate_lui(instr, r_info);
             break;
@@ -446,7 +446,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///count register usage
     uint32_t reg_count[N_REG];
-    for(int i = 0; i < N_REG; i++) {
+    for (int i = 0; i < N_REG; i++) {
         reg_count[i] = 0;
     }
 
@@ -455,7 +455,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     bool block_full = false;
 
     ///parse structs
-    for(int parse_pos = 0; parse_pos <= maxCount - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
+    for (int parse_pos = 0; parse_pos <= maxCount - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
 
         risc_instr.addr = risc_addr;
 
@@ -468,12 +468,12 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         parse_instruction(&block_cache[parse_pos], reg_count);
 
         //switch (block_cache.back().optype) {
-        switch(block_cache[parse_pos].optype) {
+        switch (block_cache[parse_pos].optype) {
 
             ///branch? or syscall?
             case SYSTEM : //fallthrough Potential program end stop parsing
             {
-                switch(block_cache[parse_pos].mnem){
+                switch (block_cache[parse_pos].mnem) {
                     case ECALL:
                         ///Potential program end stop parsing
                         instructions_in_block++;
@@ -506,7 +506,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                 instructions_in_block++;
 
-                t_risc_addr target_cm = risc_addr + ((int64_t) (block_cache[parse_pos].imm));              //ConditionMet
+                t_risc_addr
+                        target_cm = risc_addr + ((int64_t) (block_cache[parse_pos].imm));              //ConditionMet
                 t_risc_addr target_cnm = risc_addr + 4; //ConditionNotMet
 
                 t_cache_loc cache_loc_cm = lookup_cache_entry(target_cm);
@@ -528,14 +529,13 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                 }
 
 
-
                 goto PARSE_DONE;
             }
                 //break; (not required, goto above)
 
                 ///unconditional jump? -> follow
             case JUMP : {    ///JAL, JALR
-                switch(block_cache[parse_pos].mnem) {
+                switch (block_cache[parse_pos].mnem) {
                     case JAL : {
                         if (!flag_translate_opt) {
                             ///could follow, but cache
@@ -630,18 +630,18 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     ///rank registers by usage
 
     int indicesRanked[N_REG];
-    for(int i = 0; i < N_REG; i++) {
+    for (int i = 0; i < N_REG; i++) {
         indicesRanked[i] = i;
     }
     ///insertion sort:
     {
         int key, j;
-        for(int i = 1; i < N_REG; i++) {
+        for (int i = 1; i < N_REG; i++) {
             key = indicesRanked[i];
             j = i - 1;
 
             ///move move elements with index < i && element > i one to the left
-            while(j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
+            while (j >= 0 && reg_count[indicesRanked[j]] < reg_count[key]) {
                 indicesRanked[j + 1] = indicesRanked[j];
                 j--;
             }
@@ -666,7 +666,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     {
         int currMreg = 0;
-        for(int i = 0; i < N_REG; i++) {
+        for (int i = 0; i < N_REG; i++) {
             /*if (indicesRanked[i] != x0 && indicesRanked[i] != pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
@@ -704,7 +704,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     //load_risc_registers(r_info);
 
     /// translate structs
-    for(int i = 0; i < instructions_in_block; i++) {
+    for (int i = 0; i < instructions_in_block; i++) {
         translate_risc_instr(&block_cache[i], &r_info);
     }
 
@@ -720,7 +720,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", orig_risc_addr, instructions_in_block);
 
     ///finalize block and return cached location
-    if(block_cache[instructions_in_block - 1].mnem == JALR || block_cache[instructions_in_block - 1].mnem == ECALL) {
+    if (block_cache[instructions_in_block - 1].mnem == JALR || block_cache[instructions_in_block - 1].mnem == ECALL) {
         return finalize_block(LINK_NULL);
     }
     return finalize_block(DONT_LINK);
@@ -735,7 +735,7 @@ void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
 
 ///loads the Risc V registers into their allocated x86_64 registers
 void load_risc_registers(register_info r_info) {
-    for(int i = x0; i <= pc; i++) {
+    for (int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
             err |= fe_enc64(&current, FE_MOV64rm, r_info.map[i], FE_MEM_ADDR(r_info.base + 8 * i));
@@ -745,7 +745,7 @@ void load_risc_registers(register_info r_info) {
 
 ///saves the Risc V registers into their respective memory fields
 void save_risc_registers(register_info r_info) {
-    for(int i = x0; i <= pc; i++) {
+    for (int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * i), r_info.map[i]);
@@ -757,9 +757,9 @@ void save_risc_registers(register_info r_info) {
  * inserts direct jumps after first cache lookup in main
  * */
 void chain(t_cache_loc target) {
-    if(!flag_translate_opt) return;
+    if (!flag_translate_opt) return;
     int err = 0;
-    if(chain_end != NULL) {
+    if (chain_end != NULL) {
         log_general("chaining: ...\n");
         err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
     }
