@@ -2,7 +2,7 @@ image: ubuntu
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-build:
+compile:
   stage: build
   before_script:
     - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson
@@ -16,34 +16,34 @@ build:
 gtest:
   stage: test
   dependencies:
-    - build
+    - compile
   script:
     - ./build/test
 
 arithm-regular:
   stage: test
   dependencies:
-    - build
+    - compile
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm
 
 arithm-optimized:
   stage: test
   dependencies:
-    - build
+    - compile
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm -m
 
 sort-regular:
   stage: test
   dependencies:
-    - build
+    - compile
   script:
     - ./build/translator -f test/test_programs/sort_example/sort
 
 sort-optimized:
   stage: test
   dependencies:
-    - build
+    - compile
   script:
     - ./build/translator -f test/test_programs/sort_example/sort -m
