@@ -5,7 +5,6 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOG_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOG_H
 
-//error codes for internal reference
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
