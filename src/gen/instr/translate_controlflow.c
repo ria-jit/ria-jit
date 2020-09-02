@@ -273,9 +273,8 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
         ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
         if (r_info->mapped[instr->reg_src_2] && noOrder) {
             //a->cmp(r_info->map[instr->reg_src_2], x86::ptr(r_info->base + 8 * instr->reg_src_1));
-            err |= fe_enc64(&current, FE_CMP64rr, r_info->map[instr->reg_src_2],
+            err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_2],
                             FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-            //fixme Supposed to be FE_CMP64rm?
         }
             ///else get both from mem, rs1 in temp register
         else {
