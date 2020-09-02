@@ -12,6 +12,7 @@
 #include <gen/instr/core/translate_other.h>
 #include <gen/instr/ext/translate_a_ext.h>
 #include <gen/instr/ext/translate_f_ext.h>
+#include <gen/instr/ext/translate_d_ext.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>
 #include <linux/mman.h>
@@ -480,6 +481,102 @@ void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info
             break;
         case FCVTSLU:
             translate_FCVTSLU(instr, r_info);
+            break;
+        case FLD:
+            translate_FLD(instr, r_info);
+            break;
+        case FSD:
+            translate_FSD(instr, r_info);
+            break;
+        case FMADDD:
+            translate_FMADDD(instr, r_info);
+            break;
+        case FMSUBD:
+            translate_FMSUBD(instr, r_info);
+            break;
+        case FNMSUBD:
+            translate_FNMSUBD(instr, r_info);
+            break;
+        case FNMADDD:
+            translate_FNMADDD(instr, r_info);
+            break;
+        case FADDD:
+            translate_FADDD(instr, r_info);
+            break;
+        case FSUBD:
+            translate_FSUBD(instr, r_info);
+            break;
+        case FMULD:
+            translate_FMULD(instr, r_info);
+            break;
+        case FDIVD:
+            translate_FDIVD(instr, r_info);
+            break;
+        case FSQRTD:
+            translate_FSQRTD(instr, r_info);
+            break;
+        case FSGNJD:
+            translate_FSGNJD(instr, r_info);
+            break;
+        case FSGNJND:
+            translate_FSGNJND(instr, r_info);
+            break;
+        case FSGNJXD:
+            translate_FSGNJXD(instr, r_info);
+            break;
+        case FMIND:
+            translate_FMIND(instr, r_info);
+            break;
+        case FMAXD:
+            translate_FMAXD(instr, r_info);
+            break;
+        case FCVTSD:
+            translate_FCVTSD(instr, r_info);
+            break;
+        case FCVTDS:
+            translate_FCVTDS(instr, r_info);
+            break;
+        case FEQD:
+            translate_FEQD(instr, r_info);
+            break;
+        case FLTD:
+            translate_FLTD(instr, r_info);
+            break;
+        case FLED:
+            translate_FLED(instr, r_info);
+            break;
+        case FCLASSD:
+            translate_FCLASSD(instr, r_info);
+            break;
+        case FCVTWD:
+            translate_FCVTWD(instr, r_info);
+            break;
+        case FCVTWUD:
+            translate_FCVTWUD(instr, r_info);
+            break;
+        case FCVTDW:
+            translate_FCVTDW(instr, r_info);
+            break;
+        case FCVTDWU:
+            translate_FCVTDWU(instr, r_info);
+            break;
+        case FCVTLD:
+            translate_FCVTLD(instr, r_info);
+            break;
+        case FCVTLUD:
+            translate_FCVTLUD(instr, r_info);
+            break;
+        case FMVXD:
+            translate_FMVXD(instr, r_info);
+            break;
+        case FCVTDL:
+            translate_FCVTDL(instr, r_info);
+            break;
+        case FCVTDLU:
+            translate_FCVTDLU(instr, r_info);
+            break;
+        case FMVDX:
+            translate_FMVDX(instr, r_info);
             break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
