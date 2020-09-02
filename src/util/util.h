@@ -14,16 +14,7 @@ extern "C" {
 #define MAP_FIXED_NOREPLACE 0x200000
 #endif
 
-// TODO Only here because we need it places where common.h can't be included
-#ifndef ALIGN_DOWN
-#define ALIGN_DOWN(v, a) ((v) & ~((a)-1))
-#endif
-#ifndef ALIGN_UP
-#define ALIGN_UP(v, a) (((v) + (a - 1)) & ~((a)-1))
-#endif
-
 #define FAIL_HEAP_ALLOC 0x1000
-
 
 #ifdef __cplusplus
 }

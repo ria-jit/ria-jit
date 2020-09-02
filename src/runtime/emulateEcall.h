@@ -2,13 +2,13 @@
 // Created by simon on 25.06.20.
 //
 
-#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
-#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
+#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_H
+#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_H
 
 #include <util/log.h>
 #include <util/util.h>
 #include <util/typedefs.h>
-#include "gen/translate.hpp"
+#include <gen/translate.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,11 +17,11 @@ extern "C" {
 extern int guest_exit_status;
 
 void setupBrk(t_risc_addr brk);
-#ifdef __cplusplus
-}
 
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues);
 
+#ifdef __cplusplus
+}
 #endif //__cplusplus
 
-#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_HPP
+#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_EMULATEECALL_H

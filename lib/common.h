@@ -63,8 +63,7 @@ int getrlimit(int resource, struct rlimit *rlimits);
 unsigned long int getauxval(unsigned long int __type);
 
 // sys/mman.h
-void *mmap_mini(void *addr, size_t length, int prot, int flags, int fd,
-                off_t offset);
+void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
 
 int munmap(void *addr, size_t length);
 

@@ -10,7 +10,7 @@ add_link_options(-pie -Wl,-Ttext-segment=${TRANSLATOR_BASE})
 #Make Constant available as C Makro
 add_definitions(-DTRANSLATOR_BASE=${TRANSLATOR_BASE})
 
-add_compile_options(-fPIE -Wall -Wextra -Wpedantic)
+add_compile_options(-fno-stack-protector -fPIE -Wall -Wextra -Wpedantic)
 
 #Get a variable containing the meson build type corresponding to the CMake Build type
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
@@ -22,6 +22,7 @@ else ()
 endif ()
 
 include(ExternalProject)
+include(CheckCCompilerFlag)
 
 set(FADEC_PATH_PREFIX lib/fadec)
 set(FADEC_GEN_INCLUDES
@@ -39,7 +40,7 @@ list(TRANSFORM FADECLIB_GEN_INCLUDES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
 ExternalProject_Add(fadec
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX}
-        CONFIGURE_COMMAND meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
+        CONFIGURE_COMMAND CFLAGS=-fno-stack-protector meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FADEC_PATH_PREFIX}
         BUILD_COMMAND ninja -v
         INSTALL_COMMAND ""
         UPDATE_COMMAND "pwd" #dummy so cmake always tries to update the subproject
@@ -55,16 +56,16 @@ set(TRANSLATOR_SOURCES
         src/parser/parser.c src/parser/parser.h
         src/cache/cache.c src/cache/cache.h
         src/runtime/register.c src/runtime/register.h
-        src/runtime/emulateEcall.cpp src/runtime/emulateEcall.hpp
+        src/runtime/emulateEcall.c src/runtime/emulateEcall.h
         src/elf/loadElf.c src/elf/loadElf.h
-        src/gen/translate.cpp src/gen/translate.hpp
-        src/gen/instr/translate_a_ext.cpp src/gen/instr/translate_a_ext.hpp
-        src/gen/instr/translate_arithmetic.cpp src/gen/instr/translate_arithmetic.hpp
-        src/gen/instr/translate_controlflow.cpp src/gen/instr/translate_controlflow.hpp
-        src/gen/instr/translate_csr.cpp src/gen/instr/translate_csr.hpp
-        src/gen/instr/translate_loadstore.cpp src/gen/instr/translate_loadstore.hpp
-        src/gen/instr/translate_m_ext.cpp src/gen/instr/translate_m_ext.hpp
-        src/gen/instr/translate_other.cpp src/gen/instr/translate_other.hpp
+        src/gen/translate.c src/gen/translate.h
+        src/gen/instr/translate_a_ext.c src/gen/instr/translate_a_ext.h
+        src/gen/instr/translate_arithmetic.c src/gen/instr/translate_arithmetic.h
+        src/gen/instr/translate_controlflow.c src/gen/instr/translate_controlflow.h
+        src/gen/instr/translate_csr.c src/gen/instr/translate_csr.h
+        src/gen/instr/translate_loadstore.c src/gen/instr/translate_loadstore.h
+        src/gen/instr/translate_m_ext.c src/gen/instr/translate_m_ext.h
+        src/gen/instr/translate_other.c src/gen/instr/translate_other.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
         src/util/tools/analyze.c src/util/tools/analyze.h
@@ -111,3 +112,16 @@ add_dependencies(test fadecLib)
 
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)
+
+check_c_compiler_flag(-static-pie HAS_STATIC_PIE)
+
+#Only use no stdlib in the actual translator since gtest needs it.
+target_link_options(translator PRIVATE -nostdlib -lgcc)
+
+if (HAS_STATIC_PIE)
+    target_link_options(translator PRIVATE -static-pie)
+else ()
+    target_link_options(translator PRIVATE -Wl,-static -Wl,-pie -Wl,--no-dynamic-linker -Wl,-z,text)
+endif ()
+
+target_compile_definitions(translator PRIVATE -DNO_STDLIB)

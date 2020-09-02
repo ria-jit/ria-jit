@@ -2,13 +2,15 @@
 // Created by flo on 09.05.20.
 //
 
-#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_HPP
-#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_HPP
+#ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_H
+#define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_H
 
 #include <cache/cache.h>
 #include <util/typedefs.h>
 
 #ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <fadec/fadec-enc.h>
 
@@ -23,19 +25,16 @@
 /**
  * Register information for the translator functions.
  */
-struct register_info {
+typedef struct {
     FeReg *map;
     bool *mapped;
     uint64_t base;
-};
+} register_info;
 
 extern uint8_t *current;
 extern int err;
 
 void save_risc_registers(register_info r_info);
-
-extern "C" {
-#endif
 
 //basic block translation management
 void init_block();
@@ -51,4 +50,4 @@ void chain(t_cache_loc target);
 }
 #endif
 
-#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_HPP
+#endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_H

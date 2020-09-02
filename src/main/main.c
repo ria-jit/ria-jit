@@ -5,9 +5,9 @@
 #include <common.h>
 #include <stdbool.h>
 #include <util/log.h>
-#include <runtime/emulateEcall.hpp>
+#include <runtime/emulateEcall.h>
 #include <cache/cache.h>
-#include <gen/translate.hpp>
+#include <gen/translate.h>
 #include <runtime/register.h>
 #include <elf/loadElf.h>
 #include <util/tools/analyze.h>
@@ -33,12 +33,12 @@ int main(int argc, char *argv[]) {
 
     log_general("Initializing transcoding...\n");
 
-    char *temp = argv[options.last_optind - 1];
-    argv[options.last_optind - 1] = options.file_path;
+    char *temp = argv[options.last_optind];
+    argv[options.last_optind] = options.file_path;
     argv[options.file_index] = temp;
 
-    int guestArgc = argc - options.last_optind + 1;
-    char **guestArgv = argv + (options.last_optind - 1);
+    int guestArgc = argc - options.last_optind;
+    char **guestArgv = argv + (options.last_optind);
     return transcode_loop(options.file_path, guestArgc, guestArgv);
 }
 
