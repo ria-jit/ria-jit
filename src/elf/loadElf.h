@@ -38,16 +38,8 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath);
 
 /**
  * Maps a stack for the program into memory and copies argc, argv, envp, and auxv onto it.
- * @param guestArgc the number of arguments passed on to the guest program. (Should be equal to argc - optind + 1
- * after parsing in main This bracketed bit is just an impl note and can be deleted whenever.)
- * @param guestArgv the array containing pointers to the argument strings passed on to the guest program. (The
- * easiest way to get this would probably to rearrange the the argv in the main function so all guest program
- * arguments are after a certain point and then put the pointer to the filename string in front of there. The cmd
- * line could then look like dynamic-translate -f <filename> [-v][…] -- <guest programm arguments>. And then
- * after parsing the arguments in main we could exchange the pointer to '--' with the filename pointer. optind should
- * then be the index of the first guest program argument so this should be easy. Although getopt() will probably not
- * work with -nostdlib, so we will have to write our own implementation... This bracketed bit is just an impl note
- * and can be deleted whenever.)
+ * @param guestArgc the number of arguments passed on to the guest program.
+ * @param guestArgv the array containing pointers to the argument strings passed on to the guest program.
  * @param mapInfo the map result returned by the mapIntoMemory call.
  * @return the 16-Byte aligned address of the start stack pointer.
  */

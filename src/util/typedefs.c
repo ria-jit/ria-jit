@@ -170,7 +170,7 @@ char *mnem_to_string(int mnem) {
         case AMOMAXW:
             return "AMOMAXW";
         case AMOMINUW:
-            return "AMOMAXW";
+            return "AMOMINUW";
         case AMOMAXUW:
             return "AMOMAXUW";
         case LRD:

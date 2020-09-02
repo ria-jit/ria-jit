@@ -7,7 +7,7 @@ build:
   before_script:
     - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson
   script:
-    - mkdir build && cd build && cmake .. && make
+    - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make
   artifacts:
     paths:
       - build/translator
@@ -20,9 +20,30 @@ gtest:
   script:
     - ./build/test
 
-arithmtest:
+arithm-regular:
   stage: test
   dependencies:
     - build
   script:
     - ./build/translator -f test/test_programs/arithmetic_test/arithm
+
+arithm-optimized:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/arithmetic_test/arithm -m
+
+sort-regular:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/sort_example/sort
+
+sort-optimized:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./build/translator -f test/test_programs/sort_example/sort -m

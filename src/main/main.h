@@ -11,8 +11,6 @@
 extern "C" {
 #endif //__cplusplus
 
-int start_transcode(const char *file_path);
-
 #ifdef __cplusplus
 }
 #endif //__cplusplus

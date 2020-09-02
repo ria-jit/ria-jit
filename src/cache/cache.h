@@ -7,13 +7,15 @@
 
 #define UNSEEN_CODE (void*) 0
 
-#include "util/log.h"
+#include <util/log.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef void *t_cache_loc;
+
+extern uint8_t *chain_end;
 
 //cache entries for translated code segments
 typedef struct {

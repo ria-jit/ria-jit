@@ -8,10 +8,14 @@
 
 void sort(int numbers[], size_t len);
 void sort_internal(int numbers[], int buf[], size_t len, int l, int r);
-void merge(int numbers[], int buf[], size_t len, int l, int m, int r);
+void merge(int numbers[], int buf[], int l, int m, int r);
+int chk_sort(int numbers[], size_t len);
 
 int main(int argc, char **argv) {
     int len = 200;
+
+    //check for any unsorted arrays
+    int fail = 0;
 
     const size_t runs = 1000;
     double total = 0;
@@ -44,15 +48,28 @@ int main(int argc, char **argv) {
 
         double nanos = 1e9 * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
-        printf("\twith execution time %f nanoseconds\n", nanos);
+        printf("\twith execution time %f nanoseconds...", nanos);
         total += nanos;
+
+        int verified = chk_sort(values, len);
+        if (verified == 0) {
+            printf("OK\n");
+        } else {
+            printf("FAIL\n");
+        }
+
+        fail |= verified;
     }
 
     double avg = total / (double) runs;
 
     printf("Average execution time: %f nanoseconds.\n", avg);
 
-    exit(0);
+    if (fail == 1) {
+        printf("There were test failures! See above.\n");
+    }
+
+    exit(fail);
 }
 
 void sort(int numbers[], size_t len) {
@@ -97,4 +114,20 @@ void merge(int numbers[], int buf[], size_t len, int l, int m, int r) {
     for(size_t i = 0; i < part; ++i) {
         numbers[l + i] = buf[i];
     }
+}
+
+/**
+ * Checks if the passed array of numbers is sorted in an ascending manner.
+ * @param numbers the array to check
+ * @param len the length of the buffer
+ * @return 0 if the array is sorted, else 1
+ */
+int chk_sort(int numbers[], size_t len) {
+    for(size_t i = 1; i < len; i++) {
+        if (numbers[i - 1] > numbers[i]) {
+            return 1;
+        }
+    }
+
+    return 0;
 }

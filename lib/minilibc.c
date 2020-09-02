@@ -2,7 +2,9 @@
 #include "common.h"
 
 #include <elf.h>
+#include <ryu/ryu.h>
 
+//@formatter:off
 #ifdef NO_STDLIB
 extern int main(int argc, char** argv);
 void __start_main(const size_t* initial_stack, const size_t* dynv);
@@ -66,6 +68,7 @@ __clone:
     .att_syntax;
 );
 #endif
+//@formatter:on
 
 //@formatter:off
 static size_t syscall0(int syscall_number) {
@@ -323,7 +326,7 @@ int getrlimit(int resource, struct rlimit *rlimits) {
 }
 
 void *
-mmap_mini(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
+mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset) {
 #if __SIZEOF_POINTER__ == 8
     return (void *) syscall6(__NR_mmap, (size_t) addr, length, prot, flags, fd,
                              offset);
@@ -352,7 +355,7 @@ void _exit(int status) {
 }
 #endif
 
-int execve(const char* filename, const char* const argv[], const char* const envp[]) {
+int execve(const char* filename, char* const argv[], char* const envp[]) {
     return syscall3(__NR_execve, (uintptr_t) filename, (uintptr_t) argv,
                     (uintptr_t) envp);
 }
@@ -395,10 +398,15 @@ int puts(const char* s) {
     write(1, "\n", 1);
     return 0;
 }
-
-typedef void (*PrintfWriteFunc)(void*, const char*, size_t);
 //@formatter:on
 // TODO Reformat later
+int putchar(int c) {
+    write(1, (char *) &c, 1);
+    return c;
+}
+
+typedef void (*PrintfWriteFunc)(void *, const char *, size_t);
+
 static
 size_t
 printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
@@ -470,11 +478,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
         } else if (format_spec == 'd' || format_spec == 'i') {
             int32_t arg = va_arg(args, int32_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint32_t value = arg;
+            uint32_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint32_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
@@ -540,11 +550,13 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
 
             int64_t arg = va_arg(args, int64_t);
             size_t buf_idx = sizeof(buffer) - 1;
-            uint64_t value = arg;
+            uint64_t value;
             if (arg < 0) {
                 write_func(data, "-", 1);
                 bytes_written++;
-                value = -arg;
+                value = 0 - (uint64_t) arg;
+            } else {
+                value = arg;
             }
             if (value == 0) {
                 buffer[buf_idx] = '0';
@@ -558,6 +570,12 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             }
             write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
             bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec == 'f') {
+            double value = va_arg(args, double);
+            char doubleBuf[2000];
+            int len = d2fixed_buffered_n(value, 6, doubleBuf);
+            write_func(data, doubleBuf, len);
+            bytes_written += len;
         } else if (format_spec >= '0' && format_spec <= '9') {
             //Ignore specified print widths TODO Maybe figure out a way to respect them.
             goto PARSE_NEXT;
@@ -767,3 +785,8 @@ __start_main(const size_t* initial_stack, const size_t* dynv)
 #endif
 //formatter:on
 // TODO Reformat later
+
+int __dprintf_chk (int d, int flags, const char *format, ...){
+    //TODO Should not ignore flags
+    return dprintf(d, format);
+}

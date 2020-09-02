@@ -2,28 +2,27 @@
 // Created by flo on 09.05.20.
 //
 
-#include "translate.hpp"
-#include <sys/mman.h>
-#include "runtime/register.h"
-#include "instr/translate_arithmetic.hpp"
-#include "instr/translate_controlflow.hpp"
-#include "instr/translate_csr.hpp"
-#include "instr/translate_loadstore.hpp"
-#include "instr/translate_m_ext.hpp"
-#include "instr/translate_other.hpp"
-#include "instr/translate_a_ext.hpp"
-#include <util/util.h>
+#include "translate.h"
+#include <runtime/register.h>
+#include <gen/instr/translate_arithmetic.h>
+#include <gen/instr/translate_controlflow.h>
+#include <gen/instr/translate_csr.h>
+#include <gen/instr/translate_loadstore.h>
+#include <gen/instr/translate_m_ext.h>
+#include <gen/instr/translate_other.h>
+#include <gen/instr/translate_a_ext.h>
 #include <fadec/fadec-enc.h>
-#include <cstdio>
-#include <cstdlib>
-#include "util/log.h"
-#include "util/typedefs.h"
-#include "parser/parser.h"
+#include <common.h>
+#include <linux/mman.h>
+#include <util/util.h>
+#include <util/log.h>
+#include <util/typedefs.h>
+#include <parser/parser.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
-void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info);
+void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info);
 
 /**
  * The pointer to the head of the current basic block.
@@ -49,7 +48,7 @@ int err;
  * (e.g., before translating every basic block).
  */
 void init_block() {
-    auto addr = reinterpret_cast<void *>(lastUsedAddress - 4096lu);
+    void *addr = (void *) (lastUsedAddress - 4096lu);
     //allocate a memory page for the next basic block that will be translated
     void *buf = mmap(addr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
                      -1, 0);
@@ -57,11 +56,11 @@ void init_block() {
     //check for mmap fault and terminate
     if (buf != addr) {
         dprintf(2, "Memory allocation fault in assembly.\n");
-        exit(-1);
+        _exit(-1);
     }
 
     //set the block_head and current pointer and the failed status
-    block_head = static_cast<uint8_t *>(buf);
+    block_head = (uint8_t *) buf;
     current = block_head;
     err = 0;
 
@@ -74,7 +73,13 @@ void init_block() {
  * This emits the ret instruction in order to have the translated basic block return to the main loop.
  * @return the starting address of the function block, or the nullptr in case of error
  */
-t_cache_loc finalize_block() {
+t_cache_loc finalize_block(int chainLinkOp) {
+
+    ///write chainEnd to be chained by chainer
+    if(flag_translate_opt && chainLinkOp == LINK_NULL) {
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t)&chain_end), 0);
+    }
+
     //emit the ret instruction as the final instruction in the block
     err |= fe_enc64(&current, FE_RET);
 
@@ -82,7 +87,7 @@ t_cache_loc finalize_block() {
     if (err != 0) {
         //terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error after generating basic block.\n");
-        exit(-1);
+        _exit(-1);
     }
 
     //if that's fine, then we log and return
@@ -101,10 +106,10 @@ t_cache_loc finalize_block() {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info) {
+void translate_risc_instr(const t_risc_instr *instr, const register_info *r_info) {
     //todo once the optype is finalized in t_risc_instr->optype, extract multiple dispatch layers here
 
-    switch(instr.mnem) {
+    switch(instr->mnem) {
         case LUI:
             translate_lui(instr, r_info);
             break;
@@ -394,13 +399,13 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
     //log instruction
     log_asm_out(
             "Instruction %s at 0x%x (type %d) - rs1: %d rs2: %d rd: %d imm: %d\n",
-            mnem_to_string(instr.mnem),
-            instr.addr,
-            instr.optype,
-            instr.reg_src_1,
-            instr.reg_src_2,
-            instr.reg_dest,
-            instr.imm
+            mnem_to_string(instr->mnem),
+            instr->addr,
+            instr->optype,
+            instr->reg_src_1,
+            instr->reg_src_2,
+            instr->reg_dest,
+            instr->imm
     );
 
     //temporary, to make instruction boundaries visible in disassembly
@@ -416,14 +421,14 @@ void translate_risc_instr(const t_risc_instr &instr, const register_info &r_info
 
 void load_risc_registers(register_info r_info);
 
-
 void set_pc_next_inst(t_risc_addr addr, uint64_t r_addr);
 
 t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     t_risc_addr orig_risc_addr = risc_addr;
+    log_asm_out("Start translating block at (riscv)%p...\n", orig_risc_addr);
 
-    t_risc_instr risc_instr = {};
+    t_risc_instr risc_instr = {0};
 
     /// get memory for structs
 #define BLOCK_CACHE_SIZE 64
@@ -433,6 +438,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
     t_risc_instr *block_cache = (t_risc_instr *) mmap(NULL, maxCount * sizeof(t_risc_instr),
                                                       PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+    if (BAD_ADDR(block_cache)) {
+        dprintf(2, "Failed to allocate cache for parsing instructions");
+        _exit(FAIL_HEAP_ALLOC);
+    }
 
     ///count register usage
     uint32_t reg_count[N_REG];
@@ -481,7 +491,44 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                 break;
             case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
+
+                /* "true'd out" for now because it's not really improving performance
+                 * -> not finished
+                 * also using '1' as "translation-started-flag" is a bit sketchy
+                 *
+                 * recursive translation (of cond. jumps) may become entirely obsolete when chaining in main works
+                 * */
+
+                if (true || !flag_translate_opt) {
+                    instructions_in_block++;
+                    goto PARSE_DONE;
+                }
+
                 instructions_in_block++;
+
+                t_risc_addr target_cm = risc_addr + ((int64_t) (block_cache[parse_pos].imm));              //ConditionMet
+                t_risc_addr target_cnm = risc_addr + 4; //ConditionNotMet
+
+                t_cache_loc cache_loc_cm = lookup_cache_entry(target_cm);
+                t_cache_loc cache_loc_cnm = lookup_cache_entry(target_cnm);
+
+
+                if (cache_loc_cm == UNSEEN_CODE) {
+                    log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cm);
+                    set_cache_entry(target_cm, (t_cache_loc) 1); //translation-started-flag
+                    cache_loc_cm = translate_block(target_cm);
+                    set_cache_entry(target_cm, cache_loc_cm);
+                }
+
+                if (cache_loc_cnm == UNSEEN_CODE) {
+                    log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cnm);
+                    set_cache_entry(target_cnm, (t_cache_loc) 1); //translation-started-flag
+                    cache_loc_cnm = translate_block(target_cnm);
+                    set_cache_entry(target_cnm, cache_loc_cnm);
+                }
+
+
+
                 goto PARSE_DONE;
             }
                 //break; (not required, goto above)
@@ -496,7 +543,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                             goto PARSE_DONE;
                         }
 
-                        if (block_cache[parse_pos].reg_dest != t_risc_reg::x0) {
+                        if (block_cache[parse_pos].reg_dest != x0) {
                             ///could follow, but cache
                             instructions_in_block++;
 
@@ -506,7 +553,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                             t_cache_loc cache_loc = lookup_cache_entry(target);
 
                             if (cache_loc == UNSEEN_CODE) {
-                                //set_cache_entry(target, reinterpret_cast<t_cache_loc>(1)); //???????????
+                                log_asm_out("Reursion f from (riscv)%p to (riscv)%p\n", risc_addr, target);
+                                set_cache_entry(target, (t_cache_loc) 1); //???????????
                                 cache_loc = translate_block(target);
                                 set_cache_entry(target, cache_loc);
                             }
@@ -526,7 +574,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
                         t_risc_imm temp = block_cache[parse_pos].imm;
 
-                        block_cache[parse_pos] = t_risc_instr{
+                        block_cache[parse_pos] = (t_risc_instr) {
                                 risc_addr,
                                 AUIPC,
                                 IMMEDIATE,
@@ -573,26 +621,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
 
     ///loop ended at BRANCH: skip setting pc
-    PARSE_DONE:
+    PARSE_DONE:;
+
 
     ///REGISTER ALLOCATION:
-
-    /*
-    *The idea is to allocate the most used Risc V registers to real x86_64 registers
-    *but we can not use all the available x86_64 registers because we need some of them for
-    *the translated instructions that expand to multiple x86_64 instructions which probably
-    *have to store some temporary values.
-    *
-    *at the end of the translated basic block all the Risc V registers allocated to real x86_64
-    *registers will be copied back to their respective in-memory register representation fields.
-    *this is necessary because the binary translator also uses the x86_64 registers in between basic blocks
-    *and also because the allocation will probably be different for the next basic block.
-    */
-
-
-    //Again, I dont remember the exact problematic with using the standard library anymore.
-    //The unordered_map /*could be*/ is replaced by (multiple) arrays,
-    //and we could of course implement the sorting algorithm or whatever we'll use later on ourselves.
+    //doing this on a per-block-basis doesn't work in combination with chaining and is also probably very inefficient
 
     ///rank registers by usage
 
@@ -634,7 +667,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     {
         int currMreg = 0;
         for(int i = 0; i < N_REG; i++) {
-            /*if (indicesRanked[i] != t_risc_reg::x0 && indicesRanked[i] != t_risc_reg::pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
+            /*if (indicesRanked[i] != x0 && indicesRanked[i] != pc && reg_count[indicesRanked[i]] > 2 && currMreg < USED_X86_REGS) {
                 register_map[indicesRanked[i]] = x86_64_registers[i];
                 mapped[indicesRanked[i]] = true;
                 currMreg++;
@@ -657,7 +690,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     register_info r_info = {
             register_map,
             mapped,
-            reinterpret_cast<uint64_t>(get_reg_data())
+            (uint64_t) get_reg_data()
     };
 
 
@@ -672,11 +705,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     /// translate structs
     for(int i = 0; i < instructions_in_block; i++) {
-        translate_risc_instr(block_cache[i], r_info);
+        translate_risc_instr(&block_cache[i], &r_info);
     }
 
     if (block_full) {
-        set_pc_next_inst(risc_addr, reinterpret_cast<uint64_t>(get_reg_data()));
+        set_pc_next_inst(risc_addr, (uint64_t) get_reg_data());
     }
 
     ///save registers
@@ -687,7 +720,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", orig_risc_addr, instructions_in_block);
 
     ///finalize block and return cached location
-    return finalize_block();
+    if(block_cache[instructions_in_block - 1].mnem == JALR || block_cache[instructions_in_block - 1].mnem == ECALL) {
+        return finalize_block(LINK_NULL);
+    }
+    return finalize_block(DONT_LINK);
 }
 
 ///set the pc to next addr after inst
@@ -699,7 +735,7 @@ void set_pc_next_inst(const t_risc_addr addr, uint64_t r_addr) {
 
 ///loads the Risc V registers into their allocated x86_64 registers
 void load_risc_registers(register_info r_info) {
-    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
+    for(int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(r_info.map[i], x86::ptr(r_info.base + 8 * i, 0)); //x86::ptr(r_info.base+ 8 * i)
             err |= fe_enc64(&current, FE_MOV64rm, r_info.map[i], FE_MEM_ADDR(r_info.base + 8 * i));
@@ -709,10 +745,29 @@ void load_risc_registers(register_info r_info) {
 
 ///saves the Risc V registers into their respective memory fields
 void save_risc_registers(register_info r_info) {
-    for(int i = t_risc_reg::x0; i <= t_risc_reg::pc; i++) {
+    for(int i = x0; i <= pc; i++) {
         if (r_info.mapped[i]) {
             //a->mov(x86::ptr(r_info.base + 8 * i), r_info.map[i]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * i), r_info.map[i]);
         }
+    }
+}
+
+/**
+ * inserts direct jumps after first cache lookup in main
+ * */
+void chain(t_cache_loc target) {
+    if(!flag_translate_opt) return;
+    int err = 0;
+    if(chain_end != NULL) {
+        log_general("chaining: ...\n");
+        err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
+    }
+
+    ///check failed flag
+    if (err != 0) {
+        ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
+        dprintf(2, "Assembly error in chain, exiting...\n");
+        _exit(-1);
     }
 }

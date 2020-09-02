@@ -2,21 +2,16 @@
 // Created by noah on 08.07.20.
 //
 
-
-#include "log.h"
-#include "typedefs.h"
-#include "parser/parser.h"
-
+#include <util/log.h>
+#include <util/typedefs.h>
+#include <parser/parser.h>
+#include <elf/loadElf.h>
 #include <common.h>
 #include <stdbool.h>
-#include <elf/loadElf.h>
-
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count);
 
-char* to_mnem(int mnem);
-
-void analyze(const char *file_path){
+void analyze(const char *file_path) {
 
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
@@ -111,7 +106,7 @@ void analyze(const char *file_path){
 }
 
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {
-    t_risc_instr risc_instr = {};
+    t_risc_instr risc_instr = {0};
     risc_instr.addr = addr;
 
     uint32_t reg_count[N_REG]; //dont care

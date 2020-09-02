@@ -9,11 +9,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "typedefs.h"
+#include <util/typedefs.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern const char *const translator_version;
 
 /**
 * Verbose logging flags used by the main.c and logging methods.
@@ -26,18 +28,28 @@ extern bool flag_log_cache;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
 extern bool flag_translate_opt;
+extern bool flag_do_benchmark;
+extern bool flag_do_analyze;
 
-void critical_not_yet_implemented(const char* info);
+void critical_not_yet_implemented(const char *info);
 
-void not_yet_implemented(const char* info);
+void not_yet_implemented(const char *info);
 
-void log_general(const char* format, ...);
+void log_general(const char *format, ...);
+
 void log_analyze(const char *format, ...);
-void log_asm_in(const char* format, ...);
-void log_asm_out(const char* format, ...);
-void log_reg_dump(const char* format, ...);
-void log_cache(const char* format, ...);
-void log_print_mem(const char* ptr, int len);
+
+void log_asm_in(const char *format, ...);
+
+void log_asm_out(const char *format, ...);
+
+void log_reg_dump(const char *format, ...);
+
+void log_cache(const char *format, ...);
+
+void log_benchmark(const char *format, ...);
+
+void log_print_mem(const char *ptr, long int len);
 
 #ifdef __cplusplus
 }
