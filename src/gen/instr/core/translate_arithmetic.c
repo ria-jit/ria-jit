@@ -3,7 +3,11 @@
 //
 
 #include "translate_arithmetic.h"
+#include <util/util.h>
 #include <fadec/fadec-enc.h>
+
+#define FIRST_REG FE_AX
+#define SECOND_REG FE_DX
 
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
@@ -13,18 +17,15 @@
 void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     // mov rd, rs1
     // add rd, instr->imm
-    log_asm_out("Translate addiw…\n");
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(x86::rdx, r_info->map[instr->reg_src_1]);
-        a->add(x86::edx, instr->imm);
-        a->movsxd(r_info->map[instr->reg_dest], x86::edx);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_ADD32ri, FE_DX, instr->imm);
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    log_asm_out("Translate ADDIW…\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_ADD32ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -35,16 +36,15 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, rs1
     //shl rd, (instr->imm & 0x3F)
-    log_asm_out("Translate slli…\n");
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->shl(r_info->map[instr->reg_dest], instr->imm & 0b111111);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_SHL64ri, FE_AX, instr->imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    log_asm_out("Translate SLLI…\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_SHL64ri, regDest, instr->imm & 0b111111);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -54,15 +54,13 @@ void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, extended
-    log_asm_out("Translate lui…\n");
+    log_asm_out("Translate LUI…\n");
 
-    //move into register
-    if (r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        //a->mov(r_info->map[instr->reg_dest], instr->imm);
-    } else {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->imm);
-    }
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->imm);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -72,17 +70,15 @@ void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
  * @param instr
  */
 void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate addi…\n");
+    log_asm_out("Translate ADDI…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->add(r_info->map[instr->reg_dest], instr->imm);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr->imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_ADD64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -97,18 +93,12 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AUIPC…\n");
 
-    if (instr->reg_dest != x0) {
-        //add offset to the pc and store in rd
-        if (r_info->mapped[instr->reg_dest]) {
-            critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-            /*a->mov(r_info->map[instr->reg_dest], instr->addr);
-            a->add(r_info->map[instr->reg_dest], instr->imm);*/
-        } else {
-            err |= fe_enc64(&current, FE_MOV64ri, FE_AX, instr->addr);
-            err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr->imm);
-            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-        }
-    }
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr);
+    err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -121,27 +111,23 @@ void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTI…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->xor_(r_info->map[instr->reg_dest], r_info->map[instr->reg_dest]);
-        a->cmp(r_info->map[instr->reg_src_1], instr->imm);
-        a->jnl(not_less);
-        a->inc(r_info->map[instr->reg_dest]);
-        a->bind(not_less);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0);
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), instr->imm);
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
-        //insert forward jump here later
-        uint8_t *jmp_buf = current;
-        err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
 
-        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest));
+    //insert forward jump here later
+    uint8_t *jmp_buf = current;
+    err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
-        //write forward jump target when now known
-        uint8_t *not_less = current;
-        err |= fe_enc64(&jmp_buf, FE_JGE, (intptr_t) not_less);
-    }
+    err |= fe_enc64(&current, FE_INC64r, regDest);
+
+    //write forward jump target when now known
+    uint8_t *not_less = current;
+    err |= fe_enc64(&jmp_buf, FE_JGE, (intptr_t) not_less);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -154,35 +140,26 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTIU…\n");
 
-    //const Label &not_below = a->newLabel();
-    //const Label &below = a->newLabel();
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->cmp(r_info->map[instr->reg_src_1], instr->imm);
-        a->jnb(not_below);
-        a->inc(r_info->map[instr->reg_dest]);
-        a->jmp(below);
-        a->bind(not_below);
-        a->xor_(r_info->map[instr->reg_dest], r_info->map[instr->reg_dest]);
-        a->bind(below);*/
-    } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), instr->imm);
-        uint8_t *jnb_buffer = current;
-        err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
+    uint8_t *jnb_buffer = current;
+    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
-        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest));
+    err |= fe_enc64(&current, FE_INC64r, regDest);
 
-        uint8_t *jmp_buffer = current;
-        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+    uint8_t *jmp_buffer = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
-        //not_below <- jnb:
-        err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0);
+    //not_below <- jnb:
+    err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
 
-        //below <- jmp:
-        err |= fe_enc64(&jmp_buffer, FE_JMP, (intptr_t) current);
-    }
+    //below <- jmp:
+    err |= fe_enc64(&jmp_buffer, FE_JMP, (intptr_t) current);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
