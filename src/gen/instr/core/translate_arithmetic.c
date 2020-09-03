@@ -8,6 +8,7 @@
 
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
+#define THIRD_REG FE_R8
 
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
@@ -172,15 +173,13 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate XORI…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->xor_(r_info->map[instr->reg_dest], instr->imm);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64ri, FE_AX, instr->imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_XOR64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -193,15 +192,13 @@ void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ORI…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->or_(r_info->map[instr->reg_dest], instr->imm);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_OR64ri, FE_AX, instr->imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_OR64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -214,15 +211,13 @@ void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ANDI…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->and_(r_info->map[instr->reg_dest], instr->imm);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_AND64ri, FE_AX, instr->imm);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_AND64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -233,15 +228,14 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
 */
 void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRLI…\n");
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->shr(r_info->map[instr->reg_dest], instr->imm & 0b111111);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_SHR64ri, FE_AX, instr->imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_SHR64ri, regSrc1, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -252,15 +246,14 @@ void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
 */
 void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRAI…\n");
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->sar(r_info->map[instr->reg_dest], instr->imm & 0b111111);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_SAR64ri, FE_AX, instr->imm & 0b111111);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_SAR64ri, regSrc1, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -273,15 +266,14 @@ void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ADD…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->add(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_ADD64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    err |= fe_enc64(&current, FE_ADD64rr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -294,15 +286,14 @@ void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SUB…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->sub(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_SUB64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    err |= fe_enc64(&current, FE_SUB64rr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -315,18 +306,17 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLL…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->and_(x86::rcx, 0b11111);
-        a->shl(r_info->map[instr->reg_dest], x86::cl);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_SHL64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    //rs2 needs to be in CX for us to be able to encode the shift
+    err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_SHL64rr, regSrc1, FE_CX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -338,40 +328,32 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLT…\n");
 
-    //const Label &not_less = a->newLabel();
-    //const Label &less = a->newLabel();
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->cmp(r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_2]);
-        a->jnl(not_less);
-        a->inc(r_info->map[instr->reg_dest]);
-        a->jmp(less);
-        a->bind(not_less);
-        a->xor_(r_info->map[instr->reg_dest], r_info->map[instr->reg_dest]);
-        a->bind(less);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), FE_AX);
+    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
 
-        //jnl not_less
-        uint8_t *jnl_buf = current;
-        err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
+    //jnl not_less
+    uint8_t *jnl_buf = current;
+    err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
-        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest));
+    //todo verify that this does not need to be mov rd, 1?
+    err |= fe_enc64(&current, FE_INC64r, regDest);
 
-        //jmp less
-        uint8_t *jmp_buf = current;
-        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+    //jmp less
+    uint8_t *jmp_buf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
-        //not_less:
-        err |= fe_enc64(&jnl_buf, FE_JGE, (intptr_t) current);
+    //not_less:
+    err |= fe_enc64(&jnl_buf, FE_JGE, (intptr_t) current);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
 
-        //less:
-        err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
-    }
+    //less:
+    err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -383,40 +365,32 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTU…\n");
 
-    //const Label &not_below = a->newLabel();
-    //const Label &below = a->newLabel();
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->cmp(r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_2]);
-        a->jnb(not_below);
-        a->inc(r_info->map[instr->reg_dest]);
-        a->jmp(below);
-        a->bind(not_below);
-        a->xor_(r_info->map[instr->reg_dest], r_info->map[instr->reg_dest]);
-        a->bind(below);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), FE_AX);
+    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
 
-        //jnl not_below
-        uint8_t *jnb_buf = current;
-        err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
+    //jnl not_below
+    uint8_t *jnb_buf = current;
+    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
-        err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest));
+    //todo verify (see above)
+    err |= fe_enc64(&current, FE_INC64r, regDest);
 
-        //jmp below
-        uint8_t *jmp_buf = current;
-        err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+    //jmp below
+    uint8_t *jmp_buf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
 
-        //not_below:
-        err |= fe_enc64(&jnb_buf, FE_JNC, (intptr_t) current);
+    //not_below:
+    err |= fe_enc64(&jnb_buf, FE_JNC, (intptr_t) current);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
 
-        //below:
-        err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
-    }
+    //below:
+    err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -428,15 +402,14 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate XOR…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->xor_(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    err |= fe_enc64(&current, FE_XOR64rr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -449,18 +422,17 @@ void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRL…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->and_(x86::rcx, 0b11111);
-        a->shr(r_info->map[instr->reg_dest], x86::cl);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_SHR64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    //rs2 needs to be in CX for us to be able to encode the shift
+    err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_SHR64rr, regSrc1, FE_CX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -473,18 +445,17 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRA…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->and_(x86::rcx, 0b11111);
-        a->sar(r_info->map[instr->reg_dest], x86::cl);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_SAR64rr, FE_AX, FE_CX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    //rs2 needs to be in CX for us to be able to encode the shift
+    err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_SAR64rr, regSrc1, FE_CX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -496,15 +467,14 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
 void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate OR…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->or_(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_OR64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    err |= fe_enc64(&current, FE_OR64rr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -516,15 +486,14 @@ void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AND…\n");
 
-    if (r_info->mapped[instr->reg_dest] && r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->and_(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_AND64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-    }
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
+    err |= fe_enc64(&current, FE_AND64rr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**

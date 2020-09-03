@@ -397,7 +397,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     bool mapped[N_REG];
 
 
-
+    //todo be aware of the registers claimed by the individual translator functions.
+    // arithmetics temporarily replace into AX, DX, R8, CX
     //insert register pairs here, example:
 #define USED_X86_REGS 8
     FeReg x86_64_registers[] = {FE_R8, FE_R9,
