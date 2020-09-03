@@ -16,7 +16,7 @@
 void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
     switch (instr->mnem) {
         case LUI:
-            translate_lui(instr, r_info);
+            translate_LUI(instr, r_info);
             break;
         case JAL:
             translate_JAL(instr, r_info);
@@ -43,13 +43,13 @@ void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
             translate_BGEU(instr, r_info);
             break;
         case ADDI:
-            translate_addi(instr, r_info);
+            translate_ADDI(instr, r_info);
             break;
         case SLLI:
-            translate_slli(instr, r_info);
+            translate_SLLI(instr, r_info);
             break;
         case ADDIW:
-            translate_addiw(instr, r_info);
+            translate_ADDIW(instr, r_info);
             break;
         case AUIPC:
             translate_AUIPC(instr, r_info);

@@ -9,13 +9,13 @@
 #include "gen/translate.h"
 #include <util/typedefs.h>
 
-void translate_addi(const t_risc_instr *instr, const register_info *r_info);
+void translate_ADDI(const t_risc_instr *instr, const register_info *r_info);
 
-void translate_lui(const t_risc_instr *instr, const register_info *r_info);
+void translate_LUI(const t_risc_instr *instr, const register_info *r_info);
 
-void translate_slli(const t_risc_instr *instr, const register_info *r_info);
+void translate_SLLI(const t_risc_instr *instr, const register_info *r_info);
 
-void translate_addiw(const t_risc_instr *instr, const register_info *r_info);
+void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info);
 
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info);
 

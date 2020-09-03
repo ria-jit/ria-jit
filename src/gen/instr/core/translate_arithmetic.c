@@ -10,7 +10,7 @@
  * proper sign-extension of a 32-bit result in rd.
  * @param instr
  */
-void translate_addiw(const t_risc_instr *instr, const register_info *r_info) {
+void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     // mov rd, rs1
     // add rd, instr->imm
     log_asm_out("Translate addiw…\n");
@@ -32,7 +32,7 @@ void translate_addiw(const t_risc_instr *instr, const register_info *r_info) {
  * The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
  * @param instr
  */
-void translate_slli(const t_risc_instr *instr, const register_info *r_info) {
+void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, rs1
     //shl rd, (instr->imm & 0x3F)
     log_asm_out("Translate slli…\n");
@@ -52,7 +52,7 @@ void translate_slli(const t_risc_instr *instr, const register_info *r_info) {
  * The 32-bit result is sign-extended to 64 bits.
  * @param instr
  */
-void translate_lui(const t_risc_instr *instr, const register_info *r_info) {
+void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, extended
     log_asm_out("Translate lui…\n");
 
@@ -71,7 +71,7 @@ void translate_lui(const t_risc_instr *instr, const register_info *r_info) {
  * The result is stored in rd.
  * @param instr
  */
-void translate_addi(const t_risc_instr *instr, const register_info *r_info) {
+void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate addi…\n");
 
     if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_dest]) {
