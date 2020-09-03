@@ -338,8 +338,7 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *jnl_buf = current;
     err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
-    //todo verify that this does not need to be mov rd, 1?
-    err |= fe_enc64(&current, FE_INC64r, regDest);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
 
     //jmp less
     uint8_t *jmp_buf = current;
@@ -375,8 +374,7 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *jnb_buf = current;
     err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
-    //todo verify (see above)
-    err |= fe_enc64(&current, FE_INC64r, regDest);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
 
     //jmp below
     uint8_t *jmp_buf = current;
