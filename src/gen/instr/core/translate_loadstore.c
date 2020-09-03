@@ -3,17 +3,10 @@
 //
 
 #include "translate_loadstore.h"
+#include <util/util.h>
 
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
-
-static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
-
-static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
-
-static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info, FeReg replacement);
-
-static inline void storeRd(const t_risc_instr *instr, const register_info *r_info, FeReg regDest);
 
 /**
  * Translate the LB instruction.
@@ -214,42 +207,4 @@ void translate_SD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
-}
-
-static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
-    //No need to load the zero from memory, just create the zero in replacement register and move on.
-    if (instr->reg_src_1 == x0) {
-        err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
-        return replacement;
-    }
-    if (!r_info->mapped[instr->reg_src_1]) {
-        err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        return replacement;
-    } else {
-        return r_info->map[instr->reg_src_1];
-    }
-}
-
-static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
-    //No need to load the zero from memory, just create the zero in replacement register and move on.
-    if (instr->reg_src_2 == x0) {
-        err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
-        return replacement;
-    }
-    if (!r_info->mapped[instr->reg_src_2]) {
-        err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        return replacement;
-    } else {
-        return r_info->map[instr->reg_src_2];
-    }
-}
-
-static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
-    return !r_info->mapped[instr->reg_dest] ? replacement : r_info->map[instr->reg_dest];
-}
-
-static inline void storeRd(const t_risc_instr *instr, const register_info *r_info, const FeReg regDest) {
-    if (instr->reg_dest != x0 && !r_info->mapped[instr->reg_dest]) {
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), regDest);
-    }
 }
