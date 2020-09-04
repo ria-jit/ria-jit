@@ -122,7 +122,7 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *jmp_buf = current;
     err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
 
-    err |= fe_enc64(&current, FE_INC64r, regDest);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
 
     //write forward jump target when now known
     uint8_t *not_less = current;
@@ -148,7 +148,7 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *jnb_buffer = current;
     err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
 
-    err |= fe_enc64(&current, FE_INC64r, regDest);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
 
     uint8_t *jmp_buffer = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
