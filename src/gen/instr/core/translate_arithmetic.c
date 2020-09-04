@@ -115,18 +115,9 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
-
-    //insert forward jump here later
-    uint8_t *jmp_buf = current;
-    err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
-
-    //write forward jump target when now known
-    uint8_t *not_less = current;
-    err |= fe_enc64(&jmp_buf, FE_JGE, (intptr_t) not_less);
+    err |= fe_enc64(&current, FE_SETL8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
 
     storeRd(instr, r_info, regDest);
 }
@@ -145,20 +136,8 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
-    uint8_t *jnb_buffer = current;
-    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
-
-    uint8_t *jmp_buffer = current;
-    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
-
-    //not_below <- jnb:
-    err |= fe_enc64(&jnb_buffer, FE_JNC, (intptr_t) current);
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
-
-    //below <- jmp:
-    err |= fe_enc64(&jmp_buffer, FE_JMP, (intptr_t) current);
+    err |= fe_enc64(&current, FE_SETC8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
 
     storeRd(instr, r_info, regDest);
 }
@@ -333,24 +312,8 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, THIRD_REG);
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
-
-    //jnl not_less
-    uint8_t *jnl_buf = current;
-    err |= fe_enc64(&current, FE_JGE, (intptr_t) current); //dummy jmp
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
-
-    //jmp less
-    uint8_t *jmp_buf = current;
-    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
-
-    //not_less:
-    err |= fe_enc64(&jnl_buf, FE_JGE, (intptr_t) current);
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
-
-    //less:
-    err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
+    err |= fe_enc64(&current, FE_SETL8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
 
     storeRd(instr, r_info, regDest);
 }
@@ -369,24 +332,8 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, THIRD_REG);
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
-
-    //jnl not_below
-    uint8_t *jnb_buf = current;
-    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy jmp
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 1);
-
-    //jmp below
-    uint8_t *jmp_buf = current;
-    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
-
-    //not_below:
-    err |= fe_enc64(&jnb_buf, FE_JNC, (intptr_t) current);
-
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
-
-    //below:
-    err |= fe_enc64(&jmp_buf, FE_JMP, (intptr_t) current);
+    err |= fe_enc64(&current, FE_SETC8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
 
     storeRd(instr, r_info, regDest);
 }
