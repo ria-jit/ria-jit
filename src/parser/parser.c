@@ -692,7 +692,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         p_instr_struct_f->mnem += FLD - FLW;
                     default:
                         critical_not_yet_implemented("unsupported operand size for OP_OP_FP;\n"
-                                                     " you are probably using the RV64Q extension");
+                                                     " you are probably using the RV32Q/RV64Q extension");
                 }
             }
         }
