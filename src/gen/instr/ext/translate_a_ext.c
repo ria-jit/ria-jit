@@ -60,22 +60,21 @@ void translate_SCW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOSWAPW…\n");
 
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
-    err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX); //erase dx
-    err |= fe_enc64(&current, FE_MOV32rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_XCHG32rr, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regDest);
 
-    //load rs2 into FE_CX
-    err |= fe_enc64(&current, FE_MOV32rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-    //swap data at address FE_DX with content of FE_CX, should be atomic
-    err |= fe_enc64(&current, FE_XCHG32mr, FE_MEM(FE_DX, 0, 0, 0), FE_CX);
-
-    //FE_CX is now holding information of [FE_DX] => store data back in rd and rs2 (sign extended)
-    err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, FE_CX);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), FE_AX);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -267,20 +266,20 @@ void translate_SCD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOSWAPD…\n");
 
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
-    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_XCHG64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regDest);
 
-    //load rs2 into FE_CX
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-    //swap data at address FE_DX with content of FE_CX, should be atomic
-    err |= fe_enc64(&current, FE_XCHG64mr, FE_MEM(FE_DX, 0, 0, 0), FE_CX);
-
-    //FE_CX is now holding information of [FE_DX] => store data back in rd and rs2 (sign extended)
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), FE_CX);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
