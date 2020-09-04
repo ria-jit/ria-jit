@@ -690,6 +690,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     case 1:
                         //because of our ordering of the mnems in typedef.h we can just add a constant factor
                         p_instr_struct_f->mnem += FLD - FLW;
+                        break;
                     default:
                         critical_not_yet_implemented("unsupported operand size for OP_OP_FP;\n"
                                                      " you are probably using the RV32Q/RV64Q extension");
