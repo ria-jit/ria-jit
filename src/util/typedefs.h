@@ -74,11 +74,9 @@ typedef enum {
     //---RV64F---
     FCVTLS, FCVTLUS, FCVTSL, FCVTSLU,
 
-    //---RV32D---
-    FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTSD, FCVTDS, FEQD, FLTD, FLED, FCLASSD, FCVTWD, FCVTWUD, FCVTDW, FCVTDWU,
-
-    //---RV64D---
-    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
+    //---RV32D--- + //---RV64D--- //reordering for easier parser design
+    FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTWD, FCVTWUD, FMVXD, FEQD, FLTD, FLED, FCLASSD, FCVTDW, FCVTDWU, FMVDX,
+    FCVTLD, FCVTLUD, FCVTDL, FCVTDLU, FCVTSD, FCVTDS,
 
     //---PSEUDO---
     PC_NEXT_INST, SILENT_NOP, PATTERN_EMIT,
@@ -149,7 +147,7 @@ typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, FLOAT, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
@@ -167,6 +165,18 @@ typedef struct {
     t_risc_reg reg_dest;
     t_risc_imm imm;
 } t_risc_instr;
+
+typedef struct {
+    t_risc_addr addr;
+    t_risc_mnem mnem;
+    t_risc_optype optype;
+    t_risc_reg reg_src_1;
+    t_risc_reg reg_src_2;
+    t_risc_reg reg_dest;
+    uint32_t reg_src_3;
+    uint32_t reg_m;
+} t_risc_instr_f;
+// the idea is to redefine the immediate into two registers to be able to use the same structs and only do a simple cast
 
 /**
  * Register information for the translator functions.

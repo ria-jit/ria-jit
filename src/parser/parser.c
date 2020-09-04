@@ -16,6 +16,12 @@ static inline int extract_rs1(int32_t instr) {return instr >> 15 & 0b11111;}
 // extract rs2 register number bit[24:20]
 static inline int extract_rs2(int32_t instr) {return instr >> 20 & 0b11111;}
 
+// extract rs3 register number bit[31:27]
+static inline int extract_rs3(int32_t instr) {return instr >> 27 & 0b11111;}
+
+// extract func2 bit [26:25]
+static inline int extract_funct2(int32_t instr) {return instr >> 25 & 0b11;}
+
 // extract func3 bit [14:12]
 static inline int extract_funct3(int32_t instr) {return instr >> 12 & 0b111;}
 
@@ -100,6 +106,35 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JALR;
             p_instr_struct->imm = extract_imm_I(raw_instr);
+            break;
+        case OP_LOAD_FP:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->imm = extract_imm_I(raw_instr);
+            switch (extract_funct3(raw_instr)) {
+                case 2:
+                    p_instr_struct->mnem = FLW;
+                    break;
+                case 3:
+                    p_instr_struct->mnem = FLD;
+                    break;
+                default:
+                    critical_not_yet_implemented("Invalid func3 for OP_LOAD_FP Opcode");
+            }
+            break;
+        case OP_STORE_FP:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->imm = extract_imm_S(raw_instr);
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            switch (extract_funct3(raw_instr)) {
+                case 2:
+                    p_instr_struct->mnem = FSW;
+                    break;
+                case 3:
+                    p_instr_struct->mnem = FSD;
+                    break;
+                default:
+                    critical_not_yet_implemented("Invalid func3 for OP_LOAD_FP Opcode");
+            }
             break;
         case OP_MISC_MEM:
             p_instr_struct->optype = SYSTEM;
@@ -434,6 +469,233 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     return set_error_message(p_instr_struct, E_f3_IMM);
                 }
             }
+            break;
+        case OP_MADD:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->mnem = FMADDS;
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            switch (extract_funct2(raw_instr)) {
+                case 0:
+                    p_instr_struct->mnem = FMADDS;
+                    break;
+                case 1:
+                    p_instr_struct->mnem = FMADDD;
+                    break;
+                default:
+                    critical_not_yet_implemented("unsupported operand size FMADD");
+            }
+            break;
+        case OP_MSUB:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            switch (extract_funct2(raw_instr)) {
+                case 0:
+                    p_instr_struct->mnem = FMSUBS;
+                    break;
+                case 1:
+                    p_instr_struct->mnem = FMSUBD;
+                    break;
+                default:
+                    critical_not_yet_implemented("unsupported operand size FMSUB");
+            }
+            break;
+        case OP_NMADD:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            switch (extract_funct2(raw_instr)) {
+                case 0:
+                    p_instr_struct->mnem = FNMADDS;
+                    break;
+                case 1:
+                    p_instr_struct->mnem = FNMADDD;
+                    break;
+                default:
+                    critical_not_yet_implemented("unsupported operand size FNMADD");
+            }
+            break;
+        case OP_NMSUB:
+            p_instr_struct->optype = FLOAT;
+            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            switch (extract_funct2(raw_instr)) {
+                case 0:
+                    p_instr_struct->mnem = FNMSUBS;
+                    break;
+                case 1:
+                    p_instr_struct->mnem = FNMSUBD;
+                    break;
+                default:
+                    critical_not_yet_implemented("unsupported operand size FNMSUB");
+            }
+            break;
+        case OP_OP_FP: {
+            p_instr_struct->optype = FLOAT;
+            t_risc_instr_f *p_instr_struct_f = p_instr_struct;
+            int funct7 = extract_funct7(raw_instr);
+            int funct3 = extract_funct3(raw_instr);
+            int rs2 = extract_rs2(raw_instr);
+            int operandSize = funct7 & 0x11; // lower two bits determine operand size
+            // it looks like this bit determines if the rs2 field is used as a register, or as a funct code
+            if ((funct7 & 0x0100000) == 0) {
+                p_instr_struct_f->reg_src_2 = rs2;
+            }
+
+            // furthermore the 5 bit determines if the funct3 field is used as a register, or as a funct code#
+            if ((funct7 & 0x0010000) == 0) {
+                p_instr_struct_f->reg_m = funct3;
+            }
+
+            //ignore lower two bits which only set operand size
+            funct7 = funct7 >> 2;
+            switch (funct7) {
+                case 0:
+                    p_instr_struct_f->mnem = FADDS;
+                    break;
+                case 1:
+                    p_instr_struct_f->mnem = FSUBS;
+                    break;
+                case 2:
+                    p_instr_struct_f->mnem = FMULS;
+                    break;
+                case 3:
+                    p_instr_struct_f->mnem = FDIVS;
+                    break;
+                case 4:
+                    switch (funct3) {
+                        case 0:
+                            p_instr_struct_f->mnem = FSGNJS;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FSGNJNS;
+                            break;
+                        case 2:
+                            p_instr_struct_f->mnem = FSGNJXS;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for FSGNJ");
+                    }
+                    break;
+                case 5:
+                    switch (funct3) {
+                        case 0:
+                            p_instr_struct_f->mnem = FMINS;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FMAXS;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for funct7=5");
+                    }
+                    break;
+                case 8:
+                    switch (rs2) {
+                        case 0:
+                            p_instr_struct_f->mnem = FCVTDS;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FCVTSD;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for funct7=8");
+                    }
+                    break;
+                case 11:
+                    p_instr_struct_f->mnem = FSQRTS;
+                    break;
+                case 20:
+                    switch (funct3) {
+                        case 0:
+                            p_instr_struct_f->mnem = FLES;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FLTS;
+                            break;
+                        case 2:
+                            p_instr_struct_f->mnem = FEQS;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for FSGNJ");
+                    }
+                    break;
+                case 24:
+                    switch (rs2) {
+                        case 0:
+                            p_instr_struct_f->mnem = FCVTWS;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FCVTWUS;
+                            break;
+                        case 2:
+                            p_instr_struct_f->mnem = FCVTLS;
+                            break;
+                        case 3:
+                            p_instr_struct_f->mnem = FCVTLUS;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for FCVTW");
+                    }
+                    p_instr_struct_f->mnem = FSQRTS;
+                    break;
+                case 26:
+                    switch (rs2) {
+                        case 0:
+                            p_instr_struct_f->mnem = FCVTSW;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FCVTSWU;
+                            break;
+                        case 2:
+                            p_instr_struct_f->mnem = FCVTSL;
+                            break;
+                        case 3:
+                            p_instr_struct_f->mnem = FCVTSLU;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for FCVTS");
+                    }
+                    p_instr_struct_f->mnem = FSQRTS;
+                    break;
+                case 28:
+                    switch (funct3) {
+                        case 0:
+                            p_instr_struct_f->mnem = FMVXW;
+                            break;
+                        case 1:
+                            p_instr_struct_f->mnem = FCLASSS;
+                            break;
+                        default:
+                            critical_not_yet_implemented("unknown funct3 for funct7=28");
+                    }
+                    break;
+                case 30:
+                    p_instr_struct_f->mnem = FMVWX;
+                    break;
+                default:
+                    critical_not_yet_implemented("unknown funct7 for OP_OP_FP");
+                    break;
+            }
+            if (funct7 != 8) {
+                //fit mnem to the operand size
+                switch (operandSize) {
+                    case 0:
+                        //default 16 bit nothing to do
+                        break;
+                    case 1:
+                        //because of our ordering of the mnems in typedef.h we can just add a constant factor
+                        p_instr_struct_f->mnem += FLD - FLW;
+                    default:
+                        critical_not_yet_implemented("unsupported operand size for OP_OP_FP;\n"
+                                                     " you are probably using the RV64Q extension");
+                }
+            }
+        }
             break;
         case OP_AMO:
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
