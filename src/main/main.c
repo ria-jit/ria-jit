@@ -76,7 +76,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
 
     //debugging output
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     //benchmark if necessary
@@ -129,11 +129,11 @@ bool execute_cached(t_cache_loc loc) {
 
     //dump registers to the log
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     ///check for illegal x0 values
-    if (*get_reg_data() != 0) {
+    if (*get_gp_reg_file() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;

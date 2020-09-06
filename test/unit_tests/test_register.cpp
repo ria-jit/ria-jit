@@ -9,7 +9,7 @@
  * Checks the register.c storage by storing and reading back values via get_reg_data() base access.
  */
 TEST(RegisterCache, ShouldStoreValues) {
-    t_risc_reg_val *base = get_reg_data();
+    t_risc_reg_val *base = get_gp_reg_file();
     
     //store testing values
     for (size_t r = 1; r <= 31; r++) {

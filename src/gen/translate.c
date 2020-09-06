@@ -432,7 +432,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     register_info r_info = {
             register_map,
             mapped,
-            (uint64_t) get_reg_data()
+            (uint64_t) get_gp_reg_file()
     };
 
 
@@ -451,7 +451,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     if (block_full) {
-        set_pc_next_inst(risc_addr, (uint64_t) get_reg_data());
+        set_pc_next_inst(risc_addr, (uint64_t) get_gp_reg_file());
     }
 
     ///save registers

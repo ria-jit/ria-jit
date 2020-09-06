@@ -10,10 +10,10 @@
  * contents[0] is undefined, as x0 is hardwired to 0 -
  * it is left unused in order to avoid off-by-one errors in indexing.
  */
-t_risc_reg_val contents[33];
+t_risc_reg_val gp_file[33];
 
-t_risc_reg_val *get_reg_data(void) {
-    return contents;
+t_risc_reg_val *get_gp_reg_file(void) {
+    return gp_file;
 }
 
 /**
@@ -26,7 +26,7 @@ t_risc_reg_val get_value(t_risc_reg reg) {
         //an access to x0 always yields 0
         return 0;
     } else {
-        return contents[reg];
+        return gp_file[reg];
     }
 
 }
@@ -39,14 +39,14 @@ t_risc_reg_val get_value(t_risc_reg reg) {
 void set_value(t_risc_reg reg, t_risc_reg_val val) {
     //a write to x0 is ignored, hardwired zero
     if (reg != x0) {
-        contents[reg] = val;
+        gp_file[reg] = val;
     }
 }
 
 /**
  * Dump the contents of the register file.
  */
-void dump_registers() {
+void dump_gp_registers() {
     log_reg_dump("Register file contents:\n");
 
     //dump all registers:
