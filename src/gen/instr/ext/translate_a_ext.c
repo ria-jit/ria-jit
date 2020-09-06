@@ -6,8 +6,6 @@
 #include <fadec/fadec-enc.h>
 #include <util/util.h>
 
-#define FIRST_REG FE_AX
-#define SECOND_REG FE_DX
 #define THIRD_REG FE_R8
 
 /*

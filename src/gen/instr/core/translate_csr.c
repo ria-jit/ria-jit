@@ -10,9 +10,6 @@
  * This implements/emulates the CSR behaviour without account for the atomicity of the instructions.
  */
 
-#define FIRST_REG FE_AX
-#define SECOND_REG FE_DX
-
 /**
 * Translate the CSRRW instruction.
 * Description

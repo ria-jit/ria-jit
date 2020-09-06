@@ -22,6 +22,9 @@ extern "C" {
 #define LINK_ADDR 1
 #define DONT_LINK 2
 
+#define FIRST_REG FE_AX
+#define SECOND_REG FE_DX
+
 /**
  * Register information for the translator functions.
  */

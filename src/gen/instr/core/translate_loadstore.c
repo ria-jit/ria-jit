@@ -5,9 +5,6 @@
 #include "translate_loadstore.h"
 #include <util/util.h>
 
-#define FIRST_REG FE_AX
-#define SECOND_REG FE_DX
-
 /**
  * Translate the LB instruction.
  * The LB instruction loads a 8-bit value from memory and sign extends it before storing it in register rd. The
