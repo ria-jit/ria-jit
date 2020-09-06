@@ -10,10 +10,20 @@
  * contents[0] is undefined, as x0 is hardwired to 0 -
  * it is left unused in order to avoid off-by-one errors in indexing.
  */
-t_risc_reg_val gp_file[33];
+t_risc_reg_val gp_file[N_REG];
+
+/**
+ * Contents of the CSR registers stored in memory.
+ * For allocated addresses see the enum type t_risc_csr_reg.
+ */
+t_risc_reg_val csr_file[N_CSR];
 
 t_risc_reg_val *get_gp_reg_file(void) {
     return gp_file;
+}
+
+t_risc_reg_val *get_csr_reg_file(void) {
+    return csr_file;
 }
 
 /**

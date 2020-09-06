@@ -29,6 +29,7 @@ typedef struct {
     FeReg *map;
     bool *mapped;
     uint64_t base;
+    uint64_t csr_base;
 } register_info;
 
 extern uint8_t *current;

@@ -432,7 +432,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     register_info r_info = {
             register_map,
             mapped,
-            (uint64_t) get_gp_reg_file()
+            (uint64_t) get_gp_reg_file(),
+            (uint64_t) get_csr_reg_file()
     };
 
 

@@ -114,6 +114,22 @@ typedef enum {
 } t_risc_reg_mnem;
 #define N_REG 33
 
+//CSR registers
+#define N_CSR 4096
+typedef enum {
+    //read-write access (floating point)
+    fflags = 0x001, //floating point accrued exceptions
+    frm = 0x002,    //floating point dynamic rounding mode
+    fcsr = 0x003,   //floating point control and status register (frm + fflags)
+    //read-only access (counters and timers)
+    cycle = 0xC00,  //cycle counter for RDCYCLE
+    time = 0xC01,   //timer for RDTIME
+    instret = 0xC02,//instructions retired counter for RDINSTRET
+    cycleh = 0xC80, //upper 32 bits of cycle (for RV32I)
+    timeh = 0xC81,  //upper 32 bits of time (for RV32I)
+    instreth = 0xC82//upper 32 bits of instret (for RV32I)
+} t_risc_csr_reg;
+
 //register value type
 typedef uint64_t t_risc_reg_val;
 
