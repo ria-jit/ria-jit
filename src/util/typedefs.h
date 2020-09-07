@@ -76,13 +76,19 @@ typedef enum {
 #define N_MNEM FMVDX + 1
 
 typedef enum {
+    E_UNKNOWN,
     E_f3_MISC_MEM,
     E_f3_BRANCH,
     E_f3_LOAD,
     E_f3_STORE,
     E_f3_OP,
     E_f3_SYSTEM,
-
+    E_f3_IMM_32,
+    E_f3_RV64M,
+    E_f3_32,
+    E_f3_IMM,
+    E_f7_AMO,
+    E_f3_AMO
 };
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
