@@ -426,6 +426,25 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
             mapped[indicesRanked[i]] = false;
         }
     }
+#define map_reg(reg_risc, reg_x86)          \
+    ({                                      \
+        register_map[reg_risc] = reg_x86;   \
+        mapped[reg_risc] = true;            \
+    })                                      \
+
+    map_reg(ra, FE_DI);
+    map_reg(sp, FE_SI);
+    map_reg(a0, FE_R15);
+    map_reg(a1, FE_R9);
+    map_reg(a2, FE_R10);
+    map_reg(a3, FE_R11);
+    map_reg(a4, FE_R12);
+    map_reg(a5, FE_R13);
+    map_reg(a6, FE_R14);
+//    map_reg(a7, FE_R15);
+
+#undef map_reg
+
     //notice: risc reg x0 will need special treatment
 
     ///create info struct
@@ -442,9 +461,14 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///save the x86_64 registers
     //???
+    err |= fe_enc64(&current, FE_PUSHr, FE_R12);
+    err |= fe_enc64(&current, FE_PUSHr, FE_R13);
+    err |= fe_enc64(&current, FE_PUSHr, FE_R14);
+    err |= fe_enc64(&current, FE_PUSHr, FE_R15);
+
 
     ///load registers
-    //load_risc_registers(r_info);
+    load_risc_registers(r_info);
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -456,10 +480,17 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
     }
 
     ///save registers
-    //save_risc_registers(r_info);
+    if (block_cache[instructions_in_block - 1].mnem != ECALL) {
+        save_risc_registers(r_info);
+    }
 
     ///load the saved x86_64 registers
     //???
+    err |= fe_enc64(&current, FE_POPr, FE_R15);
+    err |= fe_enc64(&current, FE_POPr, FE_R14);
+    err |= fe_enc64(&current, FE_POPr, FE_R13);
+    err |= fe_enc64(&current, FE_POPr, FE_R12);
+
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", orig_risc_addr, instructions_in_block);
 
     ///finalize block and return cached location
