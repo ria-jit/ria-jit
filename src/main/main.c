@@ -40,7 +40,9 @@ int main(int argc, char *argv[]) {
 
     int guestArgc = argc - options.last_optind;
     char **guestArgv = argv + (options.last_optind);
-    return transcode_loop(options.file_path, guestArgc, guestArgv);
+    int ret = transcode_loop(options.file_path, guestArgc, guestArgv);
+    printCollisionStats();
+    return ret;
 }
 
 #endif //TESTING
