@@ -56,7 +56,8 @@ static inline int32_t extract_imm_B(int32_t instr) {
 
 int32_t set_error_message(t_risc_instr *p_instr_struct,int32_t error_code){
     p_instr_struct->optype = INVALID_INSTRUCTION;
-    p_instr_struct->mnem = error_code;
+    p_instr_struct->mnem = INVALID_MNEM;
+    p_instr_struct->reg_dest = error_code;
     p_instr_struct->imm = *(int32_t *) p_instr_struct->addr; //cast and dereference
     return error_code;
 }

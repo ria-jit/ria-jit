@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+char *errorcode_to_string(int mnem);
+
 //the RISC-V mnemonic of the instruction
 char *mnem_to_string(int mnem);
 
@@ -19,6 +21,8 @@ char *reg_to_string(int reg);
 char *reg_to_alias(int reg);
 
 typedef enum {
+    INVALID_MNEM,
+
     //---RV32I---
     LUI, //load upper Imm
     AUIPC, //register = Imm

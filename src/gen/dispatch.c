@@ -15,6 +15,9 @@
 
 void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
     switch (instr->mnem) {
+        case INVALID_MNEM:
+            translate_INVALID(instr);
+            break;
         case LUI:
             translate_LUI(instr, r_info);
             break;
