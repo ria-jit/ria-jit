@@ -77,8 +77,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     dprintf(1,
                             "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
                             "register file. (equivalent to -gioc)\n"
-                            "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
-                            "\t-i\tDisplay input riscv instruction\n"
+                            "\t-g\tDisplay general verbose info\n"
+                            "\t-i\tDisplay parsed RISC-V input assembly\n"
                             "\t-o\tDisplay translated output x86 assembly\n"
                             "\t-r\tDump registers on basic block boundaries\n"
                             "\t-c\tDisplay cache info\n"
