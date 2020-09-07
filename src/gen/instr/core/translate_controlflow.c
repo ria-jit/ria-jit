@@ -369,7 +369,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     err |= fe_enc64(&endJmpLoc, FE_JMP, (intptr_t) current); //replace dummy
 }
 
-void translate_INVALID(const t_risc_instr *instr, const register_info *r_info) {
+void translate_INVALID(const t_risc_instr *instr) {
     ///call error handler
     fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->mnem);
     fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);

@@ -12,6 +12,7 @@
 #include <util/log.h>
 #include <util/typedefs.h>
 #include <parser/parser.h>
+#include <gen/instr/core/translate_controlflow.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -174,6 +175,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {
+
+            case INVALID_INSTRUCTION : { ///...
+                translate_INVALID(&block_cache[parse_pos]);
+                goto PARSE_DONE;
+            }
 
             ///branch? or syscall?
             case SYSTEM : //fallthrough Potential program end stop parsing
