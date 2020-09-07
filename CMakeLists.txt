@@ -81,7 +81,7 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2fixed_full_table.h
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
-        lib/ryu/ryu.h)
+        lib/ryu/ryu.h src/cache/return_stack.h src/cache/return_stack.c)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
