@@ -101,7 +101,7 @@ uint64_t numTries = 1;
 
 void printCollisionStats(void) {
     uint64_t average = numTries * 1000 / collisionSum;
-    printf("Average Collisions: %li", average);
+    printf("Average tlb hits: %li/1000", average);
 }
 
 t_cache_loc check_tlb(t_risc_addr risc_addr) {
