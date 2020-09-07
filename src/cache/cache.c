@@ -95,15 +95,6 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc) {
     tlb[smallHash].cache_loc = cacheLoc;
 }
 
-
-uint64_t collisionSum = 0;
-uint64_t numTries = 1;
-
-void printCollisionStats(void) {
-    uint64_t average = numTries * 1000 / collisionSum;
-    printf("Average tlb hits: %li/1000", average);
-}
-
 t_cache_loc check_tlb(t_risc_addr risc_addr) {
     //check tlb first
     size_t smallHash = smallhash(risc_addr);
@@ -119,10 +110,8 @@ t_cache_loc check_tlb(t_risc_addr risc_addr) {
  * @return code cache address of that instruction, or NULL if nonexistent
  */
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
-    collisionSum++;
     size_t smallHash = smallhash(risc_addr);
     if (tlb[smallHash].risc_addr == risc_addr) {
-        numTries++;
         return tlb[smallHash].cache_loc;
     }
     size_t index = find_lin_slot(risc_addr);

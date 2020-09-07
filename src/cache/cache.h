@@ -40,7 +40,6 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc);
 void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc);
 
 void print_values(void);
-void printCollisionStats(void);
 
 #ifdef __cplusplus
 }
