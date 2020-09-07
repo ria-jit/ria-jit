@@ -8,6 +8,8 @@
 #include <runtime/register.h>
 #include "emulateEcall.h"
 
+//for potentially required syscalls see https://github.com/aengelke/instrew/blob/master/client/emulate.c
+
 typedef struct {
     unsigned long st_dev;        /* Device.  */
     unsigned long st_ino;        /* File serial number.  */
