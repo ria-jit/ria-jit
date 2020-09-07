@@ -154,7 +154,7 @@ void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
     err |= fe_enc64(&current, FE_XOR64ri, regSrc1, instr->imm);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
 
     storeRd(instr, r_info, regDest);
 }
@@ -173,7 +173,7 @@ void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
     err |= fe_enc64(&current, FE_OR64ri, regSrc1, instr->imm);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
 
     storeRd(instr, r_info, regDest);
 }
@@ -192,7 +192,7 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
 
     err |= fe_enc64(&current, FE_AND64ri, regSrc1, instr->imm);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
 
     storeRd(instr, r_info, regDest);
 }
