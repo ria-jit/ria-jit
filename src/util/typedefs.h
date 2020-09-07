@@ -77,6 +77,12 @@ typedef enum {
 
 typedef enum {
     E_f3_MISC_MEM,
+    E_f3_BRANCH,
+    E_f3_LOAD,
+    E_f3_STORE,
+    E_f3_OP,
+    E_f3_SYSTEM,
+
 };
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
