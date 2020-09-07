@@ -60,6 +60,19 @@ static inline void storeRd(const t_risc_instr *instr, const register_info *r_inf
     }
 }
 
+static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
+    if (regDest == regSrc1) {
+        ///mov into rd can be omitted when using rs1 as destination
+        err |= fe_enc64(&current, arithmMnem, regSrc1, regSrc2);
+    } else if (regDest == regSrc2) {
+        ///mov into rd can be omitted when using rs2 as destination
+        err |= fe_enc64(&current, arithmMnem, regSrc2, regSrc1);
+    } else {
+        ///mov first to not touch rs1 in case it is mapped to a x86 register and needed afterwards.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, arithmMnem, regDest, regSrc2);
+    }
+}
 
 #ifdef __cplusplus
 }

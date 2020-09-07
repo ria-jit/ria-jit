@@ -30,17 +30,7 @@ void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
-    if (regDest == regSrc1) {
-        ///mov into rd can be omitted when using rs1 as IMULs destination
-        err |= fe_enc64(&current, FE_IMUL64rr, regSrc1, regSrc2);
-    } else if (regDest == regSrc2) {
-        ///mov into rd can be omitted when using rs2 as IMULs destination
-        err |= fe_enc64(&current, FE_IMUL64rr, regSrc2, regSrc1);
-    } else {
-        ///mov first to not touch rs1 in case it is mapped to a x86 register and needed afterwards.
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-        err |= fe_enc64(&current, FE_IMUL64rr, regDest, regSrc2);
-    }
+    doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL64rr);
     storeRd(instr, r_info, regDest);
 }
 
@@ -442,17 +432,7 @@ void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
-    if (regDest == regSrc1) {
-        ///mov into rd can be omitted when using rs1 as IMULs destination
-        err |= fe_enc64(&current, FE_IMUL32rr, regSrc1, regSrc2);
-    } else if (regDest == regSrc2) {
-        ///mov into rd can be omitted when using rs2 as IMULs destination
-        err |= fe_enc64(&current, FE_IMUL32rr, regSrc2, regSrc1);
-    } else {
-        ///mov first to not touch rs1
-        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
-        err |= fe_enc64(&current, FE_IMUL32rr, regDest, regSrc2);
-    }
+    doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL32rr);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
