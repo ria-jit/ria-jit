@@ -182,6 +182,7 @@ context_info *init_map_context(void) {
     r_info->replacement_content = replacement_content;
     r_info->replacement_recency = replacement_recency;
     r_info->current_recency = current_recency;
+    r_info->fp_base = (uint64_t) get_fp_reg_file();
 
     //generate switching functions
     t_cache_loc load_execute_save_context;

@@ -208,6 +208,7 @@ typedef struct {
     t_risc_reg *replacement_content;
     uint64_t *replacement_recency;
     uint64_t *current_recency;
+    uint64_t fp_base;
 } register_info;
 
 #ifdef __cplusplus
