@@ -463,14 +463,14 @@ void save_risc_registers(register_info r_info) {
  * */
 void chain(t_cache_loc target) {
     if (!flag_translate_opt) return;
-    int err = 0;
+    int chain_err = 0;
     if (chain_end != NULL) {
         log_general("chaining: ...\n");
-        err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
+        chain_err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
     }
 
     ///check failed flag
-    if (err != 0) {
+    if (chain_err != 0) {
         ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error in chain, exiting...\n");
         _exit(-1);
