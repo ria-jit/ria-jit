@@ -176,8 +176,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {
 
-            case INVALID_INSTRUCTION : { ///...
-                translate_INVALID(&block_cache[parse_pos]);
+            case INVALID_INSTRUCTION : {
+                instructions_in_block++;
                 goto PARSE_DONE;
             }
 
