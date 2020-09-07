@@ -129,6 +129,7 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
 
     if (cache_table[index].cache_loc != 0) {
         //value is cached and exists
+        set_tlb(risc_addr, cache_table[index].cache_loc);
         return cache_table[index].cache_loc;
     } else {
         //value does not exist
