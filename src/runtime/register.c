@@ -56,7 +56,7 @@ void set_value(t_risc_reg reg, t_risc_reg_val val) {
 /**
  * Dump the contents of the register file.
  */
-void dump_gp_registers() {
+void dump_gp_registers(void) {
     log_reg_dump("Register file contents:\n");
 
     //dump all registers:

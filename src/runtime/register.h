@@ -20,7 +20,7 @@ t_risc_reg_val get_value(t_risc_reg reg);
 
 void set_value(t_risc_reg reg, t_risc_reg_val val);
 
-void dump_gp_registers();
+void dump_gp_registers(void);
 
 #ifdef __cplusplus
 }
