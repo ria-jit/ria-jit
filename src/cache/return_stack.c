@@ -19,12 +19,16 @@ void init_return_stack(void){
     rs_back = 0;
 }
 
-void rs_push(rs_entry entry) {
+void rs_push(t_risc_addr r_add, uintptr_t x86_add) {
     rs_front = (rs_front + 1) & 0x3f; //mod 64
-    r_stack[rs_front] = entry;
+    r_stack[rs_front].risc_addr = r_add;
+    r_stack[rs_front].x86_addr = x86_add;
     if(rs_front == rs_back) {
         rs_back = (rs_back + 1) & 0x3f;
     }
+
+    //printf("rs_push called: riscV=%p, x86=%p s=%d\n", r_add, x86_add, rs_front);
+
 }
 
 rs_entry rs_pop(void) {
@@ -51,9 +55,29 @@ rs_entry rs_peek(void) {
 void rs_pop_blind(void) {
     if(rs_front == rs_back) {
         //log_general("stack underflow prevented");
+        return;
     }
 
     rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
 }
 
+uintptr_t rs_pop_easy(t_risc_addr r_add) {
+    if(rs_front == rs_back) {
+        //log_general("stack underflow prevented");
+        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d\n", r_add, 0, rs_front);
+        return NULL;
+    }
 
+    if(r_stack[rs_front].risc_addr == r_add) {
+        uintptr_t ret = r_stack[rs_front].x86_addr;
+        rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
+        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d  ---------------hit---------------\n", r_add, ret, rs_front);
+        return ret;
+    }
+    else {
+        //pop???    scrap cache???
+        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d\n", r_add, 1, rs_front);
+
+        return NULL;
+    }
+}
