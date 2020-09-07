@@ -56,7 +56,8 @@ static inline int32_t extract_imm_B(int32_t instr) {
 
 int32_t set_error_message(t_risc_instr *p_instr_struct,int32_t error_code){
     p_instr_struct->optype = INVALID_INSTRUCTION;
-    p_instr_struct->imm = error_code;
+    p_instr_struct->mnem = error_code;
+    p_instr_struct->imm = *(int32_t *) p_instr_struct->addr; //cast and dereference
     return error_code;
 }
 
@@ -115,7 +116,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     p_instr_struct->mnem = FENCE_I;
                     break;
                 default:
-                    return set_error_message(p_instr_struct,E_f3_MISC_MEM);//  critical_not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
+                    return set_error_message(p_instr_struct,E_f3_MISC_MEM);
             }
             break;
         case OP_BRANCH:
@@ -350,7 +351,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     }
                     break;
                 default: {
-                    critical_not_yet_implemented("Invalid OP_IMM_32 Instruction");
+                    return set_error_message(p_instr_struct,E_f3_IMM_32);
                 }
             }
             break;
@@ -378,7 +379,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         p_instr_struct->mnem = REMUW;
                         break;
                     default:
-                        critical_not_yet_implemented("Invalid OP_32 RV64M Instruction");
+                        return set_error_message(p_instr_struct, E_f3_RV64M);
                 }
             } else {
                 switch (extract_funct3(raw_instr)) {
@@ -404,7 +405,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                         }
                         break;
                     default:
-                        critical_not_yet_implemented("Invalid OP_32 Instruction");
+                        return set_error_message(p_instr_struct, E_f3_32);
                 }
             }
             break;
@@ -452,7 +453,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     p_instr_struct->imm = extract_imm_I(raw_instr);
                     break;
                 default: {
-                    critical_not_yet_implemented("Invalid OP_IMM Instruction");
+                    return set_error_message(p_instr_struct, E_f3_IMM);
                 }
             }
             break;
@@ -495,7 +496,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     p_instr_struct->mnem = AMOMAXUW;
                     break;
                 default:
-                    critical_not_yet_implemented("UNKNOWN OP_AMO funct7");
+                    return set_error_message(p_instr_struct, E_f7_AMO);
             }
             // funct3 differentiates between RV32A and RV64A
             switch (extract_funct3(raw_instr)) {
@@ -507,12 +508,12 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     p_instr_struct->mnem += LRD - LRW;
                     break;
                 default:
-                    critical_not_yet_implemented("UNKNOWN OP_AMO funct3");
+                    return set_error_message(p_instr_struct, E_f3_AMO);
             }
 
             break;
         default:
-            critical_not_yet_implemented("OPCODE unknown");
+            return set_error_message(p_instr_struct, E_UNKNOWN);
     }
     return 0;
 }
