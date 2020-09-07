@@ -120,8 +120,8 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  * @return
  */
 bool execute_cached(t_cache_loc loc) {
-    if (flag_log_cache) {
-        log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+    if (flag_log_general) {
+        log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     }
 
     typedef void (*void_asm)(void);
