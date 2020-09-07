@@ -75,6 +75,10 @@ typedef enum {
 } t_risc_mnem;
 #define N_MNEM FMVDX + 1
 
+typedef enum {
+    E_f3_MISC_MEM,
+};
+
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
     x0, //x0 is hardwired to constant 0
@@ -99,7 +103,7 @@ typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK
 } t_risc_optype;
 
 //carry immediate values in the instruction struct

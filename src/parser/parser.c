@@ -54,11 +54,17 @@ static inline int32_t extract_imm_B(int32_t instr) {
             (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
 }
 
+int32_t set_error_message(t_risc_instr *p_instr_struct,int32_t error_code){
+    p_instr_struct->optype = INVALID_INSTRUCTION;
+    p_instr_struct->imm = error_code;
+    return error_code;
+}
+
 /**
  *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
-void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
+int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
     //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
 
     // print out the line to parse in grouped binary as in the spec
@@ -109,7 +115,7 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     p_instr_struct->mnem = FENCE_I;
                     break;
                 default:
-                    critical_not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
+                    return setErrorMessage(p_instr_struct,E_f3_MISC_MEM);  critical_not_yet_implemented("Invalid func3 for OP_MISC_MEM Opcode");
             }
             break;
         case OP_BRANCH:
@@ -510,4 +516,5 @@ void parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         default:
             critical_not_yet_implemented("OPCODE unknown");
     }
+    return 0;
 }
