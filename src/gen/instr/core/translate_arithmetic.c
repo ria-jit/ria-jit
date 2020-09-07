@@ -6,8 +6,6 @@
 #include <util/util.h>
 #include <fadec/fadec-enc.h>
 
-#define THIRD_REG FE_R8
-
 /**
  * ADDIW adds the sign-extended 12-bit immediate to register rs1 and produces the
  * proper sign-extension of a 32-bit result in rd.
