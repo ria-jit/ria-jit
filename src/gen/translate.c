@@ -461,10 +461,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///save the x86_64 registers
     //???
-    err |= fe_enc64(&current, FE_PUSHr, FE_R12);
-    err |= fe_enc64(&current, FE_PUSHr, FE_R13);
-    err |= fe_enc64(&current, FE_PUSHr, FE_R14);
-    err |= fe_enc64(&current, FE_PUSHr, FE_R15);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0), FE_R12);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1), FE_R13);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2), FE_R14);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3), FE_R15);
 
 
     ///load registers
@@ -486,10 +486,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
 
     ///load the saved x86_64 registers
     //???
-    err |= fe_enc64(&current, FE_POPr, FE_R15);
-    err |= fe_enc64(&current, FE_POPr, FE_R14);
-    err |= fe_enc64(&current, FE_POPr, FE_R13);
-    err |= fe_enc64(&current, FE_POPr, FE_R12);
+    err |= fe_enc64(&current, FE_MOV64rm, FE_R12, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_R13, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_R14, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_R15, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3));
 
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", orig_risc_addr, instructions_in_block);
 

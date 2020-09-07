@@ -18,12 +18,18 @@ t_risc_reg_val gp_file[N_REG];
  */
 t_risc_reg_val csr_file[N_CSR];
 
+uint64_t swap_space[4];
+
 t_risc_reg_val *get_gp_reg_file(void) {
     return gp_file;
 }
 
 t_risc_reg_val *get_csr_reg_file(void) {
     return csr_file;
+}
+
+uint64_t *get_swap_space(void) {
+    return swap_space;
 }
 
 /**
