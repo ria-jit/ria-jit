@@ -25,4 +25,6 @@ void translate_BLTU(const t_risc_instr *instr, const register_info *r_info);
 
 void translate_BGEU(const t_risc_instr *instr, const register_info *r_info);
 
+void translate_INVALID(const t_risc_instr *instr, const register_info *r_info);
+
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_CONTROLFLOW_H

@@ -129,3 +129,7 @@ void log_print_mem(const char *ptr, long int len) {
         write(1, buffer, 2);
     }
 }
+
+void invalid_error_handler(int32_t p1, int32_t p2) {
+
+}

@@ -50,6 +50,8 @@ void log_benchmark(const char *format, ...);
 
 void log_print_mem(const char *ptr, long int len);
 
+void invalid_error_handler(int32_t p1, int32_t p2);
+
 #ifdef __cplusplus
 }
 #endif
