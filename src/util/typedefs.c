@@ -323,3 +323,145 @@ char *mnem_to_string(int mnem) {
             return "UNKNOWN";
     }
 }
+
+char *reg_to_string(int reg) {
+    switch (reg) {
+        case x0:
+            return "x0";
+        case x1:
+            return "x1";
+        case x2:
+            return "x2";
+        case x3:
+            return "x3";
+        case x4:
+            return "x4";
+        case x5:
+            return "x5";
+        case x6:
+            return "x6";
+        case x7:
+            return "x7";
+        case x8:
+            return "x8";
+        case x9:
+            return "x9";
+        case x10:
+            return "x10";
+        case x11:
+            return "x11";
+        case x12:
+            return "x12";
+        case x13:
+            return "x13";
+        case x14:
+            return "x14";
+        case x15:
+            return "x15";
+        case x16:
+            return "x16";
+        case x17:
+            return "x17";
+        case x18:
+            return "x18";
+        case x19:
+            return "x19";
+        case x20:
+            return "x20";
+        case x21:
+            return "x21";
+        case x22:
+            return "x22";
+        case x23:
+            return "x23";
+        case x24:
+            return "x24";
+        case x25:
+            return "x25";
+        case x26:
+            return "x26";
+        case x27:
+            return "x27";
+        case x28:
+            return "x28";
+        case x29:
+            return "x29";
+        case x30:
+            return "x30";
+        case x31:
+            return "x31";
+        default:
+            return "INVALID";
+    }
+}
+
+char *reg_to_alias(int reg) {
+    switch (reg) {
+        case zero:
+            return "zero";
+        case ra:
+            return "ra";
+        case sp:
+            return "sp";
+        case gp:
+            return "gp";
+        case tp:
+            return "tp";
+        case t0:
+            return "t0";
+        case t1:
+            return "t1";
+        case t2:
+            return "t2";
+        case s0:
+            return "s0/fp";
+        case s1:
+            return "s1";
+        case a0:
+            return "a0";
+        case a1:
+            return "a1";
+        case a2:
+            return "a2";
+        case a3:
+            return "a3";
+        case a4:
+            return "a4";
+        case a5:
+            return "a5";
+        case a6:
+            return "a6";
+        case a7:
+            return "a7";
+        case s2:
+            return "s2";
+        case s3:
+            return "s3";
+        case s4:
+            return "s4";
+        case s5:
+            return "s5";
+        case s6:
+            return "s6";
+        case s7:
+            return "s7";
+        case s8:
+            return "s8";
+        case s9:
+            return "s9";
+        case s10:
+            return "s10";
+        case s11:
+            return "s11";
+        case t3:
+            return "t3";
+        case t4:
+            return "t4";
+        case t5:
+            return "t5";
+        case t6:
+            return "t6";
+        default:
+            return "INVALID";
+    }
+}

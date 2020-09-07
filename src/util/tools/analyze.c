@@ -9,7 +9,7 @@
 #include <common.h>
 #include <stdbool.h>
 
-void add_instruction(t_risc_addr addr, uint64_t *mnem_count);
+void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count);
 
 void analyze(const char *file_path) {
 
@@ -32,38 +32,78 @@ void analyze(const char *file_path) {
     for (int i = 0; i < N_MNEM; i++) {
         mnem[i] = 0;
     }
+
+    //create array for registers
+    uint64_t reg[N_REG];
+    for (int i = 0; i < N_REG; i++) {
+        reg[i] = 0;
+    }
+
     //loop over full segment
     for (t_risc_addr addr = startAddr; addr < endAddr; addr += 4) {
-        add_instruction(addr, mnem);
+        add_instruction(addr, mnem, reg);
     }
 
     ///rank mnem by usage
-
-    int indicesRanked[N_MNEM];
+    int mnemRanked[N_MNEM];
     for (int i = 0; i < N_MNEM; i++) {
-        indicesRanked[i] = i;
+        mnemRanked[i] = i;
     }
     ///insertion sort:
     {
         int key, j;
         for (int i = 1; i < N_MNEM; i++) {
-            key = indicesRanked[i];
+            key = mnemRanked[i];
             j = i - 1;
 
             ///move move elements with index < i && element > i one to the left
-            while (j >= 0 && mnem[indicesRanked[j]] < mnem[key]) {
-                indicesRanked[j + 1] = indicesRanked[j];
+            while (j >= 0 && mnem[mnemRanked[j]] < mnem[key]) {
+                mnemRanked[j + 1] = mnemRanked[j];
                 j--;
             }
 
             ///insert former element i to correct position
-            indicesRanked[j + 1] = key;
+            mnemRanked[j + 1] = key;
         }
     }
 
+    //rank registers by usage
+    int regRanked[N_REG];
+    for (int i = 0; i < N_REG; i++) {
+        regRanked[i] = i;
+    }
+    ///insertion sort:
+    {
+        int key, j;
+        for (int i = 1; i < N_REG; i++) {
+            key = regRanked[i];
+            j = i - 1;
+
+            ///move move elements with index < i && element > i one to the left
+            while (j >= 0 && reg[regRanked[j]] < reg[key]) {
+                regRanked[j + 1] = regRanked[j];
+                j--;
+            }
+
+            ///insert former element i to correct position
+            regRanked[j + 1] = key;
+        }
+    }
+
+    log_analyze("Mnemonics…\n");
+    log_analyze("==========\n");
     for (int i = 0; i < N_MNEM; i++) {
-        if (mnem[indicesRanked[i]] == 0) break;
-        log_analyze("Mnem %s is used %li times.\n", mnem_to_string(indicesRanked[i]), mnem[indicesRanked[i]]);
+        if (mnem[mnemRanked[i]] == 0) break;
+        log_analyze("Mnem %s is used %li times.\n", mnem_to_string(mnemRanked[i]), mnem[mnemRanked[i]]);
+    }
+    log_analyze("\n");
+
+    log_analyze("Registers…\n");
+    log_analyze("==========\n");
+    for (int i = 0; i < N_REG; i++) {
+        if (reg[regRanked[i]] == 0) break;
+        log_analyze("Register %s (%s) is used %li times.\n", reg_to_string(regRanked[i]), reg_to_alias(regRanked[i]),
+                    reg[regRanked[i]]);
     }
 
     //check for unsupported instructions
@@ -105,11 +145,16 @@ void analyze(const char *file_path) {
     if (usesRV64A) log_analyze("Warning: Guest binary uses RV64A!\n");
 }
 
-void add_instruction(t_risc_addr addr, uint64_t *mnem_count) {
+void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count) {
     t_risc_instr risc_instr = {0};
     risc_instr.addr = addr;
 
-    uint32_t reg_count[N_REG]; //dont care
-    parse_instruction(&risc_instr, reg_count);
+    uint32_t disregard[N_REG]; //dont care
+    parse_instruction(&risc_instr, disregard);
+
+    //update statistics
     mnem_count[risc_instr.mnem]++;
+    reg_count[risc_instr.reg_src_1]++;
+    reg_count[risc_instr.reg_src_2]++;
+    reg_count[risc_instr.reg_dest]++;
 }

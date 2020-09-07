@@ -58,7 +58,7 @@ void log_general(const char *format, ...) {
 void log_analyze(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    printf("[mnemonic] ");
+    printf("[analyze] ");
     vdprintf(1, format, args);
     va_end(args);
 }
