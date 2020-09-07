@@ -20,10 +20,10 @@ void init_return_stack(void){
 }
 
 void rs_push(rs_entry entry) {
-    rs_front = (rs_front + 1) & 0x111111; //mod 64
+    rs_front = (rs_front + 1) & 0x3f; //mod 64
     r_stack[rs_front] = entry;
     if(rs_front == rs_back) {
-        rs_back = (rs_back + 1) & 0x111111;
+        rs_back = (rs_back + 1) & 0x3f;
     }
 }
 
@@ -34,7 +34,7 @@ rs_entry rs_pop(void) {
         return ret;
     }
     rs_entry ret = r_stack[rs_front];
-    rs_front = (rs_front + 63) & 0x111111; //-1 mod 64
+    rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
     return ret;
 }
 
@@ -53,7 +53,7 @@ void rs_pop_blind(void) {
         //log_general("stack underflow prevented");
     }
 
-    rs_front = (rs_front + 63) & 0x111111; //-1 mod 64
+    rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
 }
 
 
