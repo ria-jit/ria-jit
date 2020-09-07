@@ -258,16 +258,32 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                             ///could follow, but cache
                             instructions_in_block++;
 
+                            ///1: recursively translate target
+                            {
+                                t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
 
-                            t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
+                                t_cache_loc cache_loc = lookup_cache_entry(target);
 
-                            t_cache_loc cache_loc = lookup_cache_entry(target);
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Reursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    cache_loc = translate_block(target);
+                                    set_cache_entry(target, cache_loc);
+                                }
+                            }
 
-                            if (cache_loc == UNSEEN_CODE) {
-                                log_asm_out("Reursion f from (riscv)%p to (riscv)%p\n", risc_addr, target);
-                                set_cache_entry(target, (t_cache_loc) 1); //???????????
-                                cache_loc = translate_block(target);
-                                set_cache_entry(target, cache_loc);
+                            ///2: recursively translate return addr (+4)
+                            //dead ends could arise here
+                            {
+                                t_risc_addr ret_target = risc_addr + 4;
+                                t_cache_loc cache_loc = lookup_cache_entry(ret_target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Reursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(ret_target);
+                                    set_cache_entry(ret_target, cache_loc);
+                                }
                             }
 
 
