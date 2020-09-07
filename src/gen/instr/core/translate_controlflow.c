@@ -370,6 +370,10 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 }
 
 void translate_INVALID(const t_risc_instr *instr, const register_info *r_info) {
-
+    ///call error handler
+    fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->mnem);
+    fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
+    fe_enc64(&current, FE_MOV64ri, FE_DX, (uint64_t) instr->addr);
+    fe_enc64(&current, FE_CALL, (uintptr_t) &invalid_error_handler);
 }
 
