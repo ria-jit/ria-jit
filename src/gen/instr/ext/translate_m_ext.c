@@ -218,11 +218,11 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FE_AX);
 
     //do actual divide
-    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
     if (regSrc1 != FE_AX) {
         ///rs1 is register mapped, but we need it in RAX for the IDIV to work
         err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP64);
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
@@ -334,11 +334,11 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FE_DX);
 
     //do actual divide
-    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
     if (regSrc1 != FE_AX) {
         ///rs1 is register mapped, but we need it in RAX for the IDIV to work
         err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP64);
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
@@ -489,11 +489,11 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FE_AX);
 
     //do actual divide
-    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
     if (regSrc1 != FE_AX) {
         ///rs1 is register mapped, but we need it in EAX for the IDIV to work
         err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP32);
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
@@ -611,11 +611,11 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FE_DX);
 
     //do actual divide
-    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
     if (regSrc1 != FE_AX) {
         ///rs1 is register mapped, but we need it in EAX for the IDIV to work
         err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP32);
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
