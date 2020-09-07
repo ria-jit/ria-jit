@@ -67,9 +67,9 @@ void dump_gp_registers(void) {
 
     //dump all registers:
     for (t_risc_reg i = x0; i < pc; ++i) {
-        log_reg_dump("x%i\t0x%lx\n", i, get_value(i));
+        log_reg_dump("%s/%s\t0x%lx\n", reg_to_string(i), reg_to_alias(i), get_value(i));
     }
 
     //nice pc output
-    log_reg_dump("pc\t0x%lx\n", get_value(pc));
+    log_reg_dump("pc\t\t0x%lx\n", get_value(pc));
 }
