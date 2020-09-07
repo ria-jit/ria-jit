@@ -13,6 +13,7 @@
 #include <util/tools/analyze.h>
 #include <env/opt.h>
 #include <util/tools/perf.h>
+#include <cache/return_stack.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -67,6 +68,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     set_value((t_risc_reg) sp, stackAddr);
 
     init_hash_table();
+    init_return_stack();
 
     set_value(pc, next_pc);
 
