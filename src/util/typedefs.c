@@ -4,6 +4,38 @@
 
 #include "typedefs.h"
 
+char* errorcode_to_string(int errorcode){
+    switch (errorcode) {
+        case E_UNKNOWN:
+            return "unknown";
+        case E_f3_32:
+            return "unknown funct3 code for OP_32";
+        case E_f3_AMO:
+            return "unknown funct3 code for OP_AMO";
+        case E_f3_BRANCH:
+            return "unknown funct3 code for OP_BRANCH";
+        case E_f3_IMM:
+            return "unknown funct3 code for OP_IMM";
+        case E_f3_IMM_32:
+            return "unknown funct3 code for OP_IMM_32";
+        case E_f3_LOAD:
+            return "unknown funct3 code for OP_LOAD";
+        case E_f3_STORE:
+            return "unknown funct3 code for OP_STORE";
+        case E_f3_MISC_MEM:
+            return "unknown funct3 code for OP_MISC_MEM";
+        case E_f3_RV64M:
+            return "unknown funct3 code for RV64M";
+        case E_f3_SYSTEM:
+            return "unknown funct3 code for OP_SYSTEM";
+        case E_f3_OP:
+            return "unknown funct3 code for OP_OP";
+        case E_f7_AMO:
+            return "unknown funct7 code for OP_AMO";
+        default:
+            return "unknown error code";
+    }
+}
 
 char *mnem_to_string(int mnem) {
     switch (mnem) {
