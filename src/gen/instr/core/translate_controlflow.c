@@ -419,6 +419,10 @@ void translate_INVALID(const t_risc_instr *instr) {
     err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
     err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
     err |= fe_enc64(&current, FE_MOV64ri, FE_DX, (uint64_t) instr->addr);
+    err |= fe_enc64(&current, FE_AND64ri, FE_SP, 0xFFFFFFFFFFFFFFF0);   //16 byte align
+    err |= fe_enc64(&current, FE_SUB64ri, FE_SP, 8); //these 8 byte + return addr from call = 16
     err |= fe_enc64(&current, FE_CALL, (uintptr_t) &invalid_error_handler);
+    
+    //still not tested, will do later
 }
 
