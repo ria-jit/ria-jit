@@ -7,12 +7,12 @@
 
 #include <cache/cache.h>
 #include <util/typedefs.h>
+#include <fadec/fadec-enc.h>
+#include <main/context.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <fadec/fadec-enc.h>
 
 //shortcut for memory operands
 #define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
@@ -25,16 +25,6 @@ extern "C" {
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
 
-/**
- * Register information for the translator functions.
- */
-typedef struct {
-    FeReg *map;
-    bool *mapped;
-    uint64_t base;
-    uint64_t csr_base;
-} register_info;
-
 extern uint8_t *current;
 extern int err;
 
@@ -46,7 +36,7 @@ void init_block();
 t_cache_loc finalize_block(int chainLinkOp);
 
 ///basic block translation
-t_cache_loc translate_block(t_risc_addr risc_addr);
+t_cache_loc translate_block(t_risc_addr risc_addr, context_info c_info);
 
 ///chaining
 void chain(t_cache_loc target);

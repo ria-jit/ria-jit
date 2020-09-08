@@ -6,6 +6,8 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 
 #include <stdint.h>
+#include <fadec/fadec-enc.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -159,6 +161,16 @@ typedef struct {
     t_risc_reg reg_dest;
     t_risc_imm imm;
 } t_risc_instr;
+
+/**
+ * Register information for the translator functions.
+ */
+typedef struct {
+    FeReg *map;
+    bool *mapped;
+    uint64_t base;
+    uint64_t csr_base;
+} register_info;
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,8 @@
 #include <gen/instr/ext/translate_f_ext.h>
 #include <gen/instr/ext/translate_d_ext.h>
 
-void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
+void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
+    const register_info *r_info = &c_info->r_info;
     switch (instr->mnem) {
         case INVALID_MNEM:
             translate_INVALID(instr);
@@ -226,7 +227,7 @@ void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
             translate_FENCE(instr, r_info);
             break;
         case ECALL:
-            translate_ECALL(instr, r_info);
+            translate_ECALL(instr, r_info, c_info);
             break;
         case EBREAK:
             translate_EBREAK(instr, r_info);

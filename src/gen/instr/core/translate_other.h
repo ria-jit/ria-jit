@@ -11,7 +11,7 @@
 
 void translate_FENCE(const t_risc_instr *instr, const register_info *r_info);
 
-void translate_ECALL(const t_risc_instr *instr, const register_info *r_info);
+void translate_ECALL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info);
 
 void translate_EBREAK(const t_risc_instr *instr, const register_info *r_info);
 

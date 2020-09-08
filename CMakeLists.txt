@@ -53,8 +53,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX})
 
 set(TRANSLATOR_SOURCES
         src/main/main.c src/main/main.h
+        src/main/context.c src/main/context.h
         src/parser/parser.c src/parser/parser.h
         src/cache/cache.c src/cache/cache.h
+        src/cache/return_stack.h src/cache/return_stack.c
         src/runtime/register.c src/runtime/register.h
         src/runtime/emulateEcall.c src/runtime/emulateEcall.h
         src/elf/loadElf.c src/elf/loadElf.h
@@ -81,7 +83,8 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2fixed_full_table.h
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
-        lib/ryu/ryu.h src/cache/return_stack.h src/cache/return_stack.c)
+        lib/ryu/ryu.h
+        )
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
