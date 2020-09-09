@@ -22,7 +22,7 @@ bool finalize = false;
 //prototypes
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
-bool execute_cached(t_cache_loc loc, context_info c_info);
+bool execute_cached(t_cache_loc loc, context_info *c_info);
 
 #ifndef TESTING
 
@@ -73,7 +73,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     init_hash_table();
     init_return_stack();
 
-    context_info c_info = init_map_context();
+    context_info *c_info = init_map_context();
 
     set_value(pc, next_pc);
 
@@ -122,7 +122,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  * @param loc the cache address of that code
  * @return
  */
-bool execute_cached(t_cache_loc loc, context_info c_info) {
+bool execute_cached(t_cache_loc loc, context_info *c_info) {
     if (flag_log_general) {
         log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     }

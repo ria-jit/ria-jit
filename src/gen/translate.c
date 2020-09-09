@@ -133,8 +133,7 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
     }
 }
 
-t_cache_loc translate_block(t_risc_addr risc_addr, context_info c_info) {
-    register_info r_info = c_info.r_info;
+t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
     t_risc_addr orig_risc_addr = risc_addr;
     log_asm_out("Start translating block at (riscv)%p...\n", orig_risc_addr);
 
@@ -367,7 +366,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, context_info c_info) {
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
-        translate_risc_instr(&block_cache[i], &c_info);
+        translate_risc_instr(&block_cache[i], c_info);
     }
 
     if (block_full) {

@@ -14,7 +14,7 @@
 #include <gen/instr/ext/translate_d_ext.h>
 
 void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
-    const register_info *r_info = &c_info->r_info;
+    register_info *r_info = c_info->r_info;
     switch (instr->mnem) {
         case INVALID_MNEM:
             translate_INVALID(instr);

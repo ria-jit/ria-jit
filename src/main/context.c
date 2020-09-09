@@ -7,18 +7,32 @@
 #include <runtime/register.h>
 #include "context.h"
 #include <gen/translate.h>
+#include <common.h>
+#include <asm/mman.h>
+#include <util/util.h>
 
 /*
  * Neither finished nor tested.
  * Dynamically generated switching blocks should give us the freedom to change the mapping more flexibly? Input needed.
  */
 
-context_info init_map_context(void) {
+context_info *init_map_context(void) {
     //register mapping as pulled from translate.c
 
-    ///create allocation MAPping
-    FeReg register_map[N_REG];
-    bool mapped[N_REG];
+    //create register allocation mapping
+    FeReg *register_map = mmap(NULL,
+                               N_REG * sizeof(FeReg),
+                               PROT_READ | PROT_WRITE,
+                               MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                               -1,
+                               0);
+
+    bool *mapped = mmap(NULL,
+                              N_REG * sizeof(bool),
+                              PROT_READ | PROT_WRITE,
+                              MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                              -1,
+                              0);
 
     //fill boolean array with 0
     for (int i = 0; i < N_REG; ++i) {
@@ -51,12 +65,18 @@ context_info init_map_context(void) {
     //notice: risc reg x0 will need special treatment
 
     ///create info struct
-    register_info r_info = {
-            register_map,
-            mapped,
-            (uint64_t) get_gp_reg_file(),
-            (uint64_t) get_csr_reg_file()
-    };
+    register_info *r_info =
+            mmap(NULL,
+                 sizeof(register_info),
+                 PROT_READ | PROT_WRITE,
+                 MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                 -1,
+                 0);
+
+    r_info->map = register_map;
+    r_info->mapped = mapped;
+    r_info->base = (uint64_t) get_gp_reg_file();
+    r_info->csr_base = (uint64_t) get_csr_reg_file();
 
     //generate switching functions
     t_cache_loc load_context;
@@ -75,8 +95,8 @@ context_info init_map_context(void) {
 
         //load by register mapping
         for (int i = x0; i <= pc; ++i) {
-            if (r_info.mapped[i]) {
-                err |= fe_enc64(&current, FE_MOV64rm, r_info.map[i], FE_MEM_ADDR(r_info.base + 8 * i));
+            if (r_info->mapped[i]) {
+                err |= fe_enc64(&current, FE_MOV64rm, r_info->map[i], FE_MEM_ADDR(r_info->base + 8 * i));
             }
         }
 
@@ -90,8 +110,8 @@ context_info init_map_context(void) {
 
         //save by register mapping
         for (int i = x0; i <= pc; ++i) {
-            if (r_info.mapped[i]) {
-                err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * i), r_info.map[i]);
+            if (r_info->mapped[i]) {
+                err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * i), r_info->map[i]);
             }
         }
 
@@ -103,11 +123,17 @@ context_info init_map_context(void) {
         save_context = finalize_block(DONT_LINK);
     }
 
-    context_info c_info = {
-            r_info,
-            load_context,
-            save_context
-    };
+    //create context info struct
+    context_info *c_info = mmap(NULL,
+                                sizeof(context_info),
+                                PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                                -1,
+                                0);
+
+    c_info->r_info = r_info;
+    c_info->load_context = load_context;
+    c_info->save_context = save_context;
 
     return c_info;
 }
@@ -115,15 +141,15 @@ context_info init_map_context(void) {
 /**
  * Load the RISC-V guest program's context by saving our registers and loading the guest registers.
  */
-void load_guest_context(context_info c_info) {
+void load_guest_context(const context_info *c_info) {
     typedef void (*void_asm)(void);
-    ((void_asm) c_info.load_context)();
+    ((void_asm) c_info->load_context)();
 }
 
 /**
  * Storer the RISC-V guest program's context by saving the guest registers and restoring our register contents.
  */
-void store_guest_context(context_info c_info) {
+void store_guest_context(const context_info *c_info) {
     typedef void (*void_asm)(void);
-    ((void_asm) c_info.save_context)();
+    ((void_asm) c_info->save_context)();
 }
