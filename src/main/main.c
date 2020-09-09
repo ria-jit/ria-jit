@@ -127,12 +127,7 @@ bool execute_cached(t_cache_loc loc, context_info *c_info) {
         log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     }
 
-    load_guest_context(c_info);
-
-    typedef void (*void_asm)(void);
-    ((void_asm) loc)(); //call asm code
-
-    store_guest_context(c_info);
+    execute_in_guest_context(c_info, loc);
 
     //dump registers to the log
     if (flag_log_reg_dump) {

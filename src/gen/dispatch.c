@@ -23,10 +23,10 @@ void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
             translate_LUI(instr, r_info);
             break;
         case JAL:
-            translate_JAL(instr, r_info);
+            translate_JAL(instr, r_info, c_info);
             break;
         case JALR:
-            translate_JALR(instr, r_info);
+            translate_JALR(instr, r_info, c_info);
             break;
         case BEQ:
             translate_BEQ(instr, r_info);

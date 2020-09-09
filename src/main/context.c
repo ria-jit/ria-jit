@@ -93,30 +93,10 @@ context_info *init_map_context(void) {
     r_info->csr_base = (uint64_t) get_csr_reg_file();
 
     //generate switching functions
-    t_cache_loc load_context;
+    t_cache_loc load_execute_save_context;
     t_cache_loc save_context;
 
     //generate these dynamically in case we need to modify them
-    {
-        //context loading
-        init_block();
-        log_general("Generating context loading block…\n");
-
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0), FE_R12);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1), FE_R13);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2), FE_R14);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3), FE_R15);
-
-        //load by register mapping
-        for (int i = x0; i <= pc; ++i) {
-            if (r_info->mapped[i]) {
-                err |= fe_enc64(&current, FE_MOV64rm, r_info->map[i], FE_MEM_ADDR(r_info->base + 8 * i));
-            }
-        }
-
-        load_context = finalize_block(DONT_LINK);
-    }
-
     {
         //context storing
         init_block();
@@ -137,6 +117,40 @@ context_info *init_map_context(void) {
         save_context = finalize_block(DONT_LINK);
     }
 
+    {
+        //context loading
+        init_block();
+        log_general("Generating context executing block…\n");
+
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0), FE_R12);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1), FE_R13);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2), FE_R14);
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3), FE_R15);
+
+        err |= fe_enc64(&current, FE_MOV64rr, FIRST_REG, FE_DI);
+        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, FE_SI);
+
+        //load by register mapping
+        for (int i = x0; i <= pc; ++i) {
+            if (r_info->mapped[i]) {
+                err |= fe_enc64(&current, FE_MOV64rm, r_info->map[i], FE_MEM_ADDR(r_info->base + 8 * i));
+            }
+        }
+        err |= fe_enc64(&current, FE_TEST32rr, SECOND_REG, SECOND_REG);
+
+        uint8_t *jmpBuf = current;
+        err |= fe_enc64(&current, FE_JZ, (intptr_t) current);
+
+        err |= fe_enc64(&current, FE_CALLr, FIRST_REG);
+
+        ///Tail call save_context
+        err |= fe_enc64(&current, FE_JMP, (intptr_t) save_context);
+
+        err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
+
+        load_execute_save_context = finalize_block(DONT_LINK);
+    }
+
     //create context info struct
     context_info *c_info = mmap(NULL,
                                 sizeof(context_info),
@@ -151,24 +165,24 @@ context_info *init_map_context(void) {
     }
 
     c_info->r_info = r_info;
-    c_info->load_context = load_context;
+    c_info->load_execute_save_context = load_execute_save_context;
     c_info->save_context = save_context;
 
     return c_info;
 }
 
 /**
- * Load the RISC-V guest program's context by saving our registers and loading the guest registers.
+ * Loads the RISC-V guest program's context, executes the translated block at the given address and stores the context
+ * back.
+ * <p>
+ * Saves the x86 registers, loads the mapped RISC-V registers, executes the given block, stores the mapped RISC-V
+ * registers and then restores the x86 registers.
+ *
+ * @param c_info the context_info to apply to (un)map the registers.
+ * @param loc the cached block to execute.
  */
-void load_guest_context(const context_info *c_info) {
-    typedef void (*void_asm)(void);
-    ((void_asm) c_info->load_context)();
+void execute_in_guest_context(const context_info *c_info, t_cache_loc loc) {
+    typedef void (*void_asm)(t_cache_loc, bool);
+    ((void_asm) c_info->load_execute_save_context)(loc, true);
 }
 
-/**
- * Storer the RISC-V guest program's context by saving the guest registers and restoring our register contents.
- */
-void store_guest_context(const context_info *c_info) {
-    typedef void (*void_asm)(void);
-    ((void_asm) c_info->save_context)();
-}

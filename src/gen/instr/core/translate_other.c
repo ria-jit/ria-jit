@@ -25,13 +25,17 @@ void translate_ECALL(const t_risc_instr *instr, const register_info *r_info, con
     //see https://stackoverflow.com/questions/59800430/risc-v-ecall-syscall-calling-convention-on-pk-linux
     log_asm_out("Translate ECALL…\n");
 
-    store_guest_context(c_info);
+    //emit c_info->save_context();
+    err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->save_context);
+    //emit emulate_ecall(instr->addr, r_info->base);
     err |= fe_enc64(&current, FE_MOV64ri, FE_DI, instr->addr);
     err |= fe_enc64(&current, FE_MOV64ri, FE_SI, r_info->base);
     typedef void emulate(t_risc_addr addr, t_risc_reg_val *registerValues);
     emulate *em = &emulate_ecall;
     err |= fe_enc64(&current, FE_CALL, (uintptr_t) em);
-    load_guest_context(c_info);
+    //emit c_info->load_execute_save_context(*, false); //* means value does not matter, false means load without execute
+    err |= fe_enc64(&current, FE_XOR32rr, FE_SI, FE_SI);
+    err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->load_execute_save_context);
 }
 
 /**

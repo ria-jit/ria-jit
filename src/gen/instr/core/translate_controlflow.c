@@ -18,23 +18,30 @@ static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *jmpLoc, uint64_t mnem);
 
 
-void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
+void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
     log_asm_out("Translate JAL\n");
 
     ///push to return stack
-    if(flag_translate_opt) {
+    if (flag_translate_opt) {
         t_risc_addr ret_target = instr->addr + 4;
 
         t_cache_loc cache_loc;
 
         if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {
-            printf("translate_JAL: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n", instr->addr);
+            printf("translate_JAL: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
+                   instr->addr);
             goto NOT_CACHED;
         }
 
+
+        //emit c_info->save_context();
+        err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->save_context);
         err |= fe_enc64(&current, FE_MOV64ri, FE_DI, instr->addr + 4);
         err |= fe_enc64(&current, FE_MOV64ri, FE_SI, cache_loc);
         err |= fe_enc64(&current, FE_CALL, &rs_push);
+        //emit c_info->load_execute_save_context(*, false); //* means value does not matter, false means load without execute
+        err |= fe_enc64(&current, FE_XOR32rr, FE_SI, FE_SI);
+        err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->load_execute_save_context);
 
         NOT_CACHED:;
     }
@@ -84,7 +91,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
     }
 }
 
-void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
+void translate_JALR(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
     /**
      * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1,
      * then setting the least-significant bit of the result to zero.
@@ -119,15 +126,25 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     ///2: check return stack
 
     if(flag_translate_opt) {
+        //emit c_info->save_context();
+        err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->save_context);
         err |= fe_enc64(&current, FE_MOV64rr, FE_DI, FE_AX);    //function argument
         err |= fe_enc64(&current, FE_PUSHr, FE_AX);             //save target address
-        err |= fe_enc64(&current, FE_CALL, &rs_pop_check);       //call rs_easy pop
+        err |= fe_enc64(&current, FE_CALL, &rs_pop_check);      //call rs_easy pop
+        err |= fe_enc64(&current, FE_PUSHr, FE_AX);             //save jump address
+        //emit c_info->load_execute_save_context(*, false); //* means value does not matter, false means load without execute
+        err |= fe_enc64(&current, FE_XOR32rr, FE_SI, FE_SI);
+        err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->load_execute_save_context);
+        err |= fe_enc64(&current, FE_POPr, FE_AX);
         err |= fe_enc64(&current, FE_CMP64ri, FE_AX, 0);        //cmp
         uint8_t *jmpLoc = current;
         err |= fe_enc64(&current, FE_JZ, current);              //dummy jump
         err |= fe_enc64(&current, FE_ADD64ri, FE_SP, 8);        //remove saved target address
         err |= fe_enc64(&current, FE_JMPr, FE_AX);              //jmp to next block (ret)
         err |= fe_enc64(&jmpLoc, FE_JZ, current);               //replace dummy
+        //emit c_info->load_execute_save_context(*, false); //* means value does not matter, false means load without execute
+        err |= fe_enc64(&current, FE_XOR32rr, FE_SI, FE_SI);
+        err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->load_execute_save_context);
         err |= fe_enc64(&current, FE_POPr, FE_AX);              //restore saved target address
     }
 
