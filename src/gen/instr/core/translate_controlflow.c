@@ -415,7 +415,6 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 
 void translate_INVALID(const t_risc_instr *instr) {
     log_asm_out("Translate INVALID_OP\n");
-    printf("INVALID_OP: %p\n", current);
     ///call error handler
     err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
     err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
