@@ -6,6 +6,8 @@
 #include <gen/instr/core/translate_arithmetic.h>
 #include <util/log.h>
 #include <fadec/fadec-enc.h>
+#include <cache/return_stack.h>
+#include <common.h>
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info, bool noOrder);
@@ -19,6 +21,26 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate JAL\n");
 
+    ///push to return stack
+    if(flag_translate_opt) {
+        t_risc_addr ret_target = instr->addr + 4;
+
+        t_cache_loc cache_loc;
+
+        if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {
+            printf("translate_JAL: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n", instr->addr);
+            goto NOT_CACHED;
+        }
+
+        err |= fe_enc64(&current, FE_MOV64ri, FE_DI, instr->addr + 4);
+        err |= fe_enc64(&current, FE_MOV64ri, FE_SI, cache_loc);
+        err |= fe_enc64(&current, FE_CALL, &rs_push);
+
+        NOT_CACHED:;
+    }
+
+
+    ///set rd
     t_risc_instr aupicInstr = (t_risc_instr) {
             instr->addr,
             AUIPC,
@@ -31,6 +53,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
 
     translate_AUIPC(&aupicInstr, r_info);
 
+    ///jump...
     t_risc_addr target = instr->addr + instr->imm;
 
     t_cache_loc cache_loc;
@@ -72,6 +95,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
 
     //assuming rax is unused, usage information will probably be added to r_info
 
+    ///1: compute target address
+
     ///mov rs1 to temp register
     if (r_info->mapped[instr->reg_src_1]) {
         //a->mov(x86::rax, r_info->map[instr->reg_src_1]);
@@ -89,6 +114,25 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     //why??? not aligned to 4 bit boundary would throw exception anyway…
     //a->and_(x86::rax, -2);
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, -2);
+
+
+    ///2: check return stack
+
+    if(flag_translate_opt) {
+        err |= fe_enc64(&current, FE_MOV64rr, FE_DI, FE_AX);    //function argument
+        err |= fe_enc64(&current, FE_PUSHr, FE_AX);             //save target address
+        err |= fe_enc64(&current, FE_CALL, &rs_pop_easy);       //call rs_easy pop
+        err |= fe_enc64(&current, FE_CMP64ri, FE_AX, 0);        //cmp
+        uint8_t *jmpLoc = current;
+        err |= fe_enc64(&current, FE_JZ, current);              //dummy jump
+        err |= fe_enc64(&current, FE_ADD64ri, FE_SP, 8);        //remove saved target address
+        err |= fe_enc64(&current, FE_JMPr, FE_AX);              //jmp to next block (ret)
+        err |= fe_enc64(&jmpLoc, FE_JZ, current);               //replace dummy
+        err |= fe_enc64(&current, FE_POPr, FE_AX);              //restore saved target address
+    }
+
+
+    ///3: prepare return to transcode loop
 
     ///write target addr to pc
     if (r_info->mapped[pc]) {
@@ -368,3 +412,15 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     //a->bind(END);
     err |= fe_enc64(&endJmpLoc, FE_JMP, (intptr_t) current); //replace dummy
 }
+
+void translate_INVALID(const t_risc_instr *instr) {
+    log_asm_out("Translate INVALID_OP\n");
+    ///call error handler
+    err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_DX, (uint64_t) instr->addr);
+    err |= fe_enc64(&current, FE_AND64ri, FE_SP, 0xFFFFFFFFFFFFFFF0);   //16 byte align
+    err |= fe_enc64(&current, FE_SUB64ri, FE_SP, 8); //these 8 byte + return addr from call = 16
+    err |= fe_enc64(&current, FE_CALL, (uintptr_t) &invalid_error_handler);
+}
+

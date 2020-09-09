@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+char *errorcode_to_string(int mnem);
+
 //the RISC-V mnemonic of the instruction
 char *mnem_to_string(int mnem);
 
@@ -19,6 +21,8 @@ char *reg_to_string(int reg);
 char *reg_to_alias(int reg);
 
 typedef enum {
+    INVALID_MNEM,
+
     //---RV32I---
     LUI, //load upper Imm
     AUIPC, //register = Imm
@@ -75,6 +79,22 @@ typedef enum {
 } t_risc_mnem;
 #define N_MNEM FMVDX + 1
 
+typedef enum {
+    E_UNKNOWN,
+    E_f3_MISC_MEM,
+    E_f3_BRANCH,
+    E_f3_LOAD,
+    E_f3_STORE,
+    E_f3_OP,
+    E_f3_SYSTEM,
+    E_f3_IMM_32,
+    E_f3_RV64M,
+    E_f3_32,
+    E_f3_IMM,
+    E_f7_AMO,
+    E_f3_AMO
+};
+
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
     x0, //x0 is hardwired to constant 0
@@ -99,7 +119,7 @@ typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK
 } t_risc_optype;
 
 //carry immediate values in the instruction struct

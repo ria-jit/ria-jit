@@ -3,6 +3,7 @@
 //
 
 #include "log.h"
+#include "typedefs.h"
 #include <common.h>
 #include <stdbool.h>
 
@@ -128,4 +129,10 @@ void log_print_mem(const char *ptr, long int len) {
 
         write(1, buffer, 2);
     }
+}
+
+void invalid_error_handler(int32_t errorcode, int32_t raw_instr, t_risc_addr addr) {
+    dprintf(2, "Critical: tried to execute invalid code 0x%x at %p\n"
+                    "error: %s\n",raw_instr, addr, errorcode_to_string(errorcode));
+    _exit(1);
 }

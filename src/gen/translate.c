@@ -12,6 +12,7 @@
 #include <util/log.h>
 #include <util/typedefs.h>
 #include <parser/parser.h>
+#include <gen/instr/core/translate_controlflow.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -175,6 +176,11 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {
 
+            case INVALID_INSTRUCTION : {
+                instructions_in_block++;
+                goto PARSE_DONE;
+            }
+
             ///branch? or syscall?
             case SYSTEM : //fallthrough Potential program end stop parsing
             {
@@ -189,7 +195,18 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                         risc_addr += 4;
                         parse_pos--; //decrement for next loop cycle
                         break;
+                    case EBREAK : {
+                        block_cache[parse_pos].imm = 0;
+                        block_cache[parse_pos].mnem = INVALID_MNEM;
+                        block_cache[parse_pos].optype = INVALID_INSTRUCTION;
+
+                        instructions_in_block++;
+                        goto PARSE_DONE;
+                    }
                     default:
+                        ///should not get here
+                        printf("Oops: line %d in %s\n", __LINE__, __FILE__);
+                        _exit(1);
                         break;
                 }
             }
@@ -252,17 +269,35 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                             ///could follow, but cache
                             instructions_in_block++;
 
+                            ///1: recursively translate target
+                            {
+                                t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
 
-                            t_risc_addr target = risc_addr + block_cache[parse_pos].imm;
+                                t_cache_loc cache_loc = lookup_cache_entry(target);
 
-                            t_cache_loc cache_loc = lookup_cache_entry(target);
-
-                            if (cache_loc == UNSEEN_CODE) {
-                                log_asm_out("Reursion f from (riscv)%p to (riscv)%p\n", risc_addr, target);
-                                set_cache_entry(target, (t_cache_loc) 1); //???????????
-                                cache_loc = translate_block(target);
-                                set_cache_entry(target, cache_loc);
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    cache_loc = translate_block(target);
+                                    set_cache_entry(target, cache_loc);
+                                }
                             }
+
+
+                            ///2: recursively translate return addr (+4)
+                            //dead ends could arise here
+                            {
+                                t_risc_addr ret_target = risc_addr + 4;
+                                t_cache_loc cache_loc = lookup_cache_entry(ret_target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(ret_target);
+                                    set_cache_entry(ret_target, cache_loc);
+                                }
+                            }
+
 
 
                             goto PARSE_DONE;
@@ -306,6 +341,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr) {
                     default: {
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
+                        _exit(1);
                     }
                 }
             }
