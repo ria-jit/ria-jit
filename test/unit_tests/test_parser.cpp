@@ -19,12 +19,9 @@ TEST(Parser, BasicOpcodeParsing) {
     //parsing result array
     t_risc_instr parsed[4];
 
-    //ignored register count
-    uint32_t reg_count;
-
     for (int i = 0; i < 4; i++) {
         parsed[i].addr = (t_risc_addr) &memory[i];
-        parse_instruction(&parsed[i], &reg_count);
+        parse_instruction(&parsed[i]);
     }
 
     /*
