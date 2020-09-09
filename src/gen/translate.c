@@ -154,12 +154,6 @@ t_cache_loc translate_block(t_risc_addr risc_addr, context_info c_info) {
         _exit(FAIL_HEAP_ALLOC);
     }
 
-    ///count register usage
-    uint32_t reg_count[N_REG];
-    for (int i = 0; i < N_REG; i++) {
-        reg_count[i] = 0;
-    }
-
     int instructions_in_block = 0;
 
     bool block_full = false;
@@ -175,7 +169,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, context_info c_info) {
         //printf("parse at: %p", (void*)block_cache[parse_pos].addr);
 
         //parse_instruction(&block_cache.back(), reg_count);
-        parse_instruction(&block_cache[parse_pos], reg_count);
+        parse_instruction(&block_cache[parse_pos]);
 
         //switch (block_cache.back().optype) {
         switch (block_cache[parse_pos].optype) {

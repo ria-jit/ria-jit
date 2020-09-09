@@ -66,7 +66,7 @@ int32_t set_error_message(t_risc_instr *p_instr_struct,int32_t error_code){
  *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
-int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
+int32_t parse_instruction(t_risc_instr *p_instr_struct) {
     //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
 
     // print out the line to parse in grouped binary as in the spec
@@ -85,26 +85,21 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
             p_instr_struct->imm = extract_imm_U(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
             break;
         case OP_AUIPC:
             p_instr_struct->optype = IMMEDIATE;
             p_instr_struct->mnem = AUIPC;
             p_instr_struct->imm = extract_imm_U(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
             break;
         case OP_JAL:
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JAL;
             p_instr_struct->imm = extract_imm_J(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
             break;
         case OP_JALR:
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JALR;
             p_instr_struct->imm = extract_imm_I(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
             break;
         case OP_MISC_MEM:
             p_instr_struct->optype = SYSTEM;
@@ -124,8 +119,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             // BEQ, BNE...
             p_instr_struct->optype = BRANCH;
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            reg_count[p_instr_struct->reg_src_1]++;
-            reg_count[p_instr_struct->reg_src_2]++;
             p_instr_struct->imm = extract_imm_B(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
@@ -153,8 +146,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_LOAD:
             p_instr_struct->optype = IMMEDIATE;
             p_instr_struct->imm = extract_imm_I(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
             switch (extract_funct3(raw_instr)) {
                 case 0: {
                     p_instr_struct->mnem = LB;
@@ -194,8 +185,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             p_instr_struct->optype = STORE;
             p_instr_struct->imm = extract_imm_S(raw_instr);
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            reg_count[p_instr_struct->reg_src_1]++;
-            reg_count[p_instr_struct->reg_src_2]++;
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = SB;
@@ -216,9 +205,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_OP:
             p_instr_struct->optype = REG_REG;
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
-            reg_count[p_instr_struct->reg_src_2]++;
             if (raw_instr & (1 << 25)) {
                 switch (extract_funct3(raw_instr)) {
                     case 0:
@@ -294,7 +280,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_SYSTEM:
             p_instr_struct->optype = SYSTEM;
             p_instr_struct->imm = extract_imm_I(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     if (raw_instr & (1 << 20)) {
@@ -305,15 +290,12 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
                     break;
                 case 1:
                     p_instr_struct->mnem = CSRRW;
-                    reg_count[p_instr_struct->reg_src_1]++;
                     break;
                 case 2:
                     p_instr_struct->mnem = CSRRS;
-                    reg_count[p_instr_struct->reg_src_1]++;
                     break;
                 case 3:
                     p_instr_struct->mnem = CSRRC;
-                    reg_count[p_instr_struct->reg_src_1]++;
                     break;
                 case 5:
                     p_instr_struct->mnem = CSRRWI;
@@ -330,8 +312,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             break;
         case OP_OP_IMM_32:
             p_instr_struct->optype = IMMEDIATE;
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = ADDIW;
@@ -359,9 +339,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
         case OP_OP_32:
             p_instr_struct->optype = REG_REG;
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
-            reg_count[p_instr_struct->reg_src_2]++;
             if (raw_instr & (1 << 25)) {
                 switch (extract_funct3(raw_instr)) {
                     case 0:
@@ -412,8 +389,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct, uint32_t *reg_count) {
             break;
         case OP_OP_IMM:
             p_instr_struct->optype = IMMEDIATE;
-            reg_count[p_instr_struct->reg_dest]++;
-            reg_count[p_instr_struct->reg_src_1]++;
             switch (extract_funct3(raw_instr)) {
                 case 0: //ADDI
                     p_instr_struct->mnem = ADDI;
