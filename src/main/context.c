@@ -8,7 +8,7 @@
 #include "context.h"
 #include <gen/translate.h>
 #include <common.h>
-#include <asm/mman.h>
+#include <linux/mman.h>
 #include <util/util.h>
 
 /*
