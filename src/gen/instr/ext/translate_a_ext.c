@@ -73,11 +73,11 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_XCHG32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+//    err |= fe_enc64(&current, FE_XCHG32rr, SCRATCH_REG, regDest);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -99,9 +99,9 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_ADD32rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_ADD32rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
@@ -125,9 +125,9 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_XOR32rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_XOR32rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
@@ -151,9 +151,9 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_AND32rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_AND32rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
@@ -177,9 +177,9 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_OR32rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_OR32rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
@@ -284,9 +284,9 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_XCHG64rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_XCHG64rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
@@ -309,9 +309,9 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_ADD64rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_ADD64rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
@@ -334,9 +334,9 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_XOR64rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_XOR64rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
@@ -359,9 +359,9 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_AND64rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_AND64rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
@@ -384,9 +384,9 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_OR64rr, SCRATCH_REG, regSrc2);
+    err |= fe_enc64(&current, FE_OR64rr, SCRATCH_REG, regDest);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
