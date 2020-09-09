@@ -76,10 +76,13 @@ typedef enum {
     FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTSD, FCVTDS, FEQD, FLTD, FLED, FCLASSD, FCVTWD, FCVTWUD, FCVTDW, FCVTDWU,
 
     //---RV64D---
-    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX
+    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
+
+    //---PSEUDO---
+    PC_NEXT_INST
 
 } t_risc_mnem;
-#define N_MNEM FMVDX + 1
+#define N_MNEM (PC_NEXT_INST + 1)
 
 typedef enum {
     E_UNKNOWN,
@@ -137,7 +140,7 @@ typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
 } t_risc_optype;
 
 //carry immediate values in the instruction struct

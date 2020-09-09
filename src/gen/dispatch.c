@@ -487,6 +487,9 @@ void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
         case FMVDX:
             translate_FMVDX(instr, r_info);
             break;
+        case PC_NEXT_INST:
+            translate_PC_NEXT_INST(instr->imm, r_info->base);
+            break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
     }

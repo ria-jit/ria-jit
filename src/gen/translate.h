@@ -28,8 +28,6 @@ extern "C" {
 extern uint8_t *current;
 extern int err;
 
-void save_risc_registers(register_info r_info);
-
 //basic block translation management
 void init_block();
 
@@ -40,6 +38,8 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);
 
 ///chaining
 void chain(t_cache_loc target);
+
+void translate_PC_NEXT_INST(t_risc_addr addr, uint64_t reg_base);
 
 #ifdef __cplusplus
 }
