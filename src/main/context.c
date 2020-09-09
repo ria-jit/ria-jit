@@ -5,7 +5,6 @@
 #include "context.h"
 
 #include <runtime/register.h>
-#include "context.h"
 #include <gen/translate.h>
 #include <common.h>
 #include <linux/mman.h>
@@ -23,16 +22,26 @@ context_info *init_map_context(void) {
     FeReg *register_map = mmap(NULL,
                                N_REG * sizeof(FeReg),
                                PROT_READ | PROT_WRITE,
-                               MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                               MAP_ANONYMOUS | MAP_PRIVATE,
                                -1,
                                0);
 
+    if (BAD_ADDR(register_map)) {
+        dprintf(2, "Failed to allocate register_map for context. Error %li", -(intptr_t) register_map);
+        _exit(FAIL_HEAP_ALLOC);
+    }
+
     bool *mapped = mmap(NULL,
-                              N_REG * sizeof(bool),
-                              PROT_READ | PROT_WRITE,
-                              MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
-                              -1,
-                              0);
+                        N_REG * sizeof(bool),
+                        PROT_READ | PROT_WRITE,
+                        MAP_ANONYMOUS | MAP_PRIVATE,
+                        -1,
+                        0);
+
+    if (BAD_ADDR(mapped)) {
+        dprintf(2, "Failed to allocate mapped for context. Error %li", -(intptr_t) mapped);
+        _exit(FAIL_HEAP_ALLOC);
+    }
 
     //fill boolean array with 0
     for (int i = 0; i < N_REG; ++i) {
@@ -69,9 +78,14 @@ context_info *init_map_context(void) {
             mmap(NULL,
                  sizeof(register_info),
                  PROT_READ | PROT_WRITE,
-                 MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                 MAP_ANONYMOUS | MAP_PRIVATE,
                  -1,
                  0);
+
+    if (BAD_ADDR(r_info)) {
+        dprintf(2, "Failed to allocate r_info for context. Error %li", -(intptr_t) r_info);
+        _exit(FAIL_HEAP_ALLOC);
+    }
 
     r_info->map = register_map;
     r_info->mapped = mapped;
@@ -127,9 +141,14 @@ context_info *init_map_context(void) {
     context_info *c_info = mmap(NULL,
                                 sizeof(context_info),
                                 PROT_READ | PROT_WRITE,
-                                MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
+                                MAP_ANONYMOUS | MAP_PRIVATE,
                                 -1,
                                 0);
+
+    if (BAD_ADDR(c_info)) {
+        dprintf(2, "Failed to allocate c_info for context. Error %li", -(intptr_t) c_info);
+        _exit(FAIL_HEAP_ALLOC);
+    }
 
     c_info->r_info = r_info;
     c_info->load_context = load_context;
