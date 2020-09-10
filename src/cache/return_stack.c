@@ -31,53 +31,22 @@ void rs_push(t_risc_addr r_add, uintptr_t x86_add) {
 
 }
 
-rs_entry rs_pop(void) {
-    if(rs_front == rs_back) {
-        rs_entry ret = {0,0};
+uintptr_t rs_pop_check(t_risc_addr r_add) {
+    if(rs_front == rs_back) {   ///stack empty
         //log_general("stack underflow prevented");
-        return ret;
-    }
-    rs_entry ret = r_stack[rs_front];
-    rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
-    return ret;
-}
-
-rs_entry rs_peek(void) {
-    if(rs_front == rs_back) {
-        rs_entry ret = {0,0};
-        //log_general("peek on empty r_stack prevented");
-        return ret;
-    }
-
-    return r_stack[rs_front];
-}
-
-void rs_pop_blind(void) {
-    if(rs_front == rs_back) {
-        //log_general("stack underflow prevented");
-        return;
-    }
-
-    rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
-}
-
-uintptr_t rs_pop_easy(t_risc_addr r_add) {
-    if(rs_front == rs_back) {
-        //log_general("stack underflow prevented");
-        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d\n", r_add, 0, rs_front);
+        //printf("rs_pop_check called: riscV=%p, x86=%p s=%d\n", r_add, 0, rs_front);
         return NULL;
     }
 
-    if(r_stack[rs_front].risc_addr == r_add) {
+    if(r_stack[rs_front].risc_addr == r_add) {  ///hit
         uintptr_t ret = r_stack[rs_front].x86_addr;
         rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
-        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d  ---------------hit---------------\n", r_add, ret, rs_front);
+        //printf("rs_pop_check called: riscV=%p, x86=%p s=%d  ---------------hit---------------\n", r_add, ret, rs_front);
         return ret;
     }
-    else {
+    else {  ///miss
         //pop???    scrap cache???
-        //printf("rs_pop_easy called: riscV=%p, x86=%p s=%d\n", r_add, 1, rs_front);
-
+        //printf("rs_pop_check called: riscV=%p, x86=%p s=%d\n", r_add, 1, rs_front);
         return NULL;
     }
 }

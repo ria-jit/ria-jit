@@ -121,7 +121,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     if(flag_translate_opt) {
         err |= fe_enc64(&current, FE_MOV64rr, FE_DI, FE_AX);    //function argument
         err |= fe_enc64(&current, FE_PUSHr, FE_AX);             //save target address
-        err |= fe_enc64(&current, FE_CALL, &rs_pop_easy);       //call rs_easy pop
+        err |= fe_enc64(&current, FE_CALL, &rs_pop_check);       //call rs_easy pop
         err |= fe_enc64(&current, FE_CMP64ri, FE_AX, 0);        //cmp
         uint8_t *jmpLoc = current;
         err |= fe_enc64(&current, FE_JZ, current);              //dummy jump
