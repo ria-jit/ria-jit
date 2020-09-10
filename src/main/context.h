@@ -8,6 +8,9 @@
 #include <util/typedefs.h>
 #include <cache/cache.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
 typedef struct {
     register_info *r_info;
     /**
@@ -23,4 +26,7 @@ void execute_in_guest_context(const context_info *c_info, t_cache_loc loc);
 
 context_info *init_map_context(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_CONTEXT_H

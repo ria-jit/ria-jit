@@ -36,6 +36,9 @@ t_cache_loc finalize_block(int chainLinkOp);
 ///basic block translation
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);
 
+t_cache_loc
+translate_block_instructions(const t_risc_instr block_cache[], int instructions_in_block, const context_info *c_info);
+
 ///chaining
 void chain(t_cache_loc target);
 

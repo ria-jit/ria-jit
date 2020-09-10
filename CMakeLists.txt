@@ -91,7 +91,8 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/test_register.cpp
         test/unit_tests/test_parser.cpp
         test/unit_tests/test_cache.cpp
-        test/unit_tests/test_faenc_experiments.cpp)
+        test/unit_tests/test_faenc_experiments.cpp
+        test/unit_tests/test_amo_ext.cpp)
 
 #include the googletest testing framework
 add_subdirectory(lib/googletest-master)

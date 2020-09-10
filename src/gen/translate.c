@@ -162,6 +162,14 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
     return block;
 }
 
+/**
+ * Translates the parsed instructions into a new memory page.
+ *
+ * @param block_cache the array of parsed RISC-V instructions
+ * @param instructions_in_block the number of instructions in block_cache
+ * @param c_info the context info for this block
+ * @return the cached location of the generated block.
+ */
 t_cache_loc
 translate_block_instructions(const t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
 
