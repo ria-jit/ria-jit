@@ -28,6 +28,9 @@ bool execute_cached(t_cache_loc loc);
 int main(int argc, char *argv[]) {
     t_opt_parse_result options = parse_cmd_arguments(argc, argv);
 
+    //command line parsing failed, cannot execute anything
+    if (options.status != 0) return options.status;
+
     if (flag_do_analyze) {
         analyze(options.file_path);
         return 0;
