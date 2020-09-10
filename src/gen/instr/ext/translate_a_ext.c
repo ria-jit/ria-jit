@@ -10,7 +10,6 @@
  * I imagine this can be refactored into something more elegant without using three replacement registers.
  * However, I keep running into segmentation faults, so this works for now.
  */
-#define THIRD_REG FE_R8
 #define SCRATCH_REG FE_CX
 
 /*
@@ -45,7 +44,7 @@ void translate_SCW(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     // rs2 -> [rs1] 0 in rd if succeed
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
@@ -66,18 +65,20 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-//    err |= fe_enc64(&current, FE_XCHG32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    //While the following is "more" atomic, since we don't support full atomicity (yet) anyways, it is not worth the way
+    // slower execution, because of the memory barrier.
+//    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
+//    err |= fe_enc64(&current, FE_XCHG32mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -92,18 +93,16 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_ADD32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_ADD32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -118,18 +117,16 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_XOR32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_XOR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -144,18 +141,16 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_AND32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_AND32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -170,18 +165,16 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV32rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_OR32rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, SCRATCH_REG, SCRATCH_REG);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_OR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -256,7 +249,7 @@ void translate_SCD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     // rs2 -> [rs1] 0 in rd if succeed
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
@@ -277,17 +270,16 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_XCHG64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -302,17 +294,16 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_ADD64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_ADD64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -327,17 +318,16 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_XOR64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_XOR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -352,17 +342,16 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_AND64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_AND64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
@@ -377,17 +366,16 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, THIRD_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
 
     //load into rd
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
-    err |= fe_enc64(&current, FE_MOV64rr, SCRATCH_REG, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, 0));
-    err |= fe_enc64(&current, FE_OR64rr, SCRATCH_REG, regDest);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_OR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
     storeRd(instr, r_info, regDest);
 }
