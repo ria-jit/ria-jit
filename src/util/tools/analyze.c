@@ -149,8 +149,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
     t_risc_instr risc_instr = {0};
     risc_instr.addr = addr;
 
-    uint32_t disregard[N_REG]; //dont care
-    parse_instruction(&risc_instr, disregard);
+    parse_instruction(&risc_instr);
 
     //update statistics
     mnem_count[risc_instr.mnem]++;

@@ -12,13 +12,17 @@
 extern "C" {
 #endif
 
-t_risc_reg_val *get_reg_data(void);
+t_risc_reg_val *get_gp_reg_file(void);
+
+t_risc_reg_val *get_csr_reg_file(void);
+
+uint64_t *get_swap_space(void);
 
 t_risc_reg_val get_value(t_risc_reg reg);
 
 void set_value(t_risc_reg reg, t_risc_reg_val val);
 
-void dump_registers();
+void dump_gp_registers(void);
 
 #ifdef __cplusplus
 }

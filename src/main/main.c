@@ -13,6 +13,7 @@
 #include <util/tools/analyze.h>
 #include <env/opt.h>
 #include <util/tools/perf.h>
+#include <main/context.h>
 #include <cache/return_stack.h>
 
 //just temporary - we need some way to control transcoding globally?
@@ -21,7 +22,7 @@ bool finalize = false;
 //prototypes
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
-bool execute_cached(t_cache_loc loc);
+bool execute_cached(t_cache_loc loc, context_info *c_info);
 
 #ifndef TESTING
 
@@ -72,11 +73,13 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     init_hash_table();
     init_return_stack();
 
+    context_info *c_info = init_map_context();
+
     set_value(pc, next_pc);
 
     //debugging output
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     //benchmark if necessary
@@ -91,7 +94,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
 
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
-            cache_loc = translate_block(next_pc);
+            cache_loc = translate_block(next_pc, c_info);
             set_cache_entry(next_pc, cache_loc);
         }
 
@@ -99,7 +102,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         chain(cache_loc);
 
         //execute the cached (or now newly generated code) and update the program counter
-        if (!execute_cached(cache_loc)) break;
+        if (!execute_cached(cache_loc, c_info)) break;
         //printf("chain_end: %p\ncache_loc: %p\n\n", chain_end, cache_loc);
 
         //store pc from registers in pc
@@ -119,21 +122,20 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  * @param loc the cache address of that code
  * @return
  */
-bool execute_cached(t_cache_loc loc) {
-    if (flag_log_cache) {
-        log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+bool execute_cached(t_cache_loc loc, context_info *c_info) {
+    if (flag_log_general) {
+        log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     }
 
-    typedef void (*void_asm)(void);
-    ((void_asm) loc)(); //call asm code
+    execute_in_guest_context(c_info, loc);
 
     //dump registers to the log
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     ///check for illegal x0 values
-    if (*get_reg_data() != 0) {
+    if (*get_gp_reg_file() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;

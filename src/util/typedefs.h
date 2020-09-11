@@ -6,6 +6,8 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 
 #include <stdint.h>
+#include <fadec/fadec-enc.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,10 +76,13 @@ typedef enum {
     FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTSD, FCVTDS, FEQD, FLTD, FLED, FCLASSD, FCVTWD, FCVTWUD, FCVTDW, FCVTDWU,
 
     //---RV64D---
-    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX
+    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
+
+    //---PSEUDO---
+    PC_NEXT_INST
 
 } t_risc_mnem;
-#define N_MNEM FMVDX + 1
+#define N_MNEM (PC_NEXT_INST + 1)
 
 typedef enum {
     E_UNKNOWN,
@@ -114,12 +119,28 @@ typedef enum {
 } t_risc_reg_mnem;
 #define N_REG 33
 
+//CSR registers
+#define N_CSR 4096
+typedef enum {
+    //read-write access (floating point)
+    csr_fflags = 0x001, //floating point accrued exceptions
+    csr_frm = 0x002,    //floating point dynamic rounding mode
+    csr_fcsr = 0x003,   //floating point control and status register (frm + fflags)
+    //read-only access (counters and timers)
+    csr_cycle = 0xC00,  //cycle counter for RDCYCLE
+    csr_time = 0xC01,   //timer for RDTIME
+    csr_instret = 0xC02,//instructions retired counter for RDINSTRET
+    csr_cycleh = 0xC80, //upper 32 bits of cycle (for RV32I)
+    csr_timeh = 0xC81,  //upper 32 bits of time (for RV32I)
+    csr_instreth = 0xC82//upper 32 bits of instret (for RV32I)
+} t_risc_csr_reg;
+
 //register value type
 typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
@@ -143,6 +164,16 @@ typedef struct {
     t_risc_reg reg_dest;
     t_risc_imm imm;
 } t_risc_instr;
+
+/**
+ * Register information for the translator functions.
+ */
+typedef struct {
+    FeReg *map;
+    bool *mapped;
+    uint64_t base;
+    uint64_t csr_base;
+} register_info;
 
 #ifdef __cplusplus
 }

@@ -19,6 +19,7 @@ void init_return_stack(void){
     rs_back = 0;
 }
 
+__attribute__((__force_align_arg_pointer__))
 void rs_push(t_risc_addr r_add, uintptr_t x86_add) {
     rs_front = (rs_front + 1) & 0x3f; //mod 64
     r_stack[rs_front].risc_addr = r_add;
@@ -31,6 +32,7 @@ void rs_push(t_risc_addr r_add, uintptr_t x86_add) {
 
 }
 
+__attribute__((__force_align_arg_pointer__))
 uintptr_t rs_pop_check(t_risc_addr r_add) {
     if(rs_front == rs_back) {   ///stack empty
         //log_general("stack underflow prevented");
@@ -38,13 +40,12 @@ uintptr_t rs_pop_check(t_risc_addr r_add) {
         return NULL;
     }
 
-    if(r_stack[rs_front].risc_addr == r_add) {  ///hit
+    if (r_stack[rs_front].risc_addr == r_add) {  ///hit
         uintptr_t ret = r_stack[rs_front].x86_addr;
         rs_front = (rs_front + 63) & 0x3f; //-1 mod 64
         //printf("rs_pop_check called: riscV=%p, x86=%p s=%d  ---------------hit---------------\n", r_add, ret, rs_front);
         return ret;
-    }
-    else {  ///miss
+    } else {  ///miss
         //pop???    scrap cache???
         //printf("rs_pop_check called: riscV=%p, x86=%p s=%d\n", r_add, 1, rs_front);
         return NULL;

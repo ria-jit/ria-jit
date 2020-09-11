@@ -13,7 +13,8 @@
 #include <gen/instr/ext/translate_f_ext.h>
 #include <gen/instr/ext/translate_d_ext.h>
 
-void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
+void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
+    register_info *r_info = c_info->r_info;
     switch (instr->mnem) {
         case INVALID_MNEM:
             translate_INVALID(instr);
@@ -22,10 +23,10 @@ void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
             translate_LUI(instr, r_info);
             break;
         case JAL:
-            translate_JAL(instr, r_info);
+            translate_JAL(instr, r_info, c_info);
             break;
         case JALR:
-            translate_JALR(instr, r_info);
+            translate_JALR(instr, r_info, c_info);
             break;
         case BEQ:
             translate_BEQ(instr, r_info);
@@ -226,7 +227,7 @@ void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
             translate_FENCE(instr, r_info);
             break;
         case ECALL:
-            translate_ECALL(instr, r_info);
+            translate_ECALL(instr, r_info, c_info);
             break;
         case EBREAK:
             translate_EBREAK(instr, r_info);
@@ -485,6 +486,9 @@ void dispatch_instr(const t_risc_instr *instr, const register_info *r_info) {
             break;
         case FMVDX:
             translate_FMVDX(instr, r_info);
+            break;
+        case PC_NEXT_INST:
+            translate_PC_NEXT_INST(instr->imm, r_info->base);
             break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");

@@ -3,6 +3,7 @@
 //
 
 #include "translate_m_ext.h"
+#include <util/util.h>
 
 /**
  * see p. 44 of the RISC-V-Spec
@@ -23,18 +24,14 @@
 void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MUL…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-         a->imul(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_2]);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_IMUL64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-        /*a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->imul(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_2));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);*/
-    }
+    ///rs1 and rd can use same temporary since the original value of rd is not needed.
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
+    doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL64rr);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -48,23 +45,28 @@ void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MULH…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-         a->imul(r_info->map[instr->reg_src_2]);
-         //we want the upper XLEN bits here
-         a->mov(r_info->map[instr->reg_dest], x86::rdx);*/
-    } else {
+    ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
+    /// because of the IMUL)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_IMUL64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_DX);
-        /*
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->imul(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        //we want the upper XLEN bits here
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rdx);*/
+    //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
+    // (overwritten by next suggestion)
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the IMUL to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+
+    //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
+    err |= fe_enc64(&current, FE_IMUL64r, regSrc2);
+
+    //we want the upper XLEN bits (in RDX) here
+    if (regDest != FE_DX) {
+        ///rd is mapped so move the result in RDX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -90,46 +92,59 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
      * We treat both registers as signed in the imul, and then add back the quantity we have "lost"
      * by treating rs2 as unsigned.
      */
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-         a->imul(r_info->map[instr->reg_src_2]);
+    ///Uses RAX and RDX specifically because of the IMULs input/output.
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-         //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
-         a->sar(r_info->map[instr->reg_src_2], 63);
-         a->and_(r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_2]);
-         a->add(x86::rdx, r_info->map[instr->reg_src_1]);
-
-         //we want the upper XLEN bits here
-         a->mov(r_info->map[instr->reg_dest], x86::rdx);*/
-    } else {
-
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_IMUL64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-
-        //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
-        err |= fe_enc64(&current, FE_SAR64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 63);
-        err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_AND64rm, FE_CX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_ADD64rr, FE_DX, FE_CX);
-
-        //we want the upper XLEN bits here
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_DX);
-
-        /*
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->imul(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-
-        //add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
-        a->sar(x86::ptr(r_info->base + 8 * instr->reg_src_2), 63);
-        a->mov(x86::rcx, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->and_(x86::rcx, x86::ptr(r_info->base + 8 * instr->reg_src_2));
-        a->add(x86::rdx, x86::rcx);
-
-        //we want the upper XLEN bits here
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rdx);
-         */
+    ///Handle special zero reg cases
+    // TODO Wanted/Necessary? Would work for all multiplications, introduced here since this is a "long" instruction).
+    //  Also possible for the dividend and result in division.
+    if (instr->reg_src_1 == x0 || instr->reg_src_2 == x0) {
+        err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
+        storeRd(instr, r_info, regDest);
+        return;
+    } else if (instr->reg_dest == x0) {
+        err |= fe_enc64(&current, FE_NOP);
+        return;
     }
+
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    ///rs2 and rd can use same temporary since the original value of rd is not needed.
+    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
+
+    //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
+    // (overwritten by next suggestion)
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the IMUL to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
+    }
+
+    //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
+    // But we need rs2 again
+    err |= fe_enc64(&current, FE_IMUL64r, regSrc2);
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
+
+    //insert same forward jump here later
+    uint8_t *jmpNoSignBitBuf = current;
+    err |= fe_enc64(&current, FE_JNS, (intptr_t) current); //dummy jmp
+
+    ///Special cases for "Sign"-bit in rs2 is set
+    ///add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
+    if (regSrc1 == FE_AX) {
+        ///temporary rs1 was overwritten, so need to load it again
+        err |= fe_enc64(&current, FE_ADD64rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+    } else {
+        err |= fe_enc64(&current, FE_ADD64rr, FE_DX, regSrc1);
+    }
+
+    uint8_t *no_sign_bit = current;
+    err |= fe_enc64(&jmpNoSignBitBuf, FE_JNS, (intptr_t) no_sign_bit);
+
+    //we want the upper XLEN (in RDX) bits here
+    if (regDest != FE_DX) {
+        ///rd is mapped so move the result in RDX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -143,23 +158,27 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MULHU…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-         a->mul(r_info->map[instr->reg_src_2]);
-         //we want the upper XLEN bits here
-         a->mov(r_info->map[instr->reg_dest], x86::rdx);*/
-    } else {
+    ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
+    /// because of the MULs input/output)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_MUL64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_DX);
-/*
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->mul(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        //we want the upper XLEN bits here
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rdx);*/
+    //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
+    // (overwritten by next suggestion)
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the MUL to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the MUL
+    err |= fe_enc64(&current, FE_MUL64r, regSrc2);
+
+    //we want the upper XLEN (in RDX) bits here
+    if (regDest != FE_DX) {
+        ///rd is mapped so move the result in RDX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -173,63 +192,51 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIV…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->cmp(r_info->map[instr->reg_src_2], 0);
-        a->mov(r_info->map[instr->reg_dest], 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
+    ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(r_info->map[instr->reg_src_2]);
-        a->mov(r_info->map[instr->reg_dest], x86::rax);
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regDest = getRd(instr, r_info, FE_AX);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_IDIV64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->cmp(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-
-        a->mov(x86::qword_ptr(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
-        a->bind(not_div_zero);
-
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the IDIV to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP64);
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, -1); //-1 is all bits set
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    if (regDest != FE_AX) {
+        ///rd is mapped so move the result in RAX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -242,62 +249,51 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
 void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIVU…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*handle division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->cmp(r_info->map[instr->reg_src_2], 0);
-        a->mov(r_info->map[instr->reg_dest], 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
+    ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(r_info->map[instr->reg_src_2]);
-        a->mov(r_info->map[instr->reg_dest], x86::rax);
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regDest = getRd(instr, r_info, FE_AX);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_DIV64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->cmp(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-        a->mov(x86::qword_ptr(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
-        a->bind(not_div_zero);
-
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the DIV to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_DIV64r, regSrc2);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, -1); //-1 is all bits set
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    if (regDest != FE_AX) {
+        ///rd is mapped so move the result in RAX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -312,61 +308,51 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REM…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*handle division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->cmp(r_info->map[instr->reg_src_2], 0);
-        a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->jz(div_zero);
+    ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    ///Uses RAX specifically because of IDIVs input
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(r_info->map[instr->reg_src_2]);
-        a->mov(r_info->map[instr->reg_dest], x86::rdx);
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///Uses RDX specifically because of IDIVs output
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_IDIV64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_DX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->cmp(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-        a->jz(div_zero);
-        a->bind(not_div_zero);
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rdx);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the IDIV to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP64);
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64rr, FE_DX, regSrc1);
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    if (regDest != FE_DX) {
+        ///rd is mapped so move the result in RDX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -381,66 +367,51 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
 void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REMU…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /*handle division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->cmp(r_info->map[instr->reg_src_2], 0);
-        a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->jz(div_zero);
+    ///Uses RCX specifically since DIV uses RDX:RAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    ///Uses RAX specifically because of DIVs input
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(r_info->map[instr->reg_src_2]);
-        a->mov(r_info->map[instr->reg_dest], x86::rdx);
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///Uses RDX specifically because of DIVs output
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        //the mov here does not affect the zero-flag, but we need to mov after comparing in case rs2 == rd
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_DIV64m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_DX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->cmp(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-
-        //the mov here does not affect the zero-flag, but we need to mov after comparing in case rs2 == rd
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-        a->jz(div_zero);
-
-        a->bind(not_div_zero);
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::qword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rdx);
-
-        a->bind(div_zero);
-         */
+    //do actual divide
+    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in RAX for the DIV to work
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, regSrc1);
     }
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_DIV64r, regSrc2);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64rr, FE_DX, regSrc1);
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    if (regDest != FE_DX) {
+        ///rd is mapped so move the result in RDX there.
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
+    }
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -453,25 +424,19 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MULW…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-         a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-         a->imul(x86::ecx);
-         a->movsxd(r_info->map[instr->reg_dest], x86::eax);*/
-    } else {
+    //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
+    // so save the instruction prefixes)
+    ///rs1 and rd can use same temporary since the original value of rd is not needed.
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_IMUL32m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_AX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
-        /*
-        a->mov(x86::eax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->imul(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->movsxd(x86::rcx, x86::eax);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rcx);
-        */
-    }
+    //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
+    doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL32rr);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -486,65 +451,52 @@ void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIVW…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->cmp(x86::ecx, 0);
-        a->mov(r_info->map[instr->reg_dest], 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
+    //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
+    // so save the instruction prefixes)
+    ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
 
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::ecx);
-        a->movsxd(r_info->map[instr->reg_dest], x86::eax);
+    err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regDest = getRd(instr, r_info, FE_AX);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_IDIV32m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_AX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->cmp(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-        a->mov(x86::dword_ptr(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
-
-        a->bind(not_div_zero);
-        a->mov(x86::eax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->movsxd(x86::rcx, x86::eax);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rcx);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in EAX for the IDIV to work
+        err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP32);
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
+
+    //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, -1); //-1 is all bits set
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -559,65 +511,52 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIVUW…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->cmp(x86::ecx, 0);
-        a->mov(r_info->map[instr->reg_dest], 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
+    //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
+    // so save the instruction prefixes)
+    ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
 
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::ecx);
-        a->movsxd(r_info->map[instr->reg_dest], x86::eax);
+    err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the DIV)
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regDest = getRd(instr, r_info, FE_AX);
 
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_DIV32m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_AX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->cmp(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->jnz(not_div_zero);
-        a->mov(x86::qword_ptr(r_info->base + 8 * instr->reg_dest), 0xFFFFFFFFFFFFFFFF);
-        a->jz(div_zero);
-
-        a->bind(not_div_zero);
-        a->mov(x86::eax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->movsxd(x86::rcx, x86::eax);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rcx);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in EAX for the IDIV to work
+        err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_DIV32r, regSrc2);
+
+    //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, -1); //-1 is all bits set
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -633,65 +572,53 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REMW…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->cmp(x86::ecx, 0);
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->jz(div_zero);
+    //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
+    // so save the instruction prefixes)
+    ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::ecx);
-        a->movsxd(r_info->map[instr->reg_dest], x86::edx);
+    ///Uses RAX specifically because of the IDIVs input
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
+    ///Uses RDX specifically because of the IDIVs output
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_IDIV32m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-        a->cmp(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->jnz(not_div_zero);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-        a->jz(div_zero);
-
-        a->bind(not_div_zero);
-        a->xor_(x86::rdx, x86::rdx);
-        a->idiv(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->movsxd(x86::rcx, x86::edx);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rcx);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in EAX for the IDIV to work
+        err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    err |= fe_enc64(&current, FE_C_SEP32);
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
+
+    //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_DX);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regSrc1);
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -707,64 +634,50 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REMUW…\n");
 
-    if (r_info->mapped[instr->reg_src_1] && r_info->mapped[instr->reg_src_2] && r_info->mapped[instr->reg_dest]) {
-        critical_not_yet_implemented("Register mapped instruction type unavailable\n");
-        /* division by zero separately
-        const Label &div_zero = a->newLabel();
-        a->mov(x86::rcx, r_info->map[instr->reg_src_2]);
-        a->cmp(x86::ecx, 0);
-        a->mov(r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
-        a->jz(div_zero);
+    //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
+    // so save the instruction prefixes)
+    ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
+    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    ///Uses RAX specifically because of the DIVs input
+    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
 
-        a->mov(x86::rax, r_info->map[instr->reg_src_1]);
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::ecx);
-        a->movsxd(r_info->map[instr->reg_dest], x86::edx);
+    err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
-        a->bind(div_zero);*/
-    } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-        err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2), 0);
+    ///Special case for div by zero
+    //insert same forward jump here later
+    uint8_t *jmpDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
-        //insert forward jump here later
-        uint8_t *jmp_not_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy jmp
+    ///Uses RDX specifically because of the DIVs output
+    FeReg regDest = getRd(instr, r_info, FE_DX);
 
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
-
-        //insert forward jump here later
-        uint8_t *jmp_div_zero_buf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-        //write forward jump target for not_div_zero jmp
-        uintptr_t not_div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_not_div_zero_buf, FE_JNZ, (intptr_t) not_div_zero);
-
-        //do actual divide
-        err |= fe_enc64(&current, FE_XOR64rr, FE_DX, FE_DX);
-        err |= fe_enc64(&current, FE_DIV32m, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-        err |= fe_enc64(&current, FE_MOVSXr64r32, FE_CX, FE_DX);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_CX);
-
-        //write forward jump target for div_zero jmp
-        uintptr_t div_zero = (uintptr_t) current; //TODO But why double cast and store as var
-        err |= fe_enc64(&jmp_div_zero_buf, FE_JZ, (intptr_t) div_zero);
-        /*
-        const Label &div_zero = a->newLabel();
-        const Label &not_div_zero = a->newLabel();
-
-        a->cmp(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2), 0);
-        a->mov(x86::rax, x86::ptr(r_info->base + 8 * instr->reg_src_1));
-        a->jnz(not_div_zero);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rax);
-        a->jz(div_zero);
-
-        a->bind(not_div_zero);
-        a->xor_(x86::rdx, x86::rdx);
-        a->div(x86::dword_ptr(r_info->base + 8 * instr->reg_src_2));
-        a->movsxd(x86::rcx, x86::edx);
-        a->mov(x86::ptr(r_info->base + 8 * instr->reg_dest), x86::rcx);
-
-        a->bind(div_zero);*/
+    //do actual divide
+    err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
+    if (regSrc1 != FE_AX) {
+        ///rs1 is register mapped, but we need it in EAX for the DIV to work
+        err |= fe_enc64(&current, FE_MOV32rr, FE_AX, regSrc1);
     }
+    // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
+    // than once.
+    err |= fe_enc64(&current, FE_DIV32r, regSrc2);
+
+    //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_DX);
+
+    //insert same forward jump here later
+    uint8_t *jmpNotDivZeroBuf = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jmp
+
+    ///Special case for div by zero
+    //write forward jump target for divZero jmp
+    uint8_t *divZero = current;
+    err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regSrc1);
+
+    //write forward jump target for notDivZero jmp
+    uint8_t *notDivZero = current;
+    err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
+
+    storeRd(instr, r_info, regDest);
 }
