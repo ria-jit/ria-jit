@@ -289,10 +289,11 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
     err |= fe_enc64(&current, FE_SHL64rr, regDest, FE_CX);
 
     storeRd(instr, r_info, regDest);
@@ -370,10 +371,11 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
     err |= fe_enc64(&current, FE_SHR64rr, regDest, FE_CX);
 
     storeRd(instr, r_info, regDest);
@@ -393,10 +395,11 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
     err |= fe_enc64(&current, FE_SAR64rr, regDest, FE_CX);
 
     storeRd(instr, r_info, regDest);
@@ -558,10 +561,10 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
 
     err |= fe_enc64(&current, FE_SHL32rr, regDest, FE_CX);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
@@ -584,10 +587,11 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+
 
     err |= fe_enc64(&current, FE_SHR32rr, regDest, FE_CX);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
@@ -610,10 +614,10 @@ void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-
     //rs2 needs to be in CX for us to be able to encode the shift
     err |= fe_enc64(&current, FE_MOV64rr, FE_CX, regSrc2);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
 
     err |= fe_enc64(&current, FE_SAR32rr, regDest, FE_CX);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
