@@ -11,8 +11,7 @@
 #include <util/util.h>
 
 /*
- * Neither finished nor tested.
- * Dynamically generated switching blocks should give us the freedom to change the mapping more flexibly? Input needed.
+ * Dynamically generated switching blocks should give us the freedom to change the mapping more flexibly.
  */
 
 context_info *init_map_context(void) {
