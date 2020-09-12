@@ -524,6 +524,9 @@ void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
         case SGTZ:
             translate_SGTZ(instr, r_info);
             break;
+        case FUSE_AUIPC_ADDI:
+            translate_FUSE_AUIPC_ADDI(instr, r_info);
+            break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
     }

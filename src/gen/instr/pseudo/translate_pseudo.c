@@ -205,3 +205,20 @@ void translate_SGTZ(const t_risc_instr *instr, const register_info *r_info) {
 
     storeRd(instr, r_info, regDest);
 }
+
+/**
+ * Translate the FUSE_AUIPC_ADDI instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void translate_FUSE_AUIPC_ADDI(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("Translate FUSE_AUIPC_ADDI…\n");
+
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr);
+    err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
+
+    storeRd(instr, r_info, regDest);
+}

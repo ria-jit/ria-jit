@@ -373,6 +373,8 @@ char *mnem_to_string(int mnem) {
             return "SLTZ";
         case SGTZ:
             return "SGTZ";
+        case FUSE_AUIPC_ADDI:
+            return "FUSE_AUIPC_ADDI";
         default:
             return "UNKNOWN";
     }
