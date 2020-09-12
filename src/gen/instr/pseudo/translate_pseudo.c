@@ -3,6 +3,7 @@
 //
 
 #include <gen/translate.h>
+#include <util/util.h>
 #include "translate_pseudo.h"
 
 ///set the pc to next addr after inst
@@ -27,7 +28,7 @@ void translate_PC_NEXT_INST(const t_risc_addr addr, uint64_t reg_base) {
  */
 void translate_NOP(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate NOP…\n");
-    critical_not_yet_implemented("NOP not yet implemented.\n");
+    err |= fe_enc64(&current, FE_NOP);
 }
 
 /**
@@ -38,7 +39,7 @@ void translate_NOP(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SILENT_NOP(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SILENT_NOP…\n");
-    critical_not_yet_implemented("SILENT_NOP not yet implemented.\n");
+    //Intentionally left blank. Can be used in order to ignore parts of the block cache prior to translation.
 }
 
 /**
@@ -49,7 +50,12 @@ void translate_SILENT_NOP(const t_risc_instr *instr, const register_info *r_info
  */
 void translate_MV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MV…\n");
-    critical_not_yet_implemented("MV not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -60,7 +66,14 @@ void translate_MV(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_NOT(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate NOT…\n");
-    critical_not_yet_implemented("NOT not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_NOT64r, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -71,7 +84,14 @@ void translate_NOT(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_NEG(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate NEG…\n");
-    critical_not_yet_implemented("NEG not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_NEG64r, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -82,7 +102,15 @@ void translate_NEG(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_NEGW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate NEGW…\n");
-    critical_not_yet_implemented("NEGW not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_NEG32r, regDest);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -93,7 +121,13 @@ void translate_NEGW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SEXTW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SEXTW…\n");
-    critical_not_yet_implemented("SEXTW not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -104,7 +138,15 @@ void translate_SEXTW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SEQZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SEQZ…\n");
-    critical_not_yet_implemented("SEQZ not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, 0);
+    err |= fe_enc64(&current, FE_SETZ8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -115,7 +157,15 @@ void translate_SEQZ(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SNEZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SNEZ…\n");
-    critical_not_yet_implemented("SNEZ not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, 0);
+    err |= fe_enc64(&current, FE_SETNZ8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -126,7 +176,15 @@ void translate_SNEZ(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SLTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTZ…\n");
-    critical_not_yet_implemented("SLTZ not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, 0);
+    err |= fe_enc64(&current, FE_SETL8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -137,5 +195,13 @@ void translate_SLTZ(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SGTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SGTZ…\n");
-    critical_not_yet_implemented("SGTZ not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, 0);
+    err |= fe_enc64(&current, FE_SETG8r, regDest);
+    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+
+    storeRd(instr, r_info, regDest);
 }
