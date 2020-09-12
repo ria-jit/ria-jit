@@ -79,10 +79,10 @@ typedef enum {
     FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
 
     //---PSEUDO---
-    PC_NEXT_INST
+    PC_NEXT_INST, NOP, SILENT_NOP, MV, NOT, NEG, NEGW, SEXTW, SEQZ, SNEZ, SLTZ, SGTZ
 
 } t_risc_mnem;
-#define N_MNEM (PC_NEXT_INST + 1)
+#define N_MNEM (SGTZ + 1)
 
 typedef enum {
     E_UNKNOWN,

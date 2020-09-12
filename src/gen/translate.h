@@ -42,8 +42,6 @@ translate_block_instructions(const t_risc_instr block_cache[], int instructions_
 ///chaining
 void chain(t_cache_loc target);
 
-void translate_PC_NEXT_INST(t_risc_addr addr, uint64_t reg_base);
-
 #ifdef __cplusplus
 }
 #endif
