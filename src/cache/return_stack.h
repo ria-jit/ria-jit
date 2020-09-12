@@ -18,4 +18,8 @@ void rs_push(t_risc_addr r_add, uintptr_t x86_add);
 
 uintptr_t rs_pop_check(t_risc_addr r_add);
 
+extern rs_entry *r_stack;
+extern volatile int rs_front;
+extern volatile int rs_back;
+
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RETURN_STACK_H

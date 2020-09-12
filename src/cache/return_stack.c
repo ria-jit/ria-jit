@@ -8,8 +8,8 @@
 #include <util/log.h>
 
 rs_entry *r_stack;
-int rs_front;
-int rs_back;
+volatile int rs_front;
+volatile int rs_back;
 
 void init_return_stack(void){
     r_stack = (rs_entry *) mmap(NULL, 64 * sizeof(rs_entry),
