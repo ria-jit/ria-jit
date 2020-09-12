@@ -84,7 +84,7 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
         lib/ryu/ryu.h
-        src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h)
+        src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h src/gen/optimize.c src/gen/optimize.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
