@@ -424,7 +424,10 @@ void chain(t_cache_loc target) {
     if (chain_end != NULL) {
         log_general("chaining: ...\n");
         chain_err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
+        ///Reset chain_end
+        chain_end = NULL;
     }
+
 
     ///check failed flag
     if (chain_err != 0) {
