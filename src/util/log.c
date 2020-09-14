@@ -14,7 +14,7 @@ bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
-bool flag_translate_opt = false;
+bool flag_translate_opt = true;
 bool flag_do_analyze = false;
 bool flag_do_benchmark = false;
 
