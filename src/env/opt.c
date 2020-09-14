@@ -11,14 +11,12 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     char opt_char;
     int optind = 1;
     char *file_path = NULL;
-    int fileIndex = 0;
 
     t_opt_parse_result parse_result;
 
     //handle no arguments passed
     if (argc <= 1) goto HELP;
 
-    NEXT:
     while (argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
         //Argument not an option string (not starting with '-' or only '-'
         if (strncmp(argv[optind], "-", 1) != 0 || strlen(argv[optind]) < 2) {
@@ -55,9 +53,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_log_cache = true;
                     break;
                 case 'f':
-                    file_path = argv[optind++];
-                    fileIndex = optind - 1;
-                    goto NEXT;
+                    file_path = argv[optind];
+                    goto END_PARSING;
                 case 's':
                     flag_fail_silently = true;
                     break;
@@ -75,8 +72,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 default:
                 HELP:
                     dprintf(1,
-                            "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
-                            "register file. (equivalent to -gioc)\n"
+                            "Usage: translator <translator option(s)> -f <filename> <guest options>\n"
+                            "\t-v\tBe more verbose. Does not dump register file. (equivalent to -gioc)\n"
                             "\t-g\tDisplay general verbose info\n"
                             "\t-i\tDisplay parsed RISC-V input assembly\n"
                             "\t-o\tDisplay translated output x86 assembly\n"
@@ -96,6 +93,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
             opt_str_index++;
         }
     }
+    END_PARSING:
 
     log_general("Translator version %s\n", translator_version);
     log_general("Command line options:\n");
@@ -119,7 +117,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
 
     //we're fine, fill struct and return
     parse_result.status = 0;
-    parse_result.file_index = fileIndex;
     parse_result.file_path = file_path;
     parse_result.last_optind = optind;
     return parse_result;

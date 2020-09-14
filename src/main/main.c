@@ -39,10 +39,6 @@ int main(int argc, char *argv[]) {
 
     log_general("Initializing transcoding...\n");
 
-    char *temp = argv[options.last_optind];
-    argv[options.last_optind] = options.file_path;
-    argv[options.file_index] = temp;
-
     int guestArgc = argc - options.last_optind;
     char **guestArgv = argv + (options.last_optind);
     int ret = transcode_loop(options.file_path, guestArgc, guestArgv);
