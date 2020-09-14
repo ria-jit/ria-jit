@@ -84,10 +84,10 @@ void sort_internal(int numbers[], int buf[], size_t len, int l, int r) {
     size_t ctr = (l + r) / 2;
     sort_internal(numbers, buf, len, l, ctr);
     sort_internal(numbers, buf, len, ctr + 1, r);
-    merge(numbers, buf, len, l, ctr, r);
+    merge(numbers, buf, l, ctr, r);
 }
 
-void merge(int numbers[], int buf[], size_t len, int l, int m, int r) {
+void merge(int numbers[], int buf[], int l, int m, int r) {
     size_t part = r - l + 1;
     size_t lo = l;
     size_t hi = m + 1;
@@ -95,7 +95,7 @@ void merge(int numbers[], int buf[], size_t len, int l, int m, int r) {
 
     if (part < 1) return;
 
-    while(lo <= m && hi <= r) {
+    while (lo <= m && hi <= r) {
         if (numbers[lo] <= numbers[hi]) {
             buf[idx++] = numbers[lo++];
         } else {
