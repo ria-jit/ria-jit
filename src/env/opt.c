@@ -30,12 +30,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_do_analyze = true;
                     break;
                 case 'v':
-                    flag_log_general = true;
-                    flag_log_asm_in = true;
-                    flag_log_asm_out = true;
-                    flag_log_reg_dump = false; //don't do register dump with the verbose option by default
-                    flag_log_cache = true;
-                    break;
+                    printf("RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
+                    parse_result.status = 1;
+                    return parse_result;
                 case 'g':
                     flag_log_general = true;
                     break;
@@ -70,9 +67,10 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 case 'h':
                 default:
                 HELP:
+                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
                     dprintf(1,
                             "Usage: translator <translator option(s)> -f <filename> <guest options>\n"
-                            "\t-v\tBe more verbose. Does not dump register file. (equivalent to -gioc)\n"
+                            "\t-v\tShow translator version.\n"
                             "\t-g\tDisplay general verbose info\n"
                             "\t-i\tDisplay parsed RISC-V input assembly\n"
                             "\t-o\tDisplay translated output x86 assembly\n"
