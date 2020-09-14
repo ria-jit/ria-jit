@@ -79,7 +79,24 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
                             block_cache[index + 1].reg_dest == block_cache[index + 1].reg_src_1
                     ) {
                 //fuse instructions, add immediate values, regDest is already set
-                block_cache[index].mnem = FUSE_AUIPC_ADDI;
+                block_cache[index].mnem = LI;
+                block_cache[index].imm = block_cache[index].addr + block_cache[index].imm + block_cache[index + 1].imm;
+
+                //invalidate following instruction
+                block_cache[index + 1].mnem = SILENT_NOP;
+            }
+            return;
+        }
+        case LUI: {
+            //lui rd, imm1 followed by addi rd, rd, imm2 can be fused into a single operation
+            if (
+                    index + 1 < len &&
+                            block_cache[index + 1].mnem == ADDI &&
+                            block_cache[index].reg_dest == block_cache[index + 1].reg_dest &&
+                            block_cache[index + 1].reg_dest == block_cache[index + 1].reg_src_1
+                    ) {
+                //fuse instructions, add immediate values, regDest is already set
+                block_cache[index].mnem = LI;
                 block_cache[index].imm = block_cache[index].imm + block_cache[index + 1].imm;
 
                 //invalidate following instruction

@@ -31,6 +31,6 @@ void translate_SLTZ(const t_risc_instr *instr, const register_info *r_info);
 
 void translate_SGTZ(const t_risc_instr *instr, const register_info *r_info);
 
-void translate_FUSE_AUIPC_ADDI(const t_risc_instr *instr, const register_info *r_info);
+void translate_LI(const t_risc_instr *instr, const register_info *r_info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_PSEUDO_H
