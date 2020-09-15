@@ -11,34 +11,28 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     char opt_char;
     int optind = 1;
     char *file_path = NULL;
-    int fileIndex = 0;
 
     t_opt_parse_result parse_result;
 
     //handle no arguments passed
     if (argc <= 1) goto HELP;
 
-    NEXT:
-    while(argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
+    while (argv[optind] != NULL && strcmp(argv[optind], "--") != 0) {
         //Argument not an option string (not starting with '-' or only '-'
         if (strncmp(argv[optind], "-", 1) != 0 || strlen(argv[optind]) < 2) {
             goto HELP;
         }
         optind++;
         int opt_str_index = 1;
-        while((opt_char = argv[optind - 1][opt_str_index]) != '\0') {
-            switch(opt_char) {
+        while ((opt_char = argv[optind - 1][opt_str_index]) != '\0') {
+            switch (opt_char) {
                 case 'a':
                     flag_do_analyze = true;
                     break;
                 case 'v':
-                    flag_log_general = true;
-                    flag_log_asm_in = true;
-                    flag_log_asm_out = true;
-                    flag_log_reg_dump = false; //don't do register dump with the verbose option by default
-                    flag_log_cache = true;
-                    flag_translate_opt = false;
-                    break;
+                    printf("RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
+                    parse_result.status = 1;
+                    return parse_result;
                 case 'g':
                     flag_log_general = true;
                     break;
@@ -55,9 +49,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_log_cache = true;
                     break;
                 case 'f':
-                    file_path = argv[optind++];
-                    fileIndex = optind - 1;
-                    goto NEXT;
+                    file_path = argv[optind];
+                    goto END_PARSING;
                 case 's':
                     flag_fail_silently = true;
                     break;
@@ -65,7 +58,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_single_step = true;
                     break;
                 case 'm':
-                    flag_translate_opt = true;
+                    flag_translate_opt = false;
                     break;
                 case 'b':
                     flag_do_benchmark = true;
@@ -74,17 +67,19 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 case 'h':
                 default:
                 HELP:
+                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
                     dprintf(1,
-                            "Usage: dynamic-translate -f <filename> <option(s)>\n\t-v\tBe more verbose. Does not dump "
-                            "register file. (equivalent to -gioc)\n"
-                            "\t-g\tDisplay general verbose info\n\t-i\tDisplay parsed RISC-V input assembly\n"
+                            "Usage: translator <translator option(s)> -f <filename> <guest options>\n"
+                            "\t-v\tShow translator version.\n"
+                            "\t-g\tDisplay general verbose info\n"
+                            "\t-i\tDisplay parsed RISC-V input assembly\n"
                             "\t-o\tDisplay translated output x86 assembly\n"
                             "\t-r\tDump registers on basic block boundaries\n"
                             "\t-c\tDisplay cache info\n"
                             "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
                             "program may enter undefined states.\n"
                             "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
-                            "\t-m\tOptimize block translation.\n"
+                            "\t-m\tDisable translation optimization features.\n"
                             "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
                             "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
                             "\t-h\tShow this help.\n"
@@ -95,10 +90,11 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
             opt_str_index++;
         }
     }
+    END_PARSING:
 
     log_general("Translator version %s\n", translator_version);
     log_general("Command line options:\n");
-    log_general("General verbose: %d\n", flag_log_general);
+    log_general("General info: %d\n", flag_log_general);
     log_general("Input assembly: %d\n", flag_log_asm_in);
     log_general("Output assembly: %d\n", flag_log_asm_out);
     log_general("Register dump: %d\n", flag_log_reg_dump);
@@ -118,7 +114,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
 
     //we're fine, fill struct and return
     parse_result.status = 0;
-    parse_result.file_index = fileIndex;
     parse_result.file_path = file_path;
     parse_result.last_optind = optind;
     return parse_result;

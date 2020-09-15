@@ -15,7 +15,7 @@ extern "C" {
 
 typedef void *t_cache_loc;
 
-extern uint8_t *chain_end;
+extern volatile uint8_t *chain_end;
 
 //cache entries for translated code segments
 typedef struct {
@@ -28,12 +28,16 @@ typedef struct {
 void init_hash_table(void);
 
 size_t hash(t_risc_addr risc_addr);
+size_t smallhash(t_risc_addr risc_addr);
+
 
 size_t find_lin_slot(t_risc_addr risc_addr);
+t_cache_loc check_tlb(t_risc_addr risc_addr);
 
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr);
 
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc);
+void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc);
 
 void print_values(void);
 

@@ -12,9 +12,15 @@
 #define INVALID_ELF_MAP (t_risc_elf_map_result){.valid = false}
 #define INVALID_STACK 0
 
+//TODO Figure out proper offset
+#define STACK_OFFSET 0x10000000
 #ifdef __cplusplus
 extern "C" {
 #endif //__cplusplus
+
+extern size_t stackSize;
+extern const size_t guard;
+
 /**
  * Struct containing map metadata. If valid is false the other values are undefined.
  */

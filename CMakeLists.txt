@@ -53,19 +53,24 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX})
 
 set(TRANSLATOR_SOURCES
         src/main/main.c src/main/main.h
+        src/main/context.c src/main/context.h
         src/parser/parser.c src/parser/parser.h
         src/cache/cache.c src/cache/cache.h
+        src/cache/return_stack.h src/cache/return_stack.c
         src/runtime/register.c src/runtime/register.h
         src/runtime/emulateEcall.c src/runtime/emulateEcall.h
         src/elf/loadElf.c src/elf/loadElf.h
         src/gen/translate.c src/gen/translate.h
-        src/gen/instr/translate_a_ext.c src/gen/instr/translate_a_ext.h
-        src/gen/instr/translate_arithmetic.c src/gen/instr/translate_arithmetic.h
-        src/gen/instr/translate_controlflow.c src/gen/instr/translate_controlflow.h
-        src/gen/instr/translate_csr.c src/gen/instr/translate_csr.h
-        src/gen/instr/translate_loadstore.c src/gen/instr/translate_loadstore.h
-        src/gen/instr/translate_m_ext.c src/gen/instr/translate_m_ext.h
-        src/gen/instr/translate_other.c src/gen/instr/translate_other.h
+        src/gen/instr/ext/translate_a_ext.c src/gen/instr/ext/translate_a_ext.h
+        src/gen/instr/core/translate_arithmetic.c src/gen/instr/core/translate_arithmetic.h
+        src/gen/instr/core/translate_controlflow.c src/gen/instr/core/translate_controlflow.h
+        src/gen/instr/core/translate_csr.c src/gen/instr/core/translate_csr.h
+        src/gen/instr/core/translate_loadstore.c src/gen/instr/core/translate_loadstore.h
+        src/gen/instr/ext/translate_m_ext.c src/gen/instr/ext/translate_m_ext.h
+        src/gen/instr/core/translate_other.c src/gen/instr/core/translate_other.h
+        src/gen/instr/ext/translate_f_ext.c src/gen/instr/ext/translate_f_ext.h
+        src/gen/instr/ext/translate_d_ext.c src/gen/instr/ext/translate_d_ext.h
+        src/gen/dispatch.c src/gen/dispatch.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
         src/util/tools/analyze.c src/util/tools/analyze.h
@@ -78,14 +83,16 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2fixed_full_table.h
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
-        lib/ryu/ryu.h)
+        lib/ryu/ryu.h
+        src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h src/gen/optimize.c src/gen/optimize.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
         test/unit_tests/test_register.cpp
         test/unit_tests/test_parser.cpp
         test/unit_tests/test_cache.cpp
-        test/unit_tests/test_faenc_experiments.cpp)
+        test/unit_tests/test_faenc_experiments.cpp
+        test/unit_tests/test_amo_ext.cpp)
 
 #include the googletest testing framework
 add_subdirectory(lib/googletest-master)

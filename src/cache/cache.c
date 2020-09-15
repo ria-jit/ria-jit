@@ -24,16 +24,22 @@
 #include <common.h>
 #include <linux/mman.h>
 
-#define INITIAL_SIZE 4096
-#define HASH_MASK 0x00003FFCu
+#define INITIAL_SIZE 8192
+#define SMALLTLB 0x20
 
 ///position where direct jump to next block can be inserted
-uint8_t *chain_end = NULL;
+volatile uint8_t *chain_end = NULL;
 
-//init table for 2^12 elements (key size is 12 bit)
+//cache table
 t_cache_entry *cache_table = NULL;
 size_t table_size = INITIAL_SIZE;
 size_t count_entries = 0;
+
+// fast lookup
+t_cache_entry *tlb;
+// size of the tlb
+size_t tlb_size = SMALLTLB;
+
 
 /**
  * Initializes the hash table array.
@@ -48,10 +54,22 @@ void init_hash_table(void) {
         dprintf(2, "Bad. Cache memory allocation failed.");
         _exit(FAIL_HEAP_ALLOC);
     }
+
+    tlb = mmap(NULL, tlb_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
+               MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    //check for heap memory allocation fail
+    if (tlb == NULL) {
+        dprintf(2, "Bad. TLB memory allocation failed.");
+        _exit(FAIL_HEAP_ALLOC);
+    }
 }
 
 inline size_t hash(t_risc_addr risc_addr) {
-    return (risc_addr & HASH_MASK) >> 2u;
+    return (risc_addr >> 2u) & (table_size - 1);
+}
+
+inline size_t smallhash(t_risc_addr risc_addr) {
+    return (risc_addr >> 3u) & (SMALLTLB - 1);
 }
 
 /**
@@ -63,12 +81,27 @@ size_t find_lin_slot(t_risc_addr risc_addr) {
     size_t index = hash(risc_addr);
 
     //linearly probe for key or empty field
-    while(cache_table[index].cache_loc != 0 && cache_table[index].risc_addr != risc_addr) {
+    while (cache_table[index].cache_loc != 0 && cache_table[index].risc_addr != risc_addr) {
         //cyclically increment to find available slots
-        index = (index + 1) % table_size;
+        index = (index + 1) & (table_size - 1);
     }
 
     return index;
+}
+
+void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc) {
+    size_t smallHash = smallhash(risc_addr);
+    tlb[smallHash].risc_addr = risc_addr;
+    tlb[smallHash].cache_loc = cacheLoc;
+}
+
+t_cache_loc check_tlb(t_risc_addr risc_addr) {
+    //check tlb first
+    size_t smallHash = smallhash(risc_addr);
+    if (tlb[smallHash].risc_addr == risc_addr) {
+        return tlb[smallHash].cache_loc;
+    }
+    return 0;
 }
 
 /**
@@ -77,10 +110,15 @@ size_t find_lin_slot(t_risc_addr risc_addr) {
  * @return code cache address of that instruction, or NULL if nonexistent
  */
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
+    size_t smallHash = smallhash(risc_addr);
+    if (tlb[smallHash].risc_addr == risc_addr) {
+        return tlb[smallHash].cache_loc;
+    }
     size_t index = find_lin_slot(risc_addr);
 
     if (cache_table[index].cache_loc != 0) {
         //value is cached and exists
+        set_tlb(risc_addr, cache_table[index].cache_loc);
         return cache_table[index].cache_loc;
     } else {
         //value does not exist
@@ -121,6 +159,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     if (cache_table[index].cache_loc != 0) {
         //update value in table
         cache_table[index].cache_loc = cache_loc;
+        set_tlb(risc_addr, cache_loc);
         return;
     }
 
@@ -128,6 +167,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     cache_table[index].cache_loc = cache_loc;
     cache_table[index].risc_addr = risc_addr;
     count_entries++;
+
+    set_tlb(risc_addr, cache_loc);
 
     //print entries
     if (flag_log_cache) {

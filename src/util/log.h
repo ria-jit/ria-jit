@@ -5,7 +5,6 @@
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOG_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_LOG_H
 
-//error codes for internal reference
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -50,6 +49,8 @@ void log_cache(const char *format, ...);
 void log_benchmark(const char *format, ...);
 
 void log_print_mem(const char *ptr, long int len);
+
+void invalid_error_handler(int32_t errocode, int32_t raw_instr, t_risc_addr addr);
 
 #ifdef __cplusplus
 }

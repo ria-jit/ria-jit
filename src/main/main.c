@@ -13,6 +13,8 @@
 #include <util/tools/analyze.h>
 #include <env/opt.h>
 #include <util/tools/perf.h>
+#include <main/context.h>
+#include <cache/return_stack.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -20,11 +22,15 @@ bool finalize = false;
 //prototypes
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
-bool execute_cached(t_cache_loc loc);
+bool execute_cached(t_cache_loc loc, context_info *c_info);
 
 #ifndef TESTING
+
 int main(int argc, char *argv[]) {
     t_opt_parse_result options = parse_cmd_arguments(argc, argv);
+
+    //command line parsing failed, cannot execute anything
+    if (options.status != 0) return options.status;
 
     if (flag_do_analyze) {
         analyze(options.file_path);
@@ -33,13 +39,10 @@ int main(int argc, char *argv[]) {
 
     log_general("Initializing transcoding...\n");
 
-    char *temp = argv[options.last_optind];
-    argv[options.last_optind] = options.file_path;
-    argv[options.file_index] = temp;
-
     int guestArgc = argc - options.last_optind;
     char **guestArgv = argv + (options.last_optind);
-    return transcode_loop(options.file_path, guestArgc, guestArgv);
+    int ret = transcode_loop(options.file_path, guestArgc, guestArgv);
+    return ret;
 }
 
 #endif //TESTING
@@ -64,12 +67,15 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     set_value((t_risc_reg) sp, stackAddr);
 
     init_hash_table();
+    init_return_stack();
+
+    context_info *c_info = init_map_context();
 
     set_value(pc, next_pc);
 
     //debugging output
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     //benchmark if necessary
@@ -78,13 +84,13 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         begin = begin_measure();
     }
 
-    while(!finalize) {
+    while (!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(next_pc);
 
         //we have not seen this block before
         if (cache_loc == UNSEEN_CODE) {
-            cache_loc = translate_block(next_pc);
+            cache_loc = translate_block(next_pc, c_info);
             set_cache_entry(next_pc, cache_loc);
         }
 
@@ -92,7 +98,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         chain(cache_loc);
 
         //execute the cached (or now newly generated code) and update the program counter
-        if (!execute_cached(cache_loc)) break;
+        if (!execute_cached(cache_loc, c_info)) break;
         //printf("chain_end: %p\ncache_loc: %p\n\n", chain_end, cache_loc);
 
         //store pc from registers in pc
@@ -112,21 +118,20 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  * @param loc the cache address of that code
  * @return
  */
-bool execute_cached(t_cache_loc loc) {
-    if (flag_log_cache) {
-        log_cache("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+bool execute_cached(t_cache_loc loc, context_info *c_info) {
+    if (flag_log_general) {
+        log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
     }
 
-    typedef void (*void_asm)(void);
-    ((void_asm) loc)(); //call asm code
+    execute_in_guest_context(c_info, loc);
 
     //dump registers to the log
     if (flag_log_reg_dump) {
-        dump_registers();
+        dump_gp_registers();
     }
 
     ///check for illegal x0 values
-    if (*get_reg_data() != 0) {
+    if (*get_gp_reg_file() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;

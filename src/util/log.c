@@ -3,6 +3,7 @@
 //
 
 #include "log.h"
+#include "typedefs.h"
 #include <common.h>
 #include <stdbool.h>
 
@@ -13,14 +14,14 @@ bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
-bool flag_translate_opt = false;
+bool flag_translate_opt = true;
 bool flag_do_analyze = false;
 bool flag_do_benchmark = false;
 
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
-const char *const translator_version = "1.1.0";
+const char *const translator_version = "1.2.0";
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
@@ -58,7 +59,7 @@ void log_general(const char *format, ...) {
 void log_analyze(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    printf("[mnemonic] ");
+    printf("[analyze] ");
     vdprintf(1, format, args);
     va_end(args);
 }
@@ -120,7 +121,7 @@ void log_benchmark(const char *format, ...) {
 
 void log_print_mem(const char *ptr, long int len) {
     char buffer[2];
-    for(const char *ptri = ptr; ptri < ptr + len; ptri++) {
+    for (const char *ptri = ptr; ptri < ptr + len; ptri++) {
 
         buffer[0] = "0123456789abcdef"[((*ptri) >> 4) & 0xf];
         buffer[1] = "0123456789abcdef"[(*ptri) & 0xf];
@@ -128,4 +129,10 @@ void log_print_mem(const char *ptr, long int len) {
 
         write(1, buffer, 2);
     }
+}
+
+void invalid_error_handler(int32_t errorcode, int32_t raw_instr, t_risc_addr addr) {
+    dprintf(2, "Critical: tried to execute invalid code 0x%x at %p\n"
+                    "error: %s\n",raw_instr, addr, errorcode_to_string(errorcode));
+    _exit(1);
 }

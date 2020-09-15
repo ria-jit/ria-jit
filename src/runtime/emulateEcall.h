@@ -20,6 +20,8 @@ void setupBrk(t_risc_addr brk);
 
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues);
 
+void setupMmapHint();
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus

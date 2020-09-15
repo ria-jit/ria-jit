@@ -6,15 +6,25 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TYPEDEFS_H
 
 #include <stdint.h>
+#include <fadec/fadec-enc.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+char *errorcode_to_string(int mnem);
+
 //the RISC-V mnemonic of the instruction
 char *mnem_to_string(int mnem);
 
+char *reg_to_string(int reg);
+
+char *reg_to_alias(int reg);
+
 typedef enum {
+    INVALID_MNEM,
+
     //---RV32I---
     LUI, //load upper Imm
     AUIPC, //register = Imm
@@ -54,10 +64,41 @@ typedef enum {
     LRW, SCW, AMOSWAPW, AMOADDW, AMOXORW, AMOANDW, AMOORW, AMOMINW, AMOMAXW, AMOMINUW, AMOMAXUW,
 
     //---RV64A---
-    LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD
+    LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD,
+
+    //---RV32F---
+    FLW, FSW, FMADDS, FMSUBS, FNMSUBS, FNMADDS, FADDS, FSUBS, FMULS, FDIVS, FSQRTS, FSGNJS, FSGNJNS, FSGNJXS, FMINS, FMAXS, FCVTWS, FCVTWUS, FMVXW, FEQS, FLTS, FLES, FCLASSS, FCVTSW, FCVTSWU, FMVWX,
+
+    //---RV64F---
+    FCVTLS, FCVTLUS, FCVTSL, FCVTSLU,
+
+    //---RV32D---
+    FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTSD, FCVTDS, FEQD, FLTD, FLED, FCLASSD, FCVTWD, FCVTWUD, FCVTDW, FCVTDWU,
+
+    //---RV64D---
+    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
+
+    //---PSEUDO---
+    PC_NEXT_INST, NOP, SILENT_NOP, MV, NOT, NEG, NEGW, SEXTW, SEQZ, SNEZ, SLTZ, SGTZ, LI
 
 } t_risc_mnem;
-#define N_MNEM AMOMAXUD + 1
+#define N_MNEM (LI + 1)
+
+typedef enum {
+    E_UNKNOWN,
+    E_f3_MISC_MEM,
+    E_f3_BRANCH,
+    E_f3_LOAD,
+    E_f3_STORE,
+    E_f3_OP,
+    E_f3_SYSTEM,
+    E_f3_IMM_32,
+    E_f3_RV64M,
+    E_f3_32,
+    E_f3_IMM,
+    E_f7_AMO,
+    E_f3_AMO
+};
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
@@ -78,16 +119,32 @@ typedef enum {
 } t_risc_reg_mnem;
 #define N_REG 33
 
+//CSR registers
+#define N_CSR 4096
+typedef enum {
+    //read-write access (floating point)
+    csr_fflags = 0x001, //floating point accrued exceptions
+    csr_frm = 0x002,    //floating point dynamic rounding mode
+    csr_fcsr = 0x003,   //floating point control and status register (frm + fflags)
+    //read-only access (counters and timers)
+    csr_cycle = 0xC00,  //cycle counter for RDCYCLE
+    csr_time = 0xC01,   //timer for RDTIME
+    csr_instret = 0xC02,//instructions retired counter for RDINSTRET
+    csr_cycleh = 0xC80, //upper 32 bits of cycle (for RV32I)
+    csr_timeh = 0xC81,  //upper 32 bits of time (for RV32I)
+    csr_instreth = 0xC82//upper 32 bits of instret (for RV32I)
+} t_risc_csr_reg;
+
 //register value type
 typedef uint64_t t_risc_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
-typedef int32_t t_risc_imm;
+typedef int64_t t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
 typedef uintptr_t t_risc_addr;
@@ -107,6 +164,16 @@ typedef struct {
     t_risc_reg reg_dest;
     t_risc_imm imm;
 } t_risc_instr;
+
+/**
+ * Register information for the translator functions.
+ */
+typedef struct {
+    FeReg *map;
+    bool *mapped;
+    uint64_t base;
+    uint64_t csr_base;
+} register_info;
 
 #ifdef __cplusplus
 }
