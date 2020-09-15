@@ -18,8 +18,8 @@
 \RequirePackage{kvoptions}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
-\RequirePackage[ngerman]{babel} % TODO: Make this an option
-\RequirePackage[babel,german=quotes]{csquotes}
+\RequirePackage[english]{babel} % TODO: Make this an option
+\RequirePackage[babel]{csquotes}
 \RequirePackage{amsmath}
 \RequirePackage{graphicx}
 \RequirePackage{color}
@@ -154,7 +154,7 @@
 \def\@author{}
 \renewcommand{\maketitle}{
     \begin{center}
-    \small\textsc{Lehrstuhl für Rechnerarchitektur und Parallele Systeme}\\[.4em]
+    \small\textsc{Chair of Computer Architecture and Parallel Systems}\\[.4em]
     {\Large\bfseries\@courselong}\\[.7em]
     \begin{tabular}{c}\@maintitle\end{tabular}
     \ifdefempty{\@author}{}{\\[1em]\begin{tabular}{c}\@author\end{tabular}}
