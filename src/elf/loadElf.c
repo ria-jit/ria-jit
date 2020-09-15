@@ -17,9 +17,6 @@
 #define EF_RISCV_TSO 0x10
 #endif
 
-//TODO Figure out proper offset
-#define STACK_OFFSET 0x10000000
-
 #define AUXC 16
 
 #ifdef NO_STDLIB
@@ -27,6 +24,10 @@
 #else
 #define envp __environ
 #endif
+
+size_t stackSize = 8 * 1024 * 1024; //Default stack size
+//Add guard page at bottom just in case.
+const size_t guard = 4096;
 
 t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     log_general("Reading %s...\n", filePath);
@@ -239,7 +240,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
 }
 
 t_risc_addr allocateStack() {
-    size_t stackSize = 8 * 1024 * 1024; //Default stack size
 
     struct rlimit rlimit;
     //Try to get the stacksize from kernel if unsuccessful or infinite use default
@@ -247,9 +247,6 @@ t_risc_addr allocateStack() {
     if (getrlimit(RLIMIT_STACK, &rlimit) == 0 && rlimit.rlim_cur != RLIM_INFINITY) {
         stackSize = rlimit.rlim_cur; //Stack size from kernel
     }
-
-    //Add guard page at bottom just in case.
-    size_t guard = 4096;
 
     //Allocate the stack with offset under the translator region where the cached blocks can go.
     uintptr_t stackStart = TRANSLATOR_BASE - STACK_OFFSET - (stackSize + guard + 4096);
