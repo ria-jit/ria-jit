@@ -21,7 +21,7 @@ bool flag_do_benchmark = false;
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
-const char *const translator_version = "1.1.0";
+const char *const translator_version = "1.2.0";
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
