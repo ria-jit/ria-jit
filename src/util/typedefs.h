@@ -187,9 +187,10 @@ typedef struct {
     t_risc_reg reg_src_2;
     t_risc_reg reg_dest;
     uint32_t reg_src_3;
-    uint32_t reg_m;
+    uint32_t rounding_mode;
 } t_risc_instr_f;
-// the idea is to redefine the immediate into two registers to be able to use the same structs and only do a simple cast
+// the idea is to redefine the immediate into a register and the rounding mode to be able to use the same structs and
+// only do a simple cast
 
 /**
  * Register information for the translator functions.

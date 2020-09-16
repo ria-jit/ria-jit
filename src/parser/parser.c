@@ -475,7 +475,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->mnem = FMADDS;
             p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
             ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FMADDS;
@@ -491,7 +491,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->optype = FLOAT;
             p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
             ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FMSUBS;
@@ -507,7 +507,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->optype = FLOAT;
             p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
             ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FNMADDS;
@@ -523,7 +523,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->optype = FLOAT;
             p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
             ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_m = extract_funct3(raw_instr);
+            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FNMSUBS;
@@ -549,7 +549,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
 
             // furthermore the 5 bit determines if the funct3 field is used as a register, or as a funct code#
             if ((funct7 & 0x0010000) == 0) {
-                p_instr_struct_f->reg_m = funct3;
+                p_instr_struct_f->rounding_mode = funct3;
             }
 
             //ignore lower two bits which only set operand size
