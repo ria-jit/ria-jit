@@ -186,7 +186,24 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINW…\n");
-    critical_not_yet_implemented("AMOMINW not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVL32rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -196,7 +213,24 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXW…\n");
-    critical_not_yet_implemented("AMOMAXW not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVG32rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -206,7 +240,24 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINUW…\n");
-    critical_not_yet_implemented("AMOMINUW not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
+    err |= fe_enc64(&current, FE_CMOVC32rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -216,7 +267,24 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
  */
 void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXUW…\n");
-    critical_not_yet_implemented("AMOMAXUW not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVA32rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -387,7 +455,24 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMIND…\n");
-    critical_not_yet_implemented("AMOMIND not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVL64rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -397,7 +482,24 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXD…\n");
-    critical_not_yet_implemented("AMOMAXD not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVG64rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -407,7 +509,24 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINUD…\n");
-    critical_not_yet_implemented("AMOMINUD not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
+    err |= fe_enc64(&current, FE_CMOVC64rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -417,5 +536,22 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
  */
 void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXUD…\n");
-    critical_not_yet_implemented("AMOMAXUD not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //load [rs1] --> rd
+    //apply binary operator rd • rs2 --> [rs1]
+
+    //load into rd
+    //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
+    err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
+    err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
+    ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
+    /// only overwritten if not needed anymore.
+    err |= fe_enc64(&current, FE_CMOVA64rm, SECOND_REG, SCRATCH_REG);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    storeRd(instr, r_info, regDest);
 }
