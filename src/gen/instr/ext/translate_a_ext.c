@@ -199,7 +199,10 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVL32rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVL32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
@@ -226,7 +229,10 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVG32rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVG32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
@@ -253,7 +259,10 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
-    err |= fe_enc64(&current, FE_CMOVC32rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVC32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
@@ -280,7 +289,10 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVA32rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVA32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
@@ -468,7 +480,10 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVL64rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVL64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
@@ -495,7 +510,10 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVG64rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVG64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
@@ -522,7 +540,10 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
-    err |= fe_enc64(&current, FE_CMOVC64rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVC64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
@@ -549,7 +570,10 @@ void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    err |= fe_enc64(&current, FE_CMOVA64rm, SECOND_REG, SCRATCH_REG);
+    if (regSrc2 != SECOND_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_CMOVA64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
