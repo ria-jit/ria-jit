@@ -68,8 +68,6 @@ void rs_emit_push(const t_risc_instr *instr){
 
     //asm rs_push   -----------
     err |= fe_enc64(&current, FE_PUSHr, FE_AX);
-    //err |= fe_enc64(&current, FE_PUSHr, FE_BX);
-    //err |= fe_enc64(&current, FE_PUSHr, FE_CX);
 
     err |= fe_enc64(&current, FE_MOV16rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));
     err |= fe_enc64(&current, FE_ADD64ri, FE_AX, 1);                                         //next field
@@ -89,8 +87,6 @@ void rs_emit_push(const t_risc_instr *instr){
     err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR((uint64_t) &rs_back), 0x3f);      //mod 64
     err |= fe_enc64(&rs_full_jmp, FE_JNZ, (intptr_t) current);                               //replace dummy
 
-    //err |= fe_enc64(&current, FE_POPr, FE_CX);
-    //err |= fe_enc64(&current, FE_POPr, FE_BX);
     err |= fe_enc64(&current, FE_POPr, FE_AX);
 
 
@@ -110,21 +106,21 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
     //RBX: front
 
     ///hit
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack)); //get base
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack));    //get base
     err |= fe_enc64(&current, FE_SHL64ri, FE_BX, 1);
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 0)); //get risc addr from stack
-    err |= fe_enc64(&current, FE_CMP64rr, FE_AX, FE_CX); //stack addr == target?
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 0));        //get risc addr from stack
+    err |= fe_enc64(&current, FE_CMP64rr, FE_AX, FE_CX);                                    //stack addr == target?
     uint8_t *nullJMPmiss = current;
-    err |= fe_enc64(&current, FE_JNZ, current); //dummy
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack)); //get base  //DUPLICATE
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 8)); // load x86 target
+    err |= fe_enc64(&current, FE_JNZ, current);                                             //dummy
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack));    //get base  //DUPLICATE
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 8));        // load x86 target
     err |= fe_enc64(&current, FE_SHR64ri, FE_BX, 1);
-    err |= fe_enc64(&current, FE_ADD64ri, FE_BX, 63); //-1 mod 64
-    err |= fe_enc64(&current, FE_AND64ri, FE_BX, 0x3f); //-1 mod 64
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) &rs_front), FE_BX); //save rs_front
+    err |= fe_enc64(&current, FE_ADD64ri, FE_BX, 63);                                       //-1 mod 64
+    err |= fe_enc64(&current, FE_AND64ri, FE_BX, 0x3f);                                     //-1 mod 64
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) &rs_front), FE_BX);   //save rs_front
     uint8_t *noJumpHit = 0;
     if (jump_or_push) {
-        err |= fe_enc64(&current, FE_JMPr, FE_CX); //jmp to next block
+        err |= fe_enc64(&current, FE_JMPr, FE_CX);  //jmp to next block
     } else {
         err |= fe_enc64(&current, FE_PUSHr, FE_CX); //save jump target
         noJumpHit = current;
@@ -138,17 +134,17 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
     if(!jump_or_push) {
         err |= fe_enc64(&current, FE_MOV64ri, FE_CX, 0);    //save target null: miss
         err |= fe_enc64(&current, FE_PUSHr, FE_CX);
-        err |= fe_enc64(&noJumpHit, FE_JMP, current); //replace dummy
+        err |= fe_enc64(&noJumpHit, FE_JMP, current);       //replace dummy
     }
 
 }
 
 void rs_jump_stack(){
-    err |= fe_enc64(&current, FE_POPr, FE_CX);  //load jump target
+    err |= fe_enc64(&current, FE_POPr, FE_CX);      //load jump target
     err |= fe_enc64(&current, FE_CMP64ri, FE_CX, 0);
     uint8_t *noJump = current;
-    err |= fe_enc64(&current, FE_JZ, current);  //dummy
+    err |= fe_enc64(&current, FE_JZ, current);      //dummy
     //err |= fe_enc64(&current, FE_MOV64ri, FE_CX, 0);
-    err |= fe_enc64(&current, FE_JMPr, FE_CX); //jmp to next block
+    err |= fe_enc64(&current, FE_JMPr, FE_CX);      //jmp to next block
     err |= fe_enc64(&noJump, FE_JZ, current);
 }
