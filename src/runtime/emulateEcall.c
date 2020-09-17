@@ -163,6 +163,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[a0] = syscall1(__NR_close, registerValues[a0]);
         }
             break;
+        case 61: //getdents64
+        {
+            log_general("Emulate syscall getdents64 (61)...\n");
+            registerValues[a0] = syscall3(__NR_getdents64, registerValues[a0], registerValues[a1], registerValues[a2]);
+
+        }
         case 62: //lseek
         {
             log_general("Emulate syscall lseek (62)...\n");
@@ -410,6 +416,18 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             }
         }
             break;
+        case 215: //munmap
+        {
+            log_general("Emulate syscall munmap (215)...\n");
+            t_risc_reg_val munmapAddr = registerValues[a0];
+            t_risc_reg_val size = registerValues[a1];
+            if (munmapAddr + size > (TRANSLATOR_BASE - STACK_OFFSET)) {
+                log_general("Prevented munmap in translator region.");
+                registerValues[a0] = -EINVAL; //Is this a fitting error code to return?
+            } else {
+                registerValues[a0] = syscall2(__NR_munmap, registerValues[a0], registerValues[a1]);
+            }
+        }
         case 222: //mmap
         {
             log_general("Emulate syscall mmap (222)...\n");
