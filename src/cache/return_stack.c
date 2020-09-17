@@ -8,14 +8,20 @@
 #include <util/log.h>
 #include <fadec/fadec-enc.h>
 #include <gen/translate.h>
+#include <util/util.h>
 
 rs_entry *r_stack;
 volatile int rs_front;
 volatile int rs_back;
 
 void init_return_stack(void){
-    r_stack = (rs_entry *) mmap(NULL, 64 * sizeof(rs_entry),
+    r_stack = mmap(NULL, 64 * sizeof(rs_entry),
                                 PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+
+    if (BAD_ADDR(r_stack)) {
+        dprintf(2, "Bad. Cache memory allocation failed.");
+        _exit(FAIL_HEAP_ALLOC);
+    }
 
     rs_front = 0;
     rs_back = 0;
@@ -69,7 +75,7 @@ void rs_emit_push(const t_risc_instr *instr){
     //asm rs_push   -----------
     err |= fe_enc64(&current, FE_PUSHr, FE_AX);
 
-    err |= fe_enc64(&current, FE_MOV16rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));
+    err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));    //get front
     err |= fe_enc64(&current, FE_ADD64ri, FE_AX, 1);                                         //next field
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, 0x3f);                                      //mod 64
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save rs_front
