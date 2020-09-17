@@ -312,7 +312,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             goto PARSE_DONE;
                         }
 
-                        if (parse_buf[parse_pos].reg_dest != x0) {
+                        if (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5) {
                             ///could follow, but cache
                             instructions_in_block++;
 
@@ -348,6 +348,23 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
 
                             goto PARSE_DONE;
+                        } else if (parse_buf[parse_pos].reg_dest != x0) {
+                            instructions_in_block++;
+
+                            ///1: recursively translate target
+                            {
+                                t_risc_addr target = risc_addr + parse_buf[parse_pos].imm;
+
+                                t_cache_loc cache_loc = lookup_cache_entry(target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    cache_loc = translate_block(target, c_info);
+                                    set_cache_entry(target, cache_loc);
+                                }
+                            }
+                            goto PARSE_DONE;
                         }
 
                         ///link
@@ -380,6 +397,22 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         break;
 
                     case JALR : {
+                        if(flag_translate_opt && (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
+                            ///2: recursively translate return addr (+4)
+                            //dead ends could arise here
+                            {
+                                t_risc_addr ret_target = risc_addr + 4;
+                                t_cache_loc cache_loc = lookup_cache_entry(ret_target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(ret_target,c_info);
+                                    set_cache_entry(ret_target, cache_loc);
+                                }
+                            }
+                        }
+
                         ///destination address unknown at translate time, stop parsing
                         instructions_in_block++;
                         goto PARSE_DONE;

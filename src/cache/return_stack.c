@@ -56,42 +56,48 @@ uintptr_t rs_pop_check(t_risc_addr r_add) {
 
 void rs_emit_push(const t_risc_instr *instr){
     ///push to return stack
-    if (flag_translate_opt && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
-        t_risc_addr ret_target = instr->addr + 4;
+    t_risc_addr ret_target = instr->addr + 4;
 
-        t_cache_loc cache_loc;
+    t_cache_loc cache_loc;
 
-        if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {  // 1 ???
-            printf("translate_JAL: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
-                   instr->addr);
-            goto NOT_CACHED;
-        }
-
-        //asm rs_push   -----------
-        err |= fe_enc64(&current, FE_MOV16rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));
-        err |= fe_enc64(&current, FE_ADD64ri, FE_AX, 1);                                         //next field
-        err |= fe_enc64(&current, FE_AND64ri, FE_AX, 0x3f);                                      //mod 64
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save rs_front
-        err |= fe_enc64(&current, FE_SHL64ri, FE_AX, 1);                                         //multiply by 2,struct array...
-        err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((uint64_t) &r_stack));     //get base
-        err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + 4);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 0), FE_CX);         //save risc adddr
-        err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (uintptr_t) cache_loc);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 8), FE_CX);         //save x86 addr
-        err |= fe_enc64(&current, FE_SHR64ri, FE_AX, 1);                                         //revert multiplying by 2
-        err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_back));     //front reached back?
-        uint8_t *rs_full_jmp = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);                                   //dummy
-        err |= fe_enc64(&current, FE_ADD64mi, FE_MEM_ADDR((uint64_t) &rs_back), 1);         //move back ahead
-        err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR((uint64_t) &rs_back), 0x3f);      //mod 64
-        err |= fe_enc64(&rs_full_jmp, FE_JNZ, (intptr_t) current);                               //replace dummy
-
-
-        NOT_CACHED:;
+    if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {  // 1 ???
+        printf("rs_emit_push: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
+               instr->addr);
+        goto NOT_CACHED;
     }
+
+    //asm rs_push   -----------
+    err |= fe_enc64(&current, FE_PUSHr, FE_AX);
+    //err |= fe_enc64(&current, FE_PUSHr, FE_BX);
+    //err |= fe_enc64(&current, FE_PUSHr, FE_CX);
+
+    err |= fe_enc64(&current, FE_MOV16rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));
+    err |= fe_enc64(&current, FE_ADD64ri, FE_AX, 1);                                         //next field
+    err |= fe_enc64(&current, FE_AND64ri, FE_AX, 0x3f);                                      //mod 64
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save rs_front
+    err |= fe_enc64(&current, FE_SHL64ri, FE_AX, 1);                                         //multiply by 2,struct array...
+    err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((uint64_t) &r_stack));     //get base
+    err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + 4);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 0), FE_CX);         //save risc adddr
+    err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (uintptr_t) cache_loc);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 8), FE_CX);         //save x86 addr
+    err |= fe_enc64(&current, FE_SHR64ri, FE_AX, 1);                                         //revert multiplying by 2
+    err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_back));     //front reached back?
+    uint8_t *rs_full_jmp = current;
+    err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);                                   //dummy
+    err |= fe_enc64(&current, FE_ADD64mi, FE_MEM_ADDR((uint64_t) &rs_back), 1);         //move back ahead
+    err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR((uint64_t) &rs_back), 0x3f);      //mod 64
+    err |= fe_enc64(&rs_full_jmp, FE_JNZ, (intptr_t) current);                               //replace dummy
+
+    //err |= fe_enc64(&current, FE_POPr, FE_CX);
+    //err |= fe_enc64(&current, FE_POPr, FE_BX);
+    err |= fe_enc64(&current, FE_POPr, FE_AX);
+
+
+    NOT_CACHED:;
 }
 
-void rs_emit_pop_RAX() {
+void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
     //RAX: target
 
     ///stack empty
@@ -116,9 +122,33 @@ void rs_emit_pop_RAX() {
     err |= fe_enc64(&current, FE_ADD64ri, FE_BX, 63); //-1 mod 64
     err |= fe_enc64(&current, FE_AND64ri, FE_BX, 0x3f); //-1 mod 64
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) &rs_front), FE_BX); //save rs_front
-    err |= fe_enc64(&current, FE_JMPr, FE_CX); //jmp to nect block
+    uint8_t *noJumpHit = 0;
+    if (jump_or_push) {
+        err |= fe_enc64(&current, FE_JMPr, FE_CX); //jmp to next block
+    } else {
+        err |= fe_enc64(&current, FE_PUSHr, FE_CX); //save jump target
+        noJumpHit = current;
+        err |= fe_enc64(&current, FE_JMP, current); //dummy
+    }
 
+    //replace miss dummys
     err |= fe_enc64(&nullJMPempty, FE_JZ, current);
     err |= fe_enc64(&nullJMPmiss, FE_JNZ, current);
 
+    if(!jump_or_push) {
+        err |= fe_enc64(&current, FE_MOV64ri, FE_CX, 0);    //save target null: miss
+        err |= fe_enc64(&current, FE_PUSHr, FE_CX);
+        err |= fe_enc64(&noJumpHit, FE_JMP, current); //replace dummy
+    }
+
+}
+
+void rs_jump_stack(){
+    err |= fe_enc64(&current, FE_POPr, FE_CX);  //load jump target
+    err |= fe_enc64(&current, FE_CMP64ri, FE_CX, 0);
+    uint8_t *noJump = current;
+    err |= fe_enc64(&current, FE_JZ, current);  //dummy
+    //err |= fe_enc64(&current, FE_MOV64ri, FE_CX, 0);
+    err |= fe_enc64(&current, FE_JMPr, FE_CX); //jmp to next block
+    err |= fe_enc64(&noJump, FE_JZ, current);
 }

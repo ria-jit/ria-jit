@@ -20,7 +20,9 @@ uintptr_t rs_pop_check(t_risc_addr r_add);
 
 void rs_emit_push(const t_risc_instr *instr);
 
-void rs_emit_pop_RAX();
+void rs_emit_pop_RAX(bool jump_or_push);
+
+void rs_jump_stack();
 
 extern rs_entry *r_stack;
 extern volatile int rs_front;

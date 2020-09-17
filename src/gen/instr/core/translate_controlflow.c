@@ -22,7 +22,9 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     log_asm_out("Translate JAL\n");
 
     ///push to return stack
-    rs_emit_push(instr);
+    if (flag_translate_opt && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
+        rs_emit_push(instr);
+    }
 
     /*
     if (flag_translate_opt && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
@@ -158,18 +160,20 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
                     ///push
                     rs_emit_push(instr);
                 } else {
+                    //not tested
                     ///pop and push
-                    rs_emit_pop_RAX();
+                    rs_emit_pop_RAX(false);
                     rs_emit_push(instr);
+                    rs_jump_stack();
                 }
             } else {
                 ///push
-                //rs_emit_push(instr);  //segfault???
+                rs_emit_push(instr);
             }
         } else {
             if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 ///pop
-                rs_emit_pop_RAX();
+                rs_emit_pop_RAX(true);
             } else {
                 ///none
             }
@@ -266,10 +270,12 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
         }
     }
 
+    /*
     ///write chainEnd to be chained by chainer
     if (flag_translate_opt) {
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
     }
+    */
 
 }
 
