@@ -1,0 +1,1374 @@
+runcpu v6247 started at 2020-09-17 12:03:34 on "sksmall"
+runcpu is: /u/home/schmidtf/spec/bin/harness/runcpu
+runcpu: runcpu --config=RISC-V-qemu --size=test --noreportable --threads=1 intspeed
+toolset: linux-x86_64
+suite: CPU2017 1.1.0
+
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/u/home/schmidtf/spec/config/RISC-V-qemu.cfg'
+
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+validate   speed      test       SPECspeed2017_int   intspeed                  
+-------------------------------------------------------------------------------
+
+Setting up environment for running intspeed...
+Starting runcpu for intspeed...
+Running "specperl /u/home/schmidtf/spec/bin/sysinfo" to gather system information.
+sysinfo: r6365 of 2019-08-21 (295195f888a3d7edb1e6e46a485a0011)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get info from /sys/devices/virtual/dmi/id
+sysinfo: ...trying to get info from dmidecode
+Retrieving flags file (/u/home/schmidtf/spec/config/flags/gcc.xml)...
+Verbosity = 5
+Action    = validate
+Tune      = base
+Label     = RISC-V-qemu-1.0-m64
+Size      = test
+benchmarks= 600.perlbench_s,602.gcc_s,605.mcf_s,620.omnetpp_s,623.xalancbmk_s,625.x264_s,631.deepsjeng_s,641.leela_s,648.exchange2_s,657.xz_s,998.specrand_is
+outputs   = txt,html,cfg,pdf,csv
+username  = schmidtf
+Environment settings:
+LD_LIBRARY_PATH = "%{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64"
+
+Benchmarks selected: 600.perlbench_s, 602.gcc_s, 605.mcf_s, 620.omnetpp_s, 623.xalancbmk_s, 625.x264_s, 631.deepsjeng_s, 641.leela_s, 648.exchange2_s, 657.xz_s, 998.specrand_is
+Compiling Binaries
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -DPERL_CORE -I. -Idist/IO -Icpan/Time-HiRes -Icpan/HTML-Parser -Iext/re -Ispecrand -DDOUBLE_SLASHES_SPECIAL=0 -D_LARGE_FILES -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -DSPEC_LINUX_X64   -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DPERL_CORE -I. -Idist/IO -Icpan/Time-HiRes -Icpan/HTML-Parser -Iext/re -Ispecrand -DDOUBLE_SLASHES_SPECIAL=0 -D_LARGE_FILES -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY="-DSPEC_LINUX_X64"
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon     -DSPEC_LINUX_X64   -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+P: PORTABILITY="-DSPEC_LINUX_X64"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 600.perlbench_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -I. -I./include -I./spec_qsort -DSPEC_602 -DIN_GCC -DHAVE_CONFIG_H  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./include -I./spec_qsort -DSPEC_602 -DIN_GCC -DHAVE_CONFIG_H"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 602.gcc_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP"
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 605.mcf_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -Isimulator/platdep -Isimulator -Imodel -DWITH_NETBUILDER  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Isimulator/platdep -Isimulator -Imodel -DWITH_NETBUILDER"
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 620.omnetpp_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG  -DAPP_NO_THREADS -DXALAN_INMEM_MSG_LOADER -I. -Ixercesc -Ixercesc/dom -Ixercesc/dom/impl -Ixercesc/sax -Ixercesc/util/MsgLoaders/InMemory -Ixercesc/util/Transcoders/Iconv -Ixalanc/include -DPROJ_XMLPARSER -DPROJ_XMLUTIL -DPROJ_PARSERS -DPROJ_SAX4C -DPROJ_SAX2 -DPROJ_DOM -DPROJ_VALIDATORS -DXML_USE_INMEM_MESSAGELOADER -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon    -DSPEC_LINUX   -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CXXFLAGS="-DAPP_NO_THREADS -DXALAN_INMEM_MSG_LOADER -I. -Ixercesc -Ixercesc/dom -Ixercesc/dom/impl -Ixercesc/sax -Ixercesc/util/MsgLoaders/InMemory -Ixercesc/util/Transcoders/Iconv -Ixalanc/include -DPROJ_XMLPARSER -DPROJ_XMLUTIL -DPROJ_PARSERS -DPROJ_SAX4C -DPROJ_SAX2 -DPROJ_DOM -DPROJ_VALIDATORS -DXML_USE_INMEM_MESSAGELOADER"
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: CXXOPTIMIZE=""
+P: PORTABILITY="-DSPEC_LINUX"
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon     -DSPEC_LINUX   -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+P: PORTABILITY="-DSPEC_LINUX"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 623.xalancbmk_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 625.x264_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -DBIG_MEMORY  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DBIG_MEMORY"
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 631.deepsjeng_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -I.  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 641.leela_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran            -c -o options.o -g -O3 -static -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fcommon -fno-openmp <source>"
+C: FC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran           "
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran                 -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran           "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 648.exchange2_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -DSPEC_AUTO_BYTEORDER=0x12345678 -DHAVE_CONFIG_H=1 -DSPEC_MEM_IO -DSPEC_XZ -I. -Ispec_mem_io -Isha-2 -Icommon -Iliblzma/api -Iliblzma/lzma -Iliblzma/common -Iliblzma/check -Iliblzma/simple -Iliblzma/delta -Iliblzma/lz -Iliblzma/rangecoder  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DSPEC_AUTO_BYTEORDER=0x12345678 -DHAVE_CONFIG_H=1 -DSPEC_MEM_IO -DSPEC_XZ -I. -Ispec_mem_io -Isha-2 -Icommon -Iliblzma/api -Iliblzma/lzma -Iliblzma/common -Iliblzma/check -Iliblzma/simple -Iliblzma/delta -Iliblzma/lz -Iliblzma/rangecoder"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 657.xz_s base RISC-V-qemu-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ispecrand-common  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ispecrand-common"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 998.specrand_is base RISC-V-qemu-1.0-m64
+
+
+Setting Up Run Directories
+  Setting up 600.perlbench_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 602.gcc_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 605.mcf_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 620.omnetpp_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 623.xalancbmk_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 625.x264_s test base RISC-V-qemu-1.0-m64: OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013 -f inputgen.cmd -e inputgen.err -o inputgen.stdout'
+Start command: 2020-09-17 12:04:01 (1600344241.51389)
+Stop command: 2020-09-17 12:04:23 (1600344263.73794)
+Elapsed time for command: 00:00:22 (22.2240419387817)
+Input generation total elapsed time = 22 seconds
+Input generation elapsed time (0:1) = 22.053357 seconds
+run_base_test_RISC-V-qemu-1.0-m64.0013
+  Setting up 631.deepsjeng_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 641.leela_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 648.exchange2_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 657.xz_s test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+  Setting up 998.specrand_is test base RISC-V-qemu-1.0-m64: run_base_test_RISC-V-qemu-1.0-m64.0007
+-----------------------------------
+Running Benchmarks
+-----------------------------------
+  Running 600.perlbench_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:04:27]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o makerand.out -e makerand.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64 -I. -I./lib makerand.pl > makerand.out 2>> makerand.err (timed)
+    -o test.out -e test.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64 -I. -I./lib test.pl > test.out 2>> test.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:04:28 (1600344268.35158)
+Stop command: 2020-09-17 12:04:36 (1600344276.44481)
+Elapsed time for command: 00:00:08 (8.09323883056641)
+Workload elapsed time (copy 0 workload 1) = 4.48616 seconds
+Workload elapsed time (copy 0 workload 2) = 3.434093 seconds
+Copy 0 of 600.perlbench_s (base test) run 1 finished at 2020-09-17 12:04:36.  Total elapsed time: 7.920253
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'makerand.out' with floatcompare=1, nansupport=no
+comparing 'test.out' with floatcompare=1, nansupport=no
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:04:36 (1600344276.65272)
+Stop command: 2020-09-17 12:04:37 (1600344277.51815)
+Elapsed time for command: 00:00:00 (0.865428924560547)
+Error with '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'; no non-empty output files exist
+  Command returned exit code 1
+****************************************
+Contents of test.err
+****************************************
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+.././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: 1: .././../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64: Syntax error: word unexpected (expecting ")")
+Failed 317 tests out of 0, 0.00% okay.
+###
+### Since some tests failed, you may want to run them individually and examine
+### any messages they produce.  You could try something like the following:
+###
+###   cd /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+###   ./../run_base_test_RISC-V-qemu-1.0-m64.0007/perlbench_s_base.RISC-V-qemu-1.0-m64 -I. -I./lib t/uni/bless.t
+###
+
+****************************************
+*** Miscompare of test.out; for details see
+    /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007/test.out.mis
+0001:  t/base/cond ................................. ok
+       t/base/cond ................................. FAILED--no leader found
+                                                     ^
+0002:  t/base/if ................................... ok
+       t/base/if ................................... FAILED--no leader found
+                                                     ^
+0003:  t/base/lex .................................. ok
+       t/base/lex .................................. FAILED--no leader found
+                                                     ^
+0004:  t/base/num .................................. ok
+       t/base/num .................................. FAILED--no leader found
+                                                     ^
+0005:  t/base/pat .................................. ok
+       t/base/pat .................................. FAILED--no leader found
+                                                     ^
+0006:  t/base/rs ................................... ok
+       t/base/rs ................................... FAILED--no leader found
+                                                     ^
+0007:  t/base/term ................................. ok
+       t/base/term ................................. FAILED--no leader found
+                                                     ^
+0008:  t/base/while ................................ ok
+       t/base/while ................................ FAILED--no leader found
+                                                     ^
+0009:  t/cmd/elsif ................................. ok
+       t/cmd/elsif ................................. FAILED--no leader found
+                                                     ^
+0010:  t/cmd/for ................................... ok
+       t/cmd/for ................................... FAILED--no leader found
+                                                     ^
+Benchmark Times:
+  Run Start:    2020-09-17 12:04:28 (1600344268)
+  Run Stop:     2020-09-17 12:04:36 (1600344276)
+  Run Elapsed:  00:00:08 (8)
+  Run Reported: 00:00:07 (7 920385000 7.920385)
+ Error 600.perlbench_s base test ratio=-0.00, runtime=7.920385, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%, errorcode=VE
+-----------------------------------
+  Running 602.gcc_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:04:39]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o t1.opts-O3_-finline-limit_50000.out -e t1.opts-O3_-finline-limit_50000.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/sgcc_base.RISC-V-qemu-1.0-m64 t1.c -O3 -finline-limit=50000 -o t1.opts-O3_-finline-limit_50000.s > t1.opts-O3_-finline-limit_50000.out 2>> t1.opts-O3_-finline-limit_50000.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:04:39 (1600344279.43204)
+Stop command: 2020-09-17 12:04:40 (1600344280.10469)
+Elapsed time for command: 00:00:00 (0.672648906707764)
+Workload elapsed time (copy 0 workload 1) = 0.501056 seconds
+Copy 0 of 602.gcc_s (base test) run 1 finished at 2020-09-17 12:04:39.  Total elapsed time: 0.501056
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 't1.opts-O3_-finline-limit_50000.s' with floatcompare=1, nansupport=no
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:04:40 (1600344280.24182)
+Stop command: 2020-09-17 12:04:40 (1600344280.74746)
+Elapsed time for command: 00:00:00 (0.50563907623291)
+Benchmark Times:
+  Run Start:    2020-09-17 12:04:39 (1600344279)
+  Run Stop:     2020-09-17 12:04:40 (1600344280)
+  Run Elapsed:  00:00:01 (1)
+  Run Reported: 00:00:00 (0 501171000 0.501171)
+ Success 602.gcc_s base test ratio=-0.00, runtime=0.501171, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 605.mcf_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:04:40]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o inp.out -e inp.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/mcf_s_base.RISC-V-qemu-1.0-m64 inp.in  > inp.out 2>> inp.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:04:41 (1600344281.02083)
+Stop command: 2020-09-17 12:05:27 (1600344327.37762)
+Elapsed time for command: 00:00:46 (46.3567979335785)
+Workload elapsed time (copy 0 workload 1) = 46.178787 seconds
+Copy 0 of 605.mcf_s (base test) run 1 finished at 2020-09-17 12:05:27.  Total elapsed time: 46.178787
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'inp.out' with 
+comparing 'mcf.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:05:27 (1600344327.56903)
+Stop command: 2020-09-17 12:05:28 (1600344328.40743)
+Elapsed time for command: 00:00:00 (0.838406085968018)
+Benchmark Times:
+  Run Start:    2020-09-17 12:04:41 (1600344281)
+  Run Stop:     2020-09-17 12:05:27 (1600344327)
+  Run Elapsed:  00:00:46 (46)
+  Run Reported: 00:00:46 (46 178908000 46.178908)
+ Success 605.mcf_s base test ratio=-0.00, runtime=46.178908, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 620.omnetpp_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:05:29]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o omnetpp.General-0.out -e omnetpp.General-0.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/omnetpp_s_base.RISC-V-qemu-1.0-m64 -c General -r 0 > omnetpp.General-0.out 2>> omnetpp.General-0.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:05:29 (1600344329.4938)
+Stop command: 2020-09-17 12:05:53 (1600344353.36374)
+Elapsed time for command: 00:00:23 (23.86994099617)
+Workload elapsed time (copy 0 workload 1) = 23.699046 seconds
+Copy 0 of 620.omnetpp_s (base test) run 1 finished at 2020-09-17 12:05:53.  Total elapsed time: 23.699046
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'General-0.sca' with abstol=1e-06, reltol=1e-05
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:05:53 (1600344353.49638)
+Stop command: 2020-09-17 12:06:00 (1600344360.08894)
+Elapsed time for command: 00:00:06 (6.59256887435913)
+Benchmark Times:
+  Run Start:    2020-09-17 12:05:29 (1600344329)
+  Run Stop:     2020-09-17 12:05:53 (1600344353)
+  Run Elapsed:  00:00:24 (24)
+  Run Reported: 00:00:23 (23 699160000 23.69916)
+ Success 620.omnetpp_s base test ratio=-0.00, runtime=23.699160, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 623.xalancbmk_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:06:02]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o test-test.out -e test-test.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xalancbmk_s_base.RISC-V-qemu-1.0-m64 -v test.xml xalanc.xsl > test-test.out 2>> test-test.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:06:02 (1600344362.37598)
+Stop command: 2020-09-17 12:06:03 (1600344363.52903)
+Elapsed time for command: 00:00:01 (1.15304803848267)
+Workload elapsed time (copy 0 workload 1) = 0.981448 seconds
+Copy 0 of 623.xalancbmk_s (base test) run 1 finished at 2020-09-17 12:06:03.  Total elapsed time: 0.981448
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'test-test.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:06:03 (1600344363.66842)
+Stop command: 2020-09-17 12:06:04 (1600344364.17047)
+Elapsed time for command: 00:00:00 (0.502055883407593)
+Benchmark Times:
+  Run Start:    2020-09-17 12:06:02 (1600344362)
+  Run Stop:     2020-09-17 12:06:03 (1600344363)
+  Run Elapsed:  00:00:01 (1)
+  Run Reported: 00:00:00 (0 981596000 0.981596)
+ Success 623.xalancbmk_s base test ratio=-0.00, runtime=0.981596, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 625.x264_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:06:04]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013
+    -o run_000-156_x264_s_base.RISC-V-qemu-1.0-m64_x264.out -e run_000-156_x264_s_base.RISC-V-qemu-1.0-m64_x264.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0013/x264_s_base.RISC-V-qemu-1.0-m64 --dumpyuv 50 --frames 156 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 > run_000-156_x264_s_base.RISC-V-qemu-1.0-m64_x264.out 2>> run_000-156_x264_s_base.RISC-V-qemu-1.0-m64_x264.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:06:04 (1600344364.89301)
+Stop command: 2020-09-17 12:11:06 (1600344666.5199)
+Elapsed time for command: 00:05:01 (301.626891136169)
+Workload elapsed time (copy 0 workload 1) = 301.453934 seconds
+Copy 0 of 625.x264_s (base test) run 1 finished at 2020-09-17 12:11:06.  Total elapsed time: 301.453934
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'imagevalidate_frame_100.out' with reltol=0.085
+comparing 'imagevalidate_frame_155.out' with reltol=0.085
+comparing 'imagevalidate_frame_50.out' with reltol=0.085
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_test_RISC-V-qemu-1.0-m64.0013 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:11:06 (1600344666.89063)
+Stop command: 2020-09-17 12:11:17 (1600344677.44784)
+Elapsed time for command: 00:00:10 (10.5572140216827)
+Benchmark Times:
+  Run Start:    2020-09-17 12:06:04 (1600344364)
+  Run Stop:     2020-09-17 12:11:06 (1600344666)
+  Run Elapsed:  00:05:02 (302)
+  Run Reported: 00:05:01 (301 454111000 301.454111)
+ Success 625.x264_s base test ratio=-0.00, runtime=301.454111, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 631.deepsjeng_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:11:17]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o test.out -e test.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/deepsjeng_s_base.RISC-V-qemu-1.0-m64 test.txt > test.out 2>> test.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:11:17 (1600344677.77917)
+Stop command: 2020-09-17 12:12:06 (1600344726.84278)
+Elapsed time for command: 00:00:49 (49.0636031627655)
+Workload elapsed time (copy 0 workload 1) = 48.892781 seconds
+Copy 0 of 631.deepsjeng_s (base test) run 1 finished at 2020-09-17 12:12:06.  Total elapsed time: 48.892781
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'test.out' with obiwan=1
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:12:06 (1600344726.98227)
+Stop command: 2020-09-17 12:12:07 (1600344727.48638)
+Elapsed time for command: 00:00:00 (0.504106044769287)
+Benchmark Times:
+  Run Start:    2020-09-17 12:11:17 (1600344677)
+  Run Stop:     2020-09-17 12:12:06 (1600344726)
+  Run Elapsed:  00:00:49 (49)
+  Run Reported: 00:00:48 (48 892948000 48.892948)
+ Success 631.deepsjeng_s base test ratio=-0.00, runtime=48.892948, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 641.leela_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:12:07]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o test.out -e test.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/leela_s_base.RISC-V-qemu-1.0-m64 test.sgf > test.out 2>> test.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:12:07 (1600344727.89437)
+Stop command: 2020-09-17 12:12:40 (1600344760.25351)
+Elapsed time for command: 00:00:32 (32.3591380119324)
+Workload elapsed time (copy 0 workload 1) = 32.187892 seconds
+Copy 0 of 641.leela_s (base test) run 1 finished at 2020-09-17 12:12:40.  Total elapsed time: 32.187892
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'test.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:12:40 (1600344760.38828)
+Stop command: 2020-09-17 12:12:40 (1600344760.88403)
+Elapsed time for command: 00:00:00 (0.495753049850464)
+Benchmark Times:
+  Run Start:    2020-09-17 12:12:07 (1600344727)
+  Run Stop:     2020-09-17 12:12:40 (1600344760)
+  Run Elapsed:  00:00:33 (33)
+  Run Reported: 00:00:32 (32 188057000 32.188057)
+ Success 641.leela_s base test ratio=-0.00, runtime=32.188057, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 648.exchange2_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:12:41]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o exchange2.txt -e exchange2.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/exchange2_s_base.RISC-V-qemu-1.0-m64 0 > exchange2.txt 2>> exchange2.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:12:41 (1600344761.15412)
+Stop command: 2020-09-17 12:13:41 (1600344821.2293)
+Elapsed time for command: 00:01:00 (60.0751740932465)
+Workload elapsed time (copy 0 workload 1) = 59.903643 seconds
+Copy 0 of 648.exchange2_s (base test) run 1 finished at 2020-09-17 12:13:41.  Total elapsed time: 59.903643
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 's.txt' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:13:41 (1600344821.36454)
+Stop command: 2020-09-17 12:13:41 (1600344821.86651)
+Elapsed time for command: 00:00:00 (0.501968145370483)
+Benchmark Times:
+  Run Start:    2020-09-17 12:12:41 (1600344761)
+  Run Stop:     2020-09-17 12:13:41 (1600344821)
+  Run Elapsed:  00:01:00 (60)
+  Run Reported: 00:00:59 (59 903755000 59.903755)
+ Success 648.exchange2_s base test ratio=-0.00, runtime=59.903755, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 657.xz_s test base RISC-V-qemu-1.0-m64 [2020-09-17 12:13:42]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o cpu2006docs.tar-4-0.out -e cpu2006docs.tar-4-0.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1548636 1555348 0 > cpu2006docs.tar-4-0.out 2>> cpu2006docs.tar-4-0.err (timed)
+    -o cpu2006docs.tar-4-1.out -e cpu2006docs.tar-4-1.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1462248 -1 1 > cpu2006docs.tar-4-1.out 2>> cpu2006docs.tar-4-1.err (timed)
+    -o cpu2006docs.tar-4-2.out -e cpu2006docs.tar-4-2.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1428548 -1 2 > cpu2006docs.tar-4-2.out 2>> cpu2006docs.tar-4-2.err (timed)
+    -o cpu2006docs.tar-4-3e.out -e cpu2006docs.tar-4-3e.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1034828 -1 3e > cpu2006docs.tar-4-3e.out 2>> cpu2006docs.tar-4-3e.err (timed)
+    -o cpu2006docs.tar-4-4.out -e cpu2006docs.tar-4-4.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1061968 -1 4 > cpu2006docs.tar-4-4.out 2>> cpu2006docs.tar-4-4.err (timed)
+    -o cpu2006docs.tar-4-4e.out -e cpu2006docs.tar-4-4e.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 4 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1034588 -1 4e > cpu2006docs.tar-4-4e.out 2>> cpu2006docs.tar-4-4e.err (timed)
+    -o cpu2006docs.tar-1-0.out -e cpu2006docs.tar-1-0.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 650156 -1 0 > cpu2006docs.tar-1-0.out 2>> cpu2006docs.tar-1-0.err (timed)
+    -o cpu2006docs.tar-1-1.out -e cpu2006docs.tar-1-1.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 639996 -1 1 > cpu2006docs.tar-1-1.out 2>> cpu2006docs.tar-1-1.err (timed)
+    -o cpu2006docs.tar-1-2.out -e cpu2006docs.tar-1-2.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 637616 -1 2 > cpu2006docs.tar-1-2.out 2>> cpu2006docs.tar-1-2.err (timed)
+    -o cpu2006docs.tar-1-3e.out -e cpu2006docs.tar-1-3e.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 628996 -1 3e > cpu2006docs.tar-1-3e.out 2>> cpu2006docs.tar-1-3e.err (timed)
+    -o cpu2006docs.tar-1-4.out -e cpu2006docs.tar-1-4.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 631912 -1 4 > cpu2006docs.tar-1-4.out 2>> cpu2006docs.tar-1-4.err (timed)
+    -o cpu2006docs.tar-1-4e.out -e cpu2006docs.tar-1-4e.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/xz_s_base.RISC-V-qemu-1.0-m64 cpu2006docs.tar.xz 1 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 629064 -1 4e > cpu2006docs.tar-1-4e.out 2>> cpu2006docs.tar-1-4e.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:13:42 (1600344822.79035)
+Stop command: 2020-09-17 12:14:26 (1600344866.24603)
+Elapsed time for command: 00:00:43 (43.4556739330292)
+Workload elapsed time (copy 0 workload 1) = 2.851342 seconds
+Workload elapsed time (copy 0 workload 2) = 2.864547 seconds
+Workload elapsed time (copy 0 workload 3) = 3.026765 seconds
+Workload elapsed time (copy 0 workload 4) = 8.517198 seconds
+Workload elapsed time (copy 0 workload 5) = 4.641212 seconds
+Workload elapsed time (copy 0 workload 6) = 9.388741 seconds
+Workload elapsed time (copy 0 workload 7) = 1.656788 seconds
+Workload elapsed time (copy 0 workload 8) = 1.665053 seconds
+Workload elapsed time (copy 0 workload 9) = 1.675161 seconds
+Workload elapsed time (copy 0 workload 10) = 2.463389 seconds
+Workload elapsed time (copy 0 workload 11) = 1.950166 seconds
+Workload elapsed time (copy 0 workload 12) = 2.582732 seconds
+Copy 0 of 657.xz_s (base test) run 1 finished at 2020-09-17 12:14:26.  Total elapsed time: 43.283094
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'cpu2006docs.tar-1-0.out' with 
+comparing 'cpu2006docs.tar-1-1.out' with 
+comparing 'cpu2006docs.tar-1-2.out' with 
+comparing 'cpu2006docs.tar-1-3e.out' with 
+comparing 'cpu2006docs.tar-1-4.out' with 
+comparing 'cpu2006docs.tar-1-4e.out' with 
+comparing 'cpu2006docs.tar-4-0.out' with 
+comparing 'cpu2006docs.tar-4-1.out' with 
+comparing 'cpu2006docs.tar-4-2.out' with 
+comparing 'cpu2006docs.tar-4-3e.out' with 
+comparing 'cpu2006docs.tar-4-4.out' with 
+comparing 'cpu2006docs.tar-4-4e.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:14:27 (1600344867.00735)
+Stop command: 2020-09-17 12:14:31 (1600344871.12737)
+Elapsed time for command: 00:00:04 (4.1200110912323)
+Benchmark Times:
+  Run Start:    2020-09-17 12:13:42 (1600344822)
+  Run Stop:     2020-09-17 12:14:26 (1600344866)
+  Run Elapsed:  00:00:44 (44)
+  Run Reported: 00:00:43 (43 283670000 43.28367)
+ Success 657.xz_s base test ratio=-0.00, runtime=43.283670, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 998.specrand_is test base RISC-V-qemu-1.0-m64 [2020-09-17 12:14:31]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_test_RISC-V-qemu-1.0-m64.0007
+    -o rand.24239.out -e rand.24239.err /u/home/schmidtf/dbt-candidate/execute-qemu.py ../run_base_test_RISC-V-qemu-1.0-m64.0007/specrand_is_base.RISC-V-qemu-1.0-m64 324342 24239 > rand.24239.out 2>> rand.24239.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-09-17 12:14:31 (1600344871.37423)
+Stop command: 2020-09-17 12:14:31 (1600344871.71157)
+Elapsed time for command: 00:00:00 (0.337345838546753)
+Workload elapsed time (copy 0 workload 1) = 0.165782 seconds
+Copy 0 of 998.specrand_is (base test) run 1 finished at 2020-09-17 12:14:31.  Total elapsed time: 0.165782
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'rand.24239.out' with floatcompare=1, nansupport=0
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_test_RISC-V-qemu-1.0-m64.0007 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-09-17 12:14:31 (1600344871.84779)
+Stop command: 2020-09-17 12:14:32 (1600344872.48026)
+Elapsed time for command: 00:00:00 (0.632472991943359)
+Benchmark Times:
+  Run Start:    2020-09-17 12:14:31 (1600344871)
+  Run Stop:     2020-09-17 12:14:31 (1600344871)
+  Run Elapsed:  00:00:00 (0)
+  Run Reported: 00:00:00 (0 165930000 0.16593)
+ Success 998.specrand_is base test ratio=-0.00, runtime=0.165930, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+Success: 1x602.gcc_s 1x605.mcf_s 1x620.omnetpp_s 1x623.xalancbmk_s 1x625.x264_s 1x631.deepsjeng_s 1x641.leela_s 1x648.exchange2_s 1x657.xz_s 1x998.specrand_is
+Error: 1x600.perlbench_s
+Producing Raw Reports
+ label: RISC-V-qemu-1.0-m64
+  workload: test
+   benchset: intspeed
+   metric: SPECspeed2017_int_base
+    format: raw -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.rsf
+Parsing flags for 600.perlbench_s base: done
+Parsing flags for 602.gcc_s base: done
+Parsing flags for 605.mcf_s base: done
+Parsing flags for 620.omnetpp_s base: done
+Parsing flags for 623.xalancbmk_s base: done
+Parsing flags for 625.x264_s base: done
+Parsing flags for 631.deepsjeng_s base: done
+Parsing flags for 641.leela_s base: done
+Parsing flags for 648.exchange2_s base: done
+Parsing flags for 657.xz_s base: done
+Doing flag reduction: done
+    format: flags -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.flags.html
+    format: cfg -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.cfg
+    format: CSV -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.csv
+    format: PDF -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.pdf
+    format: HTML -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.html
+    format: Text -> /u/home/schmidtf/spec/result/CPU2017.071.intspeed.test.txt
+   benchset: intrate
+   benchset: fpspeed
+   benchset: fprate
+runcpu finished at 2020-09-17 12:14:45; 669 total seconds elapsed
+The log for this run is in /u/home/schmidtf/spec/result/CPU2017.071.log
+
+runcpu finished at 2020-09-17 12:14:45; 671 total seconds elapsed
