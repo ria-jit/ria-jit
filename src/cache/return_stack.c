@@ -11,8 +11,8 @@
 #include <util/util.h>
 
 rs_entry *r_stack;
-volatile int rs_front;
-volatile int rs_back;
+volatile uint64_t rs_front;
+volatile uint64_t rs_back;
 
 void init_return_stack(void){
     r_stack = mmap(NULL, 64 * sizeof(rs_entry),
@@ -61,6 +61,8 @@ uintptr_t rs_pop_check(t_risc_addr r_add) {
 }
 
 void rs_emit_push(const t_risc_instr *instr){
+    return;
+
     ///push to return stack
     t_risc_addr ret_target = instr->addr + 4;
 
@@ -80,7 +82,7 @@ void rs_emit_push(const t_risc_instr *instr){
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, 0x3f);                                      //mod 64
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save rs_front
     err |= fe_enc64(&current, FE_SHL64ri, FE_AX, 1);                                         //multiply by 2,struct array...
-    err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((uint64_t) &r_stack));     //get base
+    err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((intptr_t) &r_stack));     //get base
     err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + 4);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 0), FE_CX);         //save risc adddr
     err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (uintptr_t) cache_loc);
@@ -100,6 +102,7 @@ void rs_emit_push(const t_risc_instr *instr){
 }
 
 void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
+    return;
     //RAX: target
 
     ///stack empty
@@ -146,6 +149,7 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
 }
 
 void rs_jump_stack(){
+    return;
     err |= fe_enc64(&current, FE_POPr, FE_CX);      //load jump target
     err |= fe_enc64(&current, FE_CMP64ri, FE_CX, 0);
     uint8_t *noJump = current;

@@ -25,7 +25,7 @@ void rs_emit_pop_RAX(bool jump_or_push);
 void rs_jump_stack();
 
 extern rs_entry *r_stack;
-extern volatile int rs_front;
-extern volatile int rs_back;
+extern volatile uint64_t rs_front;
+extern volatile uint64_t rs_back;
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RETURN_STACK_H
