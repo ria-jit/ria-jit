@@ -26,14 +26,14 @@ def main():
 	sys.argv[1] = ("./" if not sys.argv[1].startswith("/") else "") + sys.argv[1]
 
 	if risc and not x86:
-		os.system(emulator + " " + " ".join(sys.argv[1:]))
+		retval = os.system(emulator + " " + " ".join(sys.argv[1:]))
 	elif x86 and not risc:
-		os.system(" ".join(sys.argv[1:]))
+		retval = os.system(" ".join(sys.argv[1:]))
 	else:
 		sys.stderr.write("Bad. Unable to detect executable architecture.\n")
 		sys.exit(3)
 
-	sys.exit(0)
+	sys.exit(os.WEXITSTATUS(retval))
 
 if __name__ == '__main__':
 	main()
