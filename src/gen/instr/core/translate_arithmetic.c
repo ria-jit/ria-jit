@@ -278,7 +278,7 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SLL instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -360,7 +360,7 @@ void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SRL instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -384,7 +384,7 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SRA instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -443,7 +443,7 @@ void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SLLIW instruction. It is defined analogous to SLLI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -454,7 +454,7 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -462,7 +462,7 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SRLIW instruction. It is defined analogous to SRLI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -473,7 +473,7 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -481,7 +481,7 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SRAIW instruction. It is defined analogous to SRAI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
@@ -492,7 +492,7 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
