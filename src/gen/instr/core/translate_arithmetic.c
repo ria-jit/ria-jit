@@ -266,8 +266,12 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     if (regDest == regSrc2) {
-        err |= fe_enc64(&current, FE_NEG64r, regSrc2);
-        err |= fe_enc64(&current, FE_ADD64rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        if (regDest == regSrc1) {
+            err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest); // SUB same, same, same is equivalent to zeroing
+        } else {
+            err |= fe_enc64(&current, FE_NEG64r, regSrc2);
+            err |= fe_enc64(&current, FE_ADD64rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        }
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_SUB64rr);
     }
@@ -535,8 +539,12 @@ void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     if (regDest == regSrc2) {
-        err |= fe_enc64(&current, FE_NEG32r, regSrc2);
-        err |= fe_enc64(&current, FE_ADD32rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        if (regDest == regSrc1) {
+            err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest); // SUB same, same, same is equivalent to zeroing
+        } else {
+            err |= fe_enc64(&current, FE_NEG32r, regSrc2);
+            err |= fe_enc64(&current, FE_ADD32rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        }
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_SUB32rr);
     }
