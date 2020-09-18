@@ -13,6 +13,7 @@
 #include <parser/parser.h>
 #include <main/context.h>
 #include <gen/optimize.h>
+#include <gen/macro_optim.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -171,6 +172,9 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
 
     ///initialize new block
     init_block();
+
+    ///apply macro optimization
+    run_optimizer(block_cache,instructions_in_block);
 
 
     /// translate structs
