@@ -61,7 +61,6 @@ uintptr_t rs_pop_check(t_risc_addr r_add) {
 }
 
 void rs_emit_push(const t_risc_instr *instr){
-    return;
 
     ///push to return stack
     t_risc_addr ret_target = instr->addr + 4;
@@ -82,11 +81,11 @@ void rs_emit_push(const t_risc_instr *instr){
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, 0x3f);                                      //mod 64
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save rs_front
     err |= fe_enc64(&current, FE_SHL64ri, FE_AX, 1);                                         //multiply by 2,struct array...
-    err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((intptr_t) &r_stack));     //get base
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR((intptr_t) &r_stack));     //get base
     err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + 4);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 0), FE_CX);         //save risc adddr
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_DX, 8, FE_AX, 0), FE_CX);         //save risc adddr
     err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (uintptr_t) cache_loc);
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_BX, 8, FE_AX, 8), FE_CX);         //save x86 addr
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_DX, 8, FE_AX, 8), FE_CX);         //save x86 addr
     err |= fe_enc64(&current, FE_SHR64ri, FE_AX, 1);                                         //revert multiplying by 2
     err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_back));     //front reached back?
     uint8_t *rs_full_jmp = current;
@@ -102,12 +101,11 @@ void rs_emit_push(const t_risc_instr *instr){
 }
 
 void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
-    return;
     //RAX: target
 
     ///stack empty
-    err |= fe_enc64(&current, FE_MOV64rm, FE_BX, FE_MEM_ADDR((intptr_t) &rs_front));    //get front
-    err |= fe_enc64(&current, FE_CMP64rm, FE_BX, FE_MEM_ADDR((intptr_t) &rs_back));     //front == back?
+    err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR((intptr_t) &rs_front));    //get front
+    err |= fe_enc64(&current, FE_CMP64rm, FE_DX, FE_MEM_ADDR((intptr_t) &rs_back));     //front == back?
     uint8_t *nullJMPempty = current;
     err |= fe_enc64(&current, FE_JZ, current);  //dummy
 
@@ -116,17 +114,17 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
 
     ///hit
     err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack));    //get base
-    err |= fe_enc64(&current, FE_SHL64ri, FE_BX, 1);
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 0));        //get risc addr from stack
+    err |= fe_enc64(&current, FE_SHL64ri, FE_DX, 1);
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_DX, 0));        //get risc addr from stack
     err |= fe_enc64(&current, FE_CMP64rr, FE_AX, FE_CX);                                    //stack addr == target?
     uint8_t *nullJMPmiss = current;
     err |= fe_enc64(&current, FE_JNZ, current);                                             //dummy
     err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack));    //get base  //DUPLICATE
-    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_BX, 8));        // load x86 target
-    err |= fe_enc64(&current, FE_SHR64ri, FE_BX, 1);
-    err |= fe_enc64(&current, FE_ADD64ri, FE_BX, 63);                                       //-1 mod 64
-    err |= fe_enc64(&current, FE_AND64ri, FE_BX, 0x3f);                                     //-1 mod 64
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) &rs_front), FE_BX);   //save rs_front
+    err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM(FE_CX, 8, FE_DX, 8));        // load x86 target
+    err |= fe_enc64(&current, FE_SHR64ri, FE_DX, 1);
+    err |= fe_enc64(&current, FE_ADD64ri, FE_DX, 63);                                       //-1 mod 64
+    err |= fe_enc64(&current, FE_AND64ri, FE_DX, 0x3f);                                     //-1 mod 64
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) &rs_front), FE_DX);   //save rs_front
     uint8_t *noJumpHit = 0;
     if (jump_or_push) {
         err |= fe_enc64(&current, FE_JMPr, FE_CX);  //jmp to next block
@@ -149,7 +147,6 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
 }
 
 void rs_jump_stack(){
-    return;
     err |= fe_enc64(&current, FE_POPr, FE_CX);      //load jump target
     err |= fe_enc64(&current, FE_CMP64ri, FE_CX, 0);
     uint8_t *noJump = current;
