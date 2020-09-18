@@ -70,6 +70,8 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/core/translate_other.c src/gen/instr/core/translate_other.h
         src/gen/instr/ext/translate_f_ext.c src/gen/instr/ext/translate_f_ext.h
         src/gen/instr/ext/translate_d_ext.c src/gen/instr/ext/translate_d_ext.h
+        src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h
+        src/gen/optimize.c src/gen/optimize.h
         src/gen/dispatch.c src/gen/dispatch.h
         lib/common.h lib/minilibc.c
         src/util/log.c src/util/log.h
@@ -83,8 +85,7 @@ set(TRANSLATOR_SOURCES
         lib/ryu/d2fixed_full_table.h
         lib/ryu/d2s_intrinsics.h
         lib/ryu/digit_table.h
-        lib/ryu/ryu.h
-        src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h src/gen/optimize.c src/gen/optimize.h)
+        lib/ryu/ryu.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
@@ -92,7 +93,8 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/test_parser.cpp
         test/unit_tests/test_cache.cpp
         test/unit_tests/test_faenc_experiments.cpp
-        test/unit_tests/test_amo_ext.cpp)
+        test/unit_tests/test_amo_ext.cpp
+        test/unit_tests/test_arithm.cpp)
 
 #include the googletest testing framework
 add_subdirectory(lib/googletest-master)
