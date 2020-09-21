@@ -421,7 +421,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     }
                     break;
                 case 6:
-                    p_instr_struct->mnem = XORI;
+                    p_instr_struct->mnem = ORI;
                     p_instr_struct->imm = extract_imm_I(raw_instr);
                     break;
                 case 7:
