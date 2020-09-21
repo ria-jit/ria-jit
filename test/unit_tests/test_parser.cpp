@@ -60,7 +60,7 @@ TEST(Parser, CheckAllOpcodes) {
     const int len = 92;
     int32_t instr[len];
 
-    //fill memory with assembled instructions
+    //fill memory with assembled instructions, these are taken from the assembled all_instr.S -> all_isntr
     instr[0] = 0x0002a5b7;
     instr[1] = 0x0002a597;
     instr[2] = 0xff9ff5ef;
