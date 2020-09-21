@@ -98,7 +98,7 @@ typedef enum {
     E_f3_IMM,
     E_f7_AMO,
     E_f3_AMO
-};
+} t_error_enum;
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
