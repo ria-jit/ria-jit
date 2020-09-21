@@ -453,6 +453,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                                           registerValues[a3], registerValues[a4]);
         }
             break;
+        case 221: //execve
+        {
+            log_general("Emulate syscall execve (221)...\n");
+            registerValues[a0] = syscall3(__NR_execve, registerValues[a0], registerValues[a1], registerValues[a2]);
+        }
+            break;
         case 222: //mmap
         {
             log_general("Emulate syscall mmap (222)...\n");
@@ -486,6 +492,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                         syscall6(__NR_mmap, mmapAddr, registerValues[a1], registerValues[a2],
                                  flags, registerValues[a4], registerValues[a5]);
             }
+        }
+            break;
+        case 260: //wait4
+        {
+            log_general("Emulate syscall wait4 (260)...\n");
+            registerValues[a0] = syscall4(__NR_wait4, registerValues[a0], registerValues[a1], registerValues[a2],
+                                          registerValues[a3]);
         }
             break;
         case 261: //prlimit64
