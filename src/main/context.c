@@ -99,7 +99,7 @@ context_info *init_map_context(void) {
     {
         //context storing
         init_block();
-        log_general("Generating context storing block…\n");
+        log_general("Generating context storing block...\n");
 
         //save by register mapping
         for (int i = x0; i <= pc; ++i) {
@@ -119,7 +119,7 @@ context_info *init_map_context(void) {
     {
         //context loading
         init_block();
-        log_general("Generating context executing block…\n");
+        log_general("Generating context executing block...\n");
 
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0), FE_R12);
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1), FE_R13);

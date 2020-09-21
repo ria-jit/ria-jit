@@ -90,7 +90,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr->imm);
 
     ///set last bit to zero
-    //why??? not aligned to 4 bit boundary would throw exception anyway…
+    //why??? not aligned to 4 bit boundary would throw exception anyway...
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, -2);
 
 

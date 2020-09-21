@@ -90,7 +90,7 @@ void analyze(const char *file_path) {
         }
     }
 
-    log_analyze("Mnemonics…\n");
+    log_analyze("Mnemonics...\n");
     log_analyze("==========\n");
     for (int i = 0; i < N_MNEM; i++) {
         if (mnem[mnemRanked[i]] == 0) break;
@@ -98,7 +98,7 @@ void analyze(const char *file_path) {
     }
     log_analyze("\n");
 
-    log_analyze("Registers…\n");
+    log_analyze("Registers...\n");
     log_analyze("==========\n");
     for (int i = 0; i < N_REG; i++) {
         if (reg[regRanked[i]] == 0) break;

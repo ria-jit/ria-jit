@@ -23,7 +23,7 @@
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LRW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LRW…\n");
+    log_asm_out("Translate LRW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
@@ -40,7 +40,7 @@ void translate_LRW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SCW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SCW…\n");
+    log_asm_out("Translate SCW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -61,7 +61,7 @@ void translate_SCW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOSWAPW…\n");
+    log_asm_out("Translate AMOSWAPW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -89,7 +89,7 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOADDW…\n");
+    log_asm_out("Translate AMOADDW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -113,7 +113,7 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOXORW…\n");
+    log_asm_out("Translate AMOXORW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -137,7 +137,7 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOANDW…\n");
+    log_asm_out("Translate AMOANDW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -161,7 +161,7 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOORW…\n");
+    log_asm_out("Translate AMOORW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -185,7 +185,7 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMINW…\n");
+    log_asm_out("Translate AMOMINW...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -215,7 +215,7 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMAXW…\n");
+    log_asm_out("Translate AMOMAXW...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -245,7 +245,7 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMINUW…\n");
+    log_asm_out("Translate AMOMINUW...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -275,7 +275,7 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMAXUW…\n");
+    log_asm_out("Translate AMOMAXUW...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -305,7 +305,7 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LRD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LRD…\n");
+    log_asm_out("Translate LRD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, SECOND_REG);
@@ -324,7 +324,7 @@ void translate_LRD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SCD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SCD…\n");
+    log_asm_out("Translate SCD...\n");
     // rs2 -> [rs1] 0 in rd if succeed
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -346,7 +346,7 @@ void translate_SCD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOSWAPD…\n");
+    log_asm_out("Translate AMOSWAPD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -370,7 +370,7 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOADDD…\n");
+    log_asm_out("Translate AMOADDD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -394,7 +394,7 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOXORD…\n");
+    log_asm_out("Translate AMOXORD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -418,7 +418,7 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOANDD…\n");
+    log_asm_out("Translate AMOANDD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -442,7 +442,7 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOORD…\n");
+    log_asm_out("Translate AMOORD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -466,7 +466,7 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMIND…\n");
+    log_asm_out("Translate AMOMIND...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -496,7 +496,7 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMAXD…\n");
+    log_asm_out("Translate AMOMAXD...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -526,7 +526,7 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMINUD…\n");
+    log_asm_out("Translate AMOMINUD...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -556,7 +556,7 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AMOMAXUD…\n");
+    log_asm_out("Translate AMOMAXUD...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);

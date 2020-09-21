@@ -22,7 +22,7 @@
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate MUL…\n");
+    log_asm_out("Translate MUL...\n");
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -43,7 +43,7 @@ void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate MULH…\n");
+    log_asm_out("Translate MULH...\n");
 
     ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
     /// because of the IMUL)
@@ -78,7 +78,7 @@ void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate MULHSU…\n");
+    log_asm_out("Translate MULHSU...\n");
 
     /*
      * For signed × unsigned multiplication, we cannot directly use MUL or IMUL (unsigned² and signed², respectively).
@@ -156,7 +156,7 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate MULHU…\n");
+    log_asm_out("Translate MULHU...\n");
 
     ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
     /// because of the MULs input/output)
@@ -190,7 +190,7 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate DIV…\n");
+    log_asm_out("Translate DIV...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
@@ -247,7 +247,7 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate DIVU…\n");
+    log_asm_out("Translate DIVU...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
@@ -306,7 +306,7 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate REM…\n");
+    log_asm_out("Translate REM...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
@@ -365,7 +365,7 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate REMU…\n");
+    log_asm_out("Translate REMU...\n");
 
     ///Uses RCX specifically since DIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
@@ -422,7 +422,7 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate MULW…\n");
+    log_asm_out("Translate MULW...\n");
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
@@ -449,7 +449,7 @@ void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate DIVW…\n");
+    log_asm_out("Translate DIVW...\n");
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
@@ -509,7 +509,7 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate DIVUW…\n");
+    log_asm_out("Translate DIVUW...\n");
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
@@ -570,7 +570,7 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate REMW…\n");
+    log_asm_out("Translate REMW...\n");
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
@@ -632,7 +632,7 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate REMUW…\n");
+    log_asm_out("Translate REMUW...\n");
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)

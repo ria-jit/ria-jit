@@ -43,12 +43,12 @@ TEST(CodeCache, ResizesTableCorrectly) {
         set_cache_entry((t_risc_addr) (i << 3u), (t_cache_loc) i);
     }
 
-    printf("Filled…\n");
+    printf("Filled...\n");
 
     //expect respective results
     for (size_t i = 1; i <= 5000; i++) {
         ASSERT_EQ((t_cache_loc) i, lookup_cache_entry((t_risc_addr) (i << 3u)));
     }
 
-    printf("Checked…\n");
+    printf("Checked...\n");
 }
