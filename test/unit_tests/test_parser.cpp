@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <parser/parser.h>
 #include <util/log.h>
+#include <elf/loadElf.h>
 
 /**
  * Tests parsing of basic load-immediate as per test_parsing() in parser.c (--> @author Noah)
@@ -50,4 +51,22 @@ TEST(Parser, BasicOpcodeParsing) {
     EXPECT_EQ(a0, parsed[3].reg_src_1);
     EXPECT_EQ(a0, parsed[3].reg_dest);
     EXPECT_EQ(-273, parsed[3].imm);
+}
+
+/**
+ * Tests parsing of basic load-immediate as per test_parsing() in parser.c (--> @author Noah)
+ */
+TEST(Parser, CheckAllOpcodes) {
+
+    t_risc_addr startAddr = (t_risc_addr) malloc(0x10); //insert array here
+    int length = 10;
+    //loop over full segment
+    t_risc_mnem current_mnem = LUI;
+    t_risc_instr* p_risc_instr;
+    for (t_risc_addr addr = startAddr; addr < startAddr+length; addr += 4) {
+        p_risc_instr->addr =addr;
+        parse_instruction(p_risc_instr);
+        EXPECT_EQ(current_mnem,p_risc_instr->mnem);
+        current_mnem = static_cast<t_risc_mnem>((t_risc_mnem)  current_mnem + 1);
+    }
 }
