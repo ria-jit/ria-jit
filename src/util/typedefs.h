@@ -151,6 +151,23 @@ typedef enum {
     f30, f31
 } t_risc_fp_reg;
 
+typedef enum {
+    RNE = 0, //Round to Nearest, ties to Even
+    RTZ = 1, //Round towards Zero
+    RDN = 2, //Round Down (towards negative infinity)
+    RUP = 3, //Round Up (towards positive infinity)
+    RMM = 4, //Round to Nearest, ties to Max Magnitude
+    DYN = 7  //In instruction's rm field, selects dynamic rounding mode; In Rounding Mode register, Invalid.
+} t_risc_rm;
+
+typedef enum {
+    NV = 4, //Invalid Operation
+    DZ = 3, //Divide by Zero
+    OF = 2, //Overflow
+    UF = 1, //Underflow
+    NX = 0 //Inexact
+} t_risc_f_exp;
+
 /**
  * Register value type.
  * XLEN = 64 for the integer registers.
