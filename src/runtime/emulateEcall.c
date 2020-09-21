@@ -434,6 +434,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                 registerValues[a0] = syscall2(__NR_munmap, registerValues[a0], registerValues[a1]);
             }
         }
+            break;
         case 222: //mmap
         {
             log_general("Emulate syscall mmap (222)...\n");
