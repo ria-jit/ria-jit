@@ -149,6 +149,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             log_general("Emulate syscall chdir (49)...\n");
             registerValues[a0] = syscall1(__NR_chdir, registerValues[a0]);
         }
+            break;
         case 52: //fchmod
         {
             log_general("Emulate syscall fchmod (52)...\n");
@@ -184,8 +185,8 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall getdents64 (61)...\n");
             registerValues[a0] = syscall3(__NR_getdents64, registerValues[a0], registerValues[a1], registerValues[a2]);
-
         }
+            break;
         case 62: //lseek
         {
             log_general("Emulate syscall lseek (62)...\n");
@@ -208,7 +209,6 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall writev (66)...\n");
             registerValues[a0] = syscall3(__NR_writev, registerValues[a0], registerValues[a1], registerValues[a2]);
-
         }
             break;
         case 78: //readlinkat
