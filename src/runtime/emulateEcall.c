@@ -150,6 +150,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[a0] = syscall3(__NR_fchown, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
+        case 59: //pipe2
+        {
+            log_general("Emulate syscall pipe2 (59)...\n");
+            registerValues[a0] = syscall2(__NR_pipe2, registerValues[a0], registerValues[a1]);
+        }
+            break;
         case 56: //openat
         {
             log_general("Emulate syscall openat (56)...\n");
