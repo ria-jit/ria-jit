@@ -372,7 +372,7 @@ int pipe2(int pipefd[2], int flags) {
 //@formatter:on
 size_t strlen(const char *s) {
     size_t len = 0;
-    for(; *s != '\0'; ++len, ++s);
+    for (; *s != '\0'; ++len, ++s);
     return len;
 }
 //@formatter:off
@@ -416,7 +416,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
     char buffer[32] = {0};
     int buflen;
 
-    while(*format != '\0') {
+    while (*format != '\0') {
         char *next_format = strchr(format, '%');
         if (next_format == NULL) {
             size_t len = strlen(format);
@@ -468,7 +468,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
 
             int highest_bit = 8 * sizeof(uintptr_t) - __builtin_clzl(value);
             int nibbles = (highest_bit + 3) >> 2;
-            for(int i = nibbles - 1; i >= 0; i--) {
+            for (int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
@@ -489,7 +489,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             if (value == 0) {
                 buffer[buf_idx] = '0';
             } else {
-                while(value > 0) {
+                while (value > 0) {
                     int32_t digit = value % 10;
                     buffer[buf_idx--] = '0' + digit;
                     value /= 10;
@@ -504,7 +504,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             if (value == 0) {
                 buffer[buf_idx] = '0';
             } else {
-                while(value > 0) {
+                while (value > 0) {
                     uint32_t digit = value % 10;
                     buffer[buf_idx--] = '0' + digit;
                     value /= 10;
@@ -521,7 +521,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
                 nibbles = (highest_bit + 3) >> 2;
             }
             buflen = 0;
-            for(int i = nibbles - 1; i >= 0; i--) {
+            for (int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
@@ -538,7 +538,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
                 nibbles = (highest_bit + 3) >> 2;
             }
             buflen = 0;
-            for(int i = nibbles - 1; i >= 0; i--) {
+            for (int i = nibbles - 1; i >= 0; i--) {
                 uint8_t nibble = (value >> (4 * i)) & 0xf;
                 buffer[buflen++] = "0123456789abcdef"[nibble];
             }
@@ -561,7 +561,7 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             if (value == 0) {
                 buffer[buf_idx] = '0';
             } else {
-                while(value > 0) {
+                while (value > 0) {
                     size_t digit = value % 10;
                     buffer[buf_idx--] = '0' + digit;
                     value /= 10;
@@ -789,4 +789,8 @@ __start_main(const size_t* initial_stack, const size_t* dynv)
 int __dprintf_chk (int d, int flags, const char *format, ...){
     //TODO Should not ignore flags
     return dprintf(d, format);
+}
+
+int chdir(const char *path) {
+    return syscall1(__NR_chdir, (size_t) path);
 }

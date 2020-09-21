@@ -103,6 +103,8 @@ int dup2(int oldfd, int newfd);
 
 int pipe2(int pipefd[2], int flags);
 
+int chdir(const char *path);
+
 int __clone(int (*func)(void *), void *stack, int flags, void *arg, ...);
 
 #define STRINGIFY_ARG(x) #x

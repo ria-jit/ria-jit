@@ -22,6 +22,8 @@ bool finalize = false;
 //context_info *c_info = 0;
 
 //prototypes
+int setupWd(const char *file_path);
+
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 
 bool execute_cached(t_cache_loc loc, context_info *c_info);
@@ -57,6 +59,13 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     }
 
     setupBrk(result.dataEnd);
+
+    //setup working directory
+    int chdir_retval = setupWd(file_path);
+    if (chdir_retval != 0) {
+        dprintf(2, "Unable to set working directory.\n");
+        return 1;
+    }
 
     t_risc_addr next_pc = result.entry;
 
@@ -140,4 +149,34 @@ bool execute_cached(t_cache_loc loc, context_info *c_info) {
     }
 
     return true;
+}
+
+/**
+ * Change the working directory to the directory of the guest executable, in case the translator
+ * was not called in the executable's directory.
+ * Needed in case the guest loads relative paths.
+ * @param file_path the executable's file path, as loaded from the command line options.
+ */
+int setupWd(const char *file_path) {
+    //find last slash, if there is none, no need to change directory
+    int slash = -1;
+    for (size_t i = strlen(file_path) - 1; i >= 0; i--) {
+        if (file_path[i] == '/') {
+            slash = i;
+            break;
+        }
+    }
+
+    if (slash == -1) {
+        log_general("Working directory already set to executable's parent.\n");
+        return 0;
+    }
+
+    char directory[slash];
+    for (int i = 0; i < slash; i++) {
+        directory[i] = file_path[i];
+    }
+
+    log_general("Setting working directory to %s...\n", directory);
+    return chdir(directory);
 }
