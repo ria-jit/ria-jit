@@ -92,6 +92,17 @@ static size_t syscall4(int syscall_number, size_t a1, size_t a2, size_t a3,
     return retval;
 }
 
+static size_t syscall5(int syscall_number, size_t a1, size_t a2, size_t a3,
+                       size_t a4, size_t a5) {
+    size_t retval = syscall_number;
+    register size_t r10 __asm__("r10") = a4;
+    register size_t r8 __asm__("r8") = a5;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2), "d"(a3), "r"(r10), "r"(r8) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
 static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
                        size_t a4, size_t a5, size_t a6) {
     size_t retval = syscall_number;
@@ -433,6 +444,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             } else {
                 registerValues[a0] = syscall2(__NR_munmap, registerValues[a0], registerValues[a1]);
             }
+        }
+            break;
+        case 220: //clone
+        {
+            log_general("Emulate syscall clone (220)...\n");
+            registerValues[a0] = syscall5(__NR_clone, registerValues[a0], registerValues[a1], registerValues[a2],
+                                          registerValues[a3], registerValues[a4]);
         }
             break;
         case 222: //mmap
