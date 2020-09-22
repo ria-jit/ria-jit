@@ -92,6 +92,17 @@ static size_t syscall4(int syscall_number, size_t a1, size_t a2, size_t a3,
     return retval;
 }
 
+static size_t syscall5(int syscall_number, size_t a1, size_t a2, size_t a3,
+                       size_t a4, size_t a5) {
+    size_t retval = syscall_number;
+    register size_t r10 __asm__("r10") = a4;
+    register size_t r8 __asm__("r8") = a5;
+    __asm__ volatile("syscall" : "+a"(retval) :
+    "D"(a1), "S"(a2), "d"(a3), "r"(r10), "r"(r8) :
+    "memory", "rcx", "r11");
+    return retval;
+}
+
 static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
                        size_t a4, size_t a5, size_t a6) {
     size_t retval = syscall_number;
@@ -133,6 +144,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[a0] = syscall3(__NR_unlinkat, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
+        case 49: //chdir
+        {
+            log_general("Emulate syscall chdir (49)...\n");
+            registerValues[a0] = syscall1(__NR_chdir, registerValues[a0]);
+        }
+            break;
         case 52: //fchmod
         {
             log_general("Emulate syscall fchmod (52)...\n");
@@ -143,6 +160,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall fchown (55)...\n");
             registerValues[a0] = syscall3(__NR_fchown, registerValues[a0], registerValues[a1], registerValues[a2]);
+        }
+            break;
+        case 59: //pipe2
+        {
+            log_general("Emulate syscall pipe2 (59)...\n");
+            registerValues[a0] = syscall2(__NR_pipe2, registerValues[a0], registerValues[a1]);
         }
             break;
         case 56: //openat
@@ -156,6 +179,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall close (57)...\n");
             registerValues[a0] = syscall1(__NR_close, registerValues[a0]);
+        }
+            break;
+        case 61: //getdents64
+        {
+            log_general("Emulate syscall getdents64 (61)...\n");
+            registerValues[a0] = syscall3(__NR_getdents64, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 62: //lseek
@@ -180,7 +209,6 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         {
             log_general("Emulate syscall writev (66)...\n");
             registerValues[a0] = syscall3(__NR_writev, registerValues[a0], registerValues[a1], registerValues[a2]);
-
         }
             break;
         case 78: //readlinkat
@@ -405,6 +433,32 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             }
         }
             break;
+        case 215: //munmap
+        {
+            log_general("Emulate syscall munmap (215)...\n");
+            t_risc_reg_val munmapAddr = registerValues[a0];
+            t_risc_reg_val size = registerValues[a1];
+            if (munmapAddr + size > (TRANSLATOR_BASE - STACK_OFFSET)) {
+                log_general("Prevented munmap in translator region.");
+                registerValues[a0] = -EINVAL; //Is this a fitting error code to return?
+            } else {
+                registerValues[a0] = syscall2(__NR_munmap, registerValues[a0], registerValues[a1]);
+            }
+        }
+            break;
+        case 220: //clone
+        {
+            log_general("Emulate syscall clone (220)...\n");
+            registerValues[a0] = syscall5(__NR_clone, registerValues[a0], registerValues[a1], registerValues[a2],
+                                          registerValues[a3], registerValues[a4]);
+        }
+            break;
+        case 221: //execve
+        {
+            log_general("Emulate syscall execve (221)...\n");
+            registerValues[a0] = syscall3(__NR_execve, registerValues[a0], registerValues[a1], registerValues[a2]);
+        }
+            break;
         case 222: //mmap
         {
             log_general("Emulate syscall mmap (222)...\n");
@@ -438,6 +492,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                         syscall6(__NR_mmap, mmapAddr, registerValues[a1], registerValues[a2],
                                  flags, registerValues[a4], registerValues[a5]);
             }
+        }
+            break;
+        case 260: //wait4
+        {
+            log_general("Emulate syscall wait4 (260)...\n");
+            registerValues[a0] = syscall4(__NR_wait4, registerValues[a0], registerValues[a1], registerValues[a2],
+                                          registerValues[a3]);
         }
             break;
         case 261: //prlimit64

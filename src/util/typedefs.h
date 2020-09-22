@@ -98,7 +98,7 @@ typedef enum {
     E_f3_IMM,
     E_f7_AMO,
     E_f3_AMO
-};
+} t_error_enum;
 
 //general purpose registers (x1 is ret addr, x2 is sp by convention)
 typedef enum {
@@ -148,12 +148,6 @@ typedef int64_t t_risc_imm;
 
 //carry a pointer to the raw instruction in the struct
 typedef uintptr_t t_risc_addr;
-
-// Idea
-typedef struct {
-    uint32_t reg_count[N_REG];
-    uint32_t reg_map[N_REG];
-} t_register_allocation;
 
 typedef struct {
     t_risc_addr addr;

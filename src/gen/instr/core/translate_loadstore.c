@@ -13,7 +13,7 @@
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LB…\n");
+    log_asm_out("Translate LB...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -32,7 +32,7 @@ void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LH(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LH…\n");
+    log_asm_out("Translate LH...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -51,7 +51,7 @@ void translate_LH(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LW…\n");
+    log_asm_out("Translate LW...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -70,7 +70,7 @@ void translate_LW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LBU…\n");
+    log_asm_out("Translate LBU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -89,7 +89,7 @@ void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LHU…\n");
+    log_asm_out("Translate LHU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -108,7 +108,7 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SB(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SB…\n");
+    log_asm_out("Translate SB...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -124,7 +124,7 @@ void translate_SB(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SH(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SH…\n");
+    log_asm_out("Translate SH...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -140,7 +140,7 @@ void translate_SH(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SW…\n");
+    log_asm_out("Translate SW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -156,7 +156,7 @@ void translate_SW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LWU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LWU…\n");
+    log_asm_out("Translate LWU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -179,7 +179,7 @@ void translate_LWU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate LD…\n");
+    log_asm_out("Translate LD...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -198,7 +198,7 @@ void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_SD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SD…\n");
+    log_asm_out("Translate SD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);

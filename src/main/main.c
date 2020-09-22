@@ -19,6 +19,8 @@
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
 
+//context_info *c_info = 0;
+
 //prototypes
 int transcode_loop(const char *file_path, int guestArgc, char **guestArgv);
 

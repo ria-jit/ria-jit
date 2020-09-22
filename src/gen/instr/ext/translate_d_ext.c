@@ -12,7 +12,7 @@
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FLD…\n");
+    log_asm_out("Translate FLD...\n");
     critical_not_yet_implemented("FLD not yet implemented.\n");
 }
 
@@ -23,7 +23,7 @@ void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSD…\n");
+    log_asm_out("Translate FSD...\n");
     critical_not_yet_implemented("FSD not yet implemented.\n");
 }
 
@@ -34,7 +34,7 @@ void translate_FSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMADDD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMADDD…\n");
+    log_asm_out("Translate FMADDD...\n");
     critical_not_yet_implemented("FMADDD not yet implemented.\n");
 }
 
@@ -45,7 +45,7 @@ void translate_FMADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMSUBD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMSUBD…\n");
+    log_asm_out("Translate FMSUBD...\n");
     critical_not_yet_implemented("FMSUBD not yet implemented.\n");
 }
 
@@ -56,7 +56,7 @@ void translate_FMSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FNMSUBD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FNMSUBD…\n");
+    log_asm_out("Translate FNMSUBD...\n");
     critical_not_yet_implemented("FNMSUBD not yet implemented.\n");
 }
 
@@ -67,7 +67,7 @@ void translate_FNMSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FNMADDD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FNMADDD…\n");
+    log_asm_out("Translate FNMADDD...\n");
     critical_not_yet_implemented("FNMADDD not yet implemented.\n");
 }
 
@@ -78,7 +78,7 @@ void translate_FNMADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FADDD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FADDD…\n");
+    log_asm_out("Translate FADDD...\n");
     critical_not_yet_implemented("FADDD not yet implemented.\n");
 }
 
@@ -89,7 +89,7 @@ void translate_FADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSUBD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSUBD…\n");
+    log_asm_out("Translate FSUBD...\n");
     critical_not_yet_implemented("FSUBD not yet implemented.\n");
 }
 
@@ -100,7 +100,7 @@ void translate_FSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMULD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMULD…\n");
+    log_asm_out("Translate FMULD...\n");
     critical_not_yet_implemented("FMULD not yet implemented.\n");
 }
 
@@ -111,7 +111,7 @@ void translate_FMULD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FDIVD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FDIVD…\n");
+    log_asm_out("Translate FDIVD...\n");
     critical_not_yet_implemented("FDIVD not yet implemented.\n");
 }
 
@@ -122,7 +122,7 @@ void translate_FDIVD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSQRTD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSQRTD…\n");
+    log_asm_out("Translate FSQRTD...\n");
     critical_not_yet_implemented("FSQRTD not yet implemented.\n");
 }
 
@@ -133,7 +133,7 @@ void translate_FSQRTD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSGNJD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSGNJD…\n");
+    log_asm_out("Translate FSGNJD...\n");
     critical_not_yet_implemented("FSGNJD not yet implemented.\n");
 }
 
@@ -144,7 +144,7 @@ void translate_FSGNJD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSGNJND(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSGNJND…\n");
+    log_asm_out("Translate FSGNJND...\n");
     critical_not_yet_implemented("FSGNJND not yet implemented.\n");
 }
 
@@ -155,7 +155,7 @@ void translate_FSGNJND(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSGNJXD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FSGNJXD…\n");
+    log_asm_out("Translate FSGNJXD...\n");
     critical_not_yet_implemented("FSGNJXD not yet implemented.\n");
 }
 
@@ -166,7 +166,7 @@ void translate_FSGNJXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMIND(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMIND…\n");
+    log_asm_out("Translate FMIND...\n");
     critical_not_yet_implemented("FMIND not yet implemented.\n");
 }
 
@@ -177,7 +177,7 @@ void translate_FMIND(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMAXD…\n");
+    log_asm_out("Translate FMAXD...\n");
     critical_not_yet_implemented("FMAXD not yet implemented.\n");
 }
 
@@ -188,7 +188,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTSD…\n");
+    log_asm_out("Translate FCVTSD...\n");
     critical_not_yet_implemented("FCVTSD not yet implemented.\n");
 }
 
@@ -199,7 +199,7 @@ void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTDS…\n");
+    log_asm_out("Translate FCVTDS...\n");
     critical_not_yet_implemented("FCVTDS not yet implemented.\n");
 }
 
@@ -210,7 +210,7 @@ void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FEQD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FEQD…\n");
+    log_asm_out("Translate FEQD...\n");
     critical_not_yet_implemented("FEQD not yet implemented.\n");
 }
 
@@ -221,7 +221,7 @@ void translate_FEQD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FLTD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FLTD…\n");
+    log_asm_out("Translate FLTD...\n");
     critical_not_yet_implemented("FLTD not yet implemented.\n");
 }
 
@@ -232,7 +232,7 @@ void translate_FLTD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FLED(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FLED…\n");
+    log_asm_out("Translate FLED...\n");
     critical_not_yet_implemented("FLED not yet implemented.\n");
 }
 
@@ -243,7 +243,7 @@ void translate_FLED(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCLASSD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCLASSD…\n");
+    log_asm_out("Translate FCLASSD...\n");
     critical_not_yet_implemented("FCLASSD not yet implemented.\n");
 }
 
@@ -254,7 +254,7 @@ void translate_FCLASSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTWD…\n");
+    log_asm_out("Translate FCVTWD...\n");
     critical_not_yet_implemented("FCVTWD not yet implemented.\n");
 }
 
@@ -265,7 +265,7 @@ void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWUD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTWUD…\n");
+    log_asm_out("Translate FCVTWUD...\n");
     critical_not_yet_implemented("FCVTWUD not yet implemented.\n");
 }
 
@@ -276,7 +276,7 @@ void translate_FCVTWUD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTDW…\n");
+    log_asm_out("Translate FCVTDW...\n");
     critical_not_yet_implemented("FCVTDW not yet implemented.\n");
 }
 
@@ -287,7 +287,7 @@ void translate_FCVTDW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTDWU…\n");
+    log_asm_out("Translate FCVTDWU...\n");
     critical_not_yet_implemented("FCVTDWU not yet implemented.\n");
 }
 
@@ -298,7 +298,7 @@ void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTLD…\n");
+    log_asm_out("Translate FCVTLD...\n");
     critical_not_yet_implemented("FCVTLD not yet implemented.\n");
 }
 
@@ -309,7 +309,7 @@ void translate_FCVTLD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTLUD…\n");
+    log_asm_out("Translate FCVTLUD...\n");
     critical_not_yet_implemented("FCVTLUD not yet implemented.\n");
 }
 
@@ -320,7 +320,7 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMVXD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMVXD…\n");
+    log_asm_out("Translate FMVXD...\n");
     critical_not_yet_implemented("FMVXD not yet implemented.\n");
 }
 
@@ -331,7 +331,7 @@ void translate_FMVXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDL(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTDL…\n");
+    log_asm_out("Translate FCVTDL...\n");
     critical_not_yet_implemented("FCVTDL not yet implemented.\n");
 }
 
@@ -342,7 +342,7 @@ void translate_FCVTDL(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FCVTDLU…\n");
+    log_asm_out("Translate FCVTDLU...\n");
     critical_not_yet_implemented("FCVTDLU not yet implemented.\n");
 }
 
@@ -353,6 +353,6 @@ void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMVDX(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate FMVDX…\n");
+    log_asm_out("Translate FMVDX...\n");
     critical_not_yet_implemented("FMVDX not yet implemented.\n");
 }

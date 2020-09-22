@@ -14,7 +14,7 @@
 void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     // mov rd, rs1
     // add rd, instr->imm
-    log_asm_out("Translate ADDIW…\n");
+    log_asm_out("Translate ADDIW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -34,7 +34,7 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, rs1
     //shl rd, (instr->imm & 0x3F)
-    log_asm_out("Translate SLLI…\n");
+    log_asm_out("Translate SLLI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -52,7 +52,7 @@ void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, extended
-    log_asm_out("Translate LUI…\n");
+    log_asm_out("Translate LUI...\n");
 
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
@@ -68,7 +68,7 @@ void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
  * @param instr
  */
 void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate ADDI…\n");
+    log_asm_out("Translate ADDI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -89,7 +89,7 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AUIPC…\n");
+    log_asm_out("Translate AUIPC...\n");
 
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
@@ -107,7 +107,7 @@ void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLTI…\n");
+    log_asm_out("Translate SLTI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -127,7 +127,7 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLTIU…\n");
+    log_asm_out("Translate SLTIU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -147,7 +147,7 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate XORI…\n");
+    log_asm_out("Translate XORI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -166,7 +166,7 @@ void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate ORI…\n");
+    log_asm_out("Translate ORI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -185,7 +185,7 @@ void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate ANDI…\n");
+    log_asm_out("Translate ANDI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -203,7 +203,7 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRLI…\n");
+    log_asm_out("Translate SRLI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -221,7 +221,7 @@ void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRAI…\n");
+    log_asm_out("Translate SRAI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
@@ -240,7 +240,7 @@ void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate ADD…\n");
+    log_asm_out("Translate ADD...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -259,15 +259,19 @@ void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SUB…\n");
+    log_asm_out("Translate SUB...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     if (regDest == regSrc2) {
-        err |= fe_enc64(&current, FE_NEG64r, regSrc2);
-        err |= fe_enc64(&current, FE_ADD64rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        if (regDest == regSrc1) {
+            err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest); // SUB same, same, same is equivalent to zeroing
+        } else {
+            err |= fe_enc64(&current, FE_NEG64r, regSrc2);
+            err |= fe_enc64(&current, FE_ADD64rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        }
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_SUB64rr);
     }
@@ -278,12 +282,12 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SLL instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLL…\n");
+    log_asm_out("Translate SLL...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -306,7 +310,7 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLT…\n");
+    log_asm_out("Translate SLT...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -326,7 +330,7 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLTU…\n");
+    log_asm_out("Translate SLTU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -346,7 +350,7 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate XOR…\n");
+    log_asm_out("Translate XOR...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -360,12 +364,12 @@ void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SRL instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRL…\n");
+    log_asm_out("Translate SRL...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -384,12 +388,12 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
 /**
 * Translate the SRA instruction.
 * SLL, SRL, and SRA perform logical left, logical right, and arithmetic right shifts on the value in
-* register rs1 by the shift amount held in the lower 5 bits of register rs2.
+* register rs1 by the shift amount held in the lower 6 bits of register rs2.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRA…\n");
+    log_asm_out("Translate SRA...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -412,7 +416,7 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate OR…\n");
+    log_asm_out("Translate OR...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -430,7 +434,7 @@ void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate AND…\n");
+    log_asm_out("Translate AND...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -443,18 +447,18 @@ void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SLLIW instruction. It is defined analogous to SLLI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLLIW…\n");
+    log_asm_out("Translate SLLIW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -462,18 +466,18 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SRLIW instruction. It is defined analogous to SRLI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRLIW…\n");
+    log_asm_out("Translate SRLIW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -481,18 +485,18 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
 * Translate the SRAIW instruction. It is defined analogous to SRAI, but operates on 32-bit values.
-* The operand to be shifted is in rs1, the shift amount is in the lower 6 bits of the I-immediate field.
+* The operand to be shifted is in rs1, the shift amount is in the lower 5 bits of the I-immediate field.
 * @param instr the RISC-V instruction to translate
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRAIW…\n");
+    log_asm_out("Translate SRAIW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -507,7 +511,7 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate ADDW…\n");
+    log_asm_out("Translate ADDW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -528,15 +532,19 @@ void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SUBW…\n");
+    log_asm_out("Translate SUBW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     if (regDest == regSrc2) {
-        err |= fe_enc64(&current, FE_NEG32r, regSrc2);
-        err |= fe_enc64(&current, FE_ADD32rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        if (regDest == regSrc1) {
+            err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest); // SUB same, same, same is equivalent to zeroing
+        } else {
+            err |= fe_enc64(&current, FE_NEG32r, regSrc2);
+            err |= fe_enc64(&current, FE_ADD32rr, regSrc2, regSrc1); // equivalent to regDest, regSrc1
+        }
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_SUB32rr);
     }
@@ -555,7 +563,7 @@ void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SLLW…\n");
+    log_asm_out("Translate SLLW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -581,7 +589,7 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRLW…\n");
+    log_asm_out("Translate SRLW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
@@ -608,7 +616,7 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
 * @see SLL, SRL, SRA
 */
 void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("Translate SRAW…\n");
+    log_asm_out("Translate SRAW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);

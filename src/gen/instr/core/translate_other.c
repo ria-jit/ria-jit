@@ -12,7 +12,7 @@
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE(const t_risc_instr *instr, const register_info *r_info) {
-    log_general("Ignored FENCE…\n"); //just ignore for now
+    log_general("Ignored FENCE...\n"); //just ignore for now
 }
 
 /**
@@ -23,7 +23,7 @@ void translate_FENCE(const t_risc_instr *instr, const register_info *r_info) {
 */
 void translate_ECALL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
     //see https://stackoverflow.com/questions/59800430/risc-v-ecall-syscall-calling-convention-on-pk-linux
-    log_asm_out("Translate ECALL…\n");
+    log_asm_out("Translate ECALL...\n");
 
     //emit c_info->save_context();
     err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->save_context);
@@ -45,7 +45,7 @@ void translate_ECALL(const t_risc_instr *instr, const register_info *r_info, con
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_EBREAK(const t_risc_instr *instr, const register_info *r_info) {
-    critical_not_yet_implemented("Translate EBREAK…\n");
+    critical_not_yet_implemented("Translate EBREAK...\n");
 }
 
 /**
@@ -55,5 +55,5 @@ void translate_EBREAK(const t_risc_instr *instr, const register_info *r_info) {
 * @param r_info the runtime register mapping (RISC-V -> x86)
 */
 void translate_FENCE_I(const t_risc_instr *instr, const register_info *r_info) {
-    critical_not_yet_implemented("Translate FENCE_I…\n");
+    critical_not_yet_implemented("Translate FENCE_I...\n");
 }

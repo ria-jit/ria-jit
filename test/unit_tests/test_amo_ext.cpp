@@ -392,5 +392,129 @@ INSTANTIATE_TEST_SUITE_P(AMOANDD,
                                  testing::Bool(),
                                  testing::Bool(),
                                  testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMINUW,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMINUW),
+                                 testing::Values(true),
+                                 testing::Values(1, -1),
+                                 testing::Values(2, UINT32_MAX + 3lu),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return std::min(memAtRs1, rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMINUD,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMINUD),
+                                 testing::Values(false),
+                                 testing::Values(3lu << 32, 1lu << 32),
+                                 testing::Values(1lu << 33),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return std::min(memAtRs1, rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMINW,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMINW),
+                                 testing::Values(true),
+                                 testing::Values(3, -1),
+                                 testing::Values(2, UINT32_MAX + 3lu),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return
+                                                     (t_risc_reg_val) std::min((int32_t) memAtRs1, (int32_t) rs2) &
+                                                             0xffFFffFF;
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMIND,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMIND),
+                                 testing::Values(false),
+                                 testing::Values(-1, 3lu << 32),
+                                 testing::Values(1lu << 33),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return (t_risc_reg_val) std::min((int64_t) memAtRs1, (int64_t) rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMAXUW,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMAXUW),
+                                 testing::Values(true),
+                                 testing::Values(1, -1),
+                                 testing::Values(2, UINT32_MAX + 3lu),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return std::max(memAtRs1, rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMAXUD,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMAXUD),
+                                 testing::Values(false),
+                                 testing::Values(3lu << 32, 1lu << 32),
+                                 testing::Values(1lu << 33),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return std::max(memAtRs1, rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMAXW,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMAXW),
+                                 testing::Values(true),
+                                 testing::Values(3, -1),
+                                 testing::Values(2, UINT32_MAX + 3lu),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return
+                                                     (t_risc_reg_val) std::max((int32_t) memAtRs1, (int32_t) rs2) &
+                                                             0xffFFffFF;
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
+
+INSTANTIATE_TEST_SUITE_P(AMOMAXD,
+                         AmoExtTest,
+                         testing::Combine(
+                                 testing::Values(AMOMAXD),
+                                 testing::Values(false),
+                                 testing::Values(-1, 3lu << 32),
+                                 testing::Values(1lu << 33),
+                                 testing::Values(
+                                         [](t_risc_reg_val memAtRs1, t_risc_reg_val rs2) {
+                                             return (t_risc_reg_val) std::max((int64_t) memAtRs1, (int64_t) rs2);
+                                         }),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 #pragma ide diagonstics pop
 #pragma GCC diagnostic pop
