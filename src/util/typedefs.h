@@ -149,12 +149,6 @@ typedef int64_t t_risc_imm;
 //carry a pointer to the raw instruction in the struct
 typedef uintptr_t t_risc_addr;
 
-// Idea
-typedef struct {
-    uint32_t reg_count[N_REG];
-    uint32_t reg_map[N_REG];
-} t_register_allocation;
-
 typedef struct {
     t_risc_addr addr;
     t_risc_mnem mnem;

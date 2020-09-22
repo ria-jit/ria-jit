@@ -95,15 +95,6 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc) {
     tlb[smallHash].cache_loc = cacheLoc;
 }
 
-t_cache_loc check_tlb(t_risc_addr risc_addr) {
-    //check tlb first
-    size_t smallHash = smallhash(risc_addr);
-    if (tlb[smallHash].risc_addr == risc_addr) {
-        return tlb[smallHash].cache_loc;
-    }
-    return 0;
-}
-
 /**
  * Lookup the cache location of a given RISC-V instruction address.
  * @param risc_addr the RISC-V instruction address.

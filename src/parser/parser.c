@@ -7,8 +7,6 @@
 #include <util/log.h>
 #include "parser.h"
 
-typedef void t_parse_result; //maybe some more return information later
-
 // extract rd register number bit[11:7]
 static inline int extract_rd(int32_t instr) {return instr >> 7 & 0b11111;}
 

@@ -18,6 +18,10 @@ t_risc_reg_val gp_file[N_REG];
  */
 t_risc_reg_val csr_file[N_CSR];
 
+/**
+ * Swap space for the 4 callee-saved registers we are using for loading the context.
+ * Keeping the values here avoids stack consistency issues.
+ */
 uint64_t swap_space[4];
 
 t_risc_reg_val *get_gp_reg_file(void) {
