@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 #include <parser/parser.h>
 #include <util/log.h>
-#include <elf/loadElf.h>
 
 /**
+ * Legacy code:
  * Tests parsing of basic load-immediate as per test_parsing() in parser.c (--> @author Noah)
  */
 TEST(Parser, BasicOpcodeParsing) {
@@ -54,6 +54,7 @@ TEST(Parser, BasicOpcodeParsing) {
 }
 
 /**
+ * Legacy test. Parameterized version for easier maintainability in test_parser_param.cpp.
  * Tests parsing of basic load-immediate as per test_parsing() in parser.c (--> @author Noah)
  */
 TEST(Parser, CheckAllOpcodes) {
