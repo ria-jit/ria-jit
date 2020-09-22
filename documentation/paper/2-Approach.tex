@@ -1,0 +1,59 @@
+In the following, the term \textit{host} will refer to the system of the native architecture the binary translator is built for (in our case, x86-64), and the term \textit{guest} will designate the foreign system we are attempting to emulate (RISC--V).
+
+
+\subsection{Modes of binary translation}
+
+When attempting to execute guest programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
+
+The two extremes of this spectrum are:
+\begin{itemize}
+	\item \textbf{Interpretation}, where, much alike interpreted programming languages (e. g. JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the host system in order to simulate the guest ISA.
+	\item \textbf{Static Binary Translation}, where the guest executable is statically reverse-engineered and translated to the guest architecture as a whole.
+	After this translation step, it can be executed as if it were a native binary, without the need for any further special treatment.
+\end{itemize}
+
+However, it turns out both of these approaches have their downsides.
+Interpretation, on the one hand, comes with a significant performance penalty.
+Just as programs written for interpreted languages like Python will always execute more slowly than equivalent programs created with a compiled language like C++, there is a large overhead to having to interpret every single instruction in an executable binary.
+Especially if the program contains certain parts of the code that are executed many times -- bodies of large loop statements, for example -- the interpreter has to do a lot of redundant work in simulating the same instruction operations for as many times as that section is called.
+
+Static binary translation, on the other hand, is very difficult to achieve correctly.
+If done well, it would produce a binary native to the host's environment, and could thus run without any wrapper programs or other utilities, enjoying the same performance benefits as other native executables do.
+
+However, there are certain programming concepts that have proven difficult for a static binary translator to deal with.
+Register indirect branching, for example, is one of them, where the jump address is not selected statically, but rather computed at runtime.
+Deducing the jump target would thus again require (in some ways) emulating the program execution in order to know the values needed for the computation.
+In light of the project at hand, a dynamic binary translator would also be a very difficult program to translate statically, due to the fact that it generates some the code it executes at runtime.
+
+The solution to these issues, and our chosen approach for this project, is
+\begin{itemize}
+	\item \textbf{Dynamic Binary Translation}, which serves as a middleground between interpreting and statically translating the executable.
+	It aims to translate the program on the fly, while only focussing on the parts that are actually needed for execution.
+\end{itemize}
+
+By only translating the parts of the binary that are actually executed, the dynamic binary translator (DBT) can save the overhead a static translator would have spent on translating unused code paths.
+Also, as the DBT is actually stepping through and executing the program, the other limitations of static binary translators essentially do not apply.
+
+It can also perform significantly better than an interpreter might, as it has to translate a single piece of code only once, which can then be called many times; unlike the above-mentioned behaviour of an interpreter.
+Furthermore, as it produces blocks of code that are native to the host platform, it can be reasonably expected that a single block's execution will be faster than the respective emulation.
+
+Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than absolutely necessary.
+
+
+\subsection{Partitioning the input code}
+Logically, the DBT must somehow divide the code into chunks it can then process for translation and execution.
+
+%todo continued about basic blocks, jump/call instructions, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
