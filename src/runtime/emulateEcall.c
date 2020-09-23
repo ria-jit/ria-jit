@@ -144,6 +144,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[a0] = syscall3(__NR_unlinkat, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
+        case 48: //faccessat
+        {
+            log_general("Emulate syscall faccessat (48)...\n");
+            registerValues[a0] = syscall4(__NR_faccessat, registerValues[a0], registerValues[a1], registerValues[a2],
+                                          registerValues[a3]);
+        }
+            break;
         case 49: //chdir
         {
             log_general("Emulate syscall chdir (49)...\n");
