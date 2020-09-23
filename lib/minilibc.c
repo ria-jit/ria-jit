@@ -561,8 +561,25 @@ printf_driver(PrintfWriteFunc write_func, void *data, const char *format,
             if (value == 0) {
                 buffer[buf_idx] = '0';
             } else {
-                while(value > 0) {
+                while (value > 0) {
                     size_t digit = value % 10;
+                    buffer[buf_idx--] = '0' + digit;
+                    value /= 10;
+                }
+                buf_idx++;
+            }
+            write_func(data, buffer + buf_idx, sizeof(buffer) - buf_idx);
+            bytes_written += sizeof(buffer) - buf_idx;
+        } else if (format_spec == 'l' && *format == 'u') {
+            format++;
+
+            uint64_t value = va_arg(args, uint64_t);
+            size_t buf_idx = sizeof(buffer) - 1;
+            if (value == 0) {
+                buffer[buf_idx] = '0';
+            } else {
+                while (value > 0) {
+                    uint32_t digit = value % 10;
                     buffer[buf_idx--] = '0' + digit;
                     value /= 10;
                 }
