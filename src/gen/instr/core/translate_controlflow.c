@@ -57,10 +57,10 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
         ///set pc
         if (r_info->mapped[pc]) {
             err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc],
-                            instr->addr + (int64_t) instr->imm); //cast to sign extend
+                            instr->addr + instr->imm);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
-                            instr->addr + (int64_t) instr->imm); //cast to sign extend
+                            instr->addr + instr->imm);
         }
     } else {
         log_asm_out("DIRECT JUMP JAL\n");
