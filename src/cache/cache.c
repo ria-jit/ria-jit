@@ -122,8 +122,8 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     size_t index = find_lin_slot(risc_addr);
 
-    //check for table full before inserting
-    if (count_entries >= table_size - 1) {
+    //reallocate if we have filled more than half of the available space
+    if (count_entries >= table_size >> 1) {
         //double the table size
         table_size <<= 1u;
         log_cache("Doubling table size to %i and reallocating...\n", table_size);
@@ -138,12 +138,21 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
             _exit(FAIL_HEAP_ALLOC);
         }
 
-        //copy over the old values
-        memcpy(copy_buf, cache_table, count_entries * sizeof(t_cache_entry));
+        //set cache table to new buffer in order to use the existing methods for insertion
+        t_cache_entry *old_table = cache_table;
+        cache_table = copy_buf;
+
+        //rehash all the old values
+        for (size_t i = 0; i < table_size >> 1u; i++) {
+            if (old_table[i].cache_loc != 0) {
+                //rehash this new value
+                //this will fill the tlb with undefined hits
+                set_cache_entry(old_table[i].risc_addr, old_table[i].cache_loc);
+            }
+        }
 
         //free and reset originally allocated space
-        munmap(cache_table, (table_size >> 1u) * sizeof(t_cache_entry));
-        cache_table = copy_buf;
+        munmap(old_table, (table_size >> 1u) * sizeof(t_cache_entry));
 
         //find index again
         index = find_lin_slot(risc_addr);
