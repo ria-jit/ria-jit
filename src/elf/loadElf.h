@@ -13,7 +13,7 @@
 #define INVALID_STACK 0
 
 //TODO Figure out proper offset
-#define STACK_OFFSET 0x10000000
+#define STACK_OFFSET 0x80000000
 #ifdef __cplusplus
 extern "C" {
 #endif //__cplusplus
