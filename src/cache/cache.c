@@ -45,6 +45,8 @@ size_t tlb_size = SMALLTLB;
  * Initializes the hash table array.
  */
 void init_hash_table(void) {
+    log_cache("Initializing cache table for size %i...\n", table_size);
+
     //allocate memory for our table (MAP_ANONYMOUS --> initialize to zero)
     cache_table = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
                        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -120,10 +122,11 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     size_t index = find_lin_slot(risc_addr);
 
-    //check for table full before inserting
-    if (count_entries >= table_size - 1) {
+    //reallocate if we have filled more than half of the available space
+    if (count_entries >= table_size >> 1) {
         //double the table size
         table_size <<= 1u;
+        log_cache("Doubling table size to %i and reallocating...\n", table_size);
 
         //allocate new heap space for the cache table and copy over the values we have saved
         t_cache_entry *copy_buf = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
@@ -135,12 +138,21 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
             _exit(FAIL_HEAP_ALLOC);
         }
 
-        //copy over the old values
-        memcpy(copy_buf, cache_table, count_entries * sizeof(t_cache_entry));
+        //set cache table to new buffer in order to use the existing methods for insertion
+        t_cache_entry *old_table = cache_table;
+        cache_table = copy_buf;
+
+        //rehash all the old values
+        for (size_t i = 0; i < table_size >> 1u; i++) {
+            if (old_table[i].cache_loc != 0) {
+                //rehash this new value
+                //this will fill the tlb with undefined hits
+                set_cache_entry(old_table[i].risc_addr, old_table[i].cache_loc);
+            }
+        }
 
         //free and reset originally allocated space
-        munmap(cache_table, (table_size >> 1u) * sizeof(t_cache_entry));
-        cache_table = copy_buf;
+        munmap(old_table, (table_size >> 1u) * sizeof(t_cache_entry));
 
         //find index again
         index = find_lin_slot(risc_addr);
@@ -172,11 +184,15 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
  */
 void print_values(void) {
     if (!flag_log_cache) return;
-    log_cache("Cache updated. Contents:\n");
+
+    size_t blocks = 0;
     for (size_t i = 0; i < table_size; ++i) { //potentially better way to do this?
         if (cache_table[i].cache_loc != 0) {
-            log_cache("cache[%i]: block address %p at cache loc %p\n", i, cache_table[i].risc_addr,
-                      cache_table[i].cache_loc);
+            blocks++;
+            //maybe enable this verbose cache logging with a separate flag or setting.
+            //log_cache("cache[%i]: block address %p at cache loc %p\n", i, cache_table[i].risc_addr,
+            //          cache_table[i].cache_loc);
         }
     }
+    log_cache("Cache updated. Contains %i block(s).\n", blocks);
 }
