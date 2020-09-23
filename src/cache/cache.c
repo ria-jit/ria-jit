@@ -144,6 +144,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 
         count_entries = 0;
 
+        bool oldLogCache = flag_log_cache;
+        flag_log_cache = false;
         //rehash all the old values
         for (size_t i = 0; i < table_size >> 1u; i++) {
             if (old_table[i].cache_loc != 0) {
@@ -152,6 +154,9 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
                 set_cache_entry(old_table[i].risc_addr, old_table[i].cache_loc);
             }
         }
+
+        flag_log_cache = oldLogCache;
+        print_values();
 
         //free and reset originally allocated space
         munmap(old_table, (table_size >> 1u) * sizeof(t_cache_entry));
