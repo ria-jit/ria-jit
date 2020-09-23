@@ -8,10 +8,12 @@
 #include <stdbool.h>
 
 bool flag_log_general = false;
+bool flag_log_syscall = false;
 bool flag_log_asm_in = false;
 bool flag_log_asm_out = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
+bool flag_log_cache_contents = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
 bool flag_translate_opt = true;
@@ -50,6 +52,17 @@ void log_general(const char *format, ...) {
         va_list args;
         va_start(args, format);
         printf("[general] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_syscall(const char *format, ...) {
+    if (flag_log_syscall) {
+        va_list args;
+        va_start(args, format);
+        printf("[syscall] ");
         vdprintf(1, format, args);
         va_end(args);
         return;

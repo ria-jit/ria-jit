@@ -20,10 +20,12 @@ extern const char *const translator_version;
 * Verbose logging flags used by the main.c and logging methods.
 */
 extern bool flag_log_general;
+extern bool flag_log_syscall;
 extern bool flag_log_asm_in;
 extern bool flag_log_asm_out;
 extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
+extern bool flag_log_cache_contents;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
 extern bool flag_translate_opt;
@@ -36,7 +38,8 @@ void not_yet_implemented(const char *info);
 
 void log_general(const char *format, ...);
 
-void log_analyze(const char *format, ...);
+void log_syscall(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
 void log_asm_in(const char *format, ...);
 

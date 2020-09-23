@@ -122,112 +122,112 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     switch (registerValues[a7]) {
         case 17: //getcwd
         {
-            log_general("Emulate syscall getcwd (17)...\n");
+            log_syscall("Emulate syscall getcwd (17)...\n");
             registerValues[a0] = syscall2(__NR_getcwd, registerValues[a0], registerValues[a1]);
         }
             break;
         case 25: //fcntl
         {
-            log_general("Emulate syscall fcntl (25)...\n");
+            log_syscall("Emulate syscall fcntl (25)...\n");
             registerValues[a0] = syscall3(__NR_fcntl, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 29: //ioctl
         {
-            log_general("Emulate syscall ioctl (29)...\n");
+            log_syscall("Emulate syscall ioctl (29)...\n");
             registerValues[a0] = syscall3(__NR_ioctl, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 35: //unlinkat
         {
-            log_general("Emulate syscall unlinkat (35)...\n");
+            log_syscall("Emulate syscall unlinkat (35)...\n");
             registerValues[a0] = syscall3(__NR_unlinkat, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 48: //faccessat
         {
-            log_general("Emulate syscall faccessat (48)...\n");
+            log_syscall("Emulate syscall faccessat (48)...\n");
             registerValues[a0] = syscall4(__NR_faccessat, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }
             break;
         case 49: //chdir
         {
-            log_general("Emulate syscall chdir (49)...\n");
+            log_syscall("Emulate syscall chdir (49)...\n");
             registerValues[a0] = syscall1(__NR_chdir, registerValues[a0]);
         }
             break;
         case 52: //fchmod
         {
-            log_general("Emulate syscall fchmod (52)...\n");
+            log_syscall("Emulate syscall fchmod (52)...\n");
             registerValues[a0] = syscall2(__NR_fchmod, registerValues[a0], registerValues[a1]);
         }
             break;
         case 55: //fchown
         {
-            log_general("Emulate syscall fchown (55)...\n");
+            log_syscall("Emulate syscall fchown (55)...\n");
             registerValues[a0] = syscall3(__NR_fchown, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 59: //pipe2
         {
-            log_general("Emulate syscall pipe2 (59)...\n");
+            log_syscall("Emulate syscall pipe2 (59)...\n");
             registerValues[a0] = syscall2(__NR_pipe2, registerValues[a0], registerValues[a1]);
         }
             break;
         case 56: //openat
         {
-            log_general("Emulate syscall openat (56)...\n");
+            log_syscall("Emulate syscall openat (56)...\n");
             registerValues[a0] = syscall4(__NR_openat, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }
             break;
         case 57: //close
         {
-            log_general("Emulate syscall close (57)...\n");
+            log_syscall("Emulate syscall close (57)...\n");
             registerValues[a0] = syscall1(__NR_close, registerValues[a0]);
         }
             break;
         case 61: //getdents64
         {
-            log_general("Emulate syscall getdents64 (61)...\n");
+            log_syscall("Emulate syscall getdents64 (61)...\n");
             registerValues[a0] = syscall3(__NR_getdents64, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 62: //lseek
         {
-            log_general("Emulate syscall lseek (62)...\n");
+            log_syscall("Emulate syscall lseek (62)...\n");
             registerValues[a0] = syscall3(__NR_lseek, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 63: //read
         {
-            log_general("Emulate syscall read (63)...\n");
+            log_syscall("Emulate syscall read (63)...\n");
             registerValues[a0] = syscall3(__NR_read, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 64: //Write
         {
-            log_general("Emulate syscall write (64)...\n");
+            log_syscall("Emulate syscall write (64)...\n");
             registerValues[a0] = syscall3(__NR_write, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 66: //writev
         {
-            log_general("Emulate syscall writev (66)...\n");
+            log_syscall("Emulate syscall writev (66)...\n");
             registerValues[a0] = syscall3(__NR_writev, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 78: //readlinkat
         {
-            log_general("Emulate syscall readlinkat (78)...\n");
+            log_syscall("Emulate syscall readlinkat (78)...\n");
             registerValues[a0] = syscall4(__NR_readlinkat, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }
             break;
         case 79: //fstatat
         {
-            log_general("Emulate syscall fstat (80)...\n");
+            log_syscall("Emulate syscall fstat (80)...\n");
             statRiscV *pStatRiscV = (statRiscV *) registerValues[a2];
             struct stat buf = {0};
             registerValues[a0] = syscall4(__NR_newfstatat, registerValues[a0], registerValues[a1], (size_t) &buf,
@@ -252,7 +252,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 80: //fstat
         {
-            log_general("Emulate syscall fstat (80)...\n");
+            log_syscall("Emulate syscall fstat (80)...\n");
             statRiscV *pStatRiscV = (statRiscV *) registerValues[a1];
             struct stat buf = {0};
             registerValues[a0] = syscall2(__NR_fstat, registerValues[a0], (size_t) &buf);
@@ -276,14 +276,14 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 88: //utimensat
         {
-            log_general("Emulate syscall utimensat (88)...\n");
+            log_syscall("Emulate syscall utimensat (88)...\n");
             registerValues[a0] = syscall4(__NR_utimensat, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }
             break;
         case 93: //Exit
         {
-            log_general("Emulate syscall exit (93)...\n");
+            log_syscall("Emulate syscall exit (93)...\n");
 
             //note the guest exit code and stop main loop
             guest_exit_status = (int) get_value((t_risc_reg) a0);
@@ -292,7 +292,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 94: //exit_group
         {
-            log_general("Emulate syscall exit_group (94)...\n");
+            log_syscall("Emulate syscall exit_group (94)...\n");
             //note the guest exit code and stop main loop
             guest_exit_status = (int) get_value((t_risc_reg) a0);
             finalize = true;
@@ -300,33 +300,33 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 96: //set_tid_address
         {
-            log_general("Emulate syscall set_tid_address (96)...\n");
+            log_syscall("Emulate syscall set_tid_address (96)...\n");
             registerValues[a0] = syscall1(__NR_set_tid_address, registerValues[a0]);
 
         }
             break;
         case 98: //futex
         {
-            log_general("Emulate syscall futex (98)...\n");
+            log_syscall("Emulate syscall futex (98)...\n");
             registerValues[a0] = syscall6(__NR_futex, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3], registerValues[a4], registerValues[a5]);
         }
             break;
         case 99: //set_robust_list
         {
-            log_general("Emulate syscall set_robust_list (99)...\n");
+            log_syscall("Emulate syscall set_robust_list (99)...\n");
             registerValues[a0] = syscall2(__NR_set_robust_list, registerValues[a0], registerValues[a1]);
         }
             break;
         case 113: //clock_gettime
         {
-            log_general("Emulate syscall clock_gettime (113)...\n");
+            log_syscall("Emulate syscall clock_gettime (113)...\n");
             registerValues[a0] = syscall2(__NR_clock_gettime, registerValues[a0], registerValues[a1]);
         }
             break;
         case 131: //tgkill
         {
-            log_general("Emulate syscall tgkill (131)...\n");
+            log_syscall("Emulate syscall tgkill (131)...\n");
             registerValues[a0] =
                     syscall3(__NR_tgkill, registerValues[a0], registerValues[a1], registerValues[a2]);
 
@@ -334,14 +334,14 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 134: //rt_sigaction
         {
-            log_general("Ignore syscall rt_sigaction (134) return success...\n");
+            log_syscall("Ignore syscall rt_sigaction (134) return success...\n");
             //registerValues[a0] = syscall2(__NR_rt_sigaction, registerValues[a0], registerValues[a1]);
             registerValues[a0] = 0;
         }
             break;
         case 135: //rt_sigprocmask
         {
-            log_general("Emulate syscall rt_sigprocmask (135)...\n");
+            log_syscall("Emulate syscall rt_sigprocmask (135)...\n");
             registerValues[a0] =
                     syscall4(__NR_rt_sigprocmask, registerValues[a0], registerValues[a1], registerValues[a2],
                              registerValues[a3]);
@@ -349,61 +349,61 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 160: //uname
         {
-            log_general("Emulate syscall uname (160)...\n");
+            log_syscall("Emulate syscall uname (160)...\n");
             registerValues[a0] = syscall1(__NR_uname, registerValues[a0]);
         }
             break;
         case 169: //gettimeofday
         {
-            log_general("Emulate syscall gettimeofday (169)...\n");
+            log_syscall("Emulate syscall gettimeofday (169)...\n");
             registerValues[a0] = syscall2(__NR_gettimeofday, registerValues[a0], registerValues[a1]);
         }
             break;
         case 172: //getpid
         {
-            log_general("Emulate syscall getpid (172)...\n");
+            log_syscall("Emulate syscall getpid (172)...\n");
             registerValues[a0] = syscall0(__NR_getpid);
         }
             break;
         case 174: //getuid
         {
-            log_general("Emulate syscall getuid (174)...\n");
+            log_syscall("Emulate syscall getuid (174)...\n");
             registerValues[a0] = syscall0(__NR_getuid);
         }
             break;
         case 175: //geteuid
         {
-            log_general("Emulate syscall geteuid (175)...\n");
+            log_syscall("Emulate syscall geteuid (175)...\n");
             registerValues[a0] = syscall0(__NR_geteuid);
         }
             break;
         case 176: //getgid
         {
-            log_general("Emulate syscall getgid (176)...\n");
+            log_syscall("Emulate syscall getgid (176)...\n");
             registerValues[a0] = syscall0(__NR_getgid);
         }
             break;
         case 177: //getegid
         {
-            log_general("Emulate syscall getegid (177)...\n");
+            log_syscall("Emulate syscall getegid (177)...\n");
             registerValues[a0] = syscall0(__NR_getegid);
         }
             break;
         case 178: //gettid
         {
-            log_general("Emulate syscall gettid (178)...\n");
+            log_syscall("Emulate syscall gettid (178)...\n");
             registerValues[a0] = syscall0(__NR_gettid);
         }
             break;
         case 179: //sysinfo
         {
-            log_general("Emulate syscall sysinfo (179)...\n");
+            log_syscall("Emulate syscall sysinfo (179)...\n");
             registerValues[a0] = syscall1(__NR_sysinfo, registerValues[a0]);
         }
             break;
         case 214: //brk
         {
-            log_general("Emulate syscall brk (214)...\n");
+            log_syscall("Emulate syscall brk (214)...\n");
             t_risc_addr brkAddr = registerValues[a0];
             if (brkAddr < initialBrk) {
                 ///Cannot go below initial brk or we would go into ELF territory
@@ -442,7 +442,7 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 215: //munmap
         {
-            log_general("Emulate syscall munmap (215)...\n");
+            log_syscall("Emulate syscall munmap (215)...\n");
             t_risc_reg_val munmapAddr = registerValues[a0];
             t_risc_reg_val size = registerValues[a1];
             if (munmapAddr + size > (TRANSLATOR_BASE - STACK_OFFSET)) {
@@ -455,20 +455,20 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 220: //clone
         {
-            log_general("Emulate syscall clone (220)...\n");
+            log_syscall("Emulate syscall clone (220)...\n");
             registerValues[a0] = syscall5(__NR_clone, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3], registerValues[a4]);
         }
             break;
         case 221: //execve
         {
-            log_general("Emulate syscall execve (221)...\n");
+            log_syscall("Emulate syscall execve (221)...\n");
             registerValues[a0] = syscall3(__NR_execve, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
         case 222: //mmap
         {
-            log_general("Emulate syscall mmap (222)...\n");
+            log_syscall("Emulate syscall mmap (222)...\n");
             t_risc_reg_val mmapAddr = registerValues[a0];
             t_risc_reg_val flags = registerValues[a3];
             if (!(flags & MAP_FIXED || flags & MAP_FIXED_NOREPLACE)) {
@@ -503,14 +503,14 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 260: //wait4
         {
-            log_general("Emulate syscall wait4 (260)...\n");
+            log_syscall("Emulate syscall wait4 (260)...\n");
             registerValues[a0] = syscall4(__NR_wait4, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }
             break;
         case 261: //prlimit64
         {
-            log_general("Emulate syscall prlimit64 (261)...\n");
+            log_syscall("Emulate syscall prlimit64 (261)...\n");
             registerValues[a0] = syscall4(__NR_prlimit64, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3]);
         }

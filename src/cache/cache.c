@@ -186,15 +186,19 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
  */
 void print_values(void) {
     if (!flag_log_cache) return;
-
+    log_cache("Cache updated.\n");
+    if (flag_log_cache_contents) {
+        log_cache("New contents.\n");
+    }
     size_t blocks = 0;
     for (size_t i = 0; i < table_size; ++i) { //potentially better way to do this?
         if (cache_table[i].cache_loc != 0) {
             blocks++;
-            //maybe enable this verbose cache logging with a separate flag or setting.
-            //log_cache("cache[%i]: block address %p at cache loc %p\n", i, cache_table[i].risc_addr,
-            //          cache_table[i].cache_loc);
+            if (flag_log_cache_contents) {
+                log_cache("cache[%lu]: block address %p at cache loc %p\n", i, (void *) cache_table[i].risc_addr,
+                          cache_table[i].cache_loc);
+            }
         }
     }
-    log_cache("Cache updated. Contains %i block(s).\n", blocks);
+    log_cache("Now contains %lu block(s).\n", blocks);
 }
