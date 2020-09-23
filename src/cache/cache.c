@@ -142,6 +142,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
         t_cache_entry *old_table = cache_table;
         cache_table = copy_buf;
 
+        count_entries = 0;
+
         //rehash all the old values
         for (size_t i = 0; i < table_size >> 1u; i++) {
             if (old_table[i].cache_loc != 0) {
