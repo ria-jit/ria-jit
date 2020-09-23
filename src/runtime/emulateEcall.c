@@ -515,6 +515,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
                                           registerValues[a3]);
         }
             break;
+        case 278: //getrandom
+        {
+            log_general("Emulate syscall getrandom (278)...\n");
+            registerValues[a0] = syscall3(__NR_getrandom, registerValues[a0], registerValues[a1], registerValues[a2]);
+        }
+            break;
         default:
             dprintf(2, "Syscall %li is not yet implemented\n", registerValues[a7]);
             registerValues[a0] = -ENOSYS;
