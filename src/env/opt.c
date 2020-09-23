@@ -69,6 +69,43 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 return parse_result;
                             }
                         } while (*(option_string++) == ',');
+                    } else if (strncmp(option_string, "optimize=", 9) == 0) {
+                        option_string += 9;
+                        do {
+                            if (strncmp(option_string, "no-general", 10) == 0) {
+                                option_string += 10;
+                                flag_translate_opt = true;
+                            } else if (strncmp(option_string, "no-ras", 6) == 0) {
+                                option_string += 6;
+                                flag_translate_opt_ras = false;
+                            } else if (strncmp(option_string, "no-chain", 8) == 0) {
+                                option_string += 8;
+                                flag_translate_opt_chain = false;
+                            } else if (strncmp(option_string, "no-jump", 7) == 0) {
+                                option_string += 7;
+                                flag_translate_opt_jump = false;
+                                flag_translate_opt_ras = false;
+                            } else if (strncmp(option_string, "singlestep", 10) == 0) {
+                                option_string += 10;
+                                flag_single_step = true;
+                            } else if (strncmp(option_string, "none", 4) == 0) {
+                                option_string += 4;
+                                flag_translate_opt_ras = false;
+                                flag_translate_opt_chain = false;
+                                flag_translate_opt_jump = false;
+                                flag_translate_opt = false;
+                            } else if (strncmp(option_string, "help", 4) == 0) {
+                                printf("Log categories:\n"
+                                       "no-general\t\tDisable general optimizations\n"
+                                       "no-ras\t\t\tDisable return address stack\n"
+                                       "no-chain\t\tDisable block chaining\n"
+                                       "no-jump\t\t\tDisable recursive translation of jump targets (Implies no-ras)\n"
+                                       "none\t\t\tAll of the above\n"
+                                       "singlestep\t\tEnable single stepping mode. Each RISC-V instruction will be translated into its own block\n");
+                                parse_result.status = 1;
+                                return parse_result;
+                            }
+                        } while (*(option_string++) == ',');
                     }
                     goto NEXT;
                 case 'a':
@@ -105,6 +142,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     break;
                 case 'm':
                     flag_translate_opt = false;
+                    flag_translate_opt_jump = false;
+                    flag_translate_opt_chain = false;
+                    flag_translate_opt_ras = false;
                     break;
                 case 'b':
                     flag_do_benchmark = true;
@@ -124,11 +164,12 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             "\t-c\tDisplay cache info (--log=cache)\n"
                             "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
                             "program may enter undefined states.\n"
-                            "\t-d\tEnable Single stepping mode. Each instruction will be its own block.\n"
-                            "\t-m\tDisable translation optimization features.\n"
+                            "\t-d\tEnable Single stepping mode. Each instruction will be its own block.(--optimize=singlestep)\n"
+                            "\t-m\tDisable translation optimization features.(--optimize=none)\n"
                             "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
                             "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
                             "\t--log=category,[...]\tEnable logging for certain categories. See --log=help for more info.\n"
+                            "\t--optimize=category,[...]\tDisable certain optimization categories. See --optimize=help for more info.\n"
                             "\t-h\tShow this help.\n"
                     );
                     parse_result.status = 1;
@@ -146,7 +187,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 flag_log_cache_contents, flag_log_syscall);
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
-    log_general("Translate opt: %d\n", flag_translate_opt);
+    log_general("Translate opt: general %d, ras %d, chaining %d, recurse jumps %d, singlestep %d\n", flag_translate_opt,
+                flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_single_step);
     log_general("Do analyze: %d\n", flag_do_analyze);
     log_general("Do benchmarking: %d\n", flag_do_benchmark);
     log_general("File path: %s\n", file_path);

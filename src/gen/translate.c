@@ -3,7 +3,6 @@
 //
 
 #include "translate.h"
-#include <runtime/register.h>
 #include <gen/dispatch.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>
@@ -13,7 +12,6 @@
 #include <util/typedefs.h>
 #include <parser/parser.h>
 #include <main/context.h>
-#include <gen/instr/core/translate_controlflow.h>
 #include <gen/optimize.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
@@ -22,9 +20,6 @@ t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info);
 
 int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
-
-t_cache_loc
-translate_block_instructions(const t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info);
 
 /**
  * The pointer to the head of the current basic block.
@@ -78,7 +73,7 @@ void init_block() {
 t_cache_loc finalize_block(int chainLinkOp) {
 
     ///write chainEnd to be chained by chainer
-    if (flag_translate_opt && chainLinkOp == LINK_NULL) {
+    if (flag_translate_opt_chain && chainLinkOp == LINK_NULL) {
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
     }
 
@@ -249,7 +244,6 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
                         _exit(1);
-                        break;
                 }
             }
                 break;
@@ -306,7 +300,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
             case JUMP : {    ///JAL, JALR
                 switch (parse_buf[parse_pos].mnem) {
                     case JAL : {
-                        if (!flag_translate_opt) {
+                        if (!flag_translate_opt_jump) {
                             ///could follow, but cache
                             instructions_in_block++;
                             goto PARSE_DONE;
@@ -400,7 +394,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         break;
 
                     case JALR : {
-                        if(flag_translate_opt && (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
+                        if (flag_translate_opt_jump &&
+                                (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
                             ///2: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
@@ -456,11 +451,11 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
  * inserts direct jumps after first cache lookup in main
  * */
 void chain(t_cache_loc target) {
-    if (!flag_translate_opt) return;
+    if (!flag_translate_opt_chain) return;
     int chain_err = 0;
     if (chain_end != NULL) {
         log_general("chaining: ...\n");
-        chain_err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
+        chain_err |= fe_enc64((uint8_t **) &chain_end, FE_JMP, (intptr_t) target);
         ///Reset chain_end
         chain_end = NULL;
     }
