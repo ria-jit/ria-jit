@@ -45,7 +45,7 @@ size_t tlb_size = SMALLTLB;
  * Initializes the hash table array.
  */
 void init_hash_table(void) {
-    log_cache("Initializing cache table for size %i...\n", table_size);
+    log_cache("Initializing cache table for size %lu...\n", table_size);
 
     //allocate memory for our table (MAP_ANONYMOUS --> initialize to zero)
     cache_table = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
@@ -126,7 +126,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     if (count_entries >= table_size >> 1) {
         //double the table size
         table_size <<= 1u;
-        log_cache("Doubling table size to %i and reallocating...\n", table_size);
+        log_cache("Doubling table size to %lu and reallocating...\n", table_size);
 
         //allocate new heap space for the cache table and copy over the values we have saved
         t_cache_entry *copy_buf = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,

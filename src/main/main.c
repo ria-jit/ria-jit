@@ -101,7 +101,8 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
 
         //execute the cached (or now newly generated code) and update the program counter
         if (!execute_cached(cache_loc, c_info)) break;
-        //printf("chain_end: %p\ncache_loc: %p\n\n", chain_end, cache_loc);
+        //printf("chain_end: %p\n"
+        // "cache_loc: %p\n\n", chain_end, cache_loc);
 
         //store pc from registers in pc
         next_pc = get_value(pc);
@@ -122,7 +123,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  */
 bool execute_cached(t_cache_loc loc, context_info *c_info) {
     if (flag_log_general) {
-        log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+        log_general("Execute block at %p, cache loc %p\n", (void *) get_value(pc), loc);
     }
 
     execute_in_guest_context(c_info, loc);

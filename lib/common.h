@@ -76,7 +76,10 @@ int snprintf(char *str, size_t size, const char *restrict format, ...);
 
 int vdprintf(int fd, const char *restrict format, va_list args);
 
-int dprintf(int fd, const char *restrict format, ...);
+__attribute__((__format__(printf, 2, 0)))
+
+int dprintf(int fd, const char *restrict format, ...)
+__attribute__((__format__(printf, 2, 3)));
 
 int printf(const char *restrict format, ...);
 
@@ -112,7 +115,7 @@ int __clone(int (*func)(void *), void *stack, int flags, void *arg, ...);
 #define PASTE(a, b) PASTE_ARGS(a, b)
 
 #define ALIGN_DOWN(v, a) ((v) & ~((a)-1))
-#define ALIGN_UP(v, a) (((v) + (a - 1)) & ~((a)-1))
+#define ALIGN_UP(v, a) (((v) + ((a) - 1)) & ~((a)-1))
 
 #define LIKELY(x) __builtin_expect((x), 1)
 #define UNLIKELY(x) __builtin_expect((x), 0)

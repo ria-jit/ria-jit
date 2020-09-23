@@ -113,8 +113,8 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
     dispatch_instr(instr, c_info);
 
     //log instruction
-    log_asm_out(
-            "Instruction %s at 0x%x (type %d) – (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
+    log_asm_in(
+            "Instruction %s at 0x%lx (type %d) – (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
@@ -136,7 +136,7 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
 }
 
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
-    log_asm_out("Start translating block at (riscv)%p...\n", risc_addr);
+    log_asm_out("Start translating block at (riscv)%p...\n", (void *) risc_addr);
 
     /// get memory for structs
 #define BLOCK_CACHE_SIZE 64
@@ -157,7 +157,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
     ///Start of actual translation
     t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info);
 
-    log_asm_out("Translated block at (riscv)%p: %d instructions\n", risc_addr, instructions_in_block);
+    log_asm_out("Translated block at (riscv)%p: %d instructions\n", (void *) risc_addr, instructions_in_block);
 
     munmap(block_cache, maxCount * sizeof(t_risc_instr));
     return block;
@@ -323,8 +323,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -338,9 +339,10 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
                                     set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
-                                    cache_loc = translate_block(ret_target,c_info);
+                                    cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }
@@ -358,8 +360,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -405,9 +408,10 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
                                     set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
-                                    cache_loc = translate_block(ret_target,c_info);
+                                    cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }

@@ -36,20 +36,29 @@ void critical_not_yet_implemented(const char *info);
 
 void not_yet_implemented(const char *info);
 
-void log_general(const char *format, ...);
+void log_general(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
 void log_syscall(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
-void log_asm_in(const char *format, ...);
+void log_analyze(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
-void log_asm_out(const char *format, ...);
+void log_asm_in(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
-void log_reg_dump(const char *format, ...);
+void log_asm_out(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
-void log_cache(const char *format, ...);
+void log_reg_dump(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
-void log_benchmark(const char *format, ...);
+void log_cache(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
+
+void log_benchmark(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
 
 void log_print_mem(const char *ptr, long int len);
 
