@@ -46,28 +46,52 @@ As the DBT is responsible for managing the execution environment of the guest bi
 The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
 The DBT must take care to map the file into memory correctly, while not compromising its own memory region.
 
-The stack must also be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present.
+Furthermore, the guest registers (see section \vref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
+
 % todo details about the memory layout
-
-
 
 \subsection{Partitioning the input code}
 Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
 The natural choice here is for the translator to partition the code into basic blocks.
 
 Basic blocks, by definition, have only a single point of entry and exit; all other instructions in a single block are executed sequentially and in the order that they appear in the code.
-Of course, this does not take into account mechanisms such as out-of-order execution or system calls and interrupt/exception handling.
+(Of course, this does not take into account mechanisms such as out-of-order execution or system calls as well as interrupt- and exception handling).
 
-Thus, in our case, a basic block for the purpose of translation will be ended by any dynamic control-flow altering instruction or a system call.
-Static (or direct) jumps can be followed in translation, as the jump target is known without executing the binary; the resulting block can be seen as an extended basic block covering both the origin and target blocks.
+So, for our purposes, a basic block will be terminated by any control-flow altering instruction like a jump, call or return statement, or a system call\footnote{These may or may not have control-flow altering effects; they in any case need to be handled this way due to the reasons laid out in section \vref{sec:syscall-handling}.}.
 
 % todo continued about basic blocks, jump/call instructions, etc.
 
 
-\subsection{Translation of the partitioned code}
+\subsection{Translating the partitioned code}
+The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
+
+The quality of the code that can be easily generated here strongly depends on the properties of the host and guest architectures in question.
+Difficulties can arise due to differences in the instruction operand formats and the type of instruction set architecture the DBT is dealing with.
+
+In our case, as outlined in section \vref{sec:isa-cmp}, challenges stem from the fact that we are translating code from a load-store architecture using a three-operand instruction format into a register-memory architecture in which (generally) one of the source operands is also the implicit destination operand.
+This, for example, means that a single arithmetic \texttt{add rd, rs1, rs2} in RISC-V assembly language generally can not be translated via a single instruction, but rather requires two instructions: moving \texttt{rs1} to \texttt{rd}, then adding the value of \texttt{rs2} to \texttt{rd}.
+
+Opportunities for optimisation lie wherever there is a way to shorten the translation's amount of CPU clock cycles, possibly by employing semantically equivalent native instructions that run in a shorter timespan.
+The RISC-V pseudoinstructions (as mentioned in section \ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, as it is clear that an instruction like \texttt{xori x10, x10, -1} can be directly translated as a \texttt{not x10}, without needing to resort to \texttt{mov} and \texttt{xor}.
 
 
 \subsection{Code cache and block handling}
+Naturally, the DBT aims to store the translated code in a semi-permanent way, for it is the goal to not have to translate a required section more than once.
+
+For that, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
+Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
+
+% todo info about chaining and optimisations
+
+It is possible that this code cache might fill up during the execution of a large guest program.
+If it does, there are two different strategies to handle this issue:
+One can either invalidate and purge some or all of the blocks currently residing in the cache, or dynamically resize the cache according to the needs of the guest program~\cite[S. 3]{bintrans}.
+
+Purging the entire cache would require the translator to restart translation on older blocks that might be needed again, introducing a performance overhead that needs to be weighed against the higher memory usage of enlarging the cache.
+
+On the other hand, selective deletion of some of the blocks in the cache is very difficult due to optimisations taken in the context of chaining.
+As any chained jumps located in another cached block are dependent on the target block residing in the cache, the target's removal would invalidate these jumps.
+It would thus only be possible to either remove all blocks with jump references to the candidate up for removal, or to leave all blocks with jump references in the cache altogether.
 
 
 \subsection{Context switching and register handling}
@@ -75,7 +99,7 @@ Static (or direct) jumps can be followed in translation, as the jump target is k
 
 
 \subsection{System call handling}
-
+\label{sec:syscall-handling}
 
 
 
