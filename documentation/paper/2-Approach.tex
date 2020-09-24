@@ -37,21 +37,44 @@ Also, as the DBT is actually stepping through and executing the program, the oth
 It can also perform significantly better than an interpreter might, as it has to translate a single piece of code only once, which can then be called many times; unlike the above-mentioned behaviour of an interpreter.
 Furthermore, as it produces blocks of code that are native to the host platform, it can be reasonably expected that a single block's execution will be faster than the respective emulation.
 
-Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than absolutely necessary.
+Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f]{bintrans}.
+
+
+\subsection{Environment setup and memory layout}
+As the DBT is responsible for managing the execution environment of the guest binary in the shared address space, it must also handle the setup of said environment.
+
+The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
+The DBT must take care to map the file into memory correctly, while not compromising its own memory region.
+
+The stack must also be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present.
+% todo details about the memory layout
+
 
 
 \subsection{Partitioning the input code}
-Logically, the DBT must somehow divide the code into chunks it can then process for translation and execution.
+Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
+The natural choice here is for the translator to partition the code into basic blocks.
 
-%todo continued about basic blocks, jump/call instructions, etc.
+Basic blocks, by definition, have only a single point of entry and exit; all other instructions in a single block are executed sequentially and in the order that they appear in the code.
+Of course, this does not take into account mechanisms such as out-of-order execution or system calls and interrupt/exception handling.
+
+Thus, in our case, a basic block for the purpose of translation will be ended by any dynamic control-flow altering instruction or a system call.
+Static (or direct) jumps can be followed in translation, as the jump target is known without executing the binary; the resulting block can be seen as an extended basic block covering both the origin and target blocks.
+
+% todo continued about basic blocks, jump/call instructions, etc.
 
 
+\subsection{Translation of the partitioned code}
 
 
+\subsection{Code cache and block handling}
 
 
+\subsection{Context switching and register handling}
+\label{sec:context-switch-reg-handle}
 
 
+\subsection{System call handling}
 
 
 
