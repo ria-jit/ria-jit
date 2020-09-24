@@ -57,16 +57,18 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_log_syscall = true;
                                 option_string += 5;
                             } else if (strncmp(option_string, "help", 4) == 0) {
-                                printf("Log categories:\n"
-                                       "general\t\t\tGeneral logging that fits no other categories\n"
-                                       "asm_in\t\t\tShow parsed and raw RISC-V instructions\n"
-                                       "asm_out\t\t\tShow generated x86 code\n"
-                                       "reg\t\t\t\tDump register contents after every block (Warning: lots of logs)\n"
-                                       "cache\t\t\tLog events involving the block cache\n"
-                                       "cache-contents\tLog cache contents after every cache update (implies cache).\n"
-                                       "strace\t\t\tLog all emulated syscalls.");
+                                printf("Logging categories: --log=...\n"
+                                       "\tgeneral\t\t\tGeneral logging that fits no other categories.\n"
+                                       "\tasm_in\t\t\tShow parsed and raw RISC-V instructions.\n"
+                                       "\tasm_out\t\t\tShow generated x86 code.\n"
+                                       "\treg\t\t\t\tDump register contents after every block (warning: lots of logs).\n"
+                                       "\tcache\t\t\tLog events involving the block cache.\n"
+                                       "\tcache-contents\tLog cache contents after every cache update (implies cache).\n"
+                                       "\tstrace\t\t\tLog all emulated syscalls.\n");
                                 parse_result.status = 1;
                                 return parse_result;
+                            } else {
+                                dprintf(2, "Warning: Unknown logging category %s...\n", option_string);
                             }
                         } while (*(option_string++) == ',');
                     } else if (strncmp(option_string, "optimize=", 9) == 0) {
@@ -95,15 +97,18 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_translate_opt_jump = false;
                                 flag_translate_opt = false;
                             } else if (strncmp(option_string, "help", 4) == 0) {
-                                printf("Log categories:\n"
-                                       "no-general\t\tDisable general optimizations\n"
-                                       "no-ras\t\t\tDisable return address stack\n"
-                                       "no-chain\t\tDisable block chaining\n"
-                                       "no-jump\t\t\tDisable recursive translation of jump targets (Implies no-ras)\n"
-                                       "none\t\t\tAll of the above\n"
-                                       "singlestep\t\tEnable single stepping mode. Each RISC-V instruction will be translated into its own block\n");
+                                printf("Optimization options: --optimize=...\n"
+                                       "\tno-general\t\tDisable general optimizations.\n"
+                                       "\tno-ras\t\t\tDisable return address stack.\n"
+                                       "\tno-chain\t\tDisable block chaining.\n"
+                                       "\tno-jump\t\t\tDisable recursive translation of jump targets (implies no-ras).\n"
+                                       "\tnone\t\t\tAll of the above.\n"
+                                       "\tsinglestep\t\tEnable single stepping mode.\n"
+                                       "\t\t\t\t\tTranslates each RISC-V instruction into its own block.\n");
                                 parse_result.status = 1;
                                 return parse_result;
+                            } else {
+                                dprintf(2, "Warning: Unknown optimization option %s...\n", option_string);
                             }
                         } while (*(option_string++) == ',');
                     }
@@ -155,22 +160,35 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 HELP:
                     dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
                     dprintf(1,
-                            "Usage: translator <translator option(s)> -f <filename> <guest options>\n"
+                            "Usage: translator [translator option(s)] -f <filename> [guest options]\n"
+                            "\n"
+                            "Options:\n"
                             "\t-v\tShow translator version.\n"
+                            "\t-f\tSpecify executable. All options after the file path are passed to the guest.\n"
+                            "\t-a\tAnalyze binary. Does not execute the guest program.\n"
+                            "\t\tInspects passed program binary and shows instruction mnemonics.\n"
+                            "\t-b\tBenchmark execution. Times the execution of the program,\n"
+                            "\t\texcluding mapping the binary into memory.\n"
+                            "\t-s\tFail silently for some error conditions.\n"
+                            "\t\tAllows continued execution, but the client "
+                            "program may enter undefined states.\n"
+                            "\t-h\tShow this help.\n"
+                            "\n"
+                            "Logging:\n"
+                            "\t--log=category,[...]\n"
+                            "\t\tEnable logging for certain categories. See --log=help for more info.\n"
                             "\t-g\tDisplay general verbose info (--log=general,strace)\n"
                             "\t-i\tDisplay parsed RISC-V input assembly (--log=asm_in)\n"
                             "\t-o\tDisplay translated output x86 assembly (--log=asm_out)\n"
                             "\t-r\tDump registers on basic block boundaries (--log=reg)\n"
                             "\t-c\tDisplay cache info (--log=cache)\n"
-                            "\t-s\tFail silently for some  error conditions. Allows continued execution, but the client "
-                            "program may enter undefined states.\n"
-                            "\t-d\tEnable Single stepping mode. Each instruction will be its own block.(--optimize=singlestep)\n"
-                            "\t-m\tDisable translation optimization features.(--optimize=none)\n"
-                            "\t-a\tAnalyze binary. Inspects passed program binary and shows instruction mnemonics.\n"
-                            "\t-b\tBenchmark execution. Times the execution of the program, excluding mapping the binary into memory.\n"
-                            "\t--log=category,[...]\tEnable logging for certain categories. See --log=help for more info.\n"
-                            "\t--optimize=category,[...]\tDisable certain optimization categories. See --optimize=help for more info.\n"
-                            "\t-h\tShow this help.\n"
+                            "\n"
+                            "Optimization:\n"
+                            "\t--optimize=category,[...]\n"
+                            "\t\tDisable certain optimization categories. See --optimize=help for more info.\n"
+                            "\t-d\tEnable Single stepping mode.\n"
+                            "\t\tEach instruction will be its own block. (--optimize=singlestep)\n"
+                            "\t-m\tDisable all translation optimization features. (--optimize=none)\n"
                     );
                     parse_result.status = 1;
                     return parse_result;
@@ -194,7 +212,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {
-        dprintf(2, "Bad. Invalid file path.\n");
+        dprintf(2, "Error: File path not specified or invalid.\n");
         parse_result.status = 2;
         return parse_result;
     }
