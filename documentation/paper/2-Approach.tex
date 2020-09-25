@@ -37,7 +37,7 @@ Also, as the DBT is actually stepping through and executing the program, the oth
 It can also perform significantly better than an interpreter might, as it has to translate a single piece of code only once, which can then be called many times; unlike the above-mentioned behaviour of an interpreter.
 Furthermore, as it produces blocks of code that are native to the host platform, it can be reasonably expected that a single block's execution will be faster than the respective emulation.
 
-Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f]{bintrans}.
+Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f.]{bintrans}.
 
 
 \subsection{Environment setup and memory layout}
@@ -94,12 +94,39 @@ As any chained jumps located in another cached block are dependent on the target
 It would thus only be possible to either remove all blocks with jump references to the candidate up for removal, or to leave all blocks with jump references in the cache altogether.
 
 
-\subsection{Context switching and register handling}
+\subsection{Register handling and context switching}
 \label{sec:context-switch-reg-handle}
+As outlined in section \ref{sec:isa-cmp}, the RISC-V and x86-64 architectures have differing amounts of general purpose registers.
+In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
+
+As x86-64 only provides for 16 general-purpose registers (\texttt{rax--rdx, rsi, rdi, rsp, rbp and r8--r15}), it is impossible to directly and statically map all guest registers to native host registers.
+Adding to the above, due to the fact that some x86-64 registers have special or implicit purposes in some instructions (\texttt{rax} and \texttt{rdx} in \texttt{(i)mul}, \texttt{cl} in shifting, etc.), care must be taken in choosing the registers that can be used for such a mapping.
+Keeping a guest register file exclusively in memory, and loading them into native registers when needed within the translations of single instructions is technically possible, especially in light of x86-64's ability to extensively use memory operands in the instructions.
+However, this necessitates a large number of memory accesses for both memory operands in the instructions as well as local register allocation within the translated blocks.
+Due to the very large performance gain connected to using register operands instead of memory operands, this is also not feasible at scale~\cite[S. 8f.]{bintrans}.
+
+Accordingly, the solution would be an approach that employs parts of both of these extremes~\cite[S. 9]{bintrans}.
+We aim to employ the tools we design to discover the most-used registers in the guest programs, and statically map these to general purpose x86-64 registers.
+The remaining operands can either be used from memory directly, or dynamically allocated into free host registers inside a single block's translation.
+Thus, we save much overhead otherwise spent on memory access to the register file, but do unnecessarily occupy native register space with seldomly accessed guest registers.
+
+% todo context switching
+
+
 
 
 \subsection{System call handling}
 \label{sec:syscall-handling}
+
+
+
+
+
+
+
+
+
+
 
 
 
