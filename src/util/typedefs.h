@@ -117,7 +117,7 @@ typedef enum {
     s4, s5, s6, s7, s8, s9, s10, s11, t3, t4,
     t5, t6
 } t_risc_reg_mnem;
-#define N_REG 33
+#define N_REG 34
 
 //CSR registers
 #define N_CSR 4096
