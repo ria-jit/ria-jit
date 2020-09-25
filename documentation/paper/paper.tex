@@ -11,6 +11,7 @@
 \usepackage{siunitx}
 \usepackage{multicol}
 \usepackage[german]{varioref}
+\usepackage[toc]{appendix}
 
 \author{Noah Dormann \and Simon Kammermeier \and Johannes Pfannschmidt \and Florian Schmidt}
 \date{Summer term 2020}
@@ -54,8 +55,22 @@
 \input{5-Summary}
 
 \newpage
+\section*{Appendices}
+\begin{appendices}
+	% redefine section/subsection levels via changing \l@section and \l@subsection
+	% this collects the appendices in the toc as subsections to "Appendices"
+	\makeatletter
+	\addtocontents{toc}{%
+		\begingroup
+		\let\protect\l@section\protect\l@subsection
+		\let\protect\l@subsection\protect\l@subsubsection
+	}
+	\makeatother
+	
+	\input{A-Appendix}
+\end{appendices}
+
+\newpage
 \bibliographystyle{plain}
 \bibliography{paper}{}
-
-% possibly add an appendix here, should it be required
 \end{document}
