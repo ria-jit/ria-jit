@@ -124,14 +124,14 @@ For RISC-V, the instruction \texttt{ECALL} (for \textit{environment call}, forme
 
 However, the DBT generally cannot just reorganise the guest argument values and system call identifier according the host's calling convention and relay the system call directly.
 The RISC-V guest program expects a different operating system kernel than is present natively on the host;
-with that, the system call interface also differs~\cite[S. 3]{bintrans}.
+with that, the system call interface also differs~\cite[S. 2f.]{bintrans}.
 
 In order to handle the \texttt{ECALL} instruction correctly, the translator must thus build the translated instruction to call a specific handler routine not too dissimilar from one that may be found in a kernel.
 There, system calls that exist natively on the host architecture as well (like \texttt{write} or \texttt{clock\_gettime}) can usually be passed along to the host's kernel directly.
 
 Care must be taken for system calls that would enable the guest to change the state or context of the host -- an \texttt{mmap} into the translator's memory region, for example, or a call to \texttt{exit} -- these calls must be emulated accordingly to prevent these faults.
 In cases where the data structure layout used by the kernels differs, the DBT must also perform necessary actions to adapt the formats to each other.
-Some system calls may not exist at all on the native architecture of the host, it is up to the DBT to emulate the required functionality.
+Some system calls may not exist at all on the native architecture of the host, it is up to the DBT to emulate the required functionality~\cite[S. 2f.]{bintrans}.
 
 
 
