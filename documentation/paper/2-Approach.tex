@@ -48,7 +48,7 @@ The DBT must take care to map the file into memory correctly, while not compromi
 
 Furthermore, the guest registers (see section \vref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
 
-% todo details about the memory layout
+% todo details about the memory layout and setup of the environment
 
 \subsection{Partitioning the input code}
 Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
@@ -117,6 +117,25 @@ Thus, we save much overhead otherwise spent on memory access to the register fil
 
 \subsection{System call handling}
 \label{sec:syscall-handling}
+System calls are also a very important part of enabling the guest program's execution.
+Thus, every ISA must offer some way to switch the execution context in the kernel mode for the system call to be handled.
+
+For RISC-V, the instruction \texttt{ECALL} (for \textit{environment call}, formerly \texttt{SCALL}) handles these requests, with the system call number residing in register \texttt{a7} and the arguments being passed in \texttt{a0--a6}.
+
+However, the DBT generally cannot just reorganise the guest argument values and system call identifier according the host's calling convention and relay the system call directly.
+The RISC-V guest program expects a different operating system kernel than is present natively on the host;
+with that, the system call interface also differs~\cite[S. 3]{bintrans}.
+
+In order to handle the \texttt{ECALL} instruction correctly, the translator must thus build the translated instruction to call a specific handler routine not too dissimilar from one that may be found in a kernel.
+There, system calls that exist natively on the host architecture as well (like \texttt{write} or \texttt{clock\_gettime}) can usually be passed along to the host's kernel directly.
+
+Care must be taken for system calls that would enable the guest to change the state or context of the host -- an \texttt{mmap} into the translator's memory region, for example, or a call to \texttt{exit} -- these calls must be emulated accordingly to prevent these faults.
+In cases where the data structure layout used by the kernels differs, the DBT must also perform necessary actions to adapt the formats to each other.
+Some system calls may not exist at all on the native architecture of the host, it is up to the DBT to emulate the required functionality.
+
+
+
+
 
 
 
