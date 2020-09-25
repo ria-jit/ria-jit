@@ -1,1 +1,61 @@
-\section{First appendix}
+\section{Download and installation instructions}
+The source code for the translator can be downloaded by checking out the project's git repository.
+Take care to either \texttt{git clone} the repository with the option flag \texttt{--recursive}, or to run the command
+\begin{lstlisting}
+	git submodule update --init
+\end{lstlisting}
+as the repository contains submodules that are required for compilation.
+
+Then, the translator can be built by exeucting
+\begin{lstlisting}
+	sudo apt-get -y install gcc g++ cmake make autoconf meson
+	mkdir build && cd build && cmake .. && make
+\end{lstlisting}
+in the root directory of the repository.
+Note that the build requires CMake version 3.16 or above.
+This will build two artifacts:
+\begin{description}
+	\item[translator] The actual dynamic binary translator.
+	For details on the usage, see the section below, or execute \texttt{./translator -h}.
+	
+	\item[test] The unit test binary.
+	It can be executed via \texttt{./test} and performs extensive unit testing of the RISC-V instruction implementations, the cache, register file, as well as the parser.
+\end{description}
+
+\section{Executable program requirements}
+We can execute binaries compiled via the tools provided in the RISC-V GNU toolchain\footnote{For further information as well as download and usage instructions, see \url{https://github.com/riscv/riscv-gnu-toolchain} (last accessed on 25.09.2020).}.
+The executables need to be linked statically (pass the flag \texttt{-static} to gcc when compiling), as the translator does not support dynamically linked files.
+
+% todo update if floating point comes into play
+We currently support binaries compiled for the architecture specifier \texttt{rv64ima}, meaning the compiler is free to utilise the base integer instruction set (\texttt{i}), as well as the instructions provided by the multiplication (\texttt{m}) and atomic standard extensions (\texttt{a}).
+This can be achieved by passing \texttt{-march=rv64ima} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, the aforementioned option implies \texttt{-mabi=lp64}.}.
+
+\section{Using the translator}
+% this assumes the state of opt_rewrite, todo update as necessary
+\begin{lstlisting}
+	./translator [translator option(s)] -f <filename> [guest options]
+\end{lstlisting}
+
+Seen above is the syntax for executing the translator with a guest program.
+All possible translator options are described in the help text, as seen by executing \texttt{./translator -h}.
+Every option after the filename specified via the \texttt{-f} flag is passed along to the guest in its \texttt{argv}, so all options intended for the translator must be passed before \texttt{-f}.
+
+The command line options also include the ability to analyse (\texttt{-a}) the binary to produce a detailed breakdown of which instruction mnemonics and registers the guest will use when executed.
+Furthermore, it includes the ability to time the execution of only the guest program by passing the flag \texttt{-b}.
+
+Logging can be controlled by passing the requested category to the \texttt{----log} flag as detailed in the help, and can provide insights into the state of the translator during execution or debugging.
+Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining or recursive jump target translation via \texttt{----optimize}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
