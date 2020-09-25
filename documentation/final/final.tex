@@ -1,0 +1,85 @@
+\documentclass[german]{tum-presentation}
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage[T1]{fontenc}
+\usepackage{xstring}
+\usepackage{catchfile}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{icomma}
+\usepackage{siunitx}
+\usepackage{multicol}
+\usepackage[german]{varioref}
+\usepackage{listings}
+\usepackage{color}
+
+% setup commands
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
+\newcommand{\define}[2]{\item \textbf{#1}\\#2}
+\newcommand{\conclude}[0]{\ensuremath{\Longrightarrow} }
+\newcommand{\refer}[0]{\ensuremath{\rightarrow} }
+\sisetup{range-phrase=--,range-units=single}
+\MakeOuterQuote{"}
+
+% config for source code listings
+\lstset{
+	language=C++,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\ttfamily},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+% bibliography
+\addbibresource{literature.bib}
+
+% document properties
+\title[Binary Translation: RISC-V \refer x86--64]{Dynamische Binärübersetzung: RISC-V \refer x86--64}
+\subtitle{Endpräsentation}
+\author[Dormann, Kammermeier, Pfannschmidt, Schmidt]{Noah Dormann\inst{1}, Simon Kammermeier\inst{1},\\Johannes Pfannschmidt\inst{1}, Florian Schmidt\inst{1}}
+\institute[]{\inst{1} Fakultät für Informatik,
+  Technische Universität München (TUM)}
+\date{\today}
+
+% todo remove: typeset current commit id for draft management
+\CatchFileDef{\headfull}{../../.git/HEAD}{}
+\StrGobbleRight{\headfull}{1}[\head]
+\StrBehind[2]{\head}{/}[\branch]
+\CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
+\footline{Draft after commit \commit on branch \branch.}
+
+% beamer setup todo uncomment footer after removing commit id
+%\footline{\insertshortauthor~|~\insertshorttitle}
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+
+\begin{document}
+
+\begin{frame}[noframenumbering]
+ 	\titlepage
+\end{frame}
+
+\begin{frame}
+	\frametitle{Gliederung}
+	\tableofcontents
+\end{frame}
+
+% selbstverständlich sample-Gliederung
+\section{Einführung} % Noah
+\subsection{Grobüberblick über die RISC-V ISA}
+\begin{frame}
+	\frametitle{Einführung}
+	Hier geht's weiter\ldots
+\end{frame}
+\end{document}
