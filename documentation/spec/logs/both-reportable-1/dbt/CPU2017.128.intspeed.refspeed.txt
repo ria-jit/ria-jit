@@ -1,11 +1,23 @@
 ##################################################################################################################################
 #   INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN                                                      #
 #                                                                                                                                #
-# Your run was marked invalid because it has one or more flags in the                                                            #
-# "unknown" category. You might be able to resolve this problem without                                                          #
-# re-running your test; see                                                                                                      #
+# 'reportable' flag not set during run                                                                                           #
+# 648.exchange2_s (base) did not have enough runs!                                                                               #
+# 602.gcc_s (base) did not have enough runs!                                                                                     #
+# 600.perlbench_s (base) did not have enough runs!                                                                               #
+# 605.mcf_s (base) did not have enough runs!                                                                                     #
+# 625.x264_s (base) did not have enough runs!                                                                                    #
+# 657.xz_s (base) did not have enough runs!                                                                                      #
+# 631.deepsjeng_s (base) did not have enough runs!                                                                               #
+# 620.omnetpp_s (base) did not have enough runs!                                                                                 #
+# 641.leela_s (base) did not have enough runs!                                                                                   #
+# 623.xalancbmk_s (base) did not have enough runs!                                                                               #
+# 625.x264_s (base) had invalid runs!                                                                                            #
+# Run of 625.x264_s (base) was not valid; status is RE                                                                           #
+# Unknown flags were used! See                                                                                                   #
 #      https://www.spec.org/cpu2017/Docs/runcpu.html#flagsurl                                                                    #
-# for more information.                                                                                                          #
+# for information about how to get rid of this error.                                                                            #
+# Error 625.x264_s: copy 0 non-zero return code (exit code=255, signal=0)                                                        #
 #                                                                                                                                #
 #   INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN                                                      #
 ##################################################################################################################################
@@ -20,38 +32,28 @@
                  Base     Base        Base        Peak     Peak        Peak
 Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
 --------------- -------  ---------  ---------    -------  ---------  ---------
-600.perlbench_s       1       3045      0.583  S
-600.perlbench_s       1       3058      0.581  *
-602.gcc_s             1       3391      1.17   *
-602.gcc_s             1       3374      1.18   S
-605.mcf_s             1       3230      1.46   *
-605.mcf_s             1       3133      1.51   S
-620.omnetpp_s         1       2577      0.633  *
-620.omnetpp_s         1       2568      0.635  S
-623.xalancbmk_s       1       1679      0.844  *
-623.xalancbmk_s       1       1675      0.846  S
-625.x264_s            1       2912      0.606  *
-625.x264_s            1       2912      0.606  S
-631.deepsjeng_s       1       2466      0.581  *
-631.deepsjeng_s       1       2456      0.583  S
-641.leela_s           1       3175      0.537  S
-641.leela_s           1       3177      0.537  *
-648.exchange2_s       1       2213      1.33   *
-648.exchange2_s       1       2213      1.33   S
-657.xz_s              1       8907      0.694  *
-657.xz_s              1       8899      0.695  S
+600.perlbench_s       1      10930      0.162  *
+602.gcc_s             1       9301      0.428  *
+605.mcf_s             1       3654      1.29   *
+620.omnetpp_s         1       8210      0.199  *
+623.xalancbmk_s       1       4563      0.311  *
+625.x264_s            1        550            RE
+631.deepsjeng_s       1      10330      0.139  *
+641.leela_s           1       7517      0.227  *
+648.exchange2_s       1       4891      0.601  *
+657.xz_s              1      12625      0.490  *
 =================================================================================
-600.perlbench_s       1       3058      0.581  *
-602.gcc_s             1       3391      1.17   *
-605.mcf_s             1       3230      1.46   *
-620.omnetpp_s         1       2577      0.633  *
-623.xalancbmk_s       1       1679      0.844  *
-625.x264_s            1       2912      0.606  *
-631.deepsjeng_s       1       2466      0.581  *
-641.leela_s           1       3177      0.537  *
-648.exchange2_s       1       2213      1.33   *
-657.xz_s              1       8907      0.694  *
- Est. SPECspeed(R)2017_int_base         0.788
+600.perlbench_s       1      10930      0.162  *
+602.gcc_s             1       9301      0.428  *
+605.mcf_s             1       3654      1.29   *
+620.omnetpp_s         1       8210      0.199  *
+623.xalancbmk_s       1       4563      0.311  *
+625.x264_s                                    NR
+631.deepsjeng_s       1      10330      0.139  *
+641.leela_s           1       7517      0.227  *
+648.exchange2_s       1       4891      0.601  *
+657.xz_s              1      12625      0.490  *
+ Est. SPECspeed(R)2017_int_base         0.334
  Est. SPECspeed(R)2017_int_peak                                        Not Run
 
 
@@ -68,7 +70,7 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
                Other:  
               Memory: 78.334 GB fixme: If using DDR4, the format is:
                       'N GB (N x N GB nRxn PC4-nnnnX-X)'
-             Storage: 5.5 TB  add more disk info here
+             Storage: 6.9 TB  add more disk info here
                Other:  
 
 
@@ -78,7 +80,7 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
                       4.15.0-70-generic
             Compiler: C/C++/Fortran: Version 10.1.0 of GCC, the
                       GNU Compiler Collection
-            Parallel: No
+            Parallel: Yes
             Firmware:  
          File System: nfs
         System State: Run level 5 (add definition here)
@@ -105,7 +107,7 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
     
      Sysinfo program /u/home/schmidtf/spec/bin/sysinfo
      Rev: r6365 of 2019-08-21 295195f888a3d7edb1e6e46a485a0011
-     running on sksmall Wed Sep 16 13:14:24 2020
+     running on sksmall Fri Sep 25 00:13:41 2020
     
      SUT (System Under Test) info as seen by some common utilities.
      For more information on this section, see
@@ -136,7 +138,7 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
           Model:               85
           Model name:          Intel(R) Xeon(R) Bronze 3106 CPU @ 1.70GHz
           Stepping:            4
-          CPU MHz:             1698.845
+          CPU MHz:             1064.822
           CPU max MHz:         1700.0000
           CPU min MHz:         800.0000
           BogoMIPS:            3400.00
@@ -209,7 +211,7 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
      SPEC is set to: /u/home/schmidtf/spec
         Filesystem                                       Type  Size  Used Avail Use% Mounted
         on
-        nasil10.informatik.tu-muenchen.de:/srv/il10/home nfs   5.5T  4.1T  1.1T  79% /u/home
+        nasil10.informatik.tu-muenchen.de:/srv/il10/home nfs   6.9T  4.1T  2.5T  63% /u/home
     
      From /sys/devices/virtual/dmi/id
          BIOS:    HPE U32 11/13/2019
@@ -296,43 +298,33 @@ Benchmarks      Threads  Run Time     Ratio      Threads  Run Time     Ratio
                                                         ------------------
  600.perlbench_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
        602.gcc_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
        605.mcf_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
    620.omnetpp_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CXX)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
  623.xalancbmk_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CXX)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
       625.x264_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
  631.deepsjeng_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CXX)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
      641.leela_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CXX)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
  648.exchange2_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in FC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
         657.xz_s: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in CC)
                   "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-" (in LD)
-                  "-static -fcommon" (in OPTIMIZE) "-fno-openmp" (in EXTRA_OPTIMIZE)
 
 
                                                      Base Compiler Invocation
@@ -349,29 +341,42 @@ Fortran benchmarks:
 
                                                       Base Portability Flags
                                                       ----------------------
- 600.perlbench_s: -DSPEC_LINUX_X64 -DSPEC_LP64
-       602.gcc_s: -DSPEC_LP64
-       605.mcf_s: -DSPEC_LP64
-   620.omnetpp_s: -DSPEC_LP64
- 623.xalancbmk_s: -DSPEC_LINUX -DSPEC_LP64
-      625.x264_s: -DSPEC_LP64
- 631.deepsjeng_s: -DSPEC_LP64
-     641.leela_s: -DSPEC_LP64
- 648.exchange2_s: -DSPEC_LP64
-        657.xz_s: -DSPEC_LP64
+ 600.perlbench_s: -static(*) -DSPEC_LINUX_X64 -DSPEC_LP64
+       602.gcc_s: -static(*) -DSPEC_LP64
+       605.mcf_s: -static(*) -DSPEC_LP64
+   620.omnetpp_s: -static(*) -DSPEC_LP64
+ 623.xalancbmk_s: -static(*) -DSPEC_LINUX -DSPEC_LP64
+      625.x264_s: -static(*) -DSPEC_LP64
+ 631.deepsjeng_s: -static(*) -DSPEC_LP64
+     641.leela_s: -static(*) -DSPEC_LP64
+ 648.exchange2_s: -static(*) -DSPEC_LP64
+        657.xz_s: -static(*) -DSPEC_LP64
+(*) Indicates portability flags found in non-portability variables
 
 
                                                      Base Optimization Flags
                                                      -----------------------
 C benchmarks: 
-     -std=c99 -g -O3 -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fno-strict-aliasing
-     -fgnu89-inline
+     -std=c99 -g -O3 -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fno-openmp
+     -fno-strict-aliasing -fgnu89-inline
 
 C++ benchmarks: 
-     -std=c++03 -g -O3 -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fno-tree-loop-vectorize
+     -std=c++03 -g -O3 -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fno-openmp
 
 Fortran benchmarks: 
-     -DSPEC_SUPPRESS_OPENMP -g -O3 -fno-unsafe-math-optimizations -fno-tree-loop-vectorize
+     -DSPEC_SUPPRESS_OPENMP -g -O3 -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fno-openmp
+
+
+                                                         Base Other Flags
+                                                         ----------------
+C benchmarks: 
+     -fcommon -fallow-argument-mismatch
+
+C++ benchmarks: 
+     -fcommon -fallow-argument-mismatch
+
+Fortran benchmarks: 
+     -fcommon -fallow-argument-mismatch
 
 
   SPEC CPU and SPECspeed are registered trademarks of the Standard Performance Evaluation Corporation.  All other brand and
@@ -379,11 +384,23 @@ Fortran benchmarks:
 ##################################################################################################################################
 #   INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN                                                      #
 #                                                                                                                                #
-# Your run was marked invalid because it has one or more flags in the                                                            #
-# "unknown" category. You might be able to resolve this problem without                                                          #
-# re-running your test; see                                                                                                      #
+# 'reportable' flag not set during run                                                                                           #
+# 648.exchange2_s (base) did not have enough runs!                                                                               #
+# 602.gcc_s (base) did not have enough runs!                                                                                     #
+# 600.perlbench_s (base) did not have enough runs!                                                                               #
+# 605.mcf_s (base) did not have enough runs!                                                                                     #
+# 625.x264_s (base) did not have enough runs!                                                                                    #
+# 657.xz_s (base) did not have enough runs!                                                                                      #
+# 631.deepsjeng_s (base) did not have enough runs!                                                                               #
+# 620.omnetpp_s (base) did not have enough runs!                                                                                 #
+# 641.leela_s (base) did not have enough runs!                                                                                   #
+# 623.xalancbmk_s (base) did not have enough runs!                                                                               #
+# 625.x264_s (base) had invalid runs!                                                                                            #
+# Run of 625.x264_s (base) was not valid; status is RE                                                                           #
+# Unknown flags were used! See                                                                                                   #
 #      https://www.spec.org/cpu2017/Docs/runcpu.html#flagsurl                                                                    #
-# for more information.                                                                                                          #
+# for information about how to get rid of this error.                                                                            #
+# Error 625.x264_s: copy 0 non-zero return code (exit code=255, signal=0)                                                        #
 #                                                                                                                                #
 #   INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN -- INVALID RUN                                                      #
 ##################################################################################################################################
@@ -391,5 +408,5 @@ Fortran benchmarks:
 For questions about this result, please contact the tester.
 For other inquiries, please contact info@spec.org.
 Copyright 2017-2020 Standard Performance Evaluation Corporation
-Tested with SPEC CPU(R)2017 v1.1.0 on 2020-09-16 13:14:23+0000.
-Report generated on 2020-09-17 09:04:31 by CPU2017 text formatter v6255.
+Tested with SPEC CPU(R)2017 v1.1.0 on 2020-09-25 00:13:40+0000.
+Report generated on 2020-09-25 20:29:41 by CPU2017 text formatter v6255.
