@@ -80,6 +80,11 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         dump_gp_registers();
     }
 
+    //log profiler active
+    if (flag_do_profile) {
+        log_profile("Execution profiler active...\n");
+    }
+
     //benchmark if necessary
     struct timespec begin;
     if (flag_do_benchmark) {
@@ -108,9 +113,17 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         next_pc = get_value(pc);
     }
 
+    log_general("Guest execution finalized. Cleaning up...\n");
+
     //finalize benchmark if necessary
     if (flag_do_benchmark) {
         end_display_measure(&begin);
+    }
+
+    //display the profiler's data
+    if (flag_do_profile) {
+        log_profile("Profiler data collection finished.\n");
+        dump_profiler_data();
     }
 
     return guest_exit_status;

@@ -7,6 +7,7 @@
 
 #include <fadec/fadec-enc.h>
 #include <gen/translate.h>
+#include <runtime/register.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,10 +20,18 @@ extern "C" {
 
 #define FAIL_HEAP_ALLOC 0x1000
 
+//add an access to reg to the profiler's data
+#define RECORD_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_usage_file() + 8 * reg))
+
 /*
  * Helper functions to extract FeRegs without handling every mapping case.
  */
 static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    //log register access to profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+    }
+
     //No need to load the zero from memory, just create the zero in replacement register and move on.
     if (instr->reg_src_1 == x0) {
         err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
@@ -37,6 +46,11 @@ static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_inf
 }
 
 static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    //log register access to profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_2);
+    }
+
     //No need to load the zero from memory, just create the zero in replacement register and move on.
     if (instr->reg_src_2 == x0) {
         err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
@@ -51,6 +65,11 @@ static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_inf
 }
 
 static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info, const FeReg replacement) {
+    //log register access to profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_dest);
+    }
+
     return !r_info->mapped[instr->reg_dest] ? replacement : r_info->map[instr->reg_dest];
 }
 

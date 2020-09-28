@@ -34,6 +34,7 @@ extern bool flag_translate_opt_chain;
 extern bool flag_translate_opt_jump;
 extern bool flag_do_benchmark;
 extern bool flag_do_analyze;
+extern bool flag_do_profile;
 
 void critical_not_yet_implemented(const char *info);
 
@@ -61,6 +62,9 @@ void log_cache(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_benchmark(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
+
+void log_profile(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_print_mem(const char *ptr, long int len);

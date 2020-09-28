@@ -8,6 +8,7 @@
 #include <fadec/fadec-enc.h>
 #include <cache/return_stack.h>
 #include <common.h>
+#include <util/util.h>
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info);
@@ -20,6 +21,11 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 
 void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
     log_asm_out("Translate JAL\n");
+
+    //add rd access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_dest);
+    }
 
     ///push to return stack
     if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
@@ -76,6 +82,12 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
      * Register x0 can be used as the destination if the result is not required.
      */
     log_asm_out("Translate JALR\n");
+
+    //add rs1, rd access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_dest);
+    }
 
     ///1: compute target address
 
@@ -240,6 +252,12 @@ void translate_BGEU(const t_risc_instr *instr, const register_info *r_info) {
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info) {
+    //add rs1, rs2 access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_src_2);
+    }
+
     ///compare registers:
 
     ///rs1 mapped?

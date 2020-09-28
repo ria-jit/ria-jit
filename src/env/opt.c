@@ -154,6 +154,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 case 'b':
                     flag_do_benchmark = true;
                     break;
+                case 'p':
+                    flag_do_profile = true;
+                    break;
                 case ':':
                 case 'h':
                 default:
@@ -166,9 +169,10 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             "\t-v\tShow translator version.\n"
                             "\t-f\tSpecify executable. All options after the file path are passed to the guest.\n"
                             "\t-a\tAnalyze binary. Does not execute the guest program.\n"
-                            "\t\tInspects passed program binary and shows instruction mnemonics.\n"
+                            "\t\tInspects passed program binary and shows statistics.\n"
                             "\t-b\tBenchmark execution. Times the execution of the program,\n"
                             "\t\texcluding mapping the binary into memory.\n"
+                            "\t-p\tProfile execution. Display dynamic register usage statistics.\n"
                             "\t-s\tFail silently for some error conditions.\n"
                             "\t\tAllows continued execution, but the client "
                             "program may enter undefined states.\n"
@@ -209,6 +213,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_single_step);
     log_general("Do analyze: %d\n", flag_do_analyze);
     log_general("Do benchmarking: %d\n", flag_do_benchmark);
+    log_general("Do profiling: %d\n", flag_do_profile);
     log_general("File path: %s\n", file_path);
 
     if (file_path == NULL) {
