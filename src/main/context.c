@@ -48,8 +48,17 @@ context_info *init_map_context(void) {
     }
 
 
-    //todo be aware of the registers claimed by the individual translator functions.
-    // atomics temporarily replace into AX, DX, R8, CX
+    /**
+     * Any register mapping needs to take the translator functions into account.
+     * They temporarily replace into AX, DX and CX for arithmetics (e.g. imul, shifts),
+     * as well as CX as a scratch register for the atomics.
+     * FIRST_REG and SECOND_REG are #defined as AX and DX.
+     * As soon as this is implemented, all other x86-GPRs must be considered callee-saved
+     * when used inside instruction translations, as the mapping requires them to keep their value.
+     * So, for the registers available to the mapping, see the following:
+     * Reserved: AX, DX, CX
+     * May be used: BX, SP, BP, SI, DI, R8, R9, R10, R11, R12, R13, R14, R15
+     */
 
 #define map_reg(reg_risc, reg_x86)          \
     ({                                      \
@@ -69,8 +78,6 @@ context_info *init_map_context(void) {
 //    map_reg(a7, FE_R15);
 
 #undef map_reg
-
-    //notice: risc reg x0 will need special treatment
 
     ///create info struct
     register_info *r_info =
