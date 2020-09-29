@@ -70,7 +70,7 @@ __attribute__((__format__(printf, 1, 2)));
 
 void log_print_mem(const char *ptr, long int len);
 
-void invalid_error_handler(int32_t errocode, int32_t raw_instr, t_risc_addr addr);
+void invalid_error_handler(int32_t errorcode, int32_t raw_instr, t_risc_addr addr);
 
 #ifdef __cplusplus
 }
