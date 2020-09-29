@@ -87,6 +87,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 option_string += 7;
                                 flag_translate_opt_jump = false;
                                 flag_translate_opt_ras = false;
+                            } else if (strncmp(option_string, "no-fusion", 9) == 0) {
+                                option_string += 9;
+                                flag_translate_opt_fusion = false;
                             } else if (strncmp(option_string, "singlestep", 10) == 0) {
                                 option_string += 10;
                                 flag_single_step = true;
@@ -95,6 +98,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_translate_opt_ras = false;
                                 flag_translate_opt_chain = false;
                                 flag_translate_opt_jump = false;
+                                flag_translate_opt_fusion = false;
                                 flag_translate_opt = false;
                             } else if (strncmp(option_string, "help", 4) == 0) {
                                 printf("Optimization options: --optimize=...\n"
@@ -102,6 +106,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\tno-ras\t\t\tDisable return address stack.\n"
                                        "\tno-chain\t\tDisable block chaining.\n"
                                        "\tno-jump\t\t\tDisable recursive translation of jump targets (implies no-ras).\n"
+                                       "\tno-fusion\t\t\tDisable macro opcode fusion/conversion\n"
                                        "\tnone\t\t\tAll of the above.\n"
                                        "\tsinglestep\t\tEnable single stepping mode.\n"
                                        "\t\t\t\t\tTranslates each RISC-V instruction into its own block.\n");

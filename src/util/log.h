@@ -32,6 +32,7 @@ extern bool flag_translate_opt;
 extern bool flag_translate_opt_ras;
 extern bool flag_translate_opt_chain;
 extern bool flag_translate_opt_jump;
+extern bool flag_translate_opt_fusion;
 extern bool flag_do_benchmark;
 extern bool flag_do_analyze;
 extern bool flag_do_profile;
