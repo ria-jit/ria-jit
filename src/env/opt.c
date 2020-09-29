@@ -56,7 +56,10 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             } else if (strncmp(option_string, "strace", 5) == 0) {
                                 flag_log_syscall = true;
                                 option_string += 5;
-                            } else if (strncmp(option_string, "help", 4) == 0) {
+                            } else {
+                                if (strncmp(option_string, "help", 4) != 0) {
+                                    dprintf(2, "Warning: Unknown logging category %s...\n", option_string);
+                                }
                                 printf("Logging categories: --log=...\n"
                                        "\tgeneral\t\t\tGeneral logging that fits no other categories.\n"
                                        "\tasm_in\t\t\tShow parsed and raw RISC-V instructions.\n"
@@ -67,8 +70,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\tstrace\t\t\tLog all emulated syscalls.\n");
                                 parse_result.status = 1;
                                 return parse_result;
-                            } else {
-                                dprintf(2, "Warning: Unknown logging category %s...\n", option_string);
                             }
                         } while (*(option_string++) == ',');
                     } else if (strncmp(option_string, "optimize=", 9) == 0) {
@@ -100,7 +101,10 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_translate_opt_jump = false;
                                 flag_translate_opt_fusion = false;
                                 flag_translate_opt = false;
-                            } else if (strncmp(option_string, "help", 4) == 0) {
+                            } else {
+                                if (strncmp(option_string, "help", 4) == 0) {
+                                    dprintf(2, "Warning: Unknown optimization option %s...\n", option_string);
+                                }
                                 printf("Optimization options: --optimize=...\n"
                                        "\tno-general\t\tDisable general optimizations.\n"
                                        "\tno-ras\t\t\tDisable return address stack.\n"
@@ -112,8 +116,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\t\t\t\t\tTranslates each RISC-V instruction into its own block.\n");
                                 parse_result.status = 1;
                                 return parse_result;
-                            } else {
-                                dprintf(2, "Warning: Unknown optimization option %s...\n", option_string);
                             }
                         } while (*(option_string++) == ',');
                     }
