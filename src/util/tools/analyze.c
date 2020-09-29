@@ -219,7 +219,7 @@ void analyze(const char *file_path) {
                     flags.rd1EqRs12ORs22Flag, flags.rd2EqRsx2Flag, flags.rs12EqRs22Flag);
             int j = 0;
             for (t_node *node = arr[0]->immediateList.head; node; node = (t_node *) node->next) {
-                printf("%x, %x (%li times), ", node->imm1, node->imm2, node->count);
+                printf("0x%x, 0x%x (%li times); ", node->imm1, node->imm2, node->count);
                 if (++j > 7) {
                     break;
                 }
@@ -343,7 +343,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
         lvl3->flags = flags.asBitField;
         t_node *curNode = lvl3->immediateList.head;
         t_node *prevNode = NULL;
-        while (curNode != NULL && (curNode->imm1 != prev.imm || curNode->imm2 != cur.imm)) {
+        while (curNode != NULL && (curNode->imm1 != (uint32_t) prev.imm || curNode->imm2 != (uint32_t) cur.imm)) {
             prevNode = curNode;
             curNode = (t_node *) curNode->next;
         }
