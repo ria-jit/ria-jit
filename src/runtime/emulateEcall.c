@@ -517,14 +517,14 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             break;
         case 276: //renameat2
         {
-            log_general("Emulate syscall renameat2 (276)...\n");
+            log_syscall("Emulate syscall renameat2 (276)...\n");
             registerValues[a0] = syscall5(__NR_renameat2, registerValues[a0], registerValues[a1], registerValues[a2],
                                           registerValues[a3], registerValues[a4]);
         }
             break;
         case 278: //getrandom
         {
-            log_general("Emulate syscall getrandom (278)...\n");
+            log_syscall("Emulate syscall getrandom (278)...\n");
             registerValues[a0] = syscall3(__NR_getrandom, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
