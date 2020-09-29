@@ -52,7 +52,7 @@ static inline int32_t extract_imm_B(int32_t instr) {
             (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
 }
 
-int32_t set_error_message(t_risc_instr *p_instr_struct,int32_t error_code){
+int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
     p_instr_struct->optype = INVALID_INSTRUCTION;
     p_instr_struct->mnem = INVALID_MNEM;
     p_instr_struct->reg_dest = error_code;
@@ -69,7 +69,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
 
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
-    log_asm_in("Parsing 0x%x at %p\n", raw_instr, p_instr_struct->addr);
+    log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);
 
     //fill basic struct
     p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
@@ -143,7 +143,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     p_instr_struct->mnem = BGEU;
                     break;
                 default:
-                    return set_error_message(p_instr_struct,E_f3_BRANCH);
+                    return set_error_message(p_instr_struct, E_f3_BRANCH);
             }
             break;
         case OP_LOAD:
@@ -203,7 +203,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     p_instr_struct->mnem = SD;
                     break;
                 default:
-                    return set_error_message(p_instr_struct,E_f3_STORE);
+                    return set_error_message(p_instr_struct, E_f3_STORE);
             }
             break;
         case OP_OP:
@@ -236,7 +236,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         p_instr_struct->mnem = REMU;
                         break;
                     default:
-                        return set_error_message(p_instr_struct,E_f3_OP);
+                        return set_error_message(p_instr_struct, E_f3_OP);
                 }
             } else {
                 switch (extract_funct3(raw_instr)) {
@@ -277,7 +277,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         p_instr_struct->mnem = AND;
                         break;
                     default:
-                        return set_error_message(p_instr_struct,E_f3_OP);
+                        return set_error_message(p_instr_struct, E_f3_OP);
                 }
             }
             break;
@@ -311,7 +311,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     p_instr_struct->mnem = CSRRCI;
                     break;
                 default:
-                    return set_error_message(p_instr_struct,E_f3_SYSTEM);
+                    return set_error_message(p_instr_struct, E_f3_SYSTEM);
             }
             break;
         case OP_OP_IMM_32:
@@ -336,7 +336,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     }
                     break;
                 default: {
-                    return set_error_message(p_instr_struct,E_f3_IMM_32);
+                    return set_error_message(p_instr_struct, E_f3_IMM_32);
                 }
             }
             break;

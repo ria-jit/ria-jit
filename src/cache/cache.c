@@ -45,7 +45,7 @@ size_t tlb_size = SMALLTLB;
  * Initializes the hash table array.
  */
 void init_hash_table(void) {
-    log_cache("Initializing cache table for size %i...\n", table_size);
+    log_cache("Initializing cache table for size %lu...\n", table_size);
 
     //allocate memory for our table (MAP_ANONYMOUS --> initialize to zero)
     cache_table = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
@@ -126,7 +126,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     if (count_entries >= table_size >> 1) {
         //double the table size
         table_size <<= 1u;
-        log_cache("Doubling table size to %i and reallocating...\n", table_size);
+        log_cache("Doubling table size to %lu and reallocating...\n", table_size);
 
         //allocate new heap space for the cache table and copy over the values we have saved
         t_cache_entry *copy_buf = mmap(NULL, table_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
@@ -144,6 +144,8 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
 
         count_entries = 0;
 
+        bool oldLogCache = flag_log_cache;
+        flag_log_cache = false;
         //rehash all the old values
         for (size_t i = 0; i < table_size >> 1u; i++) {
             if (old_table[i].cache_loc != 0) {
@@ -152,6 +154,9 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
                 set_cache_entry(old_table[i].risc_addr, old_table[i].cache_loc);
             }
         }
+
+        flag_log_cache = oldLogCache;
+        print_values();
 
         //free and reset originally allocated space
         munmap(old_table, (table_size >> 1u) * sizeof(t_cache_entry));
@@ -186,15 +191,19 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
  */
 void print_values(void) {
     if (!flag_log_cache) return;
-
+    log_cache("Cache updated.\n");
+    if (flag_log_cache_contents) {
+        log_cache("New contents.\n");
+    }
     size_t blocks = 0;
     for (size_t i = 0; i < table_size; ++i) { //potentially better way to do this?
         if (cache_table[i].cache_loc != 0) {
             blocks++;
-            //maybe enable this verbose cache logging with a separate flag or setting.
-            //log_cache("cache[%i]: block address %p at cache loc %p\n", i, cache_table[i].risc_addr,
-            //          cache_table[i].cache_loc);
+            if (flag_log_cache_contents) {
+                log_cache("cache[%lu]: block address %p at cache loc %p\n", i, (void *) cache_table[i].risc_addr,
+                          cache_table[i].cache_loc);
+            }
         }
     }
-    log_cache("Cache updated. Contains %i block(s).\n", blocks);
+    log_cache("Now contains %lu block(s).\n", blocks);
 }

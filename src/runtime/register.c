@@ -24,6 +24,12 @@ t_risc_reg_val csr_file[N_CSR];
  */
 uint64_t swap_space[4];
 
+/**
+ * Usage array for profiler.
+ * Used to count register accesses during program execution.
+ */
+uint64_t usage[N_REG];
+
 t_risc_reg_val *get_gp_reg_file(void) {
     return gp_file;
 }
@@ -34,6 +40,10 @@ t_risc_reg_val *get_csr_reg_file(void) {
 
 uint64_t *get_swap_space(void) {
     return swap_space;
+}
+
+uint64_t *get_usage_file(void) {
+    return usage;
 }
 
 /**
@@ -76,4 +86,49 @@ void dump_gp_registers(void) {
 
     //nice pc output
     log_reg_dump("pc\t\t0x%lx\n", get_value(pc));
+}
+
+/**
+ * Dump the profiler register usage data.
+ */
+void dump_profiler_data(void) {
+    log_profile("Register hits (unsorted):\n");
+    log_profile("==============\n");
+
+    //dump for all registers
+    //unsorted for easier statistical usage of the data
+    for (size_t i = x0; i <= x31; i++) {
+        log_profile("%s (%s): %li\n", reg_to_string(i), reg_to_alias(i), usage[i]);
+    }
+
+    //ranked by usage
+    int regRanked[N_REG];
+    for (int i = 0; i < N_REG; i++) {
+        regRanked[i] = i;
+    }
+    ///insertion sort:
+    {
+        int key, j;
+        for (int i = 1; i < N_REG; i++) {
+            key = regRanked[i];
+            j = i - 1;
+
+            ///move move elements with index < i && element > i one to the left
+            while (j >= 0 && usage[regRanked[j]] < usage[key]) {
+                regRanked[j + 1] = regRanked[j];
+                j--;
+            }
+
+            ///insert former element i to correct position
+            regRanked[j + 1] = key;
+        }
+    }
+
+    log_profile("Register hits (ranked):\n");
+    log_profile("==============\n");
+    for (size_t i = x0; i <= x31; i++) {
+        //when we hit zero, we've listed all hits
+        if (usage[regRanked[i]] == 0) break;
+        log_profile("%s (%s): %li\n", reg_to_string(regRanked[i]), reg_to_alias(regRanked[i]), usage[regRanked[i]]);
+    }
 }

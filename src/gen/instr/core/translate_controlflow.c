@@ -8,6 +8,7 @@
 #include <fadec/fadec-enc.h>
 #include <cache/return_stack.h>
 #include <common.h>
+#include <util/util.h>
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info);
@@ -21,8 +22,13 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
     log_asm_out("Translate JAL\n");
 
+    //add rd access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_dest);
+    }
+
     ///push to return stack
-    if (flag_translate_opt && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
+    if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
         rs_emit_push(instr);
     }
 
@@ -44,12 +50,12 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     t_cache_loc cache_loc;
 
-    if (!flag_translate_opt || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
+    if (!flag_translate_opt_chain || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
             cache_loc == (t_cache_loc) 1) {
         //afaik the "multiples of two" thing is resolved in parser.c
 
         ///write chainEnd to be chained by chainer
-        if (flag_translate_opt) {
+        if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
@@ -57,10 +63,10 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
         ///set pc
         if (r_info->mapped[pc]) {
             err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc],
-                            instr->addr + (int64_t) instr->imm); //cast to sign extend
+                            instr->addr + instr->imm);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
-                            instr->addr + (int64_t) instr->imm); //cast to sign extend
+                            instr->addr + instr->imm);
         }
     } else {
         log_asm_out("DIRECT JUMP JAL\n");
@@ -76,6 +82,12 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
      * Register x0 can be used as the destination if the result is not required.
      */
     log_asm_out("Translate JALR\n");
+
+    //add rs1, rd access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_dest);
+    }
 
     ///1: compute target address
 
@@ -95,11 +107,11 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
 
     ///2: check return stack
-    if(flag_translate_opt) {
+    if (flag_translate_opt_ras) {
 
-        if(instr->reg_dest == x1 || instr->reg_dest == x5) {
-            if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
-                if(instr->reg_dest == instr->reg_src_1) {
+        if (instr->reg_dest == x1 || instr->reg_dest == x5) {
+            if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
+                if (instr->reg_dest == instr->reg_src_1) {
                     ///push
                     rs_emit_push(instr);
                 } else {
@@ -240,6 +252,12 @@ void translate_BGEU(const t_risc_instr *instr, const register_info *r_info) {
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info) {
+    //add rs1, rs2 access to profiler
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_src_2);
+    }
+
     ///compare registers:
 
     ///rs1 mapped?
@@ -274,12 +292,13 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     ///set pc: BRANCH
     t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
-    if (flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE && cache_loc != (t_cache_loc) 1) {
+    if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
+            cache_loc != (t_cache_loc) 1) {
         log_asm_out("DIRECT JUMP BRANCH 1\n");
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     } else {
         ///write chainEnd to be chained by chainer
-        if (flag_translate_opt) {
+        if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
@@ -299,12 +318,13 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 
     ///set pc: NO BRANCH
     target = instr->addr + 4;
-    if (flag_translate_opt && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE && cache_loc != (t_cache_loc) 1) {
+    if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
+            cache_loc != (t_cache_loc) 1) {
         log_asm_out("DIRECT JUMP BRANCH 2\n");
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     } else {
         ///write chainEnd to be chained by chainer
-        if (flag_translate_opt) {
+        if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }

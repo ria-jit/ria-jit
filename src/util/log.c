@@ -8,14 +8,21 @@
 #include <stdbool.h>
 
 bool flag_log_general = false;
+bool flag_log_syscall = false;
 bool flag_log_asm_in = false;
 bool flag_log_asm_out = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
+bool flag_log_cache_contents = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
 bool flag_translate_opt = true;
+bool flag_translate_opt_ras = true;
+bool flag_translate_opt_chain = true;
+bool flag_translate_opt_jump = true;
+bool flag_translate_opt_fusion = true;
 bool flag_do_analyze = false;
+bool flag_do_profile = false;
 bool flag_do_benchmark = false;
 
 /**
@@ -50,6 +57,17 @@ void log_general(const char *format, ...) {
         va_list args;
         va_start(args, format);
         printf("[general] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_syscall(const char *format, ...) {
+    if (flag_log_syscall) {
+        va_list args;
+        va_start(args, format);
+        printf("[syscall] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
@@ -119,6 +137,17 @@ void log_benchmark(const char *format, ...) {
     }
 }
 
+void log_profile(const char *format, ...) {
+    if (flag_do_profile) {
+        va_list args;
+        va_start(args, format);
+        printf("[profile] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
 void log_print_mem(const char *ptr, long int len) {
     char buffer[2];
     for (const char *ptri = ptr; ptri < ptr + len; ptri++) {
@@ -133,6 +162,6 @@ void log_print_mem(const char *ptr, long int len) {
 
 void invalid_error_handler(int32_t errorcode, int32_t raw_instr, t_risc_addr addr) {
     dprintf(2, "Critical: tried to execute invalid code 0x%x at %p\n"
-                    "error: %s\n",raw_instr, addr, errorcode_to_string(errorcode));
+               "error: %s\n", raw_instr, (void *) addr, errorcode_to_string(errorcode));
     _exit(1);
 }

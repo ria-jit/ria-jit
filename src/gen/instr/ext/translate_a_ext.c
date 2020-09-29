@@ -13,7 +13,7 @@
 #define SCRATCH_REG FE_CX
 
 /*
- * Experimental and not tested. Implemented without account for the atomicity of the instructions.
+ * Implemented without account for the atomicity of the instructions.
  * The purpose is solely to implement the required functionality in order to support RV64IMA(FD).
  */
 

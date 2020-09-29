@@ -18,7 +18,7 @@ We can execute binaries compiled via the [RISC-V toolchain gcc](https://github.c
 ## Usage
 
 ```sh
-./translator <translator option(s)> -f <program> <guest option(s)>
+./translator [translator option(s)] -f <filename> [guest options]
 ```
 
 ## Run tests
