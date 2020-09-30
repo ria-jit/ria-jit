@@ -286,13 +286,13 @@
 	Teilweise lässt sich die Mnemonic schon exakt aus dem Opcode auslesen (U/J-type).
 	\begin{lstlisting}
     int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
-    p_instr_struct->reg_dest = extract_rd(raw_instr);      //fill basic struct
+    p_instr_struct->op_field.op.reg_dest = extract_rd(raw_instr);      //fill basic struct
     t_opcodes opcode = raw_instr >> 2 & 0x1f;				//extract opcode bits[6:2]
     switch (opcode) {
         case OP_LUI:
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
-            p_instr_struct->imm = extract_imm_U(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_U(raw_instr);
             break;
         //...
     }
@@ -313,7 +313,7 @@
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = ADDIW;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 //...
             }
@@ -581,12 +581,12 @@
 	\begin{lstlisting}
 		//aus translate_arithmetic.cpp
 		void translate_ADD(const t_risc_instr &instr, const register_info &r_info) {
-			if (r_info.mapped[instr.reg_dest] && r_info.mapped[instr.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
+			if (r_info.mapped[instr.op_field.op.reg_dest] && r_info.mapped[instr.op_field.op.reg_src_1] && r_info.mapped[instr.reg_src_2]) {
 				//...
 			} else {
-				err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_1));
+				err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.op_field.op.reg_src_1));
 				err |= fe_enc64(&current, FE_ADD64rm, FE_AX, FE_MEM_ADDR(r_info.base + 8 * instr.reg_src_2));
-				err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.reg_dest), FE_AX);
+				err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info.base + 8 * instr.op_field.op.reg_dest), FE_AX);
 			}
 		}
 	\end{lstlisting}
@@ -604,16 +604,16 @@
 	Notwendigkeit von Fallunterscheidungen, z.B. \verb!REM!: (Semantik nach \footfullcite{riscv-spec}, S. 44f.)
 	\pause
 	\begin{verbatim}
-		mov rax, [r_info.base + 8 * instr.reg_src_1]
+		mov rax, [r_info.base + 8 * instr.op_field.op.reg_src_1]
 		cmp qword ptr [r_info.base + 8 * instr.reg_src_2], 0
 		jnz not_div_zero
-		mov [r_info.base + 8 * instr.reg_dest], rax
+		mov [r_info.base + 8 * instr.op_field.op.reg_dest], rax
 		jz div_zero
 		
 		not_div_zero:
 		xor rdx, rdx
 		idiv qword ptr [r_info.base + 8 * instr.reg_src_2]
-		mov [r_info.base + 8 * instr.reg_dest], rdx
+		mov [r_info.base + 8 * instr.op_field.op.reg_dest], rdx
 		
 		div_zero:
 	\end{verbatim}

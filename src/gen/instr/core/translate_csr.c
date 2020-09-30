@@ -22,13 +22,13 @@ void translate_CSRRW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if (instr->reg_dest != x0) {
+    if (instr->op_field.op.reg_dest != x0) {
         //CSR value -> rd (CSR address is in immediate field)
-        err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+        err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
     }
 
     //rs1 value -> CSR
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->csr_base + instr->imm), regSrc1);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), regSrc1);
 }
 
 /**
@@ -44,11 +44,11 @@ void translate_CSRRS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
 
-    if (instr->reg_src_1 != x0) {
+    if (instr->op_field.op.reg_src_1 != x0) {
         //use rs1 as bitmask to set the corresponding bits in the CSR
-        err |= fe_enc64(&current, FE_OR64mr, FE_MEM_ADDR(r_info->csr_base + instr->imm), regSrc1);
+        err |= fe_enc64(&current, FE_OR64mr, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), regSrc1);
     }
 }
 
@@ -65,12 +65,12 @@ void translate_CSRRC(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
 
-    if (instr->reg_src_1 != x0) {
+    if (instr->op_field.op.reg_src_1 != x0) {
         //use rs1 as bitmask to clear the corresponding bits in the CSR
         err |= fe_enc64(&current, FE_NOT64r, regSrc1);
-        err |= fe_enc64(&current, FE_AND64mr, FE_MEM_ADDR(r_info->csr_base + instr->imm), regSrc1);
+        err |= fe_enc64(&current, FE_AND64mr, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), regSrc1);
         err |= fe_enc64(&current, FE_NOT64r, regSrc1); //does the rs1 value need to be preserved?
     }
 }
@@ -86,14 +86,14 @@ void translate_CSRRWI(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regDest = getRd(instr, r_info);
 
-    if (instr->reg_dest != x0) {
+    if (instr->op_field.op.reg_dest != x0) {
         //CSR value -> rd (CSR address is in immediate field)
-        err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+        err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
     }
 
     //uimm[4:0] value -> CSR
-    uint8_t uimm_val = instr->reg_src_1;
-    err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->csr_base + instr->imm), uimm_val);
+    uint8_t uimm_val = instr->op_field.op.reg_src_1;
+    err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), uimm_val);
 }
 
 /**
@@ -108,13 +108,13 @@ void translate_CSRRSI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
 
     //see above for explanation
-    uint8_t uimm_val = instr->reg_src_1;
+    uint8_t uimm_val = instr->op_field.op.reg_src_1;
     if (uimm_val != 0) {
         //use rs1 as bitmask to set the corresponding bits in the CSR
-        err |= fe_enc64(&current, FE_OR64mi, FE_MEM_ADDR(r_info->csr_base + instr->imm), uimm_val);
+        err |= fe_enc64(&current, FE_OR64mi, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), uimm_val);
     }
 }
 
@@ -130,12 +130,12 @@ void translate_CSRRCI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm));
 
     //see above for explanation
-    uint8_t uimm_val = instr->reg_src_1;
+    uint8_t uimm_val = instr->op_field.op.reg_src_1;
     if (uimm_val != 0) {
         //use rs1 as bitmask to clear the corresponding bits in the CSR
-        err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR(r_info->csr_base + instr->imm), ~uimm_val);
+        err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR(r_info->csr_base + instr->op_field.op.imm), ~uimm_val);
     }
 }

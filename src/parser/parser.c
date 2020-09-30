@@ -61,8 +61,8 @@ static inline int32_t extract_imm_B(int32_t instr) {
 int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
     p_instr_struct->optype = INVALID_INSTRUCTION;
     p_instr_struct->mnem = INVALID_MNEM;
-    p_instr_struct->reg_dest = error_code;
-    p_instr_struct->imm = *(int32_t *) p_instr_struct->addr; //cast and dereference
+    p_instr_struct->op_field.op.reg_dest = error_code;
+    p_instr_struct->op_field.op.imm = *(int32_t *) p_instr_struct->addr; //cast and dereference
     return error_code;
 }
 
@@ -76,10 +76,10 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);
 
     //fill basic struct
-    p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
-    p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
-    p_instr_struct->reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
-    //p_instr_struct->reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
+    p_instr_struct->op_field.op.reg_dest = (t_risc_reg) extract_rd(raw_instr);
+    p_instr_struct->op_field.op.reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
+    p_instr_struct->op_field.op.reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
+    //p_instr_struct->op_field.op.reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
 
     //extract opcode bits[6:2]
     t_opcodes opcode = (t_opcodes) (raw_instr >> 2 & 0x1f);
@@ -87,29 +87,29 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         case OP_LUI:
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_U(raw_instr);
+            p_instr_struct->op_field.op.reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
+            p_instr_struct->op_field.op.imm = extract_imm_U(raw_instr);
             break;
         case OP_AUIPC:
             p_instr_struct->optype = IMMEDIATE;
             p_instr_struct->mnem = AUIPC;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_U(raw_instr);
+            p_instr_struct->op_field.op.reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
+            p_instr_struct->op_field.op.imm = extract_imm_U(raw_instr);
             break;
         case OP_JAL:
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JAL;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_J(raw_instr);
+            p_instr_struct->op_field.op.reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
+            p_instr_struct->op_field.op.imm = extract_imm_J(raw_instr);
             break;
         case OP_JALR:
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JALR;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
             break;
         case OP_LOAD_FP:
             p_instr_struct->optype = FLOAT;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 2:
                     p_instr_struct->mnem = FLW;
@@ -123,8 +123,8 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_STORE_FP:
             p_instr_struct->optype = FLOAT;
-            p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_S(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = extract_rs2(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 2:
                     p_instr_struct->mnem = FSW;
@@ -138,7 +138,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_MISC_MEM:
             p_instr_struct->optype = SYSTEM;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FENCE;
@@ -153,9 +153,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         case OP_BRANCH:
             // BEQ, BNE...
             p_instr_struct->optype = BRANCH;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_B(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
+            p_instr_struct->op_field.op.imm = extract_imm_B(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = BEQ;
@@ -181,7 +181,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_LOAD:
             p_instr_struct->optype = IMMEDIATE;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0: {
                     p_instr_struct->mnem = LB;
@@ -219,9 +219,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_STORE:
             p_instr_struct->optype = STORE;
-            p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_S(raw_instr);
+            p_instr_struct->op_field.op.reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
+            p_instr_struct->op_field.op.reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = SB;
@@ -241,7 +241,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_OP:
             p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             if (raw_instr & (1 << 25)) {
                 switch (extract_funct3(raw_instr)) {
                     case 0:
@@ -316,7 +316,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_SYSTEM:
             p_instr_struct->optype = SYSTEM;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     if (raw_instr & (1 << 20)) {
@@ -352,14 +352,14 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             switch (extract_funct3(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = ADDIW;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 1: //SLLIW opcode and func3 are unique
                     p_instr_struct->mnem = SLLIW;
-                    p_instr_struct->imm = extract_small_shamt(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_small_shamt(raw_instr);
                     break;
                 case 5: //SRAIW / SRLIW
-                    p_instr_struct->imm = extract_small_shamt(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_small_shamt(raw_instr);
                     if (raw_instr & (1 << 30)) {
                         //SRAI
                         p_instr_struct->mnem = SRAIW;
@@ -375,7 +375,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_OP_32:
             p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             if (raw_instr & (1 << 25)) {
                 switch (extract_funct3(raw_instr)) {
                     case 0:
@@ -429,26 +429,26 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             switch (extract_funct3(raw_instr)) {
                 case 0: //ADDI
                     p_instr_struct->mnem = ADDI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 1: //SLLI opcode and func3 are unique
                     p_instr_struct->mnem = SLLI;
-                    p_instr_struct->imm = extract_big_shamt(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_big_shamt(raw_instr);
                     break;
                 case 2: //SLTI
                     p_instr_struct->mnem = SLTI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 3: //SLTIU
                     p_instr_struct->mnem = SLTIU;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 4:
                     p_instr_struct->mnem = XORI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 5: //SRAI / SRLI
-                    p_instr_struct->imm = extract_big_shamt(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_big_shamt(raw_instr);
                     if (raw_instr & (1 << 30)) {
                         //SRAI
                         p_instr_struct->mnem = SRAI;
@@ -459,11 +459,11 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                     break;
                 case 6:
                     p_instr_struct->mnem = ORI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 case 7:
                     p_instr_struct->mnem = ANDI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
+                    p_instr_struct->op_field.op.imm = extract_imm_I(raw_instr);
                     break;
                 default: {
                     return set_error_message(p_instr_struct, E_f3_IMM);
@@ -473,9 +473,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         case OP_MADD:
             p_instr_struct->optype = FLOAT;
             p_instr_struct->mnem = FMADDS;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
+            p_instr_struct->op_field.f_op.reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->op_field.f_op.reg_src_3 = extract_rs3(raw_instr);
+            p_instr_struct->op_field.f_op.rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FMADDS;
@@ -489,9 +489,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_MSUB:
             p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->op_field.f_op.reg_src_3 = extract_rs3(raw_instr);
+            p_instr_struct->op_field.f_op.rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FMSUBS;
@@ -505,9 +505,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_NMADD:
             p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->op_field.f_op.reg_src_3 = extract_rs3(raw_instr);
+            p_instr_struct->op_field.f_op.rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FNMADDS;
@@ -521,9 +521,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_NMSUB:
             p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->reg_src_3 = extract_rs3(raw_instr);
-            ((t_risc_instr_f *) p_instr_struct)->rounding_mode = extract_funct3(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = extract_rs2(raw_instr);
+            p_instr_struct->op_field.f_op.reg_src_3 = extract_rs3(raw_instr);
+            p_instr_struct->op_field.f_op.rounding_mode = extract_funct3(raw_instr);
             switch (extract_funct2(raw_instr)) {
                 case 0:
                     p_instr_struct->mnem = FNMSUBS;
@@ -537,46 +537,45 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             break;
         case OP_OP_FP: {
             p_instr_struct->optype = FLOAT;
-            t_risc_instr_f *p_instr_struct_f = p_instr_struct;
             int funct7 = extract_funct7(raw_instr);
             int funct3 = extract_funct3(raw_instr);
             int rs2 = extract_rs2(raw_instr);
             int operandSize = funct7 & 0x11; // lower two bits determine operand size
             // it looks like this bit determines if the rs2 field is used as a register, or as a funct code
             if ((funct7 & 0x0100000) == 0) {
-                p_instr_struct_f->reg_src_2 = rs2;
+                p_instr_struct->op_field.op.reg_src_2 = rs2;
             }
 
             // furthermore the 5 bit determines if the funct3 field is used as a register, or as a funct code#
             if ((funct7 & 0x0010000) == 0) {
-                p_instr_struct_f->rounding_mode = funct3;
+                p_instr_struct->op_field.f_op.rounding_mode = funct3;
             }
 
             //ignore lower two bits which only set operand size
             funct7 = funct7 >> 2;
             switch (funct7) {
                 case 0:
-                    p_instr_struct_f->mnem = FADDS;
+                    p_instr_struct->mnem = FADDS;
                     break;
                 case 1:
-                    p_instr_struct_f->mnem = FSUBS;
+                    p_instr_struct->mnem = FSUBS;
                     break;
                 case 2:
-                    p_instr_struct_f->mnem = FMULS;
+                    p_instr_struct->mnem = FMULS;
                     break;
                 case 3:
-                    p_instr_struct_f->mnem = FDIVS;
+                    p_instr_struct->mnem = FDIVS;
                     break;
                 case 4:
                     switch (funct3) {
                         case 0:
-                            p_instr_struct_f->mnem = FSGNJS;
+                            p_instr_struct->mnem = FSGNJS;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FSGNJNS;
+                            p_instr_struct->mnem = FSGNJNS;
                             break;
                         case 2:
-                            p_instr_struct_f->mnem = FSGNJXS;
+                            p_instr_struct->mnem = FSGNJXS;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for FSGNJ");
@@ -585,10 +584,10 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                 case 5:
                     switch (funct3) {
                         case 0:
-                            p_instr_struct_f->mnem = FMINS;
+                            p_instr_struct->mnem = FMINS;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FMAXS;
+                            p_instr_struct->mnem = FMAXS;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for funct7=5");
@@ -597,28 +596,28 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                 case 8:
                     switch (rs2) {
                         case 0:
-                            p_instr_struct_f->mnem = FCVTDS;
+                            p_instr_struct->mnem = FCVTDS;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FCVTSD;
+                            p_instr_struct->mnem = FCVTSD;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for funct7=8");
                     }
                     break;
                 case 11:
-                    p_instr_struct_f->mnem = FSQRTS;
+                    p_instr_struct->mnem = FSQRTS;
                     break;
                 case 20:
                     switch (funct3) {
                         case 0:
-                            p_instr_struct_f->mnem = FLES;
+                            p_instr_struct->mnem = FLES;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FLTS;
+                            p_instr_struct->mnem = FLTS;
                             break;
                         case 2:
-                            p_instr_struct_f->mnem = FEQS;
+                            p_instr_struct->mnem = FEQS;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for FSGNJ");
@@ -627,55 +626,55 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                 case 24:
                     switch (rs2) {
                         case 0:
-                            p_instr_struct_f->mnem = FCVTWS;
+                            p_instr_struct->mnem = FCVTWS;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FCVTWUS;
+                            p_instr_struct->mnem = FCVTWUS;
                             break;
                         case 2:
-                            p_instr_struct_f->mnem = FCVTLS;
+                            p_instr_struct->mnem = FCVTLS;
                             break;
                         case 3:
-                            p_instr_struct_f->mnem = FCVTLUS;
+                            p_instr_struct->mnem = FCVTLUS;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for FCVTW");
                     }
-                    p_instr_struct_f->mnem = FSQRTS;
+                    p_instr_struct->mnem = FSQRTS;
                     break;
                 case 26:
                     switch (rs2) {
                         case 0:
-                            p_instr_struct_f->mnem = FCVTSW;
+                            p_instr_struct->mnem = FCVTSW;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FCVTSWU;
+                            p_instr_struct->mnem = FCVTSWU;
                             break;
                         case 2:
-                            p_instr_struct_f->mnem = FCVTSL;
+                            p_instr_struct->mnem = FCVTSL;
                             break;
                         case 3:
-                            p_instr_struct_f->mnem = FCVTSLU;
+                            p_instr_struct->mnem = FCVTSLU;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for FCVTS");
                     }
-                    p_instr_struct_f->mnem = FSQRTS;
+                    p_instr_struct->mnem = FSQRTS;
                     break;
                 case 28:
                     switch (funct3) {
                         case 0:
-                            p_instr_struct_f->mnem = FMVXW;
+                            p_instr_struct->mnem = FMVXW;
                             break;
                         case 1:
-                            p_instr_struct_f->mnem = FCLASSS;
+                            p_instr_struct->mnem = FCLASSS;
                             break;
                         default:
                             critical_not_yet_implemented("unknown funct3 for funct7=28");
                     }
                     break;
                 case 30:
-                    p_instr_struct_f->mnem = FMVWX;
+                    p_instr_struct->mnem = FMVWX;
                     break;
                 default:
                     critical_not_yet_implemented("unknown funct7 for OP_OP_FP");
@@ -689,7 +688,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         break;
                     case 1:
                         //because of our ordering of the mnems in typedef.h we can just add a constant factor
-                        p_instr_struct_f->mnem += FLD - FLW;
+                        p_instr_struct->mnem += FLD - FLW;
                         break;
                     default:
                         critical_not_yet_implemented("unsupported operand size for OP_OP_FP;\n"
@@ -699,10 +698,10 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         }
             break;
         case OP_AMO:
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            p_instr_struct->imm = extract_funct7(raw_instr);
+            p_instr_struct->op_field.op.reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
+            p_instr_struct->op_field.op.imm = extract_funct7(raw_instr);
             // switch between different OP_AMO types, which are decoded in upper bytes of funct7
-            switch (p_instr_struct->imm >> 2) {
+            switch (p_instr_struct->op_field.op.imm >> 2) {
                 case 0:
                     p_instr_struct->mnem = AMOADDW;
                     break;

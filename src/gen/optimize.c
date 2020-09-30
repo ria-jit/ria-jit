@@ -25,16 +25,16 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
 
                     /*
                     case rs1_h1 : {
-                        if(block_cache[j + k].reg_src_1 !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_src_1) {
+                        if(block_cache[j + k].op_field.op.reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_src_1) {
                             goto MISMATCH;
                         }
                     } break;
                      */
                     /*
                     case rs2_h1: {
-                        if(block_cache[j + k].reg_src_1 !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_src_2) {
+                        if(block_cache[j + k].op_field.op.reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_src_2) {
                             goto MISMATCH;
                         }
                     }
@@ -42,16 +42,16 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                     */
 
                     case rd_h1: {
-                        if (block_cache[j + k].reg_src_1 !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                        if (block_cache[j + k].op_field.op.reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }
                         break;
 
                     case not_rd_h1 : {
-                        if (block_cache[j + k].reg_src_1 ==
-                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                        if (block_cache[j + k].op_field.op.reg_src_1 ==
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }
@@ -59,8 +59,8 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
 
                         /*
                         case rs1_h2: {
-                            if(block_cache[j + k].reg_src_1 !=
-                                    block_cache[j + patterns[i].elements[k].h2].reg_src_1) {
+                            if(block_cache[j + k].op_field.op.reg_src_1 !=
+                                    block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_src_1) {
                                 goto MISMATCH;
                             }
                         }
@@ -68,8 +68,8 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                         */
                         /*
                         case rs2_h2: {
-                            if(block_cache[j + k].reg_src_1 !=
-                                    block_cache[j + patterns[i].elements[k].h2].reg_src_2) {
+                            if(block_cache[j + k].op_field.op.reg_src_1 !=
+                                    block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_src_2) {
                                 goto MISMATCH;
                             }
                         }
@@ -77,15 +77,15 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                         */
 
                     case rd_h2: {
-                        if(block_cache[j + k].reg_src_1 !=
-                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                        if(block_cache[j + k].op_field.op.reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }
                         break;
 
                     default: {
-                        if(block_cache[j + k].reg_src_1 != patterns[i].elements[k].rs1) {
+                        if(block_cache[j + k].op_field.op.reg_src_1 != patterns[i].elements[k].rs1) {
                             goto MISMATCH;
                         }
                     }
@@ -99,29 +99,29 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
 
                         /*
                         case rs2_h2 : {
-                            if(block_cache[j + k].reg_src_2 !=
-                                    block_cache[j + patterns[i].elements[k].h2].reg_src_2) {
+                            if(block_cache[j + k].op_field.op.reg_src_2 !=
+                                    block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_src_2) {
                                 goto MISMATCH;
                             }
                         } break;
                          */
 
                     case rd_h1 : {
-                        if(block_cache[j + k].reg_src_2 !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                        if(block_cache[j + k].op_field.op.reg_src_2 !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }   break;
 
                     case rd_h2 : {
-                        if(block_cache[j + k].reg_src_2 !=
-                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                        if(block_cache[j + k].op_field.op.reg_src_2 !=
+                                block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }   break;
 
                     default: {
-                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs2) {
+                        if(block_cache[j + k].op_field.op.reg_src_2 != patterns[i].elements[k].rs2) {
                             goto MISMATCH;
                         }
                     }
@@ -134,38 +134,38 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                     //insert as needed
 
                     case rd_h1 : {
-                        if(block_cache[j + k].reg_dest !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                        if(block_cache[j + k].op_field.op.reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     } break;
 
                     case rd_h2 : {
-                        if(block_cache[j + k].reg_dest !=
-                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                        if(block_cache[j + k].op_field.op.reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h2].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }
                         break;
 
                     case rs1_h1 : {
-                        if (block_cache[j + k].reg_dest !=
-                                block_cache[j + patterns[i].elements[k].h1].reg_src_1) {
+                        if (block_cache[j + k].op_field.op.reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_src_1) {
                             goto MISMATCH;
                         }
                     }
                         break;
 
                     case not_rd_h1 : {
-                        if (block_cache[j + k].reg_dest ==
-                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                        if (block_cache[j + k].op_field.op.reg_dest ==
+                                block_cache[j + patterns[i].elements[k].h1].op_field.op.reg_dest) {
                             goto MISMATCH;
                         }
                     }
                         break;
 
                     default: {
-                        if (block_cache[j + k].reg_dest != patterns[i].elements[k].rd) {
+                        if (block_cache[j + k].op_field.op.reg_dest != patterns[i].elements[k].rd) {
                             goto MISMATCH;
                         }
                     }
@@ -176,13 +176,13 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                     case 0 : {} break;
 
                     case 1 : {
-                        if (block_cache[j + k].imm != patterns[i].elements[k].imm_value) {
+                        if (block_cache[j + k].op_field.op.imm != patterns[i].elements[k].imm_value) {
                             goto MISMATCH;
                         }
                     } break;
 
                     case 2 : {
-                        if (block_cache[j + k].imm != block_cache[j + patterns[i].elements[k].imm_value].imm) {
+                        if (block_cache[j + k].op_field.op.imm != block_cache[j + patterns[i].elements[k].imm_value].op_field.op.imm) {
                             goto MISMATCH;
                         }
                     } break;

@@ -13,18 +13,17 @@
  */
 void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     // mov rd, rs1
-    // add rd, instr->imm
+    // add rd, instr->op_field.op.imm
     log_asm_out("Translate ADDIW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-    } else if (instr->imm != 0) {
-        err |= fe_enc64(&current, FE_ADD32ri, regDest, instr->imm);
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    } else if (instr->op_field.op.imm != 0) {
+        err |= fe_enc64(&current, FE_ADD32ri, regDest, instr->op_field.op.imm);
     }
-
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
@@ -35,13 +34,13 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, rs1
-    //shl rd, (instr->imm & 0x3F)
+    //shl rd, (instr->op_field.op.imm & 0x3F)
     log_asm_out("Translate SLLI...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    t_risc_imm masked_imm = instr->imm & 0b111111;
+    t_risc_imm masked_imm = instr->op_field.op.imm & 0b111111;
     if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
         err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
     } else {
@@ -64,7 +63,7 @@ void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->imm);
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->op_field.op.imm);
 }
 
 /**
@@ -80,9 +79,9 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-    } else if (instr->imm != 0) {
-        err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
+        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    } else if (instr->op_field.op.imm != 0) {
+        err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->op_field.op.imm);
     }
 }
 
@@ -97,10 +96,10 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
 */
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AUIPC...\n");
-    if (instr->reg_dest != x0) {
+    if (instr->op_field.op.reg_dest != x0) {
         FeReg regDest = getRd(instr, r_info);
 
-        err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr + instr->imm);
+        err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr + instr->op_field.op.imm);
     }
 }
 
@@ -117,7 +116,7 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->op_field.op.imm);
     err |= fe_enc64(&current, FE_SETL8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 }
@@ -135,7 +134,7 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
+    err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->op_field.op.imm);
     err |= fe_enc64(&current, FE_SETC8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 }
@@ -157,7 +156,7 @@ void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_XOR64ri, regDest, instr->imm);
+    err |= fe_enc64(&current, FE_XOR64ri, regDest, instr->op_field.op.imm);
 }
 
 /**
@@ -177,7 +176,7 @@ void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_OR64ri, regDest, instr->imm);
+    err |= fe_enc64(&current, FE_OR64ri, regDest, instr->op_field.op.imm);
 }
 
 /**
@@ -193,18 +192,18 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if ((uint32_t) instr->imm == (uint64_t) instr->imm) {
+    if ((uint32_t) instr->op_field.op.imm == (uint64_t) instr->op_field.op.imm) {
         if (regDest != regSrc1) {
             err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
         }
 
-        err |= fe_enc64(&current, FE_AND32ri, regDest, instr->imm);
+        err |= fe_enc64(&current, FE_AND32ri, regDest, instr->op_field.op.imm);
     } else {
         if (regDest != regSrc1) {
             err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
         }
 
-        err |= fe_enc64(&current, FE_AND64ri, regDest, instr->imm);
+        err |= fe_enc64(&current, FE_AND64ri, regDest, instr->op_field.op.imm);
     }
 
 }
@@ -225,7 +224,7 @@ void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHR64ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHR64ri, regDest, instr->op_field.op.imm & 0b111111);
 }
 
 /**
@@ -244,7 +243,7 @@ void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SAR64ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SAR64ri, regDest, instr->op_field.op.imm & 0b111111);
 }
 
 /**
@@ -313,10 +312,10 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
@@ -396,10 +395,10 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
 
@@ -428,10 +427,10 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
 
@@ -485,7 +484,7 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    t_risc_imm masked_imm = instr->imm & 0b11111;
+    t_risc_imm masked_imm = instr->op_field.op.imm & 0b11111;
     if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
         err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
     } else {
@@ -514,7 +513,7 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
-    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
+    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->op_field.op.imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
@@ -533,7 +532,7 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
-    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
+    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->op_field.op.imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
@@ -608,10 +607,10 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
 
@@ -642,10 +641,10 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
 
@@ -676,10 +675,10 @@ void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
         if (regDest == regSrc2) {
             if (regSrc1 == FE_AX) {
                 invalidateReplacement(r_info, FE_DX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_DX, true);
             } else {
                 invalidateReplacement(r_info, FE_AX, true);
-                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->op_field.op.reg_dest, FE_AX, true);
             }
         }
 

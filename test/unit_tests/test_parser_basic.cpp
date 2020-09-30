@@ -34,23 +34,23 @@ TEST(Parser, BasicOpcodeParsing) {
      */
 
     EXPECT_EQ(LUI, parsed[0].mnem);
-    EXPECT_EQ(0x38 << 12, parsed[0].imm);
-    EXPECT_EQ(a0, parsed[0].reg_dest);
+    EXPECT_EQ(0x38 << 12, parsed[0].op_field.op.imm);
+    EXPECT_EQ(a0, parsed[0].op_field.op.reg_dest);
 
     EXPECT_EQ(ADDIW, parsed[1].mnem);
-    EXPECT_EQ(-1353, parsed[1].imm);
-    EXPECT_EQ(a0, parsed[1].reg_src_1);
-    EXPECT_EQ(a0, parsed[1].reg_dest);
+    EXPECT_EQ(-1353, parsed[1].op_field.op.imm);
+    EXPECT_EQ(a0, parsed[1].op_field.op.reg_src_1);
+    EXPECT_EQ(a0, parsed[1].op_field.op.reg_dest);
 
     EXPECT_EQ(SLLI, parsed[2].mnem);
-    EXPECT_EQ(0xe, parsed[2].imm & 0b111111);
-    EXPECT_EQ(a0, parsed[2].reg_src_1);
-    EXPECT_EQ(a0, parsed[2].reg_dest);
+    EXPECT_EQ(0xe, parsed[2].op_field.op.imm & 0b111111);
+    EXPECT_EQ(a0, parsed[2].op_field.op.reg_src_1);
+    EXPECT_EQ(a0, parsed[2].op_field.op.reg_dest);
 
     EXPECT_EQ(ADDI, parsed[3].mnem);
-    EXPECT_EQ(a0, parsed[3].reg_src_1);
-    EXPECT_EQ(a0, parsed[3].reg_dest);
-    EXPECT_EQ(-273, parsed[3].imm);
+    EXPECT_EQ(a0, parsed[3].op_field.op.reg_src_1);
+    EXPECT_EQ(a0, parsed[3].op_field.op.reg_dest);
+    EXPECT_EQ(-273, parsed[3].op_field.op.imm);
 }
 
 /**

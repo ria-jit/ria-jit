@@ -187,27 +187,32 @@ typedef int64_t t_risc_imm;
 typedef uintptr_t t_risc_addr;
 
 typedef struct {
-    t_risc_addr addr;
-    t_risc_mnem mnem;
-    t_risc_optype optype;
     t_risc_reg reg_src_1;
     t_risc_reg reg_src_2;
     t_risc_reg reg_dest;
     t_risc_imm imm;
-} t_risc_instr;
+} t_operand_field;
 
 typedef struct {
-    t_risc_addr addr;
-    t_risc_mnem mnem;
-    t_risc_optype optype;
     t_risc_reg reg_src_1;
     t_risc_reg reg_src_2;
     t_risc_reg reg_dest;
     uint32_t reg_src_3;
     uint32_t rounding_mode;
-} t_risc_instr_f;
-// the idea is to redefine the immediate into a register and the rounding mode to be able to use the same structs and
-// only do a simple cast
+} t_f_operand_field;
+
+union t_op_field{
+    t_operand_field op;
+    t_f_operand_field f_op;
+};
+
+
+typedef struct {
+    t_risc_addr addr;
+    t_risc_mnem mnem;
+    t_risc_optype optype;
+    union t_op_field op_field;
+} t_risc_instr;
 
 /**
  * Register information for the translator functions.

@@ -16,10 +16,10 @@
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FLW(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FLW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLW...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest, FE_MEM_ADDR(instr->reg_src_1 + ((t_risc_instr *) instr)->imm));
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest, FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm));
     setFpReg(regDest, r_info, FIRST_FP_REG);
 }
 
@@ -30,10 +30,10 @@ void translate_FLW(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSW(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSW...\n");
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(instr->reg_src_1 + ((t_risc_instr *) instr)->imm), regSrc2);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm), regSrc2);
 }
 
 /**
@@ -42,11 +42,11 @@ void translate_FSW(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMADDS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMADDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMADDS...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     //move src1 to dest if src1 was mapped
     if (regSrc1 != regDest) {
@@ -54,16 +54,16 @@ void translate_FMADDS(const t_risc_instr_f *instr, const register_info *r_info) 
     }
 
     //depending if src3 was mapped or not use memory or register operand
-    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    FeReg regSrc3 = getFpRegNoLoad(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
     if (regSrc3 == FIRST_FP_REG) {
         //regSrc3 is in memory
         err |= fe_enc64(&current, FE_VFMADD213SSrrm, regDest, regSrc2,
-                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->op_field.f_op.reg_src_3));
     } else {
         err |= fe_enc64(&current, FE_VFMADD213SSrrr, regDest, regSrc2, regSrc3);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -72,11 +72,11 @@ void translate_FMADDS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMSUBS...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     //move src1 to dest if src1 was mapped
     if (regSrc1 != regDest) {
@@ -84,16 +84,16 @@ void translate_FMSUBS(const t_risc_instr_f *instr, const register_info *r_info) 
     }
 
     //depending if src3 was mapped or not use memory or register operand
-    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    FeReg regSrc3 = getFpRegNoLoad(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
     if (regSrc3 == FIRST_FP_REG) {
         //regSrc3 is in memory
         err |= fe_enc64(&current, FE_VFMSUB213SSrrm, regDest, regSrc2,
-                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->op_field.f_op.reg_src_3));
     } else {
         err |= fe_enc64(&current, FE_VFMSUB213SSrrr, regDest, regSrc2, regSrc3);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -102,11 +102,11 @@ void translate_FMSUBS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FNMSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FNMSUBS...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     //move src1 to dest if src1 was mapped
     if (regSrc1 != regDest) {
@@ -114,16 +114,16 @@ void translate_FNMSUBS(const t_risc_instr_f *instr, const register_info *r_info)
     }
 
     //depending if src3 was mapped or not use memory or register operand
-    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    FeReg regSrc3 = getFpRegNoLoad(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
     if (regSrc3 == FIRST_FP_REG) {
         //regSrc3 is in memory
         err |= fe_enc64(&current, FE_VFNMSUB213SSrrr, regDest, regSrc2,
-                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->op_field.f_op.reg_src_3));
     } else {
         err |= fe_enc64(&current, FE_VFNMSUB213SSrrr, regDest, regSrc2, regSrc3);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -132,11 +132,11 @@ void translate_FNMSUBS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FNMADDS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FNMADDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FNMADDS...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     //move src1 to dest if src1 was mapped
     if (regSrc1 != regDest) {
@@ -144,16 +144,16 @@ void translate_FNMADDS(const t_risc_instr_f *instr, const register_info *r_info)
     }
 
     //depending if src3 was mapped or not use memory or register operand
-    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    FeReg regSrc3 = getFpRegNoLoad(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
     if (regSrc3 == FIRST_FP_REG) {
         //regSrc3 is in memory
         err |= fe_enc64(&current, FE_VFNMADD213SSrrr, regDest, regSrc2,
-                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->op_field.f_op.reg_src_3));
     } else {
         err |= fe_enc64(&current, FE_VFNMADD213SSrrr, regDest, regSrc2, regSrc3);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -162,16 +162,16 @@ void translate_FNMADDS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FADDS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FADDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FADDS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     doFpArithmCommutative(regSrc1, regSrc2, regDest, FE_SSE_ADDSSrr);
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -180,30 +180,30 @@ void translate_FADDS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSUBS...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    if (instr->reg_dest == instr->reg_src_2 && instr->reg_dest == instr->reg_src_1) {
+    if (instr->op_field.op.reg_dest == instr->op_field.op.reg_src_2 && instr->op_field.op.reg_dest == instr->op_field.op.reg_src_1) {
 
         err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest,
                         regDest); // SUB same, same, same is equivalent to zeroing
     } else {
         //save rs2
-        FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+        FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
         if (regSrc2 == regDest) { //save src2 if necessary
             err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc2); //TODO check encoding
             regSrc2 = SECOND_FP_REG;
         }
         //load first operand into regDest
-        FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, regDest);
+        FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, regDest);
         if (regSrc1 != regDest) { // move if src1 was mapped
             err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
         }
         err |= fe_enc64(&current, FE_SUB64rr, regDest, regSrc2);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -212,16 +212,16 @@ void translate_FSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMULS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMULS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMULS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     doFpArithmCommutative(regSrc1, regSrc2, regDest, FE_SSE_MULSSrr);
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -230,10 +230,10 @@ void translate_FMULS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FDIVS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FDIVS...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     if (regDest == regSrc2) {
         //happens only if both are mapped and the same
         //save rs2
@@ -241,7 +241,7 @@ void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
         regSrc2 = SECOND_FP_REG;
     }
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, regDest); //load src1 into destination
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, regDest); //load src1 into destination
     if (regSrc1 != regDest) {
         //src1 was mapped => move into regDest
         err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest,
@@ -249,7 +249,7 @@ void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
     }
     err |= fe_enc64(&current, FE_SSE_DIVSSrr, regDest, regSrc2);
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -258,14 +258,14 @@ void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSQRTS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSQRTS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSQRTS...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_SQRTSSrr, regDest, regSrc1); //TODO has SQRTSS really two operands???
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -275,18 +275,18 @@ void translate_FSQRTS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSGNJS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSGNJS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJS...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    if (instr->reg_src_1 == instr->reg_src_2) {
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    if (instr->op_field.op.reg_src_1 == instr->op_field.op.reg_src_2) {
         //simple move
         if (regSrc1 != regDest) {
             //move to regDest
             err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1);
         }
     } else {
-        FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+        FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
         err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
@@ -303,7 +303,7 @@ void translate_FSGNJS(const t_risc_instr_f *instr, const register_info *r_info) 
         err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
     }
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 
 }
 
@@ -313,11 +313,11 @@ void translate_FSGNJS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSGNJNS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSGNJNS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJNS...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
     err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
@@ -336,7 +336,7 @@ void translate_FSGNJNS(const t_risc_instr_f *instr, const register_info *r_info)
     err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
 
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -346,18 +346,18 @@ void translate_FSGNJNS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FSGNJXS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FSGNJXS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJXS...\n");
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
     err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
     err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
 
     //xor first and second sign
-    err |= fe_enc64(&current, FE_XOR32rr, SECOND_REG, FIRST_REG)
+    err |= fe_enc64(&current, FE_XOR32rr, SECOND_REG, FIRST_REG);
 
     //remove sign from first
     err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
@@ -370,7 +370,7 @@ void translate_FSGNJXS(const t_risc_instr_f *instr, const register_info *r_info)
     err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
 
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -380,12 +380,12 @@ void translate_FSGNJXS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMINS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMINS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMINS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
         if (regDest != regSrc1) {
@@ -433,7 +433,7 @@ void translate_FMINS(const t_risc_instr_f *instr, const register_info *r_info) {
     }
 
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -443,12 +443,12 @@ void translate_FMINS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMAXS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMAXS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMAXS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
         if (regDest != regSrc1) {
@@ -496,7 +496,7 @@ void translate_FMAXS(const t_risc_instr_f *instr, const register_info *r_info) {
     }
 
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -506,10 +506,10 @@ void translate_FMAXS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTWS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWS...\n");
 
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI32rr, regDest, regSrc2);
@@ -524,10 +524,10 @@ void translate_FCVTWS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTWUS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTWUS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWUS...\n");
 
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
@@ -543,9 +543,9 @@ void translate_FCVTWUS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMVXW(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMVXW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMVXW...\n");
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);
@@ -560,11 +560,11 @@ void translate_FMVXW(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FEQS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FEQS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FEQS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
@@ -583,11 +583,11 @@ void translate_FEQS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FLTS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FLTS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLTS...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
@@ -604,11 +604,11 @@ void translate_FLTS(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FLES(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FLES(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLES...\n");
 
-    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
@@ -625,7 +625,7 @@ void translate_FLES(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCLASSS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCLASSS...\n");
     /* Definiton bit is set if:
      * 0: rs is negative infinity
@@ -649,16 +649,16 @@ void translate_FCLASSS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTSW(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTSW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS32rr, regDest, regSrc1);
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -667,11 +667,11 @@ void translate_FCVTSW(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTSWU(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTSWU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSWU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
     //zero upper bits by moving into FIRST_REG
     err |= fe_enc64(&current, FE_MOV32rr, FIRST_REG, regSrc1);
 
@@ -679,7 +679,7 @@ void translate_FCVTSWU(const t_risc_instr_f *instr, const register_info *r_info)
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest,
                     FIRST_REG); //use 64 bit convert to get a unsigned conversion
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -689,14 +689,14 @@ void translate_FCVTSWU(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FMVWX(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FMVWX(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMVWX...\n");
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);//TODO how does it recognize the direction?
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -705,10 +705,10 @@ void translate_FMVWX(const t_risc_instr_f *instr, const register_info *r_info) {
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTLS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTLS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLS...\n");
 
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
@@ -722,10 +722,10 @@ void translate_FCVTLS(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTLUS(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLUS...\n");
 
-    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //constant saved here
@@ -759,16 +759,16 @@ void translate_FCVTLUS(const t_risc_instr_f *instr, const register_info *r_info)
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTSL(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTSL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSL...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, regSrc1);
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -778,11 +778,11 @@ void translate_FCVTSL(const t_risc_instr_f *instr, const register_info *r_info) 
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
-void translate_FCVTSLU(const t_risc_instr_f *instr, const register_info *r_info) {
+void translate_FCVTSLU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSLU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
@@ -813,5 +813,5 @@ void translate_FCVTSLU(const t_risc_instr_f *instr, const register_info *r_info)
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
 
 
-    setFpReg(instr->reg_dest, r_info, regDest);
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
