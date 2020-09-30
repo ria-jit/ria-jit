@@ -13,12 +13,11 @@ extern "C"{
 #endif
 
 #define SWAP_BX FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 0)
-#define SWAP_SP FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 1)
-#define SWAP_BP FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 2)
-#define SWAP_R12 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 3)
-#define SWAP_R13 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 4)
-#define SWAP_R14 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 5)
-#define SWAP_R15 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 6)
+#define SWAP_BP FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 1)
+#define SWAP_R12 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 2)
+#define SWAP_R13 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 3)
+#define SWAP_R14 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 4)
+#define SWAP_R15 FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 5)
 
 typedef struct {
     register_info *r_info;

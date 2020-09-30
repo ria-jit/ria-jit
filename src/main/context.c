@@ -56,9 +56,9 @@ context_info *init_map_context(void) {
      * As soon as this is implemented, all other x86-GPRs must be considered callee-saved
      * when used inside instruction translations, as the mapping requires them to keep their value.
      * So, for the registers available to the mapping, see the following:
-     * Reserved: AX, DX, CX
-     * May be used: BX, SP, BP, SI, DI, R8, R9, R10, R11, R12, R13, R14, R15
-     * Of which are callee-saved: BX, SP, BP, R12, R13, R14, R15
+     * Reserved: AX, DX, CX (also, SP without great care)
+     * May be used: BX, BP, SI, DI, R8, R9, R10, R11, R12, R13, R14, R15
+     * Of which are callee-saved: BX, BP, R12, R13, R14, R15
      */
 #define map_reg(reg_risc, reg_x86)          \
     ({                                      \
@@ -69,10 +69,10 @@ context_info *init_map_context(void) {
     /**
      * We capture approximately 85 % of the register hits when we map the following registers:
      * (by order of access frequency)
-     * x15, x14, x13, x10, x8, x2, x12, x11, x9,  x1,  x17, x18, x27
-     * a5,  a4,  a3,  a0,  fp, sp, a2,  a1,  s1,  ra,  a7,  s2,  s11
+     * x15, x14, x13, x10, x8, x2, x12, x11, x9,  x1,  x17, x18
+     * a5,  a4,  a3,  a0,  fp, sp, a2,  a1,  s1,  ra,  a7,  s2
      *                             into
-     * BX,  BP,  SI,  DI,  R8, R9, R10, R11, R12, R13, R14, R15, SP
+     * BX,  BP,  SI,  DI,  R8, R9, R10, R11, R12, R13, R14, R15
      */
     map_reg(a5, FE_BX);
     map_reg(a4, FE_BP);
@@ -86,7 +86,6 @@ context_info *init_map_context(void) {
     map_reg(ra, FE_R13);
     map_reg(a7, FE_R14);
     map_reg(s2, FE_R15);
-    //map_reg(s11, FE_SP);
 
 #undef map_reg
 
@@ -126,14 +125,13 @@ context_info *init_map_context(void) {
             }
         }
 
-        //load back callee-saved host registers BX, BP, R12, R13, R14, R15(, SP?)
+        //load back callee-saved host registers BX, BP, R12, R13, R14, R15
         err |= fe_enc64(&current, FE_MOV64rm, FE_BX, SWAP_BX);
         err |= fe_enc64(&current, FE_MOV64rm, FE_BP, SWAP_BP);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R12, SWAP_R12);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R13, SWAP_R13);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R14, SWAP_R14);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R15, SWAP_R15);
-        //err |= fe_enc64(&current, FE_MOV64rm, FE_SP, SWAP_SP);
 
         save_context = finalize_block(DONT_LINK);
     }
@@ -143,14 +141,13 @@ context_info *init_map_context(void) {
         init_block();
         log_general("Generating context executing block...\n");
 
-        //store callee-saved host registers BX, BP, R12, R13, R14, R15(, SP?)
+        //store callee-saved host registers BX, BP, R12, R13, R14, R15
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_BX, FE_BX);
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_BP, FE_BP);
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_R12, FE_R12);
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_R13, FE_R13);
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_R14, FE_R14);
         err |= fe_enc64(&current, FE_MOV64mr, SWAP_R15, FE_R15);
-        //err |= fe_enc64(&current, FE_MOV64mr, SWAP_SP, FE_SP);
 
         //move function arguments to scratch registers (would be overwritten by following guest context load)
         err |= fe_enc64(&current, FE_MOV64rr, FIRST_REG, FE_DI);
