@@ -58,24 +58,35 @@ context_info *init_map_context(void) {
      * So, for the registers available to the mapping, see the following:
      * Reserved: AX, DX, CX
      * May be used: BX, SP, BP, SI, DI, R8, R9, R10, R11, R12, R13, R14, R15
+     * Of which are callee-saved: BX, SP, BP, R12, R13, R14, R15
      */
-
 #define map_reg(reg_risc, reg_x86)          \
     ({                                      \
         register_map[reg_risc] = reg_x86;   \
         mapped[reg_risc] = true;            \
     })                                      \
 
-    map_reg(ra, FE_DI);
-    map_reg(sp, FE_SI);
-    map_reg(a0, FE_R15);
-    map_reg(a1, FE_R9);
+    /**
+     * We capture approximately 85 % of the register hits when we map the following registers:
+     * (by order of access frequency)
+     * x15, x14, x13, x10, x8, x2, x12, x11, x9,  x1,  x17, x18, x27
+     * a5,  a4,  a3,  a0,  fp, sp, a2,  a1,  s1,  ra,  a7,  s2,  s11
+     *                             into
+     * BX,  BP,  SI,  DI,  R8, R9, R10, R11, R12, R13, R14, R15, SP
+     */
+    map_reg(a5, FE_BX);
+    map_reg(a4, FE_BP);
+    map_reg(a3, FE_SI);
+    map_reg(a0, FE_DI);
+    map_reg(fp, FE_R8);
+    map_reg(sp, FE_R9);
     map_reg(a2, FE_R10);
-    map_reg(a3, FE_R11);
-    map_reg(a4, FE_R12);
-    map_reg(a5, FE_R13);
-    map_reg(a6, FE_R14);
-//    map_reg(a7, FE_R15);
+    map_reg(a1, FE_R11);
+    map_reg(s1, FE_R12);
+    map_reg(ra, FE_R13);
+    map_reg(a7, FE_R14);
+    map_reg(s2, FE_R15);
+    //map_reg(s11, FE_SP);
 
 #undef map_reg
 
@@ -115,10 +126,14 @@ context_info *init_map_context(void) {
             }
         }
 
-        err |= fe_enc64(&current, FE_MOV64rm, FE_R12, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_R13, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_R14, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_R15, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3));
+        //load back callee-saved host registers BX, BP, R12, R13, R14, R15(, SP?)
+        err |= fe_enc64(&current, FE_MOV64rm, FE_BX, SWAP_BX);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_BP, SWAP_BP);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_R12, SWAP_R12);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_R13, SWAP_R13);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_R14, SWAP_R14);
+        err |= fe_enc64(&current, FE_MOV64rm, FE_R15, SWAP_R15);
+        //err |= fe_enc64(&current, FE_MOV64rm, FE_SP, SWAP_SP);
 
         save_context = finalize_block(DONT_LINK);
     }
@@ -128,11 +143,16 @@ context_info *init_map_context(void) {
         init_block();
         log_general("Generating context executing block...\n");
 
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 0), FE_R12);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 1), FE_R13);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 2), FE_R14);
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((intptr_t) get_swap_space() + 8 * 3), FE_R15);
+        //store callee-saved host registers BX, BP, R12, R13, R14, R15(, SP?)
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_BX, FE_BX);
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_BP, FE_BP);
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_R12, FE_R12);
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_R13, FE_R13);
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_R14, FE_R14);
+        err |= fe_enc64(&current, FE_MOV64mr, SWAP_R15, FE_R15);
+        //err |= fe_enc64(&current, FE_MOV64mr, SWAP_SP, FE_SP);
 
+        //move function arguments to scratch registers (would be overwritten by following guest context load)
         err |= fe_enc64(&current, FE_MOV64rr, FIRST_REG, FE_DI);
         err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, FE_SI);
 

@@ -16,7 +16,7 @@ t_risc_reg_val *get_gp_reg_file(void);
 
 t_risc_reg_val *get_csr_reg_file(void);
 
-uint64_t *get_swap_space(void);
+uint64_t *get_swap_file(void);
 
 uint64_t *get_usage_file(void);
 
