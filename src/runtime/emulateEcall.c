@@ -453,13 +453,6 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             }
         }
             break;
-        case 220: //clone
-        {
-            log_syscall("Emulate syscall clone (220)...\n");
-            registerValues[a0] = syscall5(__NR_clone, registerValues[a0], registerValues[a1], registerValues[a2],
-                                          registerValues[a3], registerValues[a4]);
-        }
-            break;
         case 221: //execve
         {
             log_syscall("Emulate syscall execve (221)...\n");
