@@ -3,10 +3,11 @@
 //
 
 #include "translate_f_ext.h"
-#include "util/util.h"
 #include <fadec/fadec-enc.h>
 
 /* https://www.felixcloutier.com */
+
+#define SIGN_BIT_MASK (0x1 << 31) //left most bit
 
 /**
  * Translate the FLW instruction.
@@ -17,7 +18,9 @@
  */
 void translate_FLW(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FLW...\n");
-    critical_not_yet_implemented("FLW not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest, FE_MEM_ADDR(instr->reg_src_1 + ((t_risc_instr *) instr)->imm));
+    setFpReg(regDest, r_info, FIRST_FP_REG);
 }
 
 /**
@@ -29,7 +32,8 @@ void translate_FLW(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FSW(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSW...\n");
-    critical_not_yet_implemented("FSW not yet implemented.\n");
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(instr->reg_src_1 + ((t_risc_instr *) instr)->imm), regSrc2);
 }
 
 /**
@@ -40,7 +44,26 @@ void translate_FSW(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FMADDS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMADDS...\n");
-    critical_not_yet_implemented("FMADDS not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    //move src1 to dest if src1 was mapped
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+    }
+
+    //depending if src3 was mapped or not use memory or register operand
+    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    if (regSrc3 == FIRST_FP_REG) {
+        //regSrc3 is in memory
+        err |= fe_enc64(&current, FE_VFMADD213SSrrm, regDest, regSrc2,
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+    } else {
+        err |= fe_enc64(&current, FE_VFMADD213SSrrr, regDest, regSrc2, regSrc3);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -51,7 +74,26 @@ void translate_FMADDS(const t_risc_instr_f *instr, const register_info *r_info) 
  */
 void translate_FMSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMSUBS...\n");
-    critical_not_yet_implemented("FMSUBS not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    //move src1 to dest if src1 was mapped
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+    }
+
+    //depending if src3 was mapped or not use memory or register operand
+    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    if (regSrc3 == FIRST_FP_REG) {
+        //regSrc3 is in memory
+        err |= fe_enc64(&current, FE_VFMSUB213SSrrm, regDest, regSrc2,
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+    } else {
+        err |= fe_enc64(&current, FE_VFMSUB213SSrrr, regDest, regSrc2, regSrc3);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -62,7 +104,26 @@ void translate_FMSUBS(const t_risc_instr_f *instr, const register_info *r_info) 
  */
 void translate_FNMSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FNMSUBS...\n");
-    critical_not_yet_implemented("FNMSUBS not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    //move src1 to dest if src1 was mapped
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+    }
+
+    //depending if src3 was mapped or not use memory or register operand
+    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    if (regSrc3 == FIRST_FP_REG) {
+        //regSrc3 is in memory
+        err |= fe_enc64(&current, FE_VFNMSUB213SSrrr, regDest, regSrc2,
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+    } else {
+        err |= fe_enc64(&current, FE_VFNMSUB213SSrrr, regDest, regSrc2, regSrc3);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -73,7 +134,26 @@ void translate_FNMSUBS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FNMADDS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FNMADDS...\n");
-    critical_not_yet_implemented("FNMADDS not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    //move src1 to dest if src1 was mapped
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+    }
+
+    //depending if src3 was mapped or not use memory or register operand
+    FeReg regSrc3 = getFpRegNoLoad(instr->reg_src_3, r_info, FIRST_FP_REG);
+    if (regSrc3 == FIRST_FP_REG) {
+        //regSrc3 is in memory
+        err |= fe_enc64(&current, FE_VFNMADD213SSrrr, regDest, regSrc2,
+                        FE_MEM_ADDR(r_info->fp_base + 8 * instr->reg_src_3));
+    } else {
+        err |= fe_enc64(&current, FE_VFNMADD213SSrrr, regDest, regSrc2, regSrc3);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -84,7 +164,14 @@ void translate_FNMADDS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FADDS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FADDS...\n");
-    critical_not_yet_implemented("FADDS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    doFpArithmCommutative(regSrc1, regSrc2, regDest, FE_SSE_ADDSSrr);
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -95,7 +182,28 @@ void translate_FADDS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSUBS...\n");
-    critical_not_yet_implemented("FSUBS not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    if (instr->reg_dest == instr->reg_src_2 && instr->reg_dest == instr->reg_src_1) {
+
+        err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest,
+                        regDest); // SUB same, same, same is equivalent to zeroing
+    } else {
+        //save rs2
+        FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+        if (regSrc2 == regDest) { //save src2 if necessary
+            err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc2); //TODO check encoding
+            regSrc2 = SECOND_FP_REG;
+        }
+        //load first operand into regDest
+        FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, regDest);
+        if (regSrc1 != regDest) { // move if src1 was mapped
+            err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+        }
+        err |= fe_enc64(&current, FE_SUB64rr, regDest, regSrc2);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -106,7 +214,14 @@ void translate_FSUBS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FMULS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMULS...\n");
-    critical_not_yet_implemented("FMULS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    doFpArithmCommutative(regSrc1, regSrc2, regDest, FE_SSE_MULSSrr);
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -117,7 +232,24 @@ void translate_FMULS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FDIVS...\n");
-    critical_not_yet_implemented("FDIVS not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    if (regDest == regSrc2) {
+        //happens only if both are mapped and the same
+        //save rs2
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc2); //TODO check encoding
+        regSrc2 = SECOND_FP_REG;
+    }
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, regDest); //load src1 into destination
+    if (regSrc1 != regDest) {
+        //src1 was mapped => move into regDest
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest,
+                        regSrc1); //TODO check encoding needs to be F3 0F 11 and not 10
+    }
+    err |= fe_enc64(&current, FE_SSE_DIVSSrr, regDest, regSrc2);
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -128,18 +260,51 @@ void translate_FDIVS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FSQRTS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSQRTS...\n");
-    critical_not_yet_implemented("FSQRTS not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    err |= fe_enc64(&current, FE_SSE_SQRTSSrr, regDest, regSrc1); //TODO has SQRTSS really two operands???
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
  * Translate the FSGNJS instruction.
  * Description: takes all bits but sign from rs1, sign bit is that from rs2
+ * naive approach by first moving into normal register, doing bit artihmetic and then putting it back
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSGNJS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJS...\n");
-    critical_not_yet_implemented("FSGNJS not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    if (instr->reg_src_1 == instr->reg_src_2) {
+        //simple move
+        if (regSrc1 != regDest) {
+            //move to regDest
+            err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1);
+        }
+    } else {
+        FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+
+
+        err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
+        err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+
+        //remove sign from first
+        err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
+
+        //mask sign from second
+        err |= fe_enc64(&current, FE_AND32ri, SECOND_REG, SIGN_BIT_MASK);
+        //merge
+        err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
+        //move back to fp_reg
+        err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+    }
+
+    setFpReg(instr->reg_dest, r_info, regDest);
+
 }
 
 /**
@@ -150,7 +315,28 @@ void translate_FSGNJS(const t_risc_instr_f *instr, const register_info *r_info) 
  */
 void translate_FSGNJNS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJNS...\n");
-    critical_not_yet_implemented("FSGNJNS not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+
+
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+
+    //remove sign from first
+    err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
+
+    //flip second (negate sign)
+    err |= fe_enc64(&current, FE_NOT32r, SECOND_REG);
+    //mask sign from second
+    err |= fe_enc64(&current, FE_AND32ri, SECOND_REG, SIGN_BIT_MASK);
+    //merge
+    err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
+    //move back to fp_reg
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -162,7 +348,29 @@ void translate_FSGNJNS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FSGNJXS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FSGNJXS...\n");
-    critical_not_yet_implemented("FSGNJXS not yet implemented.\n");
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+
+
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+
+    //xor first and second sign
+    err |= fe_enc64(&current, FE_XOR32rr, SECOND_REG, FIRST_REG)
+
+    //remove sign from first
+    err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
+
+    //mask sign from second
+    err |= fe_enc64(&current, FE_AND32ri, SECOND_REG, SIGN_BIT_MASK);
+    //merge
+    err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
+    //move back to fp_reg
+    err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -174,7 +382,58 @@ void translate_FSGNJXS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FMINS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMINS...\n");
-    critical_not_yet_implemented("FMINS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
+        if (regDest != regSrc1) {
+            //move src1 in dest
+            err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+        }
+    } else {
+        if (regSrc2 == regDest) {//rs2 needs to be first operand, thus, check rs1
+            //check if rs1 is nan
+            err |= fe_enc64(&current, FE_SSE_UCOMISSrr, regSrc1, regSrc1);
+
+            uint8_t *jmpBufNaN = current;
+            err |= fe_enc64(&current, FE_JP, (intptr_t) current); //dummy
+
+            err |= fe_enc64(&current, FE_SSE_MINSSrr, regDest, regSrc1); //if regSrc2 is NaN regSrc1 will be returned
+
+            err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+            //branch if rs1 is nan, nothing to do as src2 is already in dest
+        } else {
+            //check if rs2 is nan
+            err |= fe_enc64(&current, FE_SSE_UCOMISSrr, regSrc2, regSrc2);
+
+            uint8_t *jmpBufNaN = current;
+            err |= fe_enc64(&current, FE_JP, (intptr_t) current); //dummy
+
+            //move src1 in dest
+            if (regSrc1 != regDest) {
+                err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+            }
+            err |= fe_enc64(&current, FE_SSE_MINSSrr, regDest, regSrc2); //if regSrc1 is NaN regSrc2 will be returned
+
+            //check if rs1 is already in dest, in this case we don't need the jump
+            if (regSrc1 == regDest) {
+                err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+            } else {
+
+                uint8_t *jmpBufEnd = current;
+                err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
+                err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+
+                err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
+            }
+        }
+    }
+
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -186,7 +445,58 @@ void translate_FMINS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FMAXS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMAXS...\n");
-    critical_not_yet_implemented("FMAXS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
+        if (regDest != regSrc1) {
+            //move src1 in dest
+            err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+        }
+    } else {
+        if (regSrc2 == regDest) {//rs2 needs to be first operand, thus, check rs1
+            //check if rs1 is nan
+            err |= fe_enc64(&current, FE_SSE_UCOMISSrr, regSrc1, regSrc1);
+
+            uint8_t *jmpBufNaN = current;
+            err |= fe_enc64(&current, FE_JP, (intptr_t) current); //dummy
+
+            err |= fe_enc64(&current, FE_SSE_MAXSSrr, regDest, regSrc1); //if regSrc2 is NaN regSrc1 will be returned
+
+            err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+            //branch if rs1 is nan, nothing to do as src2 is already in dest
+        } else {
+            //check if rs2 is nan
+            err |= fe_enc64(&current, FE_SSE_UCOMISSrr, regSrc2, regSrc2);
+
+            uint8_t *jmpBufNaN = current;
+            err |= fe_enc64(&current, FE_JP, (intptr_t) current); //dummy
+
+            //move src1 in dest
+            if (regSrc1 != regDest) {
+                err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+            }
+            err |= fe_enc64(&current, FE_SSE_MAXSSrr, regDest, regSrc2); //if regSrc1 is NaN regSrc2 will be returned
+
+            //check if rs1 is already in dest, in this case we don't need the jump
+            if (regSrc1 == regDest) {
+                err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+            } else {
+
+                uint8_t *jmpBufEnd = current;
+                err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
+                err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
+
+                err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
+            }
+        }
+    }
+
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -198,18 +508,32 @@ void translate_FMAXS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FCVTWS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWS...\n");
-    critical_not_yet_implemented("FCVTWS not yet implemented.\n");
+
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_SSE_CVTSS2SI32rr, regDest, regSrc2);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
  * Translate the FCVTWUS instruction.
  * Description: convert floating-point number in floating-point register rs2 to unsigned 32-bit int in int register rd
+ * WARNING this implementation will still clamp the value but won't set the exceptions every time
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWUS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWUS...\n");
-    critical_not_yet_implemented("FCVTWUS not yet implemented.\n");
+
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -221,7 +545,12 @@ void translate_FCVTWUS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FMVXW(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMVXW...\n");
-    critical_not_yet_implemented("FMVXW not yet implemented.\n");
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -233,7 +562,18 @@ void translate_FMVXW(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FEQS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FEQS...\n");
-    critical_not_yet_implemented("FEQS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc1, regSrc2);
+    err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0);
+    err |= fe_enc64(&current, FE_SETNP8r, regDest);
+    err |= fe_enc64(&current, FE_CMOVNZ64rr, regDest, SECOND_REG);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -245,7 +585,16 @@ void translate_FEQS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FLTS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FLTS...\n");
-    critical_not_yet_implemented("FLTS not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc2, regSrc1);
+    err |= fe_enc64(&current, FE_SETA8r, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -257,7 +606,16 @@ void translate_FLTS(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FLES(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FLES...\n");
-    critical_not_yet_implemented("FLES not yet implemented.\n");
+
+    FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc2, regSrc1);
+    err |= fe_enc64(&current, FE_SETA8r, regDest);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -269,6 +627,19 @@ void translate_FLES(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FCLASSS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCLASSS...\n");
+    /* Definiton bit is set if:
+     * 0: rs is negative infinity
+     * 1: rs is a negative normal number
+     * 2: rs is a negative subnormal number
+     * 3: rs is minus zero
+     * 4: rs is positive zero
+     * 5: rs is a positive subnormal number
+     * 6: rs is a positive normal number
+     * 7: rs is positive infinity
+     * 8: rs is a signaling NaN
+     * 9: rs is a quiet NaN
+     * Assembler code for the following instructions
+     */
     critical_not_yet_implemented("FCLASSS not yet implemented.\n");
 }
 
@@ -280,7 +651,14 @@ void translate_FCLASSS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FCVTSW(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSW...\n");
-    critical_not_yet_implemented("FCVTSW not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SS32rr, regDest, regSrc1);
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -291,7 +669,17 @@ void translate_FCVTSW(const t_risc_instr_f *instr, const register_info *r_info) 
  */
 void translate_FCVTSWU(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSWU...\n");
-    critical_not_yet_implemented("FCVTSWU not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+    //zero upper bits by moving into FIRST_REG
+    err |= fe_enc64(&current, FE_MOV32rr, FIRST_REG, regSrc1);
+
+    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest,
+                    FIRST_REG); //use 64 bit convert to get a unsigned conversion
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -303,7 +691,12 @@ void translate_FCVTSWU(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FMVWX(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FMVWX...\n");
-    critical_not_yet_implemented("FMVWX not yet implemented.\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);//TODO how does it recognize the direction?
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
@@ -314,7 +707,13 @@ void translate_FMVWX(const t_risc_instr_f *instr, const register_info *r_info) {
  */
 void translate_FCVTLS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLS...\n");
-    critical_not_yet_implemented("FCVTLS not yet implemented.\n");
+
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -325,7 +724,33 @@ void translate_FCVTLS(const t_risc_instr_f *instr, const register_info *r_info) 
  */
 void translate_FCVTLUS(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLUS...\n");
-    critical_not_yet_implemented("FCVTLUS not yet implemented.\n");
+
+    FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    //constant saved here
+    const unsigned long C0 = 1593835520;
+    //load const into register
+    err |= fe_enc64(&current, FE_MOV32ri, SECOND_REG, C0);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, SECOND_FP_REG, SECOND_REG);
+
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc2, SECOND_FP_REG);
+    uint8_t *jmpBufCOM = current;
+    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy
+
+    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+
+    uint8_t *jmpBufEnd = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
+
+
+    err |= fe_enc64(&jmpBufCOM, FE_JNC, (intptr_t) current);
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regSrc2, SECOND_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_BTC64mi, regDest, 63);
+    err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
+
+    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -336,16 +761,57 @@ void translate_FCVTLUS(const t_risc_instr_f *instr, const register_info *r_info)
  */
 void translate_FCVTSL(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSL...\n");
-    critical_not_yet_implemented("FCVTSL not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, regSrc1);
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
  * Translate the FCVTSLU instruction.
  * Description: convert a unsigned 64-bit int in rs1 to a fp number in fp register rd
+ * Conversion taken from godbolt
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTSLU(const t_risc_instr_f *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTSLU...\n");
-    critical_not_yet_implemented("FCVTSLU not yet implemented.\n");
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
+    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
+
+    uint8_t *jmpBufSign = current;
+    err |= fe_enc64(&current, FE_JS, (intptr_t) current); //dummy
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, regSrc1);
+
+    uint8_t *jmpBufEnd = current;
+    err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
+
+    //set jump address
+    err |= fe_enc64(&jmpBufSign, FE_JS, (intptr_t) current);
+
+    if (regSrc1 != FIRST_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, FIRST_REG, regSrc1);
+    }
+    err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc1);
+    err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, 0x1);
+    err |= fe_enc64(&current, FE_SSE_PXORrr, FIRST_FP_REG, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SHR64ri, SECOND_REG, 0x1);
+    err |= fe_enc64(&current, FE_OR64rr, SECOND_REG, FIRST_REG);
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, SECOND_REG);
+    err |= fe_enc64(&current, FE_SSE_ADDSSrr, regDest, regDest);
+
+
+    //set jump address
+    err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
+
+
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
