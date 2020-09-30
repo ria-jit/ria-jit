@@ -289,8 +289,8 @@ void translate_FSGNJS(const t_risc_instr *instr, const register_info *r_info) {
         FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
-        err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
-        err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+        err |= fe_enc64(&current, FE_SSE_MOVDrr, FIRST_REG, regSrc1);
+        err |= fe_enc64(&current, FE_SSE_MOVDrr, SECOND_REG, regSrc2);
 
         //remove sign from first
         err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
@@ -300,7 +300,7 @@ void translate_FSGNJS(const t_risc_instr *instr, const register_info *r_info) {
         //merge
         err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
         //move back to fp_reg
-        err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+        err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, FIRST_REG);
     }
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
@@ -320,8 +320,8 @@ void translate_FSGNJNS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, FIRST_REG, regSrc1);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, SECOND_REG, regSrc2);
 
     //remove sign from first
     err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, ~SIGN_BIT_MASK);
@@ -333,7 +333,7 @@ void translate_FSGNJNS(const t_risc_instr *instr, const register_info *r_info) {
     //merge
     err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
     //move back to fp_reg
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, FIRST_REG);
 
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
@@ -353,8 +353,8 @@ void translate_FSGNJXS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
 
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, SECOND_REG, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, FIRST_REG, regSrc1);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, SECOND_REG, regSrc2);
 
     //xor first and second sign
     err |= fe_enc64(&current, FE_XOR32rr, SECOND_REG, FIRST_REG);
@@ -367,7 +367,7 @@ void translate_FSGNJXS(const t_risc_instr *instr, const register_info *r_info) {
     //merge
     err |= fe_enc64(&current, FE_OR32rr, FIRST_REG, SECOND_REG);
     //move back to fp_reg
-    err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, FIRST_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, FIRST_REG);
 
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
