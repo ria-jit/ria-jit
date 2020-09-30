@@ -307,94 +307,94 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_AMOMAXUD(instr, r_info);
             break;
         case FLW:
-            translate_FLW(instr, r_info);
+            translate_FLW((const t_risc_instr_f *) instr, r_info);
             break;
         case FSW:
-            translate_FSW(instr, r_info);
+            translate_FSW((const t_risc_instr_f *) instr, r_info);
             break;
         case FMADDS:
-            translate_FMADDS(instr, r_info);
+            translate_FMADDS((const t_risc_instr_f *) instr, r_info);
             break;
         case FMSUBS:
-            translate_FMSUBS(instr, r_info);
+            translate_FMSUBS((const t_risc_instr_f *) instr, r_info);
             break;
         case FNMSUBS:
-            translate_FNMSUBS(instr, r_info);
+            translate_FNMSUBS((const t_risc_instr_f *) instr, r_info);
             break;
         case FNMADDS:
-            translate_FNMADDS(instr, r_info);
+            translate_FNMADDS((const t_risc_instr_f *) instr, r_info);
             break;
         case FADDS:
-            translate_FADDS(instr, r_info);
+            translate_FADDS((const t_risc_instr_f *) instr, r_info);
             break;
         case FSUBS:
-            translate_FSUBS(instr, r_info);
+            translate_FSUBS((const t_risc_instr_f *) instr, r_info);
             break;
         case FMULS:
-            translate_FMULS(instr, r_info);
+            translate_FMULS((const t_risc_instr_f *) instr, r_info);
             break;
         case FDIVS:
-            translate_FDIVS(instr, r_info);
+            translate_FDIVS((const t_risc_instr_f *) instr, r_info);
             break;
         case FSQRTS:
-            translate_FSQRTS(instr, r_info);
+            translate_FSQRTS((const t_risc_instr_f *) instr, r_info);
             break;
         case FSGNJS:
-            translate_FSGNJS(instr, r_info);
+            translate_FSGNJS((const t_risc_instr_f *) instr, r_info);
             break;
         case FSGNJNS:
-            translate_FSGNJNS(instr, r_info);
+            translate_FSGNJNS((const t_risc_instr_f *) instr, r_info);
             break;
         case FSGNJXS:
-            translate_FSGNJXS(instr, r_info);
+            translate_FSGNJXS((const t_risc_instr_f *) instr, r_info);
             break;
         case FMINS:
-            translate_FMINS(instr, r_info);
+            translate_FMINS((const t_risc_instr_f *) instr, r_info);
             break;
         case FMAXS:
-            translate_FMAXS(instr, r_info);
+            translate_FMAXS((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTWS:
-            translate_FCVTWS(instr, r_info);
+            translate_FCVTWS((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTWUS:
-            translate_FCVTWUS(instr, r_info);
+            translate_FCVTWUS((const t_risc_instr_f *) instr, r_info);
             break;
         case FMVXW:
-            translate_FMVXW(instr, r_info);
+            translate_FMVXW((const t_risc_instr_f *) instr, r_info);
             break;
         case FEQS:
-            translate_FEQS(instr, r_info);
+            translate_FEQS((const t_risc_instr_f *) instr, r_info);
             break;
         case FLTS:
-            translate_FLTS(instr, r_info);
+            translate_FLTS((const t_risc_instr_f *) instr, r_info);
             break;
         case FLES:
-            translate_FLES(instr, r_info);
+            translate_FLES((const t_risc_instr_f *) instr, r_info);
             break;
         case FCLASSS:
-            translate_FCLASSS(instr, r_info);
+            translate_FCLASSS((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTSW:
-            translate_FCVTSW(instr, r_info);
+            translate_FCVTSW((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTSWU:
-            translate_FCVTSWU(instr, r_info);
+            translate_FCVTSWU((const t_risc_instr_f *) instr, r_info);
             break;
         case FMVWX:
-            translate_FMVWX(instr, r_info);
+            translate_FMVWX((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTLS:
-            translate_FCVTLS(instr, r_info);
+            translate_FCVTLS((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTLUS:
-            translate_FCVTLUS(instr, r_info);
+            translate_FCVTLUS((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTSL:
-            translate_FCVTSL(instr, r_info);
+            translate_FCVTSL((const t_risc_instr_f *) instr, r_info);
             break;
         case FCVTSLU:
-            translate_FCVTSLU(instr, r_info);
+            translate_FCVTSLU((const t_risc_instr_f *) instr, r_info);
             break;
         case FLD:
             translate_FLD(instr, r_info);
