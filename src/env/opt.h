@@ -4,6 +4,7 @@
 
 #ifndef DYNAMICBINARYTRANSLATORRISCV64_X86_64_OPT_H
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_OPT_H
+extern int perfFd;
 
 typedef struct {
     int status;

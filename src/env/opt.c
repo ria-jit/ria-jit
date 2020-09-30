@@ -7,6 +7,17 @@
 #include <common.h>
 #include "opt.h"
 
+int perfFd = -1;
+
+static int open_perfmap(void) {
+    int pid = getpid();
+
+    char filename[32];
+    snprintf(filename, sizeof(filename), "/tmp/perf-%u.map", pid);
+
+    return open(filename, O_CREAT | O_TRUNC | O_NOFOLLOW | O_WRONLY | O_CLOEXEC, 0600);
+}
+
 t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     char opt_char;
     int optind = 1;
@@ -118,6 +129,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 return parse_result;
                             }
                         } while (*(option_string++) == ',');
+                    } else if (strncmp(option_string, "perf", 4) == 0) {
+                        perfFd = open_perfmap();
                     }
                     goto NEXT;
                 case 'a':
