@@ -529,7 +529,7 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
 
 static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
     //for now always load from memory
-    err |= fe_enc64(&current, FE_SSE_MOVSSrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
+    err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
     return replacement;
 }
 
