@@ -171,7 +171,7 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                      MAP_FIXED_NOREPLACE | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     //Failed means that we couldn't get enough memory at the correct address
     if (BAD_ADDR(elf)) {
-        dprintf(2, "Could not map elf because error %s", -(intptr_t) elf);//-(intptr_t) elf
+        dprintf(2, "Could not map elf because error %li", -(intptr_t) elf);//-(intptr_t) elf
         return INVALID_ELF_MAP;
     }
     //Check in case MAP_FIXED_NOREPLACE is not supported on that kernel version.
@@ -320,7 +320,7 @@ mapInfo) {
         }
         for (int i = 0; stack[i] || envp[i]; ++i) {
             if (stack[i] != envp[i]) {
-                log_general("Difference in envp %p and environ %p\n", stack[i], envp[i]);
+                log_general("Difference in envp %s and environ %s\n", stack[i], envp[i]);
             }
         }
         stackPos = (t_risc_addr) stack;

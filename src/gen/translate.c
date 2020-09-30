@@ -3,7 +3,6 @@
 //
 
 #include "translate.h"
-#include <runtime/register.h>
 #include <gen/dispatch.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>
@@ -13,7 +12,6 @@
 #include <util/typedefs.h>
 #include <parser/parser.h>
 #include <main/context.h>
-#include <gen/instr/core/translate_controlflow.h>
 #include <gen/optimize.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
@@ -22,9 +20,6 @@ t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info);
 
 int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
-
-t_cache_loc
-translate_block_instructions(const t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info);
 
 /**
  * The pointer to the head of the current basic block.
@@ -78,7 +73,7 @@ void init_block() {
 t_cache_loc finalize_block(int chainLinkOp) {
 
     ///write chainEnd to be chained by chainer
-    if (flag_translate_opt && chainLinkOp == LINK_NULL) {
+    if (flag_translate_opt_chain && chainLinkOp == LINK_NULL) {
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
     }
 
@@ -113,8 +108,8 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
     dispatch_instr(instr, c_info);
 
     //log instruction
-    log_asm_out(
-            "Instruction %s at 0x%x (type %d) – (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
+    log_asm_in(
+            "Instruction %s at 0x%lx (type %d) – (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
@@ -136,7 +131,7 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
 }
 
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
-    log_asm_out("Start translating block at (riscv)%p...\n", risc_addr);
+    log_asm_out("Start translating block at (riscv)%p...\n", (void *) risc_addr);
 
     /// get memory for structs
 #define BLOCK_CACHE_SIZE 64
@@ -157,7 +152,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
     ///Start of actual translation
     t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info);
 
-    log_asm_out("Translated block at (riscv)%p: %d instructions\n", risc_addr, instructions_in_block);
+    log_asm_out("Translated block at (riscv)%p: %d instructions\n", (void *) risc_addr, instructions_in_block);
 
     munmap(block_cache, maxCount * sizeof(t_risc_instr));
     return block;
@@ -180,7 +175,9 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
-        optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
+        if (flag_translate_opt_fusion) {
+            optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
+        }
         translate_risc_instr(&block_cache[i], c_info);
     }
 
@@ -249,7 +246,6 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
                         _exit(1);
-                        break;
                 }
             }
                 break;
@@ -306,7 +302,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
             case JUMP : {    ///JAL, JALR
                 switch (parse_buf[parse_pos].mnem) {
                     case JAL : {
-                        if (!flag_translate_opt) {
+                        if (!flag_translate_opt_jump) {
                             ///could follow, but cache
                             instructions_in_block++;
                             goto PARSE_DONE;
@@ -323,8 +319,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -338,9 +335,10 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
                                     set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
-                                    cache_loc = translate_block(ret_target,c_info);
+                                    cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }
@@ -358,8 +356,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n", risc_addr, target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cyles
+                                    log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -397,7 +396,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         break;
 
                     case JALR : {
-                        if(flag_translate_opt && (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
+                        if (flag_translate_opt_jump &&
+                                (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
                             ///2: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
@@ -405,9 +405,10 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
-                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n", risc_addr, ret_target);
+                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
                                     set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
-                                    cache_loc = translate_block(ret_target,c_info);
+                                    cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }
@@ -452,11 +453,11 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
  * inserts direct jumps after first cache lookup in main
  * */
 void chain(t_cache_loc target) {
-    if (!flag_translate_opt) return;
+    if (!flag_translate_opt_chain) return;
     int chain_err = 0;
     if (chain_end != NULL) {
         log_general("chaining: ...\n");
-        chain_err |= fe_enc64(&chain_end, FE_JMP, (intptr_t) target);
+        chain_err |= fe_enc64((uint8_t **) &chain_end, FE_JMP, (intptr_t) target);
         ///Reset chain_end
         chain_end = NULL;
     }

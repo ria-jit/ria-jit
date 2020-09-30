@@ -80,6 +80,11 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         dump_gp_registers();
     }
 
+    //log profiler active
+    if (flag_do_profile) {
+        log_profile("Execution profiler active...\n");
+    }
+
     //benchmark if necessary
     struct timespec begin;
     if (flag_do_benchmark) {
@@ -101,15 +106,24 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
 
         //execute the cached (or now newly generated code) and update the program counter
         if (!execute_cached(cache_loc, c_info)) break;
-        //printf("chain_end: %p\ncache_loc: %p\n\n", chain_end, cache_loc);
+        //printf("chain_end: %p\n"
+        // "cache_loc: %p\n\n", chain_end, cache_loc);
 
         //store pc from registers in pc
         next_pc = get_value(pc);
     }
 
+    log_general("Guest execution finalized. Cleaning up...\n");
+
     //finalize benchmark if necessary
     if (flag_do_benchmark) {
         end_display_measure(&begin);
+    }
+
+    //display the profiler's data
+    if (flag_do_profile) {
+        log_profile("Profiler data collection finished.\n");
+        dump_profiler_data();
     }
 
     return guest_exit_status;
@@ -122,7 +136,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
  */
 bool execute_cached(t_cache_loc loc, context_info *c_info) {
     if (flag_log_general) {
-        log_general("Execute block at %p, cache loc %p\n", get_value(pc), loc);
+        log_general("Execute block at %p, cache loc %p\n", (void *) get_value(pc), loc);
     }
 
     execute_in_guest_context(c_info, loc);
