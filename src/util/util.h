@@ -527,6 +527,16 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
     }
 }
 
+static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
+    //for now always load from memory
+    err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
+    return replacement;
+}
+
+static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), replacement);
+}
+
 static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
     if (regDest == regSrc1) {
         ///mov into rd can be omitted when using rs1 as destination
