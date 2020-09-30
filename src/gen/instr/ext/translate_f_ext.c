@@ -263,7 +263,7 @@ void translate_FSQRTS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    err |= fe_enc64(&current, FE_SSE_SQRTSSrr, regDest, regSrc1); //TODO has SQRTSS really two operands???
+    err |= fe_enc64(&current, FE_SSE_SQRTSSrr, regDest, regSrc1);
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
@@ -694,7 +694,7 @@ void translate_FMVWX(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);//TODO how does it recognize the direction?
+    err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
