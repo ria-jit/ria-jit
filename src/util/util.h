@@ -264,7 +264,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
  * Load a register into a specific replacement register.
  * Used for instructions that require a specific target register for translation (i.e. CX in shifting).
  * If the requested destination register is free, it will be directly loaded.
- * If not, a write-back will be performed. 
+ * If not, a write-back will be performed.
  * In cases where the register is already mapped, the value will be exchanged to the requested destination.
  * @param r_info the static register mapping and dynamic allocation info
  * @param candidate the requested RISC-V register to map
@@ -529,12 +529,16 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
 
 static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
     //for now always load from memory
-    err |= fe_enc64(&current, FE_MOV64rm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
+    err |= fe_enc64(&current, FE_SSE_MOVSSrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
     return replacement;
 }
 
-static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), replacement);
+static inline FeReg getFpRegNoLoad(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
+    return replacement;
+}
+
+static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg regUsed) {
+    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), regUsed);
 }
 
 static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
@@ -547,6 +551,20 @@ static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDe
     } else {
         ///mov first to not touch rs1 in case it is mapped to a x86 register and needed afterwards.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, arithmMnem, regDest, regSrc2);
+    }
+}
+
+static inline void doFpArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
+    if (regDest == regSrc1) {
+        ///mov into rd can be omitted when using rs1 as destination
+        err |= fe_enc64(&current, arithmMnem, regSrc1, regSrc2);
+    } else if (regDest == regSrc2) {
+        ///mov into rd can be omitted when using rs2 as destination
+        err |= fe_enc64(&current, arithmMnem, regSrc2, regSrc1);
+    } else {
+        ///mov first to not touch rs1 in case it is mapped to a x86 register and needed afterwards.
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1);
         err |= fe_enc64(&current, arithmMnem, regDest, regSrc2);
     }
 }
