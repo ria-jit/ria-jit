@@ -16,7 +16,7 @@ Note that the build requires CMake version 3.16 or above.
 This will build two artifacts:
 \begin{description}
 	\item[translator] The actual dynamic binary translator.
-	For details on the usage, see the section below, or execute \texttt{./translator -h}.
+	For details on the usage, see section \vref{sec:translator-usage}, or execute \texttt{./translator -h}.
 	
 	\item[test] The unit test binary.
 	It can be executed via \texttt{./test} and performs extensive unit testing of the RISC-V instruction implementations, the cache, register file, as well as the parser.
@@ -30,7 +30,9 @@ The executables need to be linked statically (pass the flag \texttt{-static} to 
 We currently support binaries compiled for the architecture specifier \texttt{rv64ima}, meaning the compiler is free to utilise the base integer instruction set (\texttt{i}), as well as the instructions provided by the multiplication (\texttt{m}) and atomic standard extensions (\texttt{a}).
 This can be achieved by passing \texttt{-march=rv64ima} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, the aforementioned option implies \texttt{-mabi=lp64}.}.
 
+
 \section{Using the translator}
+\label{sec:translator-usage}
 % this assumes the state of opt_rewrite, todo update as necessary
 \begin{lstlisting}
 	./translator [translator option(s)] -f <filename> [guest options]
@@ -47,9 +49,9 @@ Logging can be controlled by passing the requested category to the \texttt{----l
 Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining or recursive jump target translation via \texttt{----optimize}.
 
 
-
-
-
+\section{Using the bundled tools}
+% todo section about usage of -a, -p, -b and --perf
+There seems to be nothing here yet\ldots
 
 
 
