@@ -529,7 +529,7 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
 
 static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
     //for now always load from memory
-    err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
+    err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg)); //TODO maybe use movq instead?
     return replacement;
 }
 
@@ -538,7 +538,7 @@ static inline FeReg getFpRegNoLoad(const t_risc_fp_reg fp_reg, const register_in
 }
 
 static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg regUsed) {
-    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), regUsed);
+    err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), regUsed);
 }
 
 static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
@@ -564,7 +564,7 @@ static inline void doFpArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg reg
         err |= fe_enc64(&current, arithmMnem, regSrc2, regSrc1);
     } else {
         ///mov first to not touch rs1 in case it is mapped to a x86 register and needed afterwards.
-        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
         err |= fe_enc64(&current, arithmMnem, regDest, regSrc2);
     }
 }
