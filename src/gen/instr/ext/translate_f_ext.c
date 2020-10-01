@@ -9,6 +9,9 @@
 
 #define SIGN_BIT_MASK (0x1 << 31) //left most bit
 
+//TODO if enabled fused mul add functions need to be reworked because they will overwrite operands if they are mapped
+#undef AVX_SUPPORT
+
 /**
  * Translate the FLW instruction.
  * Description: load a single-precision floating-point value from memory into floating-point register rd
@@ -19,7 +22,8 @@
 void translate_FLW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLW...\n");
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest, FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm));
+    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest,
+                    FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm));
     setFpReg(regDest, r_info, FIRST_FP_REG);
 }
 
@@ -33,7 +37,8 @@ void translate_FLW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_FSW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSW...\n");
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSmr, FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVSSmr,
+                    FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm), regSrc2);
 }
 
 /**
@@ -44,6 +49,8 @@ void translate_FSW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FMADDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMADDS...\n");
+
+#ifdef AVX_SUPPORT
     FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
@@ -62,6 +69,29 @@ void translate_FMADDS(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         err |= fe_enc64(&current, FE_VFMADD213SSrrr, regDest, regSrc2, regSrc3);
     }
+#else
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, SECOND_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+
+    //TODO could be optimized by reducing moves
+    //move src1 to SECOND_FP_REG if src1 was mapped
+    if (regSrc1 != SECOND_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc1); //TODO check encoding
+    }
+
+    //multiply rs2
+    err |= fe_enc64(&current, FE_SSE_MULSSrr, SECOND_FP_REG, regSrc2);
+
+    //move rs3 into dest
+    FeReg regSrc3 = getFpReg(instr->op_field.f_op.reg_src_3, r_info, regDest);
+    if (regSrc3 != regDest) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc3); //TODO check encoding
+    }
+
+    //add multiply result
+    err |= fe_enc64(&current, FE_SSE_ADDSSrr, regDest, SECOND_FP_REG);
+#endif
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
@@ -74,6 +104,8 @@ void translate_FMADDS(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMSUBS...\n");
+
+#ifdef AVX_SUPPORT
     FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
@@ -92,6 +124,37 @@ void translate_FMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         err |= fe_enc64(&current, FE_VFMSUB213SSrrr, regDest, regSrc2, regSrc3);
     }
+#else
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, SECOND_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
+
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, SECOND_FP_REG);
+
+    //multiply rs1 and rs2
+    //move src1 to SECOND_FP_REG if src1 was mapped
+    if (regSrc1 != SECOND_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc1); //TODO check encoding
+    }
+
+    err |= fe_enc64(&current, FE_SSE_MULSSrr, SECOND_FP_REG, regSrc2);
+
+    FeReg regSrc3 = getFpReg(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
+
+    //if src3 is already in dest save it
+    if (regDest == regSrc3) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, FIRST_FP_REG, regSrc3); //TODO check encoding
+        regSrc3 = FIRST_FP_REG;
+    }
+
+
+    //move multiply result in SECOND_FP_REG to regDest
+    if (regSrc1 != FIRST_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, SECOND_FP_REG); //TODO check encoding
+    }
+
+    //subtract rs3
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regDest, regSrc3);
+#endif
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
@@ -104,6 +167,8 @@ void translate_FMSUBS(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FNMSUBS...\n");
+
+#ifdef AVX_SUPPORT
     FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
@@ -124,16 +189,44 @@ void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
+#else
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, SECOND_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
+
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+
+    //move src1 to SECOND_FP_REG if src1 was mapped
+    if (regSrc1 != SECOND_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc1); //TODO check encoding
+    }
+
+    //multiply rs1 and rs2
+    err |= fe_enc64(&current, FE_SSE_MULSSrr, SECOND_FP_REG, regSrc2);
+
+    //FIRST_FP_REG is now free again
+    FeReg regSrc3 = getFpReg(instr->op_field.f_op.reg_src_3, r_info, FIRST_FP_REG);
+
+    //if src3 is not already in dest move it
+    if (regDest == regSrc3) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc3); //TODO check encoding
+        regSrc3 = FIRST_FP_REG;
+    }
+
+    //subtract multiply result
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regDest, SECOND_FP_REG);
+#endif
 }
 
 /**
  * Translate the FNMADDS instruction.
- * Description -(rs1 x rs2) - rs3w
+ * Description -(rs1 x rs2) - rs3
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FNMADDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FNMADDS...\n");
+
+#ifdef AVX_SUPPORT
     FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
@@ -152,7 +245,40 @@ void translate_FNMADDS(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         err |= fe_enc64(&current, FE_VFNMADD213SSrrr, regDest, regSrc2, regSrc3);
     }
+#else
+    FeReg regSrc1 = getFpReg(instr->op_field.op.reg_src_1, r_info, SECOND_FP_REG);
+    FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
 
+    FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
+
+    //multiply rs1 and rs2
+    //move src1 to SECOND_FP_REG if src1 was mapped
+    if (regSrc1 != SECOND_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc1); //TODO check encoding
+    }
+
+    err |= fe_enc64(&current, FE_SSE_MULSSrr, SECOND_FP_REG, regSrc2);
+
+    //negate by subtracting
+    err |= fe_enc64(&current, FE_SSE_PXORrr, FIRST_FP_REG, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, FIRST_FP_REG, SECOND_FP_REG);
+
+    FeReg regSrc3 = getFpReg(instr->op_field.f_op.reg_src_3, r_info, SECOND_FP_REG);
+    //if src3 is already in dest save it
+    if (regDest == regSrc3) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, SECOND_FP_REG, regSrc3); //TODO check encoding
+        regSrc3 = SECOND_FP_REG;
+    }
+
+
+    //move negated multiply result in FIRST_FP_REG to regDest
+    if (regDest != FIRST_FP_REG) {
+        err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, FIRST_FP_REG); //TODO check encoding
+    }
+
+    //subtract rs3
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regDest, regSrc3);
+#endif
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
@@ -184,7 +310,8 @@ void translate_FSUBS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSUBS...\n");
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    if (instr->op_field.op.reg_dest == instr->op_field.op.reg_src_2 && instr->op_field.op.reg_dest == instr->op_field.op.reg_src_1) {
+    if (instr->op_field.op.reg_dest == instr->op_field.op.reg_src_2 &&
+            instr->op_field.op.reg_dest == instr->op_field.op.reg_src_1) {
 
         err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest,
                         regDest); // SUB same, same, same is equivalent to zeroing
