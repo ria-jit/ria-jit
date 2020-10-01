@@ -21,10 +21,10 @@
  */
 void translate_FLW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLW...\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSrm, regDest,
-                    FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm));
-    setFpReg(regDest, r_info, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_MOVSSrm,regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -36,9 +36,9 @@ void translate_FLW(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FSW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSW...\n");
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSSmr,
-                    FE_MEM_ADDR(instr->op_field.op.reg_src_1 + ((t_risc_instr *) instr)->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVSSmr,FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm), regSrc2);
 }
 
 /**
