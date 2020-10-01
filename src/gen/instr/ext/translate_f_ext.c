@@ -215,6 +215,7 @@ void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     //subtract multiply result
     err |= fe_enc64(&current, FE_SSE_SUBSSrr, regDest, SECOND_FP_REG);
 #endif
+    setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
 }
 
 /**
@@ -260,7 +261,7 @@ void translate_FNMADDS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_SSE_MULSSrr, SECOND_FP_REG, regSrc2);
 
     //negate by subtracting
-    err |= fe_enc64(&current, FE_SSE_PXORrr, FIRST_FP_REG, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, FIRST_FP_REG, FIRST_FP_REG);
     err |= fe_enc64(&current, FE_SSE_SUBSSrr, FIRST_FP_REG, SECOND_FP_REG);
 
     FeReg regSrc3 = getFpReg(instr->op_field.f_op.reg_src_3, r_info, SECOND_FP_REG);
@@ -327,7 +328,7 @@ void translate_FSUBS(const t_risc_instr *instr, const register_info *r_info) {
         if (regSrc1 != regDest) { // move if src1 was mapped
             err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc1); //TODO check encoding
         }
-        err |= fe_enc64(&current, FE_SUB64rr, regDest, regSrc2);
+        err |= fe_enc64(&current, FE_SSE_SUBSSrr, regDest, regSrc2);
     }
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
@@ -658,7 +659,7 @@ void translate_FCVTWUS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest); //TODO necessary? is it okay that the higher bits are scrambled?
 
     storeRd(instr, r_info, regDest);
 }
@@ -676,6 +677,7 @@ void translate_FMVXW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_MOVDrr, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);//sign extend
 
     storeRd(instr, r_info, regDest);
 }
@@ -694,7 +696,7 @@ void translate_FEQS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest); //TODO should it clear 64 or 32 bit?
     err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0);
     err |= fe_enc64(&current, FE_SETNP8r, regDest);
@@ -782,7 +784,7 @@ void translate_FCVTSW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS32rr, regDest, regSrc1);
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
@@ -802,7 +804,7 @@ void translate_FCVTSWU(const t_risc_instr *instr, const register_info *r_info) {
     //zero upper bits by moving into FIRST_REG
     err |= fe_enc64(&current, FE_MOV32rr, FIRST_REG, regSrc1);
 
-    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest,
                     FIRST_REG); //use 64 bit convert to get a unsigned conversion
 
@@ -874,7 +876,7 @@ void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&jmpBufCOM, FE_JNC, (intptr_t) current);
     err |= fe_enc64(&current, FE_SSE_SUBSSrr, regSrc2, SECOND_FP_REG);
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
-    err |= fe_enc64(&current, FE_BTC64mi, regDest, 63);
+    err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
 
     storeRd(instr, r_info, regDest);
@@ -892,7 +894,7 @@ void translate_FCVTSL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, regSrc1);
 
     setFpReg(instr->op_field.op.reg_dest, r_info, regDest);
@@ -911,7 +913,7 @@ void translate_FCVTSLU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 
-    err |= fe_enc64(&current, FE_SSE_PXORrr, regDest, regDest); //needs to be done because of cvtsi2ss design
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
 
     uint8_t *jmpBufSign = current;
@@ -929,7 +931,7 @@ void translate_FCVTSLU(const t_risc_instr *instr, const register_info *r_info) {
     }
     err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc1);
     err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, 0x1);
-    err |= fe_enc64(&current, FE_SSE_PXORrr, FIRST_FP_REG, FIRST_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_XORPSrr, FIRST_FP_REG, FIRST_FP_REG);
     err |= fe_enc64(&current, FE_SHR64ri, SECOND_REG, 0x1);
     err |= fe_enc64(&current, FE_OR64rr, SECOND_REG, FIRST_REG);
     err |= fe_enc64(&current, FE_SSE_CVTSI2SS64rr, regDest, SECOND_REG);
