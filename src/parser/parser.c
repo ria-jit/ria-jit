@@ -540,7 +540,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             int funct7 = extract_funct7(raw_instr);
             int funct3 = extract_funct3(raw_instr);
             int rs2 = extract_rs2(raw_instr);
-            int operandSize = funct7 & 0x11; // lower two bits determine operand size
+            int operandSize = funct7 & 0b11; // lower two bits determine operand size
             // it looks like this bit determines if the rs2 field is used as a register, or as a funct code
             if ((funct7 & 0x0100000) == 0) {
                 p_instr_struct->op_field.op.reg_src_2 = rs2;
