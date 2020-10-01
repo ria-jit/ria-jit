@@ -1,4 +1,4 @@
-\section{Download and installation instructions}
+\subsection{Download and installation instructions}
 The source code for the translator can be downloaded by checking out the project's git repository.
 Take care to either \texttt{git clone} the repository with the option flag \texttt{--recursive}, or to run the command
 \begin{lstlisting}
@@ -22,7 +22,7 @@ This will build two artifacts:
 	It can be executed via \texttt{./test} and performs extensive unit testing of the RISC-V instruction implementations, the cache, register file, as well as the parser.
 \end{description}
 
-\section{Executable program requirements}
+\subsection{Executable program requirements}
 We can execute binaries compiled via the tools provided in the RISC-V GNU toolchain\footnote{For further information as well as download and usage instructions, see \url{https://github.com/riscv/riscv-gnu-toolchain} (last accessed on 25.09.2020).}.
 The executables need to be linked statically (pass the flag \texttt{-static} to gcc when compiling), as the translator does not support dynamically linked files.
 
@@ -31,7 +31,7 @@ We currently support binaries compiled for the architecture specifier \texttt{rv
 This can be achieved by passing \texttt{-march=rv64ima} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, the aforementioned option implies \texttt{-mabi=lp64}.}.
 
 
-\section{Using the translator}
+\subsection{Using the translator}
 \label{sec:translator-usage}
 % this assumes the state of opt_rewrite, todo update as necessary
 \begin{lstlisting}
@@ -49,13 +49,16 @@ Logging can be controlled by passing the requested category to the \texttt{----l
 Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining or recursive jump target translation via \texttt{----optimize}.
 
 
-\section{Using the bundled tools}
+\subsection{Using the bundled tools}
 % todo section about usage of -a, -p, -b and --perf
 There seems to be nothing here yet\ldots
 
 
+\subsection{Version history}
+The following mirrors the version control change log of the translator over the course of its development.
 
-
+\paragraph{v1.2.2}
+Continued here...
 
 
 

@@ -59,17 +59,8 @@
 
 \newpage
 \section*{Appendices}
-\begin{appendices}
-	% redefine section/subsection levels via changing \l@section and \l@subsection
-	% this collects the appendices in the toc as subsections to "Appendices"
-	\makeatletter
-	\addtocontents{toc}{%
-		\begingroup
-		\let\protect\l@section\protect\l@subsection
-		\let\protect\l@subsection\protect\l@subsubsection
-	}
-	\makeatother
-	
+\begin{appendices}	
+	\renewcommand\thesubsection{\Alph{subsection}}
 	\input{A-Appendix}
 \end{appendices}
 
