@@ -15,8 +15,39 @@ The following section aims to provide an in-depth overview of the system's archi
 \subsection{Optimisation of the generated code}
 \subsubsection{Block chaining}
 \subsubsection{Recursive jump translation}
-% todo optimisation details, maybe split up?
+% todo optimisation details, maybe split up? more sections?
 
-\subsection{System call handling overview}
-% todo add an overview table for the system calls handled
+\subsection{Detailed system call overview}
 % todo special description for emulated calls
+
+As described in section \vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
+We achieve this by translating the \texttt{ECALL} instruction as a context switch and jump to the \texttt{emulate\_ecall} routine.
+
+As we stored the guest's registers before jumping to the handler, the requested system call index is now available to the DBT in the register file as entry \texttt{a7}.
+We may now handle the system calls based on that index and the arguments passed in the registers \texttt{a0} through \texttt{a6}, and write the return value to entry \texttt{a0} of the register file prior to switching the context back to the guest.
+
+We will shortly list the different types of handling required by some system calls that are either not present on the x86-64 host architecture, or may influence or break the state of the DBT.
+\begin{description}
+	\item[To be continued] \ldots
+\end{description}
+
+\begin{table}
+	\centering
+	\begin{tabular}{ccc}
+		\toprule
+		\textbf{System Call (index)} & \textbf{Handling} & \textbf{x86-64 base (index)}\\ 
+		\midrule
+				\texttt{fstatat} (79) & data reformat & \texttt{newfstatat} (262)\\
+		\texttt{fstat} (80) & data reformat & \texttt{fstat} (5)\\
+		\texttt{exit} (93) & emulate & n/a\\
+		\texttt{exit\_group} (94) & emulate & n/a\\
+		\texttt{rt\_sigaction} (134) & ignore & n/a\\
+		\texttt{brk} (214) & emulate & n/a\\
+		\texttt{munmap} (215) & guarded pass-through & \texttt{munmap} (11)\\
+		\texttt{mmap} (222) & guarded pass-through & \texttt{mmap} (9)\\
+		\bottomrule
+	\end{tabular}
+	% todo keep up-to-date
+	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
+	\caption{An overview of the system calls we support that require special handling by the binary translator.}
+\end{table}
