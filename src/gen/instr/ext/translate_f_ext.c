@@ -641,6 +641,7 @@ void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI32rr, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);//sign extend
 
     storeRd(instr, r_info, regDest);
 }
@@ -659,7 +660,7 @@ void translate_FCVTWUS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest); //TODO necessary? is it okay that the higher bits are scrambled?
+    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);//TODO necessary? does cvtss2si clear them already
 
     storeRd(instr, r_info, regDest);
 }
@@ -696,7 +697,7 @@ void translate_FEQS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest); //TODO should it clear 64 or 32 bit?
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0);
     err |= fe_enc64(&current, FE_SETNP8r, regDest);
