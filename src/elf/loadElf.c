@@ -77,14 +77,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         critical_not_yet_implemented("C ABI is not yet supported");
         incompatible = true;
     }
-    if (flags & EF_RISCV_FLOAT_ABI_SINGLE) {
-        critical_not_yet_implemented("F ABI is not yet supported");
-        incompatible = true;
-    }
-    if (flags & EF_RISCV_FLOAT_ABI_DOUBLE) {
-        critical_not_yet_implemented("D ABI is not yet supported");
-        incompatible = true;
-    }
     if (flags & EF_RISCV_FLOAT_ABI_QUAD) {
         critical_not_yet_implemented("Q ABI is not yet supported");
         incompatible = true;
