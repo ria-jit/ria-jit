@@ -6,7 +6,7 @@ import os
 
 def main():
 	readelf = "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-readelf"
-	perf = "perf record --timestamp-filename --freq 5000"
+	perf = "perf record --timestamp-filename --freq 1000"
 	#emulator = "/u/home/schmidtf/qemu/build/qemu-riscv64"
 	emulator = "/u/home/schmidtf/dbt-candidate/translator --perf -f"
 
