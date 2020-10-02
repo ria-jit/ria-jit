@@ -15,21 +15,52 @@ The following section aims to provide an in-depth overview of the system's archi
 \subsection{Optimisation of the generated code}
 \subsubsection{Block chaining}
 \subsubsection{Recursive jump translation}
+\subsubsection{Macro operation fusion}
 % todo optimisation details, maybe split up? more sections?
 
 \subsection{Detailed system call overview}
 % todo special description for emulated calls
 
 As described in section \vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
-We achieve this by translating the \texttt{ECALL} instruction as a context switch and jump to the \texttt{emulate\_ecall} routine.
+We achieve this by translating the \texttt{ECALL} instruction as a context switch and jump to the \texttt{emulate\_ecall} routine in the DBT, which can then take the appropriate action.
 
-As we stored the guest's registers before jumping to the handler, the requested system call index is now available to the DBT in the register file as entry \texttt{a7}.
+As we stored the guest's registers before jumping to the handler, the requested system call index is now available to the DBT in the register file as entry \texttt{a7}, as per the RISC-V standard calling convention.
 We may now handle the system calls based on that index and the arguments passed in the registers \texttt{a0} through \texttt{a6}, and write the return value to entry \texttt{a0} of the register file prior to switching the context back to the guest.
 
-We will shortly list the different types of handling required by some system calls that are either not present on the x86-64 host architecture, or may influence or break the state of the DBT.
+As previously mentioned, some system calls require special handling when encountered by the DBT (see table \vref{tab:syscall-special} for details).
+The following will describe the specifics of these issues with system calls that are either not present on the x86-64 host architecture, or may influence or break the state of the DBT.
 \begin{description}
-	\item[To be continued] \ldots
+	\item[Adapting structure data format.]
+	There are system calls like \texttt{fstat} and \texttt{fstatat} that exist both on RISC-V as well as x86-64, but use different data structure layouts in their return values.
+	Thus, the DBT must adapt the host's returned data to the required format prior to passing it back to the guest.
+	
+	
+	\item[Emulation required.]
+	The DBT captures the \texttt{exit} and \texttt{exit\_group} calls.
+	Passing them through would immediately terminate the DBT -- an action that is undesirable as it prevents any form of clean-up or post-execution profiling and analysis to take place.
+	Thus, the DBT uses these system calls to set a flag which stops the translator's main loop from executing the next iteration.
+	
+	The \texttt{brk} system call must also be entirely emulated, as it would otherwise allow the guest program to modify the endpoint of the DBT's data segment (\textit{program break}), thus potentially deallocating some of the translator's memory.
+	
+	
+	\item[Ignoring system calls.]
+	% todo expand the rationale here. is this correct?
+	The \texttt{rt\_sigaction} system call is ignored by the DBT, as any signals received by the process will be handled by the translator due to the fact that the guest program's execution is emulated in the DBT's process.
+	
+	
+	\item[Guarded pass-through to host.]
+	Essentially, any system call that has the possibility to influence the state or memory of the translator needs to have respective safe-guards in place.
+	A good example of this behaviour is the \texttt{mmap} system call, the handling of which also reflects the memory layout scheme discussed in section \vref{sec:memory-layout}.
+	
+	In any case, we must prevent a memory mapping into the translator's memory region.
+	Mappings that do not interfere with the DBT's memory can be passed along to the host directly.
+	In case a hinted mapping would conflict with the translator's memory, we may just re-hint the mapping to the top of the guest's address space.
+	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping; thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
+	
+	Similarly, we fail the guest's \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the deallocation.
 \end{description}
+
+The other supported system calls may be directly passed through to the host after performing the necessary index mapping (see table \vref{tab:syscall-pass-through}).
 
 \begin{table}
 	\centering
@@ -37,7 +68,7 @@ We will shortly list the different types of handling required by some system cal
 		\toprule
 		\textbf{System Call (index)} & \textbf{Handling} & \textbf{x86-64 base (index)}\\ 
 		\midrule
-				\texttt{fstatat} (79) & data reformat & \texttt{newfstatat} (262)\\
+		\texttt{fstatat} (79) & data reformat & \texttt{newfstatat} (262)\\
 		\texttt{fstat} (80) & data reformat & \texttt{fstat} (5)\\
 		\texttt{exit} (93) & emulate & n/a\\
 		\texttt{exit\_group} (94) & emulate & n/a\\
@@ -50,4 +81,65 @@ We will shortly list the different types of handling required by some system cal
 	% todo keep up-to-date
 	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
 	\caption{An overview of the system calls we support that require special handling by the binary translator.}
+	\label{tab:syscall-special}
 \end{table}
+
+\begin{table}
+	\centering
+	\begin{tabular}{rlc}
+		\toprule
+		\textbf{RISC-V system call} & \textbf{\ldots index} & \textbf{x86-64 index}\\
+		\midrule
+		\texttt{getcwd} & 17 & \refer 79\\
+		\texttt{fcntl} & 25 & \refer 72\\
+		\texttt{ioctl} & 29 & \refer 16\\
+		\texttt{unlinkat} & 35 & \refer 263\\
+		\texttt{faccessat} & 48 & \refer 269\\
+		\texttt{chdir} & 49 & \refer 80\\
+		\texttt{fchmod} & 52 & \refer 91\\
+		\texttt{fchown} & 55 & \refer 93\\
+		\texttt{pipe2} & 59 & \refer 293\\
+		\texttt{openat} & 56 & \refer 257\\
+		\texttt{close} & 57 & \refer 3\\
+		\texttt{getdents64} & 61 & \refer 217\\
+		\texttt{lseek} & 62 & \refer 8\\
+		\texttt{read} & 63 & \refer 0\\
+		\texttt{write} & 64 & \refer 1\\
+		\texttt{writev} & 66 & \refer 20\\
+		\texttt{readlinkat} & 78 & \refer 267\\
+		\texttt{utimensat} & 88 & \refer 280\\
+		\texttt{set\_tid\_address} & 96 & \refer 218\\
+		\texttt{futex} & 98 & \refer 202\\
+		\texttt{set\_robust\_list} & 99 & \refer 273\\
+		\texttt{clock\_gettime} & 113 & \refer 228\\
+		\texttt{tgkill} & 131 & \refer 234\\
+		\texttt{rt\_sigprocmask} & 135 & \refer 14\\
+		\texttt{uname} & 160 & \refer 63\\
+		\texttt{gettimeofday} & 169 & \refer 96\\
+		\texttt{getpid} & 172 & \refer 39\\
+		\texttt{getuid} & 174 & \refer 102\\
+		\texttt{geteuid} & 175 & \refer 107\\
+		\texttt{getgid} & 176 & \refer 104\\
+		\texttt{getegid} & 177 & \refer 108\\
+		\texttt{gettid} & 178 & \refer 186\\
+		\texttt{sysinfo} & 179 & \refer 99\\
+		\texttt{execve} & 221 & \refer 59\\
+		\texttt{wait4} & 260 & \refer 61\\
+		\texttt{prlimit64} & 261 & \refer 302\\
+		\texttt{renameat2} & 276 & \refer 316\\
+		\texttt{getrandom} & 278 & \refer 318\\
+		\bottomrule
+	\end{tabular}
+	% todo keep up-to-date
+	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
+	\caption{An overview of the system calls handled via pass-through to the host.}
+	\label{tab:syscall-pass-through}
+\end{table}
+
+
+
+
+
+
+
+
