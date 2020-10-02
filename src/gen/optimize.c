@@ -3,6 +3,8 @@
 //
 
 #include "optimize.h"
+#include <common.h>
+#include <gen/translate.h>
 
 /**
  * Optimize the current instruction (potentially by applying macro operation fusing with the adjacent instructions).
@@ -109,12 +111,155 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
     }
 }
 
+const pattern * const patterns;
 
 /**
  * pattern matching
 */
 void optimize_patterns(t_risc_instr *block_cache, size_t len) {
 #define PATTERNS_NUM 64
+
+    for(int i = 0; i < PATTERNS_NUM; i++) {
+        for(int j = 0; j < len - patterns[i].len; j++) {
+            for(int k = 0; k < patterns[i].len; k++) {
+                ///mnem match
+                if(patterns[i].elements[k].mnem != block_cache[j + k].mnem) {
+                    goto MISMATCH;
+                }
+
+                ///rs1 match
+                switch(patterns[i].elements[k].rs1) {
+                    case DONT_CARE : {} break;
+
+                    //uncomment as needed
+
+                    /*
+                    case rs1_h1 : {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].reg_src_1) {
+                            goto MISMATCH;
+                        }
+                    } break;
+                     */
+                    /*
+                    case rs2_h1: {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].reg_src_2) {
+                            goto MISMATCH;
+                        }
+                    }
+                        break;
+                    */
+                    /*
+                    case rd_h1: {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    }
+                        break;
+                    */
+                    /*
+                    case rs1_h2: {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h2].reg_src_1) {
+                            goto MISMATCH;
+                        }
+                    }
+                        break;
+                    */
+                    /*
+                    case rs2_h2: {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h2].reg_src_2) {
+                            goto MISMATCH;
+                        }
+                    }
+                        break;
+                    */
+                    /*
+                    case rd_h2: {
+                        if(block_cache[j + k].reg_src_1 !=
+                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    }
+                        break;
+                    */
+                    default: {
+                        if(block_cache[j + k].reg_src_1 != patterns[i].elements[k].rs1) {
+                            goto MISMATCH;
+                        }
+                    }
+                }
+
+                ///rs2 match
+                switch (patterns[i].elements[k].rs2) {
+                    case DONT_CARE : {} break;
+
+                        //insert as needed
+
+                        /*
+                        case rs2_h2 : {
+                            if(block_cache[j + k].reg_src_2 !=
+                                    block_cache[j + patterns[i].elements[k].h2].reg_src_2) {
+                                goto MISMATCH;
+                            }
+                        } break;
+                         */
+                    default: {
+                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs1) {
+                            goto MISMATCH;
+                        }
+                    }
+                }
+
+                ///rd match
+                switch (patterns[i].elements[k].rd) {
+                    case DONT_CARE : {} break;
+
+                        //insert as needed
+
+                        /*
+                        case rd_h2 : {
+                            if(block_cache[j + k].reg_dest !=
+                                    block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                                goto MISMATCH;
+                            }
+                        } break;
+                         */
+                    default: {
+                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs1) {
+                            goto MISMATCH;
+                        }
+                    }
+                }
+
+                ///imm match
+                switch (patterns[i].elements[k].imm) {
+                    case DONT_CARE : {} break;
+                    default : {
+                        if(block_cache[j + k].imm != patterns[i].elements[k].imm_value) {
+                            goto MISMATCH;
+                        }
+                    }
+                }
+            }
+
+            ///match:
+
+            ///insert pseudo instruction
+            block_cache[j].mnem = PATTERN_EMIT;
+            block_cache[j].imm = i;
+
+            //invalidate matched sequence ??
+
+            ///skip to end of pattern
+            j = j + patterns[i].len;
+
+            MISMATCH:;
+        }
+    }
 
     for(size_t i = 0; i < len; i++) {
         for(int j = 0; j < PATTERNS_NUM; j++) {
@@ -130,5 +275,12 @@ void optimize_patterns(t_risc_instr *block_cache, size_t len) {
             }
             */
         }
+    }
+}
+
+void translate_pattern_emit(const t_risc_instr *instr, const register_info *r_info) {
+    printf("PATTERN EMIT: @%p", instr->addr);
+    for(int i = 0; i < patterns[instr->imm].code_size; i++) {
+        *current = patterns[instr->imm].code[i];
     }
 }

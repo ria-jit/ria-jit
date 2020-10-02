@@ -13,10 +13,14 @@
 #include <gen/instr/ext/translate_f_ext.h>
 #include <gen/instr/ext/translate_d_ext.h>
 #include <gen/instr/pseudo/translate_pseudo.h>
+#include <gen/optimize.h>
 
 void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
     register_info *r_info = c_info->r_info;
     switch (instr->mnem) {
+        case PATTERN_EMIT:
+            translate_pattern_emit(instr, r_info);
+            break;
         case INVALID_MNEM:
             translate_INVALID(instr);
             break;

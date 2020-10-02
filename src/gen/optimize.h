@@ -12,4 +12,38 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len);
 
 void optimize_patterns(t_risc_instr *block_cache, size_t len);
 
+void translate_pattern_emit(const t_risc_instr *instr, const register_info *r_info);
+
+typedef enum {
+    DONT_CARE = 33,
+
+    // -> same as rs[x] at pattern position h1
+    rs1_h1,
+    rs2_h1,
+    rd_h1,
+    rs1_h2,
+    rs2_h2,
+    rd_h2,
+} t_risc_reg_meta;
+
+typedef struct {
+    short mnem;
+    short rs1;
+    short rs2;
+    short rd;
+    int h1;
+    int h2;
+    short imm;
+    int imm_value;
+
+} pattern_element;
+
+typedef struct {
+    pattern_element *elements;
+    int len;
+    //equivalent x86 code ...
+    uint8_t *code;
+    int code_size;
+} pattern;
+
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_OPTIMIZE_H
