@@ -110,7 +110,11 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/test_amo_ext.cpp
         test/unit_tests/test_arithm.cpp
         test/unit_tests/test_float_arithm.cpp
+        test/unit_tests/test_float_con.cpp
         test/unit_tests/test_double_arithm.cpp
+        test/unit_tests/test_double_con.cpp
+        test/unit_tests/test_double_gp_to_fp.cpp
+        test/unit_tests/test_double_fp_to_gp.cpp
         test/unit_tests/test_parser_param.cpp)
 
 #include the googletest testing framework
