@@ -10,7 +10,69 @@ The following section aims to provide an in-depth overview of the system's archi
 % todo
 
 \subsection{Static hybrid register mapping}
-% todo register mapping details
+\subsubsection{Register priority analysis}
+In order to achieve the best performance with the hybrid approach to the register mapping described in section \vref{sec:context-switch-reg-handle}, we must decide which registers of the RISC-V guest to map into the host's limited number of available GPRs.
+There are two main ways of determining the priority of registers when considering them as candidates for a mapping.
+
+It is, on the one hand, possible to assess the priority statically, by performing an analysis of the binary in question.
+Essentially, the hereby produced metric counts the number of times the register is used in the assembly instructions listed in the guest program and thus delivers an idea of how important each register is to this specific executable.
+We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag (see appendix \ref{sec:appendix-tools}).
+
+However, this approach does not take into account that a single instruction may be executed many times while the program is running.
+Accordingly, the other approach is to assess the register priority dynamically by analysing and profiling the execution of the testing program, thereby gaining an insight into how often each register is actually used during the execution.
+The translator is also capable of performing such an analysis, commanded by the \texttt{-p} flag.
+A dynamic analysis, of course, delivers a largely more accurate idea of the priority of the registers in question, but has the decided and obvious disadvantage that it cannot be performed without actually executing the binary.
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\includegraphics[height=1.17\textwidth,angle=90]{media/register-usage}%
+	}
+	\caption{The results of a static and dynamic register usage analysis of several \textit{SPEC CPU 2017} benchmarks, \textit{gzip} as well as a merge sort utility program.}
+	\label{tab:register-analysis-results}
+\end{table}
+
+For the results of such an analysis performed on a range of programs, including \textit{gzip}~\cite{gzip} and several benchmarks of the \texttt{intspeed}-Suite of \textit{SPEC CPU 2017}~\cite{spec-cpu-2017}, see table \vref{tab:register-analysis-results}.
+Primarily, we gain interesting insights into the differences between the static and dynamic results yielded by the analysis.
+While the static ranked hit list does not differ greatly between the different executables and the top $12$ entries are identical for every one of the tested programs, the dynamic results are far more variable.
+This makes creating a register mapping that fits well to every executable very difficult.
+
+The benchmarks \texttt{605.mcf\_s} (route planning workload) and \texttt{620.omnetpp\_s} (discrete event simulation for computer networking)~\cite{spec-cpu-doc} of the \textit{SPEC CPU} suite can serve as examples here.
+For programs like \texttt{605.mcf\_s} that only lightly use the stack, holding the stack pointer \texttt{sp/x2} in a native register when only $1,20\,\%$ of accesses actually utilise it would not be necessary.
+However, other programs like \texttt{620.omnetpp\_s} may rely heavily on the stack, and thus log very frequent accesses to \texttt{sp/x2};
+when statistically every ninth access is to the stack pointer, it is absolutely essential to map the register to a native GPR.
+
+If a static analysis yielded results of similar quality to the dynamic counterpart, the DBT could analyse the binary prior to execution and run every program with a best-fit static register mapping.
+However, evidently, this is impossible with dynamic profiling.
+
+
+\subsubsection{Structure of the mapping}
+When we structure our mapping by the average case of the insights gained, we statistically capture about $83,59\,\%$ of register accesses, leaving the remaining $16,41\,\%$ to read from the register file in memory.
+
+From the 16 general-purpose registers x86-64 has to offer, we may use the 12 registers \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}.
+The remaining registers have either implicit or exclusive functions in some instructions (\texttt{rax} and \texttt{rdx} for multiplication/division, \texttt{cl} for shifting), or, like \texttt{rsp}, are impractical to use in combination with block chaining and function calls.
+
+Taking the 12 registers that are most accessed on average, the mapping structure is as seen in table \vref{tab:static-register-mapping}.
+
+\begin{table}
+	\centering
+	\begin{tabular}{rcccccccccccc}
+		\toprule
+		\textbf{RISC-V register} & \texttt{a5} & \texttt{a4} & \texttt{a3} & \texttt{a0} & \texttt{fp} & \texttt{sp} & \texttt{a2} & \texttt{a1} & \texttt{s1} & \texttt{ra} & \texttt{a7} & \texttt{s2}\\
+		\textbf{x86-64 mapping} & \texttt{rbx} & \texttt{rbp} & \texttt{rsi} & \texttt{rdi} & \texttt{r8} & \texttt{r9} & \texttt{r10} & \texttt{r11} & \texttt{r12} & \texttt{r13} & \texttt{r14} & \texttt{r15}\\
+		\bottomrule
+	\end{tabular}
+	\caption{The static register mapping in use by the translator.}
+	\label{tab:static-register-mapping}
+\end{table}
+
+\subsubsection{Register file memory access}
+Continued here\ldots
+% todo about register loads in instructions
+
+
+\subsection{Context switching details}
+% todo context switching
 
 \subsection{Optimisation of the generated code}
 \subsubsection{Block chaining}
