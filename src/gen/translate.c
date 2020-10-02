@@ -291,6 +291,17 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         instructions_in_block++;
                         goto PARSE_DONE;
                     }
+                    case CSRRS:
+                    case CSRRSI:
+                    case CSRRW:
+                    case CSRRWI:
+                    case CSRRC:
+                    case CSRRCI: {
+                        ///next instruction address
+                        risc_addr += 4;
+                        instructions_in_block++;
+                        break;
+                    }
                     default:
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
