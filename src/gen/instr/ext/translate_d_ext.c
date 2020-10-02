@@ -321,17 +321,21 @@ void translate_FSGNJD(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         FeReg regSrc2 = getFpReg(instr->op_field.op.reg_src_2, r_info, SECOND_FP_REG);
 
-
         err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-        err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_REG, regSrc2);
+        err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
 
-        //remove sign from first
-        err |= fe_enc64(&current, FE_AND64ri, FIRST_REG, ~D_SIGN_BIT_MASK);
+        //load bitmask
+        err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
+        err |= fe_enc64(&current, FE_ROR64ri, SECOND_REG, 0x1);
 
         //mask sign from second
-        err |= fe_enc64(&current, FE_AND64ri, SECOND_REG, D_SIGN_BIT_MASK);
+        err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
+
+        //remove sign from first
+        err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
+
         //merge
-        err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, SECOND_REG);
+        err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
         //move back to fp_reg
         err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
     }
@@ -353,17 +357,23 @@ void translate_FSGNJND(const t_risc_instr *instr, const register_info *r_info) {
 
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_REG, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
+
+    //load bitmask
+    err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
+    err |= fe_enc64(&current, FE_ROR64ri, SECOND_REG, 0x1);
 
     //remove sign from first
-    err |= fe_enc64(&current, FE_AND64ri, FIRST_REG, ~D_SIGN_BIT_MASK);
+    err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
 
     //flip second (negate sign)
-    err |= fe_enc64(&current, FE_NOT64r, SECOND_REG);
+    err |= fe_enc64(&current, FE_NOT64r, FE_R8);
+
+
     //mask sign from second
-    err |= fe_enc64(&current, FE_AND64ri, SECOND_REG, D_SIGN_BIT_MASK);
+    err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
     //merge
-    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, SECOND_REG);
+    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
     //move back to fp_reg
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
 
@@ -386,18 +396,22 @@ void translate_FSGNJXD(const t_risc_instr *instr, const register_info *r_info) {
 
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_REG, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
+
+    //load bitmask
+    err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
+    err |= fe_enc64(&current, FE_ROR64ri, SECOND_REG, 0x1);
 
     //xor first and second sign
-    err |= fe_enc64(&current, FE_XOR64rr, SECOND_REG, FIRST_REG);
+    err |= fe_enc64(&current, FE_XOR64rr, FE_R8, FIRST_REG);
 
     //remove sign from first
-    err |= fe_enc64(&current, FE_AND64ri, FIRST_REG, ~D_SIGN_BIT_MASK);
+    err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
 
     //mask sign from second
-    err |= fe_enc64(&current, FE_AND64ri, SECOND_REG, D_SIGN_BIT_MASK);
+    err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
     //merge
-    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, SECOND_REG);
+    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
     //move back to fp_reg
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
 
