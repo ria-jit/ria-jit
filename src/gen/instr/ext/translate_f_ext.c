@@ -743,7 +743,7 @@ void translate_FLES(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc2, regSrc1);
-    err |= fe_enc64(&current, FE_SETA8r, regDest);
+    err |= fe_enc64(&current, FE_SETNC8r, regDest);
 
     storeRd(instr, r_info, regDest);
 }
