@@ -22,7 +22,11 @@ uint64_t *get_swap_file(void);
 
 t_risc_reg_val get_value(t_risc_reg reg);
 
+t_risc_fp_reg_val get_fpvalue(t_risc_reg reg);
+
 void set_value(t_risc_reg reg, t_risc_reg_val val);
+
+void set_fpvalue(t_risc_reg reg, t_risc_fp_reg_val val);
 
 void dump_gp_registers(void);
 

@@ -22,7 +22,7 @@ t_risc_reg_val csr_file[N_CSR];
  * Contents of the floating point registers stored in memory.
  * For convenience, see enum type t_risc_fp_reg.
  */
-t_risc_reg_val fp_file[N_FP];
+t_risc_fp_reg_val fp_file[N_FP];
 
 /**
  * Swap space for the 6 callee-saved registers and a scratch register
@@ -70,6 +70,15 @@ t_risc_reg_val get_value(t_risc_reg reg) {
 }
 
 /**
+ * Get the value currently in the passed register.
+ * @param reg the register to lookup
+ * @return value in register reg
+ */
+t_risc_fp_reg_val get_fpvalue(t_risc_reg reg) {
+    return fp_file[reg];
+}
+
+/**
  * Set the value of the passed register.
  * @param reg the register to update
  * @param val the new value
@@ -79,6 +88,15 @@ void set_value(t_risc_reg reg, t_risc_reg_val val) {
     if (reg != x0) {
         gp_file[reg] = val;
     }
+}
+
+/**
+ * Set the value of the passed register.
+ * @param reg the register to update
+ * @param val the new value
+ */
+void set_fpvalue(t_risc_reg reg, t_risc_fp_reg_val val) {
+    fp_file[reg] = val;
 }
 
 /**

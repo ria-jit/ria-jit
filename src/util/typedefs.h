@@ -171,9 +171,18 @@ typedef enum {
 /**
  * Register value type.
  * XLEN = 64 for the integer registers.
- * For floating point, F-extension requires FLEN = 32-bit, D-extension requires 64-bit.
  */
 typedef uint64_t t_risc_reg_val;
+
+/**
+ * Float Register value type.
+ * For floating point, F-extension requires FLEN = 32-bit, D-extension requires 64-bit.
+ */
+typedef union {
+    float f;
+    double d;
+    unsigned long i;
+} t_risc_fp_reg_val;
 
 //RISC-V operation types (for later optimization)
 typedef enum {
@@ -201,17 +210,17 @@ typedef struct {
     uint32_t rounding_mode;
 } t_f_operand_field;
 
-union t_op_field{
+typedef union {
     t_operand_field op;
     t_f_operand_field f_op;
-};
+} t_op_field;
 
 
 typedef struct {
     t_risc_addr addr;
     t_risc_mnem mnem;
     t_risc_optype optype;
-    union t_op_field op_field;
+    t_op_field op_field;
 } t_risc_instr;
 
 /**
