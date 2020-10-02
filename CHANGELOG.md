@@ -6,7 +6,23 @@
 
 [![pipeline status](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/badges/develop/pipeline.svg)](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/-/commits/develop)
 
-## Version 1.2.1 (latest)
+
+## Version 1.2.2 (latest)
+### Release notes
+
+* expand the static register mapping for better performance overall
+* reallocate the code cache index and rehash all values when it is 50 % full for better lookup performance on capacity overflow
+* rewrite command line options parsing to allow for long options (see `./translator -h`)
+* allow finer control of specific optimisation features via `--optimize`
+* add instruction pattern matching to the binary analyser to gather data for macro operation fusing
+* add a profiler for counting register accesses
+* implement emulation for syscalls `faccessat, getrandom, renameat2`
+* remove emulation for the syscall `clone`
+* fix crash when the code cache fills up by increasing the memory space available for translated blocks
+
+
+
+## Version 1.2.1
 
 ### Release notes
 
@@ -32,6 +48,7 @@
 * flip `-m` translation optimiser flag (enabled by default, flag now turns off optimisations)
 
 
+
 ## Version 1.1.0
 
 ### Release notes
@@ -42,11 +59,13 @@
 *  add performance measuring flags to the translator
 
 
+
 ## Version 1.0.1
 
 ### Release notes
 
 *  Fix an issue with the `read` system call that could cause blocking problems with gzip.
+
 
 
 ## Version 1.0
