@@ -13,12 +13,6 @@
 
 typedef double (*t_arithmResFunc)(double, double);
 
-inline t_risc_fp_reg_val getdouble(double d) {
-    t_risc_fp_reg_val ret;
-    ret.d = d;
-    return ret;
-}
-
 /**
  * Parameterized using the following parameters:
  *
@@ -104,8 +98,8 @@ TEST_P(ArithmDoubleTest, AllDifferent) {
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-    set_fpvalue(rs1, getdouble(rs1StartValue));
-    set_fpvalue(rs2, getdouble(rs2StartValue));
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+    set_fpvalue(rs2, get_dVal(rs2StartValue));
 
     execute_in_guest_context(c_info, loc);
 
@@ -120,8 +114,8 @@ TEST_P(ArithmDoubleTest, Rs1RdSame) {
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-    set_fpvalue(rs1, getdouble(rs1StartValue));
-    set_fpvalue(rs2, getdouble(rs2StartValue));
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+    set_fpvalue(rs2, get_dVal(rs2StartValue));
 
     execute_in_guest_context(c_info, loc);
 
@@ -135,8 +129,8 @@ TEST_P(ArithmDoubleTest, Rs2RdSame) {
 
         t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, getdouble(rs1StartValue));
-        set_fpvalue(rs2, getdouble(rs2StartValue));
+        set_fpvalue(rs1, get_dVal(rs1StartValue));
+        set_fpvalue(rs2, get_dVal(rs2StartValue));
 
         execute_in_guest_context(c_info, loc);
 
@@ -149,7 +143,7 @@ TEST_P(ArithmDoubleTest, Rs1Rs2Same) {
 
         t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, getdouble(rs1StartValue));
+        set_fpvalue(rs1, get_dVal(rs1StartValue));
 
         execute_in_guest_context(c_info, loc);
 
@@ -162,7 +156,7 @@ TEST_P(ArithmDoubleTest, AllSame) {
 
         t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, getdouble(rs1StartValue));
+        set_fpvalue(rs1, get_dVal(rs1StartValue));
 
         execute_in_guest_context(c_info, loc);
 

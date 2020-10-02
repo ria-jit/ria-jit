@@ -181,8 +181,20 @@ typedef uint64_t t_risc_reg_val;
 typedef union {
     float f;
     double d;
-    unsigned long i;
+    uint64_t i;
 } t_risc_fp_reg_val;
+
+static inline t_risc_fp_reg_val get_fVal(float f){
+    t_risc_fp_reg_val ret;
+    ret.f = f;
+    return ret;
+}
+
+static inline t_risc_fp_reg_val get_dVal(double d){
+    t_risc_fp_reg_val ret;
+    ret.d = d;
+    return ret;
+}
 
 //RISC-V operation types (for later optimization)
 typedef enum {
