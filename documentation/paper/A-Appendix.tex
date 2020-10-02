@@ -57,10 +57,69 @@ There seems to be nothing here yet\ldots
 \subsection{Version history}
 The following mirrors the version control change log of the translator over the course of its development.
 
-\paragraph{v1.2.2}
-Continued here...
+\paragraph{Version 1.2.2 (latest)}
+\begin{itemize*}
+ 	\item expand the static register mapping for better performance overall
+ 	\item reallocate the code cache index and rehash all values when it is 50 \% full for better lookup performance on capacity overflow
+ 	\item rewrite command line options parsing to allow for long options\\(see \texttt{./translator -h})
+ 	\item allow finer control of specific optimisation features via \texttt{----optimize}
+ 	\item add instruction pattern matching to the binary analyser to gather data for macro operation fusing
+ 	\item add a profiler for counting register accesses
+ 	\item implement emulation for syscalls \texttt{faccessat, getrandom, renameat2}
+ 	\item remove emulation for the syscall \texttt{clone}
+ 	\item fix crash when the code cache fills up by increasing the memory space available for translated blocks
+\end{itemize*}
 
 
+\paragraph{Version 1.2.1}
+\begin{itemize*}
+ 	\item add implementations for \texttt{AMOMIN} and \texttt{AMOMAX} instructions
+ 	\item add extensive unit testing for atomic and arithmetic instructions, as well as the parser
+ 	\item fix several issues to enable the SPEC CPU 2017 benchmark suite to run
+ 	\item implement emulation for syscalls \texttt{chdir, pipe2, getdents64, munmap, clone, execve, wait4}
+ 	\item fix \texttt{ORI} instruction being parsed as \texttt{XORI}
+ 	\item fix instruction semantics for \texttt{SUB(W)}
+ 	\item finalize implementation of the return address stack
+\end{itemize*}
+
+
+\paragraph{Version 1.2.0}
+\begin{itemize*}
+ 	\item enable register mapping for translated instructions
+ 	\item add context switching from host to guest programs
+ 	\item rework instruction translator function for flexibility
+ 	\item implement a return address stack
+ 	\item implement a TLB for cache lookup of blocks
+ 	\item flip \texttt{-m} translation optimiser flag (enabled by default, flag now turns off optimisations)
+\end{itemize*}
+
+
+\paragraph{Version 1.1.0}
+\begin{itemize*}
+ 	\item cleanup and refactor project files
+ 	\item remove all C++ usage from translator code
+ 	\item eliminate standard library usage
+ 	\item add performance measuring flags to the translator
+\end{itemize*}
+
+
+\paragraph{Version 1.0.1}
+\begin{itemize*}
+ 	\item fix an issue with the \texttt{read} system call that causes blocking problems with gzip
+\end{itemize*}
+
+
+\paragraph{Version 1.0}
+The initial release of the translator capable of executing gzip.
+
+This release supports
+\begin{itemize*}
+ 	\item the RISC-V integer instruction set
+ 	\item the multiplication extension instructions (M)
+ 	\item the atomic extension instructions (A).
+\end{itemize*}
+
+The latter are not yet implemented atomically, however they make the translator compatible with binaries compiled for the architecture \texttt{rv64ima}, with the ABI \texttt{lp64}.
 
 
 

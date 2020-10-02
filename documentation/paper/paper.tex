@@ -35,6 +35,13 @@
 % list sections and subsections in toc, ignore smaller
 \setcounter{tocdepth}{2}
 
+% itemize without parskip and itemsep for compact listings
+\newenvironment{itemize*}%
+  {\begin{itemize}%
+    \setlength{\itemsep}{0ex}%
+    \setlength{\parskip}{0ex}}%
+  {\end{itemize}}
+
 \begin{document}
 \maketitle
 \tableofcontents
@@ -65,6 +72,11 @@
 \end{appendices}
 
 \newpage
+\listoftables
+\listoffigures
+
+\newpage
 \bibliographystyle{plain}
+\addcontentsline{toc}{section}{References}
 \bibliography{paper}{}
 \end{document}
