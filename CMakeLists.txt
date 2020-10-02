@@ -109,6 +109,8 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/test_faenc_experiments.cpp
         test/unit_tests/test_amo_ext.cpp
         test/unit_tests/test_arithm.cpp
+        test/unit_tests/test_float_arithm.cpp
+        test/unit_tests/test_double_arithm.cpp
         test/unit_tests/test_parser_param.cpp)
 
 #include the googletest testing framework
