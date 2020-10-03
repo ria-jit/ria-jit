@@ -34,7 +34,7 @@ void rs_emit_push(const t_risc_instr *instr) {
     t_cache_loc cache_loc;
 
     if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {  // 1 ???
-        printf("rs_emit_push: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
+        log_asm_out("rs_emit_push: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
                (void *) instr->addr);
         goto NOT_CACHED;
     }

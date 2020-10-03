@@ -98,7 +98,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             } else if (strncmp(option_string, "no-jump", 7) == 0) {
                                 option_string += 7;
                                 flag_translate_opt_jump = false;
-                                flag_translate_opt_ras = false;
+                                //flag_translate_opt_ras = false;
                             } else if (strncmp(option_string, "no-fusion", 9) == 0) {
                                 option_string += 9;
                                 flag_translate_opt_fusion = false;

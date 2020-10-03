@@ -184,7 +184,9 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
 
     t_cache_loc block;
     ///finalize block and return cached location
-    if (block_cache[instructions_in_block - 1].mnem == JALR || block_cache[instructions_in_block - 1].mnem == ECALL) {
+    if (
+            //block_cache[instructions_in_block - 1].mnem == JALR ||
+            block_cache[instructions_in_block - 1].mnem == ECALL) {
         block = finalize_block(LINK_NULL);
     } else {
         block = finalize_block(DONT_LINK);
@@ -343,9 +345,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 }
                             }
 
-
-
                             goto PARSE_DONE;
+
                         } else if (parse_buf[parse_pos].reg_dest != x0) {
                             instructions_in_block++;
 
@@ -396,9 +397,11 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         break;
 
                     case JALR : {
-                        if (flag_translate_opt_jump &&
+
+                        if (flag_translate_opt_ras &&
                                 (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
-                            ///2: recursively translate return addr (+4)
+
+                            ///1: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
                                 t_risc_addr ret_target = risc_addr + 4;
@@ -412,6 +415,59 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }
+                        }
+
+                        if(     flag_translate_opt_jump &&
+                                instructions_in_block > 0 &&
+                                //condition rd == x1 || x5 already met here
+                                parse_buf[parse_pos - 1].mnem == AUIPC &&
+                                parse_buf[parse_pos - 1].reg_dest != x0 &&
+                                parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos - 1].reg_dest
+                                )
+                        {
+                            //printf("AUIPC + JALR: %p\n", risc_addr);
+
+                            //check if pop will happen
+                            if(parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos].reg_dest) {
+                                log_asm_out("---------WRONG POP JALR------------\n");
+                            }
+
+                            ///1: recursively translate return addr (+4)
+                            //dead ends could arise here
+                            {
+                                t_risc_addr ret_target = risc_addr + 4;
+                                t_cache_loc cache_loc = lookup_cache_entry(ret_target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
+                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(ret_target, c_info);
+                                    set_cache_entry(ret_target, cache_loc);
+                                }
+                            }
+
+                            ///2: recursively translate target
+                            {
+                                t_risc_addr target = (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
+
+                                t_cache_loc cache_loc = lookup_cache_entry(target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JALR from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(target, c_info);
+                                    set_cache_entry(target, cache_loc);
+                                }
+                            }
+
+                            ///3: tell translate_JALR to chain
+                            parse_buf[parse_pos].reg_src_2 = 1;
+
+                        } else {
+                            ///2: tell translate_JALR not to chain
+                            parse_buf[parse_pos].reg_src_2 = 0;
                         }
 
                         ///destination address unknown at translate time, stop parsing
