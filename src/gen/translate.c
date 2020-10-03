@@ -419,7 +419,6 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
                         if(     flag_translate_opt_jump &&
                                 instructions_in_block > 0 &&
-                                //condition rd == x1 || x5 already met here
                                 parse_buf[parse_pos - 1].mnem == AUIPC &&
                                 parse_buf[parse_pos - 1].reg_dest != x0 &&
                                 parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos - 1].reg_dest
@@ -428,7 +427,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             //printf("AUIPC + JALR: %p\n", risc_addr);
 
                             //check if pop will happen
-                            if(parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos].reg_dest) {
+                            if( (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                                    parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
 
