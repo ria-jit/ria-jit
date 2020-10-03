@@ -428,7 +428,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
                             //check if pop will happen
                             if( (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
-                                    parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos].reg_dest) {
+                                    parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
 
