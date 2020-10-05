@@ -279,22 +279,6 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
             MISMATCH:;
         }
     }
-
-    for(size_t i = 0; i < len; i++) {
-        for(int j = 0; j < PATTERNS_NUM; j++) {
-            /*
-            if(patterns_length[i] > len - i) break;
-            for(int k = 0; k < patterns_length[i]; k++) {
-                if(block_cache[i + k] != patterns[j][k]) break;
-            }
-
-            block_cache[i] = pattern_replacement[j];
-            for(int k = 1; k < pattern_length[j]; k++) {
-                block_cache[i + k] = SILENT_NOP;
-            }
-            */
-        }
-    }
 }
 
 void translate_pattern_emit(t_risc_instr *instr, const register_info *r_info) {
