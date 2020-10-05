@@ -45,19 +45,26 @@ void init_patterns() {
 }
 
 void emit_pattern_0(const t_risc_instr *instr) {
-    printf("emit pattern 0: inc mem64 at %p\n", instr->addr);
+    log_asm_out("emit pattern 0: inc mem64 at %p\n", instr->addr);
 
-    err |= fe_enc64(&current, FE_ADD64mi, FE_MEM_ADDR(instr->addr + instr->imm), instr[2].imm);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm));
+    err |= fe_enc64(&current, FE_ADD64mi, FE_MEM(FE_AX, 0, 0, 0), instr[2].imm);
 }
 
 void emit_pattern_1(const t_risc_instr *instr) {
-    printf("emit pattern 1: inc mem64 at %p\n", instr->addr);
+    log_asm_out("emit pattern 1: inc mem64 at %p\n", instr->addr);
 
-    err |= fe_enc64(&current, FE_ADD32mi, FE_MEM_ADDR(instr->addr + instr->imm), instr[2].imm);
+    //err |= fe_enc64(&current, FE_ADD32mi, FE_MEM_ADDR(instr->addr + instr->imm), instr[2].imm);
+
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm));
+    err |= fe_enc64(&current, FE_ADD64mi, FE_MEM(FE_AX, 0, 0, 0), instr[2].imm);
+
 }
 
 void emit_pattern_2(const t_risc_instr *instr) {
-    printf("emit pattern 2: inc m64 at %p\n", instr->addr);
+    log_asm_out("emit pattern 2: inc m64 at %p\n", instr->addr);
 
-    err |= fe_enc64(&current, FE_ADD32mi, FE_MEM_ADDR(instr->addr + instr->imm + instr[2].imm), instr[3].imm);
+    //err |= fe_enc64(&current, FE_ADD32mi, FE_MEM_ADDR(instr->addr + instr->imm + instr[1].imm + instr[2].imm), instr[3].imm);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm + instr[2].imm)),
+    err |= fe_enc64(&current, FE_ADD32mi, FE_MEM(FE_AX,0,0,0), instr[3].imm);
 }

@@ -264,7 +264,7 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                         if (block_cache[j + k].imm != block_cache[j + patterns[i].elements[k].imm_value].imm) {
                             goto MISMATCH;
                         }
-                    }
+                    } break;
 
                     default : {
                         goto MISMATCH;
@@ -289,6 +289,8 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
 }
 
 void translate_pattern_emit(t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("Translate Pattern...\n");
+
     patterns[instr->optype].emitter(instr);
 
     for(int i = 1; i < patterns[instr->optype].len; i++) {
