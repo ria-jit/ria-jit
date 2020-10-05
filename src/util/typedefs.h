@@ -215,9 +215,9 @@ typedef struct {
 } t_operand_field;
 
 typedef struct {
-    t_risc_reg reg_src_1;
-    t_risc_reg reg_src_2;
-    t_risc_reg reg_dest;
+    t_risc_fp_reg reg_src_1;
+    t_risc_fp_reg reg_src_2;
+    t_risc_fp_reg reg_dest;
     uint32_t reg_src_3;
     uint32_t rounding_mode;
 } t_f_operand_field;
