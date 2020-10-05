@@ -18,11 +18,9 @@ typedef uint64_t (*t_arithmResFunc)(double);
  *
  * @param t_risc_mnem the mnemonic of the Arithm Instruction.
  * @param t_risc_reg_val the initial value for rs1
- * @param t_risc_reg_val the initial value for rs2
- * @param t_res_func the functor/lambda that provides, given the addr of the instruction, the value of rs1 and the value
+ * @param t_arithmResFunc the functor/lambda that provides, given the addr of the instruction, the value of rs1 and the value
  *        in rs2
  * @param bool whether rs1 should be mapped. (if multiple registers are the same for a test the priority is rs1>rs2>rd.)
- * @param bool whether rs2 should be mapped. (if multiple registers are the same for a test the priority is rs1>rs2>rd.)
  * @param bool whether rd should be mapped. (if multiple registers are the same for a test the priority is rs1>rs2>rd.)
  */
 class FpToGpDoubleTest :
@@ -108,6 +106,28 @@ INSTANTIATE_TEST_SUITE_P(FMVXD,
                                  testing::Values(1, 20.123, 300.4,-1232.123),
                                  testing::Values([](double rs1) {
                                      return *(uint64_t *)((double*)&rs1);
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+
+INSTANTIATE_TEST_SUITE_P(FCVTLD,
+                         FpToGpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTLD),
+                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values([](double rs1) {
+                                     return (uint64_t )(int64_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+INSTANTIATE_TEST_SUITE_P(FCVTLUD,
+                         FpToGpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTLUD),
+                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values([](double rs1) {
+                                     return (uint64_t)rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
