@@ -665,6 +665,8 @@ void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI32rr, regDest, regSrc1);
+    //sign extend
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest,regDest);
 
     storeRd(instr, r_info, regDest);
 }
