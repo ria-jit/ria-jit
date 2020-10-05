@@ -11,7 +11,11 @@
 
 #define attr_unused __attribute__((__unused__))
 
-typedef uint64_t (*t_arithmResFunc)(uint64_t);
+typedef double (*t_i2dResFunc)(t_risc_reg_val);
+
+inline t_risc_reg_val doubleToIntRep(double d){
+    return *(t_risc_reg_val *)((double*)&d);
+}
 
 /**
  * Parameterized using the following parameters:
@@ -27,13 +31,13 @@ typedef uint64_t (*t_arithmResFunc)(uint64_t);
  */
 class GpToFpDoubleTest :
         public ::testing::TestWithParam<
-                std::tuple<t_risc_mnem, uint64_t, t_arithmResFunc, bool,
+                std::tuple<t_risc_mnem, uint64_t, t_i2dResFunc, bool,
                         bool>> {
 protected:
     t_risc_mnem mnem{};
-    uint64_t rs1StartValue{};
-    t_arithmResFunc resFunc{};
-    uint64_t expectedRd;
+    t_risc_reg_val rs1StartValue{};
+    t_i2dResFunc resFunc{};
+    double expectedRd;
     bool rs1Mapped{};
     bool rdMapped{};
 
@@ -98,16 +102,61 @@ TEST_P(GpToFpDoubleTest, AllDifferent) {
     execute_in_guest_context(c_info, loc);
 
     EXPECT_EQ(rs1StartValue, get_value(rs1));
-    EXPECT_EQ(expectedRd, get_fpvalue(rd).i);
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).d);
 }
 
 INSTANTIATE_TEST_SUITE_P(FMVDX,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FMVDX),
-                                 testing::Values(1, -200,0x1234<<10),
+                                 testing::Values(doubleToIntRep(1),doubleToIntRep(-200),doubleToIntRep(12312.12)),
                                  testing::Values([](uint64_t rs1) {
-                                     return rs1;
+                                     return *(double *)((uint64_t*)&rs1);
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+
+INSTANTIATE_TEST_SUITE_P(FCVTDW,
+                         GpToFpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTDW),
+                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values([](uint64_t rs1) {
+                                     return (double)(int32_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDWU,
+                         GpToFpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTDWU),
+                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values([](uint64_t rs1) {
+                                     return (double)(uint32_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDL,
+                         GpToFpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTDL),
+                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values([](uint64_t rs1) {
+                                     return (double)(int64_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDLU,
+                         GpToFpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTDLU),
+                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values([](uint64_t rs1) {
+                                     return (double)rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));

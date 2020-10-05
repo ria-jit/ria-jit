@@ -11,7 +11,7 @@
 
 #define attr_unused __attribute__((__unused__))
 
-typedef uint64_t (*t_arithmResFunc)(double, double);
+typedef uint64_t (*t_d2iResFunc)(double, double);
 
 /**
  * Parameterized using the following parameters:
@@ -27,13 +27,13 @@ typedef uint64_t (*t_arithmResFunc)(double, double);
  */
 class ConditionalDoubleTest :
         public ::testing::TestWithParam<
-                std::tuple<t_risc_mnem, double, double, t_arithmResFunc, bool, bool,
+                std::tuple<t_risc_mnem, double, double, t_d2iResFunc, bool, bool,
                         bool>> {
 protected:
     t_risc_mnem mnem{};
     double rs1StartValue{};
     double rs2StartValue{};
-    t_arithmResFunc resFunc{};
+    t_d2iResFunc resFunc{};
     uint64_t expectedRd;
     bool rs1Mapped{};
     bool rs2Mapped{};

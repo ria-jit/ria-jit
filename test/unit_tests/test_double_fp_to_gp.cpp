@@ -11,7 +11,7 @@
 
 #define attr_unused __attribute__((__unused__))
 
-typedef uint64_t (*t_arithmResFunc)(double);
+typedef uint64_t (*t_d2iResFunc)(double);
 
 /**
  * Parameterized using the following parameters:
@@ -25,12 +25,12 @@ typedef uint64_t (*t_arithmResFunc)(double);
  */
 class FpToGpDoubleTest :
         public ::testing::TestWithParam<
-                std::tuple<t_risc_mnem, double, t_arithmResFunc, bool,
+                std::tuple<t_risc_mnem, double, t_d2iResFunc, bool,
                         bool>> {
 protected:
     t_risc_mnem mnem{};
     double rs1StartValue{};
-    t_arithmResFunc resFunc{};
+    t_d2iResFunc resFunc{};
     uint64_t expectedRd;
     bool rs1Mapped{};
     bool rdMapped{};
@@ -110,6 +110,29 @@ INSTANTIATE_TEST_SUITE_P(FMVXD,
                                  testing::Values(false),
                                  testing::Values(false)));
 
+
+
+INSTANTIATE_TEST_SUITE_P(FCVTWD,
+                         FpToGpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTWD),
+                                 testing::Values(1, 20.123, 300.4,-1232.123),
+                                 testing::Values([](double rs1) {
+                                     return (uint64_t )(int32_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
+
+INSTANTIATE_TEST_SUITE_P(FCVTWUD,
+                         FpToGpDoubleTest,
+                         testing::Combine(
+                                 testing::Values(FCVTWUD),
+                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values([](double rs1) {
+                                     return (uint64_t )(uint32_t)rs1;
+                                 }),
+                                 testing::Values(false),
+                                 testing::Values(false)));
 
 INSTANTIATE_TEST_SUITE_P(FCVTLD,
                          FpToGpDoubleTest,
