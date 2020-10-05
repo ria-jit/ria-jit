@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <math.h>
 
 void init(int number, char* name);
 
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
         init(++num, "DivZero");
         double n = 256;
         double m = 0;
-        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
+        assert_equals(INFINITY, (n / m), &failed_tests);
     }
 
     {
