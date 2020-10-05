@@ -640,7 +640,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         default:
                             critical_not_yet_implemented("unknown funct3 for FCVTW");
                     }
-                    p_instr_struct->mnem = FSQRTS;
                     break;
                 case 26:
                     switch (rs2) {
@@ -659,7 +658,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
                         default:
                             critical_not_yet_implemented("unknown funct3 for FCVTS");
                     }
-                    p_instr_struct->mnem = FSQRTS;
                     break;
                 case 28:
                     switch (funct3) {
