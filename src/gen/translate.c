@@ -13,7 +13,6 @@
 #include <parser/parser.h>
 #include <main/context.h>
 #include <gen/optimize.h>
-#include <gen/macro_optim.h>
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
