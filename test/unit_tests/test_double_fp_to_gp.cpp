@@ -125,7 +125,7 @@ INSTANTIATE_TEST_SUITE_P(FCVTLUD,
                          FpToGpDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTLUD),
-                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111, 10000000000000000000.0,-10000000000000000.0),
                                  testing::Values([](double rs1) {
                                      return (uint64_t)rs1;
                                  }),
