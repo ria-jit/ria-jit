@@ -19,7 +19,7 @@ void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getFpRegNoLoad(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
     err |= fe_enc64(&current, FE_SSE_MOVSDrm,regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
-    setFpReg(regDest, r_info, FIRST_FP_REG);
+    setFpReg(instr->op_field.op.reg_dest, r_info, FIRST_FP_REG);
 }
 
 /**
@@ -759,14 +759,14 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
     //constant saved here
-    const unsigned long C0 = 1138753536;
+    const unsigned long C0 = 0;//1138753536uL;
     //load const into register
     err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, C0);
     err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_FP_REG, SECOND_REG);
 
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, SECOND_FP_REG);
     uint8_t *jmpBufCOM = current;
-    err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy
+    err |= fe_enc64(&current, FE_JC, (intptr_t) current); //dummy
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI64rr, regDest, regSrc1);
 
@@ -774,10 +774,10 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
 
 
-    err |= fe_enc64(&jmpBufCOM, FE_JNC, (intptr_t) current);
-    err |= fe_enc64(&current, FE_SSE_SUBSDrr, regSrc1, SECOND_FP_REG);
+    err |= fe_enc64(&jmpBufCOM, FE_JC, (intptr_t) current);
+    //err |= fe_enc64(&current, FE_SSE_SUBSDrr, regSrc1, SECOND_FP_REG);
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI64rr, regDest, regSrc1);
-    err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
+    //err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
 
     storeRd(instr, r_info, regDest);
