@@ -174,7 +174,7 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
     init_block();
 
     ///apply macro optimization
-    run_optimizer(block_cache,instructions_in_block);
+    optimize_patterns(block_cache,instructions_in_block);
 
 
     /// translate structs

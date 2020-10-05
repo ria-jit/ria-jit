@@ -10,9 +10,9 @@
 
 void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len);
 
-void optimize_patterns(t_risc_instr *block_cache, size_t len);
+void optimize_patterns(t_risc_instr *block_cache, int len);
 
-void translate_pattern_emit(const t_risc_instr *instr, const register_info *r_info);
+void translate_pattern_emit(t_risc_instr *instr, const register_info *r_info);
 
 typedef enum {
     DONT_CARE = 33,
@@ -34,16 +34,15 @@ typedef struct {
     int h1;
     int h2;
     short imm;
-    int imm_value;
+    int imm_value;  //0: DONT_CARE  1: imm_value  2: imm patt. pos imm_value
 
 } pattern_element;
 
 typedef struct {
-    pattern_element *elements;
+    const pattern_element * const elements;
     int len;
     //equivalent x86 code ...
-    uint8_t *code;
-    int code_size;
+    void (* emitter)(const t_risc_instr *);
 } pattern;
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_OPTIMIZE_H

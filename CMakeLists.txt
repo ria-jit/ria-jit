@@ -86,7 +86,7 @@ set(TRANSLATOR_SOURCES
         lib/ryu/ryu.h
         src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h
         src/gen/optimize.c src/gen/optimize.h
-        src/gen/macro_optim.c src/gen/macro_optim.h)
+        src/gen/macro_optim.c src/gen/macro_optim.h src/gen/instr/patterns.h src/gen/instr/patterns.c)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
