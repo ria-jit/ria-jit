@@ -24,8 +24,7 @@ void assert_equals(double expected, double actual, int *failed_tests);
  * @param argv
  * @return
  */
-int main(int argc, char **argv) {
-    int num = 0;
+int main(int argc, char **argv) {int num = 0;
     int failed_tests;
 
     {
@@ -41,10 +40,10 @@ int main(int argc, char **argv) {
     }
 
     {
-        init(++num, "5/2");
-        double m = 5;
-        m /= 2;
-        assert_equals(2.5, m, &failed_tests);
+        init(++num, "2.5/3.5");
+        double m = 2.5;
+        m /= 3.5;
+        assert_equals(5.0/7.0, m, &failed_tests);
     }
 
     {
@@ -60,15 +59,15 @@ int main(int argc, char **argv) {
     {
         init(++num, "3000*7");
         double n = 3000;
-        double m = 7;
-        assert_equals(21000, (n * m), &failed_tests);
+        double m = 7.0;
+        assert_equals(21000.0, (n * m), &failed_tests);
     }
 
     {
         init(++num, "3000/7");
         double n = 3000;
-        double m = 7;
-        assert_equals(428, (n / m), &failed_tests);
+        double m = 7.0;
+        assert_equals(428.0, (n / m), &failed_tests);
     }
 
     {
@@ -123,7 +122,6 @@ int main(int argc, char **argv) {
             assert_equals(expecteds[n - 1], fact, &failed_tests);
         }
     }
-
     m_exit(failed_tests);
 }
 
@@ -151,9 +149,9 @@ void assert_equals(double expected, double actual, int *failed_tests) {
     if (!check_condition(expected == actual)) {
         (*failed_tests)++;
         print("Expected: ");
-        printi((int)(expected));
+        printi((int)(expected*100));
         print(" but was: ");
-        printi((int)(actual));
+        printi((int)(actual*100));
         print("\n");
     }
 }
