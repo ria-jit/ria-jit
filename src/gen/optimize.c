@@ -117,7 +117,7 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
  * pattern matching
 */
 void optimize_patterns(t_risc_instr *block_cache, int len) {
-#define PATTERNS_NUM 2
+#define PATTERNS_NUM 3
 
     for(int i = 0; i < PATTERNS_NUM; i++) {
         for(int j = 0; j < len - patterns[i].len; j++) {
@@ -211,6 +211,13 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                     case rd_h1 : {
                         if(block_cache[j + k].reg_src_2 !=
                                 block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    }   break;
+
+                    case rd_h2 : {
+                        if(block_cache[j + k].reg_src_2 !=
+                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
                             goto MISMATCH;
                         }
                     }   break;
