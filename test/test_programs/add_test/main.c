@@ -11,9 +11,9 @@ __attribute_noinline__ void inc() {
 }
 
 int main() {
-    printf("a_int = \n", a_int);
+    printf("a_int = %d\n", a_int);
     inc();
-    printf("a_int = \n", a_int);
+    printf("a_int = %d\n", a_int);
     inc();
-    printf("a_int = \n", a_int);
+    printf("a_int = %d\n", a_int);
 }
