@@ -1,0 +1,1000 @@
+runcpu v6247 started at 2020-10-05 17:40:14 on "sksmall"
+runcpu is: /u/home/schmidtf/spec/bin/harness/runcpu
+runcpu: runcpu --config=RISC-V-dbt --noreportable --size=ref intspeed
+toolset: linux-x86_64
+suite: CPU2017 1.1.0
+
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/u/home/schmidtf/spec/config/RISC-V-dbt.cfg'
+
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+validate   speed      refspeed   SPECspeed2017_int   intspeed                  
+-------------------------------------------------------------------------------
+
+Setting up environment for running intspeed...
+Starting runcpu for intspeed...
+Running "specperl /u/home/schmidtf/spec/bin/sysinfo" to gather system information.
+sysinfo: r6365 of 2019-08-21 (295195f888a3d7edb1e6e46a485a0011)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get info from /sys/devices/virtual/dmi/id
+sysinfo: ...trying to get info from dmidecode
+Retrieving flags file (/u/home/schmidtf/spec/config/flags/gcc.xml)...
+Verbosity = 5
+Action    = validate
+Tune      = base
+Label     = RISC-V-dbt-1.0-m64
+Size      = refspeed
+benchmarks= 600.perlbench_s,602.gcc_s,605.mcf_s,620.omnetpp_s,623.xalancbmk_s,625.x264_s,631.deepsjeng_s,641.leela_s,648.exchange2_s,657.xz_s,998.specrand_is
+outputs   = txt,html,cfg,pdf,csv
+username  = schmidtf
+Environment settings:
+LD_LIBRARY_PATH = "%{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64"
+
+Benchmarks selected: 600.perlbench_s, 602.gcc_s, 605.mcf_s, 620.omnetpp_s, 623.xalancbmk_s, 625.x264_s, 631.deepsjeng_s, 641.leela_s, 648.exchange2_s, 657.xz_s, 998.specrand_is
+Compiling Binaries
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -DPERL_CORE -I. -Idist/IO -Icpan/Time-HiRes -Icpan/HTML-Parser -Iext/re -Ispecrand -DDOUBLE_SLASHES_SPECIAL=0 -D_LARGE_FILES -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -DSPEC_LINUX_X64   -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DPERL_CORE -I. -Idist/IO -Icpan/Time-HiRes -Icpan/HTML-Parser -Iext/re -Ispecrand -DDOUBLE_SLASHES_SPECIAL=0 -D_LARGE_FILES -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY="-DSPEC_LINUX_X64"
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch     -DSPEC_LINUX_X64   -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+P: PORTABILITY="-DSPEC_LINUX_X64"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 600.perlbench_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -I. -I./include -I./spec_qsort -DSPEC_602 -DIN_GCC -DHAVE_CONFIG_H  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./include -I./spec_qsort -DSPEC_602 -DIN_GCC -DHAVE_CONFIG_H"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 602.gcc_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP"
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 605.mcf_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -Isimulator/platdep -Isimulator -Imodel -DWITH_NETBUILDER  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Isimulator/platdep -Isimulator -Imodel -DWITH_NETBUILDER"
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 620.omnetpp_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG  -DAPP_NO_THREADS -DXALAN_INMEM_MSG_LOADER -I. -Ixercesc -Ixercesc/dom -Ixercesc/dom/impl -Ixercesc/sax -Ixercesc/util/MsgLoaders/InMemory -Ixercesc/util/Transcoders/Iconv -Ixalanc/include -DPROJ_XMLPARSER -DPROJ_XMLUTIL -DPROJ_PARSERS -DPROJ_SAX4C -DPROJ_SAX2 -DPROJ_DOM -DPROJ_VALIDATORS -DXML_USE_INMEM_MESSAGELOADER -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch    -DSPEC_LINUX   -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CXXFLAGS="-DAPP_NO_THREADS -DXALAN_INMEM_MSG_LOADER -I. -Ixercesc -Ixercesc/dom -Ixercesc/dom/impl -Ixercesc/sax -Ixercesc/util/MsgLoaders/InMemory -Ixercesc/util/Transcoders/Iconv -Ixalanc/include -DPROJ_XMLPARSER -DPROJ_XMLUTIL -DPROJ_PARSERS -DPROJ_SAX4C -DPROJ_SAX2 -DPROJ_DOM -DPROJ_VALIDATORS -DXML_USE_INMEM_MESSAGELOADER"
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: CXXOPTIMIZE=""
+P: PORTABILITY="-DSPEC_LINUX"
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch     -DSPEC_LINUX   -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+P: PORTABILITY="-DSPEC_LINUX"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 623.xalancbmk_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ildecod_src/inc -Ix264_src -Ix264_src/extras -Ix264_src/common -DSPEC_AUTO_BYTEORDER=0x12345678"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 625.x264_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -DBIG_MEMORY  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DBIG_MEMORY"
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 631.deepsjeng_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03  -c -o options.o -DSPEC -DNDEBUG -I.  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CXXFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03       -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++     -std=c++03 "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 641.leela_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran            -c -o options.o -g -O3 -static -fno-unsafe-math-optimizations -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch -fno-openmp <source>"
+C: FC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran           "
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran                 -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran           "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 648.exchange2_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -DSPEC_AUTO_BYTEORDER=0x12345678 -DHAVE_CONFIG_H=1 -DSPEC_MEM_IO -DSPEC_XZ -I. -Ispec_mem_io -Isha-2 -Icommon -Iliblzma/api -Iliblzma/lzma -Iliblzma/common -Iliblzma/check -Iliblzma/simple -Iliblzma/delta -Iliblzma/lz -Iliblzma/rangecoder  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DSPEC_AUTO_BYTEORDER=0x12345678 -DHAVE_CONFIG_H=1 -DSPEC_MEM_IO -DSPEC_XZ -I. -Ispec_mem_io -Isha-2 -Icommon -Iliblzma/api -Iliblzma/lzma -Iliblzma/common -Iliblzma/check -Iliblzma/simple -Iliblzma/delta -Iliblzma/lz -Iliblzma/rangecoder"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 657.xz_s base RISC-V-dbt-1.0-m64
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -Ispecrand-common  -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ispecrand-common"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>            -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-g -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations  -fno-tree-loop-vectorize -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 998.specrand_is base RISC-V-dbt-1.0-m64
+
+
+Setting Up Run Directories
+  Setting up 600.perlbench_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 602.gcc_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 605.mcf_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 620.omnetpp_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 623.xalancbmk_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 625.x264_s refspeed (ref) base RISC-V-dbt-1.0-m64: OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+**WARNING: environment variable 'TERMCAP' contains embedded CR or LF; they will be converted to spaces
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f inputgen.cmd -e inputgen.err -o inputgen.stdout'
+Start command: 2020-10-05 17:40:57 (1601919657.19778)
+Stop command: 2020-10-05 17:45:16 (1601919916.35785)
+Elapsed time for command: 00:04:19 (259.160069942474)
+Input generation total elapsed time = 259 seconds
+Input generation elapsed time (0:1) = 258.984358 seconds
+run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 631.deepsjeng_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 641.leela_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 648.exchange2_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 657.xz_s refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+  Setting up 998.specrand_is refspeed (ref) base RISC-V-dbt-1.0-m64: run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+-----------------------------------
+Running Benchmarks
+-----------------------------------
+  Running 600.perlbench_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-05 17:45:30]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o checkspam.2500.5.25.11.150.1.1.1.1.out -e checkspam.2500.5.25.11.150.1.1.1.1.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/perlbench_s_base.RISC-V-dbt-1.0-m64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1 > checkspam.2500.5.25.11.150.1.1.1.1.out 2>> checkspam.2500.5.25.11.150.1.1.1.1.err (timed)
+    -o diffmail.4.800.10.17.19.300.out -e diffmail.4.800.10.17.19.300.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/perlbench_s_base.RISC-V-dbt-1.0-m64 -I./lib diffmail.pl 4 800 10 17 19 300 > diffmail.4.800.10.17.19.300.out 2>> diffmail.4.800.10.17.19.300.err (timed)
+    -o splitmail.6400.12.26.16.100.0.out -e splitmail.6400.12.26.16.100.0.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/perlbench_s_base.RISC-V-dbt-1.0-m64 -I./lib splitmail.pl 6400 12 26 16 100 0 > splitmail.6400.12.26.16.100.0.out 2>> splitmail.6400.12.26.16.100.0.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-05 17:45:31 (1601919931.1747)
+Stop command: 2020-10-05 20:48:22 (1601930902.67893)
+Elapsed time for command: 03:02:51 (10971.504237175)
+Workload elapsed time (copy 0 workload 1) = 3553.416383 seconds
+Workload elapsed time (copy 0 workload 2) = 3800.4589 seconds
+Workload elapsed time (copy 0 workload 3) = 3617.458339 seconds
+Copy 0 of 600.perlbench_s (base refspeed) run 1 finished at 2020-10-05 20:48:22.  Total elapsed time: 10971.333622
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'checkspam.2500.5.25.11.150.1.1.1.1.out' with floatcompare=1, nansupport=no
+comparing 'diffmail.4.800.10.17.19.300.out' with floatcompare=1, nansupport=no
+comparing 'splitmail.6400.12.26.16.100.0.out' with floatcompare=1, nansupport=no
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/600.perlbench_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-05 20:48:22 (1601930902.91858)
+Stop command: 2020-10-05 20:48:24 (1601930904.78799)
+Elapsed time for command: 00:00:01 (1.86941695213318)
+Benchmark Times:
+  Run Start:    2020-10-05 17:45:31 (1601919931)
+  Run Stop:     2020-10-05 20:48:22 (1601930902)
+  Run Elapsed:  03:02:51 (10971)
+  Run Reported: 03:02:51 (10971 333872000 10971.333872)
+ Success 600.perlbench_s base refspeed ratio=0.16, runtime=10971.333872, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 602.gcc_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-05 20:48:26]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o gcc-pp.opts-O5_-fipa-pta.out -e gcc-pp.opts-O5_-fipa-pta.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/sgcc_base.RISC-V-dbt-1.0-m64 gcc-pp.c -O5 -fipa-pta -o gcc-pp.opts-O5_-fipa-pta.s > gcc-pp.opts-O5_-fipa-pta.out 2>> gcc-pp.opts-O5_-fipa-pta.err (timed)
+    -o gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.out -e gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/sgcc_base.RISC-V-dbt-1.0-m64 gcc-pp.c -O5 -finline-limit=1000 -fselective-scheduling -fselective-scheduling2 -o gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.s > gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.out 2>> gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.err (timed)
+    -o gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.out -e gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/sgcc_base.RISC-V-dbt-1.0-m64 gcc-pp.c -O5 -finline-limit=24000 -fgcse -fgcse-las -fgcse-lm -fgcse-sm -o gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.s > gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.out 2>> gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-05 20:48:26 (1601930906.78418)
+Stop command: 2020-10-05 23:13:20 (1601939600.00609)
+Elapsed time for command: 02:24:53 (8693.22191286087)
+Workload elapsed time (copy 0 workload 1) = 3041.999916 seconds
+Workload elapsed time (copy 0 workload 2) = 2913.085744 seconds
+Workload elapsed time (copy 0 workload 3) = 2737.962997 seconds
+Copy 0 of 602.gcc_s (base refspeed) run 1 finished at 2020-10-05 23:13:19.  Total elapsed time: 8693.048657
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'gcc-pp.opts-O5_-finline-limit_1000_-fselective-scheduling_-fselective-scheduling2.s' with floatcompare=1, nansupport=no
+comparing 'gcc-pp.opts-O5_-finline-limit_24000_-fgcse_-fgcse-las_-fgcse-lm_-fgcse-sm.s' with floatcompare=1, nansupport=no
+comparing 'gcc-pp.opts-O5_-fipa-pta.s' with floatcompare=1, nansupport=no
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/602.gcc_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-05 23:13:20 (1601939600.24948)
+Stop command: 2020-10-05 23:13:54 (1601939634.02149)
+Elapsed time for command: 00:00:33 (33.7720069885254)
+Benchmark Times:
+  Run Start:    2020-10-05 20:48:26 (1601930906)
+  Run Stop:     2020-10-05 23:13:20 (1601939600)
+  Run Elapsed:  02:24:54 (8694)
+  Run Reported: 02:24:53 (8693 48965000 8693.048965)
+ Success 602.gcc_s base refspeed ratio=0.46, runtime=8693.048965, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 605.mcf_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-05 23:13:54]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o inp.out -e inp.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/mcf_s_base.RISC-V-dbt-1.0-m64 inp.in  > inp.out 2>> inp.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-05 23:13:54 (1601939634.30047)
+Stop command: 2020-10-06 00:13:12 (1601943192.52768)
+Elapsed time for command: 00:59:18 (3558.22721099854)
+Workload elapsed time (copy 0 workload 1) = 3558.057669 seconds
+Copy 0 of 605.mcf_s (base refspeed) run 1 finished at 2020-10-06 00:13:12.  Total elapsed time: 3558.057669
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'inp.out' with 
+comparing 'mcf.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 00:13:12 (1601943192.724)
+Stop command: 2020-10-06 00:13:13 (1601943193.60604)
+Elapsed time for command: 00:00:00 (0.882038831710815)
+Benchmark Times:
+  Run Start:    2020-10-05 23:13:54 (1601939634)
+  Run Stop:     2020-10-06 00:13:12 (1601943192)
+  Run Elapsed:  00:59:18 (3558)
+  Run Reported: 00:59:18 (3558 57825000 3558.057825)
+ Success 605.mcf_s base refspeed ratio=1.33, runtime=3558.057825, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 620.omnetpp_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 00:13:14]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o omnetpp.General-0.out -e omnetpp.General-0.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/omnetpp_s_base.RISC-V-dbt-1.0-m64 -c General -r 0 > omnetpp.General-0.out 2>> omnetpp.General-0.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 00:13:14 (1601943194.6971)
+Stop command: 2020-10-06 02:24:47 (1601951087.06765)
+Elapsed time for command: 02:11:32 (7892.3705508709)
+Workload elapsed time (copy 0 workload 1) = 7892.198225 seconds
+Copy 0 of 620.omnetpp_s (base refspeed) run 1 finished at 2020-10-06 02:24:46.  Total elapsed time: 7892.198225
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'General-0.sca' with abstol=1e-06, reltol=1e-05
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/620.omnetpp_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 02:24:47 (1601951087.23237)
+Stop command: 2020-10-06 02:24:54 (1601951094.0508)
+Elapsed time for command: 00:00:06 (6.8184278011322)
+Benchmark Times:
+  Run Start:    2020-10-06 00:13:14 (1601943194)
+  Run Stop:     2020-10-06 02:24:47 (1601951087)
+  Run Elapsed:  02:11:33 (7893)
+  Run Reported: 02:11:32 (7892 198391000 7892.198391)
+ Success 620.omnetpp_s base refspeed ratio=0.21, runtime=7892.198391, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 623.xalancbmk_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 02:24:56]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o ref-t5.out -e ref-t5.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/xalancbmk_s_base.RISC-V-dbt-1.0-m64 -v t5.xml xalanc.xsl > ref-t5.out 2>> ref-t5.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 02:24:56 (1601951096.39332)
+Stop command: 2020-10-06 03:36:49 (1601955409.84683)
+Elapsed time for command: 01:11:53 (4313.45350813866)
+Workload elapsed time (copy 0 workload 1) = 4313.280079 seconds
+Copy 0 of 623.xalancbmk_s (base refspeed) run 1 finished at 2020-10-06 03:36:49.  Total elapsed time: 4313.280079
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'ref-t5.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/623.xalancbmk_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 03:36:49 (1601955409.98674)
+Stop command: 2020-10-06 03:36:51 (1601955411.08421)
+Elapsed time for command: 00:00:01 (1.09747695922852)
+Benchmark Times:
+  Run Start:    2020-10-06 02:24:56 (1601951096)
+  Run Stop:     2020-10-06 03:36:49 (1601955409)
+  Run Elapsed:  01:11:53 (4313)
+  Run Reported: 01:11:53 (4313 280249000 4313.280249)
+ Success 623.xalancbmk_s base refspeed ratio=0.33, runtime=4313.280249, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 625.x264_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 03:36:51]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass1.out -e run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass1.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/x264_s_base.RISC-V-dbt-1.0-m64 --pass 1 --stats x264_stats.log --bitrate 1000 --frames 1000 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 > run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass1.out 2>> run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass1.err (timed)
+    -o run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass2.out -e run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass2.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/x264_s_base.RISC-V-dbt-1.0-m64 --pass 2 --stats x264_stats.log --bitrate 1000 --dumpyuv 200 --frames 1000 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 > run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass2.out 2>> run_000-1000_x264_s_base.RISC-V-dbt-1.0-m64_x264_pass2.err (timed)
+    -o run_0500-1250_x264_s_base.RISC-V-dbt-1.0-m64_x264.out -e run_0500-1250_x264_s_base.RISC-V-dbt-1.0-m64_x264.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/x264_s_base.RISC-V-dbt-1.0-m64 --seek 500 --dumpyuv 200 --frames 1250 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 > run_0500-1250_x264_s_base.RISC-V-dbt-1.0-m64_x264.out 2>> run_0500-1250_x264_s_base.RISC-V-dbt-1.0-m64_x264.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 03:36:51 (1601955411.93236)
+Stop command: 2020-10-06 04:43:40 (1601959420.65774)
+Elapsed time for command: 01:06:48 (4008.72537207603)
+Workload elapsed time (copy 0 workload 1) = 527.372546 seconds
+Workload elapsed time (copy 0 workload 2) = 1776.049871 seconds
+Workload elapsed time (copy 0 workload 3) = 1705.130666 seconds
+Copy 0 of 625.x264_s (base refspeed) run 1 finished at 2020-10-06 04:43:40.  Total elapsed time: 4008.553083
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'imagevalidate_frame_1100.out' with reltol=0.085
+comparing 'imagevalidate_frame_1249.out' with reltol=0.085
+comparing 'imagevalidate_frame_200.out' with reltol=0.085
+comparing 'imagevalidate_frame_400.out' with reltol=0.085
+comparing 'imagevalidate_frame_600.out' with reltol=0.085
+comparing 'imagevalidate_frame_700.out' with reltol=0.085
+comparing 'imagevalidate_frame_800.out' with reltol=0.085
+comparing 'imagevalidate_frame_900.out' with reltol=0.085
+comparing 'imagevalidate_frame_999.out' with reltol=0.085
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/625.x264_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 04:43:41 (1601959421.63234)
+Stop command: 2020-10-06 04:44:34 (1601959474.03481)
+Elapsed time for command: 00:00:52 (52.4024767875671)
+Benchmark Times:
+  Run Start:    2020-10-06 03:36:51 (1601955411)
+  Run Stop:     2020-10-06 04:43:40 (1601959420)
+  Run Elapsed:  01:06:49 (4009)
+  Run Reported: 01:06:48 (4008 553262000 4008.553262)
+ Success 625.x264_s base refspeed ratio=0.44, runtime=4008.553262, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 631.deepsjeng_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 04:44:34]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o ref.out -e ref.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/deepsjeng_s_base.RISC-V-dbt-1.0-m64 ref.txt > ref.out 2>> ref.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 04:44:34 (1601959474.31833)
+Stop command: 2020-10-06 07:32:43 (1601969563.41409)
+Elapsed time for command: 02:48:09 (10089.0957629681)
+Workload elapsed time (copy 0 workload 1) = 10088.928265 seconds
+Copy 0 of 631.deepsjeng_s (base refspeed) run 1 finished at 2020-10-06 07:32:43.  Total elapsed time: 10088.928265
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'ref.out' with obiwan=1
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/631.deepsjeng_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 07:32:43 (1601969563.58314)
+Stop command: 2020-10-06 07:32:44 (1601969564.15043)
+Elapsed time for command: 00:00:00 (0.567283153533936)
+Benchmark Times:
+  Run Start:    2020-10-06 04:44:34 (1601959474)
+  Run Stop:     2020-10-06 07:32:43 (1601969563)
+  Run Elapsed:  02:48:09 (10089)
+  Run Reported: 02:48:08 (10088 928436000 10088.928436)
+ Success 631.deepsjeng_s base refspeed ratio=0.14, runtime=10088.928436, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 641.leela_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 07:32:44]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o ref.out -e ref.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/leela_s_base.RISC-V-dbt-1.0-m64 ref.sgf > ref.out 2>> ref.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 07:32:44 (1601969564.58749)
+Stop command: 2020-10-06 09:24:41 (1601976281.00239)
+Elapsed time for command: 01:51:56 (6716.41489601135)
+Workload elapsed time (copy 0 workload 1) = 6716.23989 seconds
+Copy 0 of 641.leela_s (base refspeed) run 1 finished at 2020-10-06 09:24:40.  Total elapsed time: 6716.23989
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'ref.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/641.leela_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 09:24:41 (1601976281.1464)
+Stop command: 2020-10-06 09:24:41 (1601976281.71484)
+Elapsed time for command: 00:00:00 (0.568432092666626)
+Benchmark Times:
+  Run Start:    2020-10-06 07:32:44 (1601969564)
+  Run Stop:     2020-10-06 09:24:40 (1601976280)
+  Run Elapsed:  01:51:56 (6716)
+  Run Reported: 01:51:56 (6716 240005000 6716.240005)
+ Success 641.leela_s base refspeed ratio=0.25, runtime=6716.240005, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 648.exchange2_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 09:24:41]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o exchange2.txt -e exchange2.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/exchange2_s_base.RISC-V-dbt-1.0-m64 6 > exchange2.txt 2>> exchange2.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 09:24:42 (1601976282.01787)
+Stop command: 2020-10-06 10:45:30 (1601981130.77969)
+Elapsed time for command: 01:20:48 (4848.76181793213)
+Workload elapsed time (copy 0 workload 1) = 4848.589712 seconds
+Copy 0 of 648.exchange2_s (base refspeed) run 1 finished at 2020-10-06 10:45:30.  Total elapsed time: 4848.589712
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 's.txt' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/648.exchange2_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 10:45:30 (1601981130.92164)
+Stop command: 2020-10-06 10:45:31 (1601981131.46945)
+Elapsed time for command: 00:00:00 (0.547808170318604)
+Benchmark Times:
+  Run Start:    2020-10-06 09:24:42 (1601976282)
+  Run Stop:     2020-10-06 10:45:30 (1601981130)
+  Run Elapsed:  01:20:48 (4848)
+  Run Reported: 01:20:48 (4848 589869000 4848.589869)
+ Success 648.exchange2_s base refspeed ratio=0.61, runtime=4848.589869, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 657.xz_s refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 10:45:31]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o cpu2006docs.tar-6643-4.out -e cpu2006docs.tar-6643-4.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/xz_s_base.RISC-V-dbt-1.0-m64 cpu2006docs.tar.xz 6643 055ce243071129412e9dd0b3b69a21654033a9b723d874b2015c774fac1553d9713be561ca86f74e4f16f22e664fc17a79f30caa5ad2c04fbc447549c2810fae 1036078272 1111795472 4 > cpu2006docs.tar-6643-4.out 2>> cpu2006docs.tar-6643-4.err (timed)
+    -o cld.tar-1400-8.out -e cld.tar-1400-8.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/xz_s_base.RISC-V-dbt-1.0-m64 cld.tar.xz 1400 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 536995164 539938872 8 > cld.tar-1400-8.out 2>> cld.tar-1400-8.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 10:45:31 (1601981131.83124)
+Stop command: 2020-10-06 14:14:35 (1601993675.28639)
+Elapsed time for command: 03:29:03 (12543.4551539421)
+Workload elapsed time (copy 0 workload 1) = 6823.346787 seconds
+Workload elapsed time (copy 0 workload 2) = 5719.93431 seconds
+Copy 0 of 657.xz_s (base refspeed) run 1 finished at 2020-10-06 14:14:35.  Total elapsed time: 12543.281097
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'cld.tar-1400-8.out' with 
+comparing 'cpu2006docs.tar-6643-4.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/657.xz_s/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 14:14:35 (1601993675.49652)
+Stop command: 2020-10-06 14:14:36 (1601993676.38549)
+Elapsed time for command: 00:00:00 (0.888966798782349)
+Benchmark Times:
+  Run Start:    2020-10-06 10:45:31 (1601981131)
+  Run Stop:     2020-10-06 14:14:35 (1601993675)
+  Run Elapsed:  03:29:04 (12544)
+  Run Reported: 03:29:03 (12543 281250000 12543.28125)
+ Success 657.xz_s base refspeed ratio=0.49, runtime=12543.281250, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 998.specrand_is refspeed (ref) base RISC-V-dbt-1.0-m64 [2020-10-06 14:14:36]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000
+    -o rand.234923.out -e rand.234923.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-dbt-1.0-m64.0000/specrand_is_base.RISC-V-dbt-1.0-m64 1255432124 234923 > rand.234923.out 2>> rand.234923.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-06 14:14:36 (1601993676.64958)
+Stop command: 2020-10-06 14:14:39 (1601993679.29337)
+Elapsed time for command: 00:00:02 (2.64379215240479)
+Workload elapsed time (copy 0 workload 1) = 2.472727 seconds
+Copy 0 of 998.specrand_is (base refspeed) run 1 finished at 2020-10-06 14:14:39.  Total elapsed time: 2.472727
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'rand.234923.out' with floatcompare=1, nansupport=0
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/998.specrand_is/run/run_base_refspeed_RISC-V-dbt-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-06 14:14:39 (1601993679.43485)
+Stop command: 2020-10-06 14:14:41 (1601993681.22931)
+Elapsed time for command: 00:00:01 (1.79445791244507)
+Benchmark Times:
+  Run Start:    2020-10-06 14:14:36 (1601993676)
+  Run Stop:     2020-10-06 14:14:39 (1601993679)
+  Run Elapsed:  00:00:03 (3)
+  Run Reported: 00:00:02 (2 472839000 2.472839)
+ Success 998.specrand_is base refspeed ratio=4.04, runtime=2.472839, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+Success: 1x600.perlbench_s 1x602.gcc_s 1x605.mcf_s 1x620.omnetpp_s 1x623.xalancbmk_s 1x625.x264_s 1x631.deepsjeng_s 1x641.leela_s 1x648.exchange2_s 1x657.xz_s 1x998.specrand_is
+Producing Raw Reports
+ label: RISC-V-dbt-1.0-m64
+  workload: refspeed (ref)
+   benchset: intspeed
+   metric: SPECspeed2017_int_base
+    format: raw -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.rsf
+Parsing flags for 600.perlbench_s base: done
+Parsing flags for 602.gcc_s base: done
+Parsing flags for 605.mcf_s base: done
+Parsing flags for 620.omnetpp_s base: done
+Parsing flags for 623.xalancbmk_s base: done
+Parsing flags for 625.x264_s base: done
+Parsing flags for 631.deepsjeng_s base: done
+Parsing flags for 641.leela_s base: done
+Parsing flags for 648.exchange2_s base: done
+Parsing flags for 657.xz_s base: done
+Doing flag reduction: done
+    format: flags -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.flags.html
+    format: cfg -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.cfg
+    format: CSV -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.csv
+    format: PDF -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.pdf
+    format: HTML -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.html
+    format: Text -> /u/home/schmidtf/spec/result/CPU2017.140.intspeed.refspeed.txt
+   benchset: intrate
+   benchset: fpspeed
+   benchset: fprate
+runcpu finished at 2020-10-06 14:14:54; 74079 total seconds elapsed
+Info: file_tail(25473): file '/u/home/schmidtf/spec/tmp/CPU2017.140/templogs/preenv.intspeed.140.0.debug' was removed and will no longer be followed.  No action is required.
+The log for this run is in /u/home/schmidtf/spec/result/CPU2017.140.log
+
+runcpu finished at 2020-10-06 14:14:55; 74081 total seconds elapsed
