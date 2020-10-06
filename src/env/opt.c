@@ -65,9 +65,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                     flag_log_cache_contents = true;
                                     option_string += 9;
                                 }
-                            } else if (strncmp(option_string, "strace", 5) == 0) {
+                            } else if (strncmp(option_string, "strace", 6) == 0) {
                                 flag_log_syscall = true;
-                                option_string += 5;
+                                option_string += 6;
                             } else if (strncmp(option_string, "verbose-disasm", 11) == 0) {
                                 flag_verbose_disassembly = true;
                                 option_string += 11;
