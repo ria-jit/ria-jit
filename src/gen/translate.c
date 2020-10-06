@@ -123,7 +123,7 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
     );
 
     //make instruction boundaries visible in disassembly if required
-    if (flag_log_asm_out) {
+    if (flag_verbose_disassembly) {
         err |= fe_enc64(&current, FE_NOP);
         err |= fe_enc64(&current, FE_NOP);
         err |= fe_enc64(&current, FE_NOP);
