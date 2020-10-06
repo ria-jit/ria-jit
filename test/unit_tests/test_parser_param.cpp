@@ -581,3 +581,375 @@ INSTANTIATE_TEST_SUITE_P(AMOMAXUD, ParserTest,
                                  testing::Values(0xe0c6b5af),
                                  testing::Values(AMOMAXUD)
                          ));
+
+INSTANTIATE_TEST_SUITE_P(FLW, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2007),
+                                 testing::Values(FLW)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSW, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2027),
+                                 testing::Values(FSW)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMADDS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x7043),
+                                 testing::Values(FMADDS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMSUBS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x7047),
+                                 testing::Values(FMSUBS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FNMSUBS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x0000704B),
+                                 testing::Values(FNMSUBS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FNMADDS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x0000704F),
+                                 testing::Values(FNMADDS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FADDS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x7053),
+                                 testing::Values(FADDS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSUBS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x8007053),
+                                 testing::Values(FSUBS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMULS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x10007053),
+                                 testing::Values(FMULS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FDIVS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x18007053),
+                                 testing::Values(FDIVS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSQRTS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x58007053),
+                                 testing::Values(FSQRTS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x20000053),
+                                 testing::Values(FSGNJS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJNS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x20001053),
+                                 testing::Values(FSGNJNS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJXS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x20002053),
+                                 testing::Values(FSGNJXS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMINS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x28000053),
+                                 testing::Values(FMINS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMAXS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x28001053),
+                                 testing::Values(FMAXS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTWS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC0007053),
+                                 testing::Values(FCVTWS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTWUS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC0107053),
+                                 testing::Values(FCVTWUS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMVXW, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xE0000053),
+                                 testing::Values(FMVXW)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FEQS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA0002053),
+                                 testing::Values(FEQS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FLTS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA0001053),
+                                 testing::Values(FLTS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FLES, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA0000053),
+                                 testing::Values(FLES)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCLASSS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xE0001053),
+                                 testing::Values(FCLASSS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTSW, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD0007053),
+                                 testing::Values(FCVTSW)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTSWU, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD0107053),
+                                 testing::Values(FCVTSWU)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMVWX, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xF0000053),
+                                 testing::Values(FMVWX)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTLS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC0207053),
+                                 testing::Values(FCVTLS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTLUS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC0307053),
+                                 testing::Values(FCVTLUS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTSL, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD0207053),
+                                 testing::Values(FCVTSL)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTSLU, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD0307053),
+                                 testing::Values(FCVTSLU)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FLD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x3007),
+                                 testing::Values(FLD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x3027),
+                                 testing::Values(FSD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMADDD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2007043),
+                                 testing::Values(FMADDD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMSUBD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2007047),
+                                 testing::Values(FMSUBD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FNMSUBD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x0200704B),
+                                 testing::Values(FNMSUBD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FNMADDD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x0200704F),
+                                 testing::Values(FNMADDD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FADDD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2007053),
+                                 testing::Values(FADDD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSUBD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x0A007053),
+                                 testing::Values(FSUBD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMULD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x12007053),
+                                 testing::Values(FMULD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FDIVD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x1A007053),
+                                 testing::Values(FDIVD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSQRTD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x5A007053),
+                                 testing::Values(FSQRTD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x22000053),
+                                 testing::Values(FSGNJD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJND, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x22001053),
+                                 testing::Values(FSGNJND)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FSGNJXD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x22002053),
+                                 testing::Values(FSGNJXD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMIND, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2A000053),
+                                 testing::Values(FMIND)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMAXD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x2A001053),
+                                 testing::Values(FMAXD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTSD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x40107053),
+                                 testing::Values(FCVTSD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDS, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0x42000053),
+                                 testing::Values(FCVTDS)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTWD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC2007053),
+                                 testing::Values(FCVTWD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTWUD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC2107053),
+                                 testing::Values(FCVTWUD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMVXD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xE2000053),
+                                 testing::Values(FMVXD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FEQD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA2002053),
+                                 testing::Values(FEQD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FLTD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA2001053),
+                                 testing::Values(FLTD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FLED, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xA2000053),
+                                 testing::Values(FLED)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCLASSD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xE2001053),
+                                 testing::Values(FCLASSD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDW, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD2000053),
+                                 testing::Values(FCVTDW)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDWU, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD2100053),
+                                 testing::Values(FCVTDWU)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FMVDX, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xF2000053),
+                                 testing::Values(FMVDX)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTLD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC2207053),
+                                 testing::Values(FCVTLD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTLUD, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xC2307053),
+                                 testing::Values(FCVTLUD)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDL, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD2207053),
+                                 testing::Values(FCVTDL)
+                         ));
+
+INSTANTIATE_TEST_SUITE_P(FCVTDLU, ParserTest,
+                         testing::Combine(
+                                 testing::Values(0xD2307053),
+                                 testing::Values(FCVTDLU)
+                         ));
