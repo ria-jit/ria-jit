@@ -117,7 +117,7 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
  * pattern matching
 */
 void optimize_patterns(t_risc_instr *block_cache, int len) {
-#define PATTERNS_NUM 3
+#define PATTERNS_NUM 6
 
     for(int i = 0; i < PATTERNS_NUM; i++) {
         for(int j = 0; j < len - patterns[i].len; j++) {
@@ -223,7 +223,7 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                     }   break;
 
                     default: {
-                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs1) {
+                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs2) {
                             goto MISMATCH;
                         }
                     }
@@ -233,18 +233,24 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                 switch (patterns[i].elements[k].rd) {
                     case DONT_CARE : {} break;
 
-                        //insert as needed
+                    //insert as needed
 
+                    case rd_h1 : {
+                        if(block_cache[j + k].reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    } break;
 
-                        case rd_h1 : {
-                            if(block_cache[j + k].reg_dest !=
-                                    block_cache[j + patterns[i].elements[k].h1].reg_dest) {
-                                goto MISMATCH;
-                            }
-                        } break;
+                    case rs1_h1 : {
+                        if(block_cache[j + k].reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h1].reg_src_1) {
+                            goto MISMATCH;
+                        }
+                    } break;
 
                     default: {
-                        if(block_cache[j + k].reg_src_2 != patterns[i].elements[k].rs1) {
+                        if(block_cache[j + k].reg_dest != patterns[i].elements[k].rd) {
                             goto MISMATCH;
                         }
                     }
@@ -291,7 +297,7 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
 void translate_pattern_emit(t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate Pattern...\n");
 
-    patterns[instr->optype].emitter(instr);
+    patterns[instr->optype].emitter(instr, r_info);
 
     for(int i = 1; i < patterns[instr->optype].len; i++) {
         instr[i].mnem = SILENT_NOP;

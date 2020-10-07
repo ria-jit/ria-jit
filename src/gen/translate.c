@@ -181,7 +181,7 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
         if (flag_translate_opt_fusion) {
-            optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
+            //optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
         }
         translate_risc_instr(&block_cache[i], c_info);
     }

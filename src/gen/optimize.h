@@ -42,7 +42,7 @@ typedef struct {
     const pattern_element * const elements;
     int len;
     //equivalent x86 code ...
-    void (* emitter)(const t_risc_instr *);
+    void (* emitter)(const t_risc_instr *, const register_info *);
 } pattern;
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_OPTIMIZE_H
