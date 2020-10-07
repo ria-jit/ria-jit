@@ -40,6 +40,8 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc);
 
 void print_values(void);
 
+void dump_cache_stats(void);
+
 #ifdef __cplusplus
 }
 #endif

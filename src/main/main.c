@@ -123,7 +123,8 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     //display the profiler's data
     if (flag_do_profile) {
         log_profile("Profiler data collection finished.\n");
-        dump_profiler_data();
+        dump_register_stats();
+        dump_cache_stats();
     }
 
     return guest_exit_status;

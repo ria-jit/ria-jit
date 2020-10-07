@@ -41,6 +41,9 @@ t_cache_entry *tlb;
 // size of the tlb
 size_t tlb_size = SMALLTLB;
 
+//count accesses for profiling
+static size_t count_lookups = 0;
+
 
 /**
  * Initializes the hash table array.
@@ -104,6 +107,8 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc) {
  * @return code cache address of that instruction, or NULL if nonexistent
  */
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
+    if (flag_do_profile) count_lookups++;
+
     size_t smallHash = smallhash(risc_addr);
     if (tlb[smallHash].risc_addr == risc_addr) {
         return tlb[smallHash].cache_loc;
@@ -209,4 +214,8 @@ void print_values(void) {
         }
     }
     log_cache("Now contains %lu block(s).\n", blocks);
+}
+
+void dump_cache_stats(void) {
+    log_profile("Logged %lu cache lookups, total block count %lu.\n", count_lookups, count_entries);
 }
