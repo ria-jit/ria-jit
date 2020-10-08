@@ -8,6 +8,49 @@
 #include <common.h>
 
 
+/**
+ * how to create a pattern:
+ *
+ * ----1: elements:-----
+ * Element fields:
+ *  mnem : mnem
+ *  rs1, rs2, rd :
+ *      rs1_h1 means, that rs1 of the instruction
+ *      has to be the same as in the instruction at
+ *      the position stored in h1. (block_cache[pattern_start + h1]).
+ *      rs2, rd work the same. all are also available with h2.
+ *
+ *      Example:
+ *      pattern_element jsjfbefjb[] = {
+ *          {.....},
+ *          {.....},
+ *          {ADDI, rd_h1, DONT_CARE, rs1_h2, 1, 0, 1, 32}
+ *      };
+ *
+ *      In this example, rs1 of the 3rd instruction has to be
+ *      the same register as rd of the second instruction,
+ *      and rd has to be the same register as rs1 of the first instruction.
+ *      The immediate has to be 32.
+ *
+ *      NOTE: not all options are implemented for every field yet
+ *            (to avoid unnecessary comparisons in matcher).
+ *            Do so in the switch-case under the corresponding comments (e.g. "rs1 match") in optimize.c
+ *
+ *  h1, h2 : helper variables
+ *
+ *  imm :
+ *      0 = dont care ;
+ *      1 = value has to be equal to imm_value ;
+ *      2 = value has to be equal to immediate of (block_cache[pattern_start + h1])
+ *
+ * ----2: emitter function:-----
+ * Emits the x86 equivalent of the pattern.
+ *
+ * ----3: entry in patterns[]:-----
+ *
+ * */
+
+
 const pattern_element p_0_elem[] = {
         {LUI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
         {LD, rd_h1, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
