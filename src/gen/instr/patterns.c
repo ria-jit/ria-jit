@@ -124,7 +124,7 @@ void emit_pattern_6(const t_risc_instr *instr, const register_info *r_info) {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), 0);
 
             err |= fe_enc64(&current, FE_MOV32mr,
-                            FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr[1].reg_dest]), r_info->map[instr->reg_src_1]);
+                            FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), r_info->map[instr->reg_src_1]);
         }
     } else if(r_info->mapped[instr[1].reg_dest]){
         err |= fe_enc64(&current, FE_MOV32rm, r_info->map[instr[1].reg_dest],
