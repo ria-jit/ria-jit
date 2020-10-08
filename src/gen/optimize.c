@@ -117,9 +117,7 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
  * pattern matching
 */
 void optimize_patterns(t_risc_instr *block_cache, int len) {
-#define PATTERNS_NUM 6
-
-    for(int i = 0; i < PATTERNS_NUM; i++) {
+    for(int i = 0; patterns[i].len > 0; i++) {
         for(int j = 0; j < len - patterns[i].len; j++) {
             for(int k = 0; k < patterns[i].len; k++) {
                 ///mnem match

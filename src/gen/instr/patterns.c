@@ -115,84 +115,91 @@ void emit_pattern_2(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_ADD32mi, FE_MEM(FE_AX,0,0,0), instr[3].imm);
 }
 
-void emit_pattern_3(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("emit pattern 3: AUIPC + ADDI at %p\n", instr->addr);
+void emit_pattern_3(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 3: AUIPC + ADDI at %p\n", instrs[0].addr);
 
-    if(instr[1].reg_dest == x0) {
+    if(instrs[1].reg_dest == x0) {
         log_asm_out("pattern 3: addi x0 at %p\n", current);
         return;
     }
 
-    if(r_info->mapped[instr[1].reg_dest]) {
-        err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], (instr->addr + instr->imm + instr[1].imm));
+    if(r_info->mapped[instrs[1].reg_dest]) {
+        err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instrs[0].reg_dest], (instrs[0].addr + instrs[0].imm + instrs[1].imm));
     } else {
-        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), FE_AX);
-    }
-}
-
-void emit_pattern_4(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("emit pattern 4: AUIPC + LW at %p\n", instr->addr);
-
-    if(r_info->mapped[instr[1].reg_dest]) {
-        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm));
-        err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instr[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
-    } else {
-        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm));
-        err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM(FE_AX, 0, 0, 0));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), FE_AX);
-    }
-}
-
-void emit_pattern_5(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("emit pattern 5: AUIPC + LD at %p\n", instr->addr);
-
-    if(r_info->mapped[instr[1].reg_dest]) {
-        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm));
-        err |= fe_enc64(&current, FE_MOV64rm, r_info->map[instr[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
-    } else {
-        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm + instr[1].imm));
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM(FE_AX, 0, 0, 0));
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), FE_AX);
-    }
-}
-
-void emit_pattern_6(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("emit pattern 6: SLLI +  SRLI at %p\n", instr->addr);
-
-    if(r_info->mapped[instr->reg_src_1]) {
-        if(r_info->mapped[instr[1].reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV32rr, r_info->map[instr[1].reg_dest], r_info->map[instr->reg_src_1]);   //sets high 32 to zero
+        if((instrs[0].addr + instrs->imm + instrs[1].imm) == (int)(instrs[0].addr + instrs->imm + instrs[1].imm)) {
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), (instrs[0].addr + instrs->imm + instrs[1].imm));
         } else {
-            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), 0);
+            err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instrs[0].addr + instrs->imm + instrs[1].imm));
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), FE_AX);
+        }
+    }
+}
+
+void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 4: AUIPC + LW at %p\n", instrs[0].addr);
+
+    if(r_info->mapped[instrs[1].reg_dest]) {
+        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instrs[0].addr + instrs[0].imm + instrs[1].imm));
+        err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
+    } else {
+        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instrs[0].addr + instrs[0].imm + instrs[1].imm));
+        err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM(FE_AX, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), FE_AX);
+    }
+}
+
+void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 5: AUIPC + LD at %p\n", instrs[0].addr);
+
+    if(r_info->mapped[instrs[1].reg_dest]) {
+        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instrs[0].addr + instrs[0].imm + instrs[1].imm));
+        err |= fe_enc64(&current, FE_MOV64rm, r_info->map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
+    } else {
+        err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instrs[0].addr + instrs[0].imm + instrs[1].imm));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM(FE_AX, 0, 0, 0));
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), FE_AX);
+    }
+}
+
+void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 6: SLLI +  SRLI at %p\n", instrs->addr);
+
+    if(r_info->mapped[instrs[0].reg_src_1]) {
+        if(r_info->mapped[instrs[1].reg_dest]) {
+            err |= fe_enc64(&current, FE_MOV32rr, r_info->map[instrs[1].reg_dest], r_info->map[instrs[0].reg_src_1]);   //sets high 32 to zero
+        } else {
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), 0);
 
             err |= fe_enc64(&current, FE_MOV32mr,
-                            FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), r_info->map[instr->reg_src_1]);
+                            FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), r_info->map[instrs[0].reg_src_1]);
         }
-    } else if(r_info->mapped[instr[1].reg_dest]){
-        err |= fe_enc64(&current, FE_MOV32rm, r_info->map[instr[1].reg_dest],
-                        FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));  //sets high 32 to zero
+    } else if(r_info->mapped[instrs[1].reg_dest]){
+        err |= fe_enc64(&current, FE_MOV32rm, r_info->map[instrs[1].reg_dest],
+                        FE_MEM_ADDR(r_info->base + 8 * instrs[0].reg_src_1));  //sets high 32 to zero
     } else {
-        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1)); //sets high 32 to zero
-        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr[1].reg_dest), FE_AX);
+        err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instrs[0].reg_src_1)); //sets high 32 to zero
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), FE_AX);
     }
 }
 
-void emit_pattern_7(const t_risc_instr *instr, const register_info *r_info) {
-    log_asm_out("emit pattern 7: ADDIW + SLLI + SRLI at %p\n", instr->addr);
+void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_info) {
+    log_asm_out("emit pattern 7: ADDIW + SLLI + SRLI at %p\n", instr[0].addr);
 
-    if(r_info->mapped[instr->reg_src_1]) {
-        err |= fe_enc64(&current, FE_ADD32ri, r_info->map[instr->reg_src_1], instr->imm);
+    if(r_info->mapped[instr[0].reg_src_1]) {
+        err |= fe_enc64(&current, FE_ADD32ri, r_info->map[instr[0].reg_src_1], instr[0].imm);
     } else {
         err |= fe_enc64(&current, FE_ADD64mi,
-                        FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr->reg_src_1]), instr->imm);
+                        FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr[0].reg_src_1]), instr[0].imm);
         err |= fe_enc64(&current, FE_MOV32mi,
-                        FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr->reg_src_1] + 4), 0);
+                        FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr[0].reg_src_1] + 4), 0);
     }
 }
 
 
-//order = length, descending !!!!!!!!!!!!!!!!!!!!!!!!!!! important
+//order = length, descending
+//order is important because longer patterns can contain shorter ones,
+//and would never match if the shorter pattern would be tested before the longer one
+//(and if the shorter pattern is contained at the beginning).
 const pattern patterns[] = {
         {p_2_elem, 5, &emit_pattern_2}, //inc mem64
         {p_7_elem, 3, &emit_pattern_7}, //ADDIW + SLLI + SRLI
@@ -200,6 +207,8 @@ const pattern patterns[] = {
         {p_4_elem, 2, &emit_pattern_4}, //AUIPC + LW
         {p_5_elem, 2, &emit_pattern_5}, //AUIPC + LD
         {p_6_elem, 2, &emit_pattern_6}, //SLLI + SRLI
+
+        {0, 0, 0},      //stopper
 
         //unused
         {p_0_elem, 4, &emit_pattern_0},
