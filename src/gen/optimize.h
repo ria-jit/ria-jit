@@ -28,13 +28,13 @@ typedef enum {
 } t_risc_reg_meta;
 
 typedef struct {
-    short mnem;
-    short rs1;
-    short rs2;
-    short rd;
-    int h1;
-    int h2;
-    short imm;
+    unsigned short mnem;
+    unsigned short rs1;
+    unsigned short rs2;
+    unsigned short rd;
+    unsigned int h1;
+    unsigned int h2;
+    unsigned short imm;
     int imm_value;  //0: DONT_CARE  1: imm_value  2: imm patt. pos imm_value
 
 } pattern_element;
