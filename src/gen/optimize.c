@@ -116,7 +116,7 @@ void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len) {
 /**
  * pattern matching
 */
-void optimize_patterns(t_risc_instr *block_cache, int len) {
+void optimize_patterns(t_risc_instr block_cache[], int len) {
     for(int i = 0; patterns[i].len > 0; i++) {
         for(int j = 0; j < len - patterns[i].len; j++) {
             for(int k = 0; k < patterns[i].len; k++) {
@@ -156,6 +156,13 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                         }
                     }
                         break;
+
+                    case not_rd_hs1 : {
+                        if(block_cache[j + k].reg_src_1 ==
+                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    } break;
 
                     /*
                     case rs1_h2: {
@@ -240,9 +247,23 @@ void optimize_patterns(t_risc_instr *block_cache, int len) {
                         }
                     } break;
 
+                    case rd_h2 : {
+                        if(block_cache[j + k].reg_dest !=
+                                block_cache[j + patterns[i].elements[k].h2].reg_dest) {
+                            goto MISMATCH;
+                        }
+                    } break;
+
                     case rs1_h1 : {
                         if(block_cache[j + k].reg_dest !=
                                 block_cache[j + patterns[i].elements[k].h1].reg_src_1) {
+                            goto MISMATCH;
+                        }
+                    } break;
+
+                    case not_rd_hs1 : {
+                        if(block_cache[j + k].reg_dest ==
+                                block_cache[j + patterns[i].elements[k].h1].reg_dest) {
                             goto MISMATCH;
                         }
                     } break;

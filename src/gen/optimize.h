@@ -24,6 +24,7 @@ typedef enum {
     rs1_h2,
     rs2_h2,
     rd_h2,
+    not_rd_hs1,
 } t_risc_reg_meta;
 
 typedef struct {

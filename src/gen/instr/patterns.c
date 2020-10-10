@@ -99,6 +99,17 @@ const pattern_element p_7_elem[] = {
         {SRLI, rd_h1, DONT_CARE, rd_h1, 0, 0, 1, 32}
 };
 
+const pattern_element p_8_elem[] = {
+        {ADDIW, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 0}
+};
+
+const pattern_element p_9_elem[] = {
+        {LUI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
+        {ADDI, rd_h1, DONT_CARE, not_rd_hs1, 0, 0, 1, 0},
+        {SLLI, not_rd_hs1, DONT_CARE, rd_h2, 1, 0, 1, 32},
+        {SRLI, rd_h1, DONT_CARE, rd_h1, 2, 0, 1, 32}
+};
+
 
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at %p\n", instr->addr);
@@ -195,6 +206,37 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
     }
 }
 
+void emit_pattern_8(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 8: ADDIW 32b sign extension at %p\n", instr[0].addr);
+
+    if(r_info->mapped[instr->reg_src_1]) {
+        if(r_info->mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOVSXr64r32, r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
+        } else {
+            err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, r_info->map[instr->reg_src_1]);
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
+        }
+    } else {
+        if(r_info->mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instr->reg_dest], FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+        } else {
+            err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
+        }
+    }
+}
+
+void emit_pattern_9(const t_risc_instr instrs[static 4], const register_info *r_info) {
+    printf("emit pattern 9: LUI + ADDIW + SLLI + SRLI at %p\n", instrs[0].addr);
+
+    if(r_info->mapped[instrs[1].reg_dest]) {
+        err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instrs[1].reg_dest], instrs[0].imm);
+    } else {
+        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest));
+    }
+
+    emit_pattern_6(&instrs[2], r_info);
+}
 
 //order = length, descending
 //order is important because longer patterns can contain shorter ones,
@@ -202,11 +244,13 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
 //(and if the shorter pattern is contained at the beginning).
 const pattern patterns[] = {
         {p_2_elem, 5, &emit_pattern_2}, //inc mem64
+        {p_9_elem, 4, &emit_pattern_9}, //LUI + ADDI + SRLI + SLLI
         {p_7_elem, 3, &emit_pattern_7}, //ADDIW + SLLI + SRLI
         {p_3_elem, 2, &emit_pattern_3}, //AUIPC + ADDI
         {p_4_elem, 2, &emit_pattern_4}, //AUIPC + LW
         {p_5_elem, 2, &emit_pattern_5}, //AUIPC + LD
         {p_6_elem, 2, &emit_pattern_6}, //SLLI + SRLI
+        {p_8_elem, 1, &emit_pattern_8}, //ADDIW SX only
 
         {0, 0, 0},      //stopper
 
