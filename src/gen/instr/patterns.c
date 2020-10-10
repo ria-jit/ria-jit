@@ -5,7 +5,7 @@
 #include <gen/instr/patterns.h>
 #include <gen/translate.h>
 #include <util/typedefs.h>
-#include <common.h>
+#include <util/util.h>
 
 
 /**
@@ -110,6 +110,46 @@ const pattern_element p_9_elem[] = {
         {SRLI, rd_h1, DONT_CARE, rd_h1, 2, 0, 1, 32}
 };
 
+const pattern_element p_10_elem[] = {
+        {ADDI, x0, DONT_CARE, x0, 0, 0, 1, 0}
+};
+
+const pattern_element p_11_elem[] = {
+        {ADDI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 0}
+};
+
+const pattern_element p_12_elem[] = {
+        {XORI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, -1}
+};
+
+const pattern_element p_13_elem[] = {
+        {SUB, x0, DONT_CARE, DONT_CARE, 0, 0, 0, 0}
+};
+
+const pattern_element p_14_elem[] = {
+        {SUBW, x0, DONT_CARE, DONT_CARE, 0, 0, 0, 0}
+};
+
+const pattern_element p_15_elem[] = {
+        {SLTIU, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 1}
+};
+
+const pattern_element p_16_elem[] = {
+        {SLTU, x0, DONT_CARE, DONT_CARE, 0, 0, 0, 0}
+};
+
+const pattern_element p_17_elem[] = {
+        {SLT, DONT_CARE, x0, DONT_CARE, 0, 0, 0, 0}
+};
+
+const pattern_element p_18_elem[] = {
+        {SLT, x0, DONT_CARE, DONT_CARE, 0, 0, 0, 0}
+};
+
+const pattern_element p_19_elem[] = {
+        {LUI,  DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
+        {ADDI, rd_h1,     DONT_CARE, rd_h1,     0, 0, 0, 0}
+};
 
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at %p\n", instr->addr);
@@ -238,19 +278,156 @@ void emit_pattern_9(const t_risc_instr instrs[static 4], const register_info *r_
     emit_pattern_6(&instrs[2], r_info);
 }
 
+void emit_pattern_10(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 10: ADDI as NOP at 0x%lx\n", instr->addr);
+    err |= fe_enc64(&current, FE_NOP);
+}
+
+void emit_pattern_11(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 11: ADDI as MV at 0x%lx\n", instr->addr);
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_12(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 12: XORI as NOT at 0x%lx\n", instr->addr);
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    if (regDest != regSrc1) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    }
+    err |= fe_enc64(&current, FE_NOT64r, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_13(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 13: SUB as NEG at 0x%lx\n", instr->addr);
+
+    FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    if (regDest != regSrc2) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_NEG64r, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_14(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 14: SUBW as NEGW at 0x%lx\n", instr->addr);
+
+    FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    if (regDest != regSrc2) {
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc2);
+    }
+    err |= fe_enc64(&current, FE_NEG32r, regDest);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_15(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 15: SLTIU as SEQZ at 0x%lx\n", instr->addr);
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
+    err |= fe_enc64(&current, FE_SETZ8r, regDest);
+    //Implicit zero extension to 64bit
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_16(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 16: SLTU as SNEZ at 0x%lx\n", instr->addr);
+
+    FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
+    err |= fe_enc64(&current, FE_SETNZ8r, regDest);
+    //Implicit zero extension to 64bit
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_17(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 17: SLT as SLTZ at 0x%lx\n", instr->addr);
+
+    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    }
+    err |= fe_enc64(&current, FE_SHR64ri, 63);
+
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_18(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 18: SLT as SGTZ at 0x%lx\n", instr->addr);
+
+    FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
+    err |= fe_enc64(&current, FE_SETG8r, regDest);
+    //Implicit zero extension to 64bit
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
+
+    storeRd(instr, r_info, regDest);
+}
+
+void emit_pattern_19(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 19: LUI ADDI as LI at 0x%lx\n", instrs->addr);
+
+    FeReg regDest = getRd(instrs, r_info, FIRST_REG);
+
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, instrs[0].imm + instrs[1].imm);
+
+    storeRd(instrs, r_info, regDest);
+}
+
+
 //order = length, descending
 //order is important because longer patterns can contain shorter ones,
 //and would never match if the shorter pattern would be tested before the longer one
 //(and if the shorter pattern is contained at the beginning).
 const pattern patterns[] = {
-        {p_2_elem, 5, &emit_pattern_2}, //inc mem64
-        {p_9_elem, 4, &emit_pattern_9}, //LUI + ADDI + SRLI + SLLI
-        {p_7_elem, 3, &emit_pattern_7}, //ADDIW + SLLI + SRLI
-        {p_3_elem, 2, &emit_pattern_3}, //AUIPC + ADDI
-        {p_4_elem, 2, &emit_pattern_4}, //AUIPC + LW
-        {p_5_elem, 2, &emit_pattern_5}, //AUIPC + LD
-        {p_6_elem, 2, &emit_pattern_6}, //SLLI + SRLI
-        {p_8_elem, 1, &emit_pattern_8}, //ADDIW SX only
+        {p_2_elem,  5, &emit_pattern_2},  //inc mem64
+        {p_9_elem,  4, &emit_pattern_9},  //LUI + ADDI + SRLI + SLLI
+        {p_7_elem,  3, &emit_pattern_7},  //ADDIW + SLLI + SRLI
+        {p_3_elem,  2, &emit_pattern_3},  //AUIPC + ADDI
+        {p_4_elem,  2, &emit_pattern_4},  //AUIPC + LW
+        {p_5_elem,  2, &emit_pattern_5},  //AUIPC + LD
+        {p_6_elem,  2, &emit_pattern_6},  //SLLI + SRLI
+        {p_19_elem, 2, &emit_pattern_19}, //LUI + ADDI
+        {p_8_elem,  1, &emit_pattern_8},  //ADDIW SX only
+        {p_10_elem, 1, &emit_pattern_10}, //ADDI NOP
+        {p_11_elem, 1, &emit_pattern_11}, //ADDI MV
+        {p_12_elem, 1, &emit_pattern_12}, //XORI NOT
+        {p_13_elem, 1, &emit_pattern_13}, //SUB NEG
+        {p_14_elem, 1, &emit_pattern_14}, //SUBW NEGW
+        {p_15_elem, 1, &emit_pattern_15}, //SLTIU SEQZ
+        {p_16_elem, 1, &emit_pattern_16}, //SLTU SNEZ
+        {p_17_elem, 1, &emit_pattern_17}, //SLT SLTZ gcc seems to emit slti rd, rs, 0 instead
+        {p_18_elem, 1, &emit_pattern_18}, //SLT SGTZ
+
 
         {0, 0, 0},      //stopper
 

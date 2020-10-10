@@ -76,7 +76,9 @@ void translate_NOT(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    if (regDest != regSrc1) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    }
     err |= fe_enc64(&current, FE_NOT64r, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -94,7 +96,9 @@ void translate_NEG(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    if (regDest != regSrc1) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    }
     err |= fe_enc64(&current, FE_NEG64r, regDest);
 
     storeRd(instr, r_info, regDest);
@@ -112,7 +116,9 @@ void translate_NEGW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+    if (regDest != regSrc1) {
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+    }
     err |= fe_enc64(&current, FE_NEG32r, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
