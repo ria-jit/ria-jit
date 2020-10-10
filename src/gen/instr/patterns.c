@@ -104,10 +104,10 @@ const pattern_element p_8_elem[] = {
 };
 
 const pattern_element p_9_elem[] = {
-        {LUI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
-        {ADDI, rd_h1, DONT_CARE, not_rd_hs1, 0, 0, 1, 0},
-        {SLLI, not_rd_hs1, DONT_CARE, rd_h2, 1, 0, 1, 32},
-        {SRLI, rd_h1, DONT_CARE, rd_h1, 2, 0, 1, 32}
+        {LUI,  DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
+        {ADDI, rd_h1,     DONT_CARE, not_rd_h1, 0, 0, 1, 0},
+        {SLLI, not_rd_h1, DONT_CARE, rd_h2,     1, 0, 1, 32},
+        {SRLI, rd_h1,     DONT_CARE, rd_h1,     2, 0, 1, 32}
 };
 
 const pattern_element p_10_elem[] = {

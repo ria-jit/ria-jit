@@ -51,8 +51,8 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                     }
                         break;
 
-                    case not_rd_hs1 : {
-                        if(block_cache[j + k].reg_src_1 ==
+                    case not_rd_h1 : {
+                        if (block_cache[j + k].reg_src_1 ==
                                 block_cache[j + patterns[i].elements[k].h1].reg_dest) {
                             goto MISMATCH;
                         }
@@ -158,8 +158,8 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
                     }
                         break;
 
-                    case not_rd_hs1 : {
-                        if(block_cache[j + k].reg_dest ==
+                    case not_rd_h1 : {
+                        if (block_cache[j + k].reg_dest ==
                                 block_cache[j + patterns[i].elements[k].h1].reg_dest) {
                             goto MISMATCH;
                         }
