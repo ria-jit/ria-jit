@@ -130,7 +130,7 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
     err |= fe_enc64(&current, FE_SETL8r, regDest);
-    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
 }
@@ -150,7 +150,7 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
     err |= fe_enc64(&current, FE_SETC8r, regDest);
-    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
 }
@@ -351,7 +351,7 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_SETL8r, regDest);
-    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
 }
@@ -371,7 +371,7 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_SETC8r, regDest);
-    err |= fe_enc64(&current, FE_AND64ri, regDest, 0x1);
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
     storeRd(instr, r_info, regDest);
 }
