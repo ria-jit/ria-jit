@@ -3,5 +3,75 @@ This not only generates reproducible and widely accepted results in the industry
 
 % todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
 The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
+Further context is provided by performance testing using the data compression utility gzip, where compression time is compared between runs on a native machine, in QEMU and in the DBT.
 
+\subsection{SPEC CPU 2017 Results}
 % todo benchmark results
+% ======= EXAMPLE PLOT =======
+% Update, copy and modify as needed. Shows tikz usage.
+% todo remove before submission (obviously).
+% ============================
+% The [h] requests TeX put the float <h>ere.
+% There are other options for <p>age, <t>op, <b>ottom;
+% If it shouldn't float, \usepackage{float} and use [H]
+% or a minipage with associated caption.
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Example bar graph},
+			ybar,
+			area legend,
+			ylabel = {Value in some unit},
+			xtick = data,
+			xtick style = {draw = none},
+			ytick = {0, 2500, 5000, 7500, 10000, 12500},
+			scaled y ticks = false,
+			symbolic x coords={First category, Second category, Third category},
+			ymin = 0, ymax = 12500,
+			ymajorgrids = true,
+			height = 6.0cm,
+			width = \linewidth,
+			legend style = {
+				at = {(0.5, -0.25)},
+				anchor = north,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]	
+			\addplot+ [
+				fill=era-red,
+				draw=black
+			] coordinates {
+				(First category, 3061)
+				(Second category, 10930)
+				(Third category, 10971)
+			};
+			
+			\addplot+ [
+				fill=era-orange,
+				draw=black
+			] coordinates {
+				(First category, 3061)
+				(Second category, 9092)
+				(Third category, 5042)
+			};
+			
+			\addplot+ [
+				fill=era-green,
+				draw=black
+			] coordinates {
+				(First category, 4043)
+				(Second category, 6092)
+				(Third category, 7971)
+			};
+
+			
+			\legend{First series, Second series, Third series}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{I am an example figure. If you're reading the submitted document, someone forgot to remove me.}
+\end{figure}
+
+\subsection{Data compression via gzip}
+% gzip results

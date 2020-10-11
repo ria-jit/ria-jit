@@ -13,18 +13,29 @@
 \usepackage{url}
 \usepackage[german]{varioref}
 \usepackage[toc]{appendix}
+\usepackage{tikz}
+\usepackage{pgfplots}
 
 \author{Noah Dormann \and Simon Kammermeier \and Johannes Pfannschmidt \and Florian Schmidt}
 \date{Summer term 2020}
 \title{Dynamic Binary Translation for RISC--V code on x86--64}
 
+% ======= NOTE =======
+% Checkout todos (--> remove before flight).
+% Many unresolved issues/missing details/pending layout
+% are marked by todos. Be sure to resolve all prior to
+% submission.
+% ====================
+
 % typeset current git commit id for drafts
+% todo remove commit id before submission
 \CatchFileDef{\headfull}{../../.git/HEAD}{}
 \StrGobbleRight{\headfull}{1}[\head]
 \StrBehind[2]{\head}{/}[\branch]
 \CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
 \cfoot{Draft after commit \commit on branch \branch.}
 
+% define utilities and symbols
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
 \newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
 \newcommand{\define}[2]{\item \textbf{#1}\\#2}
@@ -42,6 +53,13 @@
     \setlength{\itemsep}{0ex}%
     \setlength{\parskip}{0ex}}%
   {\end{itemize}}
+
+% environment setup for pgfplots and tikz
+\pgfplotsset{compat=newest}
+\definecolor{era-orange}{HTML}{FFB74D}
+\definecolor{era-red}{HTML}{f44336}
+\definecolor{era-blue}{HTML}{64B5F6}
+\definecolor{era-green}{HTML}{AED581}
 
 \begin{document}
 \maketitle
