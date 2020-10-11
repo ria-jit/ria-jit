@@ -502,7 +502,7 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, regDest);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
@@ -523,7 +523,7 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, regDest);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
@@ -544,7 +544,7 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, regDest);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
@@ -625,7 +625,7 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_SHL32rr, regDest, FE_CX);
@@ -655,7 +655,7 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_SHR32rr, regDest, FE_CX);
@@ -685,7 +685,7 @@ void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_SAR32rr, regDest, FE_CX);
