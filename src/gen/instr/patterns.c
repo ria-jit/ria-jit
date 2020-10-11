@@ -94,9 +94,9 @@ const pattern_element p_6_elem[] = {
 };
 
 const pattern_element p_7_elem[] = {
-        {ADDIW, DONT_CARE, DONT_CARE, rs1_h1, 0, 0, 0, 0}, //rd != rs1 ???
-        {SLLI,  rd_h1,     DONT_CARE, rd_h1,  0, 0, 1, 32},
-        {SRLI,  rd_h1,     DONT_CARE, rd_h1,  0, 0, 1, 32}
+        {ADDIW, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
+        {SLLI,  rd_h1,     DONT_CARE, rd_h1,     0, 0, 1, 32},
+        {SRLI,  rd_h1,     DONT_CARE, rd_h1,     0, 0, 1, 32}
 };
 
 const pattern_element p_8_elem[] = {
@@ -243,14 +243,16 @@ void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_
 void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_info) {
     log_asm_out("emit pattern 7: ADDIW + SLLI + SRLI at 0x%lx\n", instr[0].addr);
 
-    if (r_info->mapped[instr[0].reg_src_1]) {
-        err |= fe_enc64(&current, FE_ADD32ri, r_info->map[instr[0].reg_src_1], instr[0].imm);
-    } else {
-        err |= fe_enc64(&current, FE_ADD64mi, FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr[0].reg_src_1]),
-                        instr[0].imm);
-        err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR(r_info->base + 8 * r_info->map[instr[0].reg_src_1] + 4),
-                        0);
+    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
+
+    err |= fe_enc64(&current, FE_ADD32ri, regDest, instr[0].imm);
+
+    storeRd(instr, r_info, regDest);
 }
 
 void emit_pattern_8(const t_risc_instr *instr, const register_info *r_info) {
