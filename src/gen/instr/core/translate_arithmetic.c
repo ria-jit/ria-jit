@@ -103,13 +103,16 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
 */
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AUIPC...\n");
+    if (instr->reg_dest != x0) {
+        FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+        err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr);
+        if (instr->imm != 0) {
+            err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
+        }
 
-    err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr);
-    err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
-
-    storeRd(instr, r_info, regDest);
+        storeRd(instr, r_info, regDest);
+    }
 }
 
 /**
