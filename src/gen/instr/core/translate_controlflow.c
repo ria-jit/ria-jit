@@ -291,8 +291,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
         }
             ///else get rs2 from mem
         else {
-            err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
-                            FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            if (instr->reg_src_2 == x0) {
+                err |= fe_enc64(&current, FE_TEST64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_1]);
+            } else {
+
+                err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
+                                FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            }
         }
     } else {
         ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
@@ -303,8 +308,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
         }
             ///else get both from mem, rs1 in temp register
         else {
-            err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-            err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            if (instr->reg_src_2 == x0) {
+                err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), 0);
+            } else {
+
+                err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+                err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            }
         }
     }
 }
