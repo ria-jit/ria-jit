@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 //shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, (addr) - (intptr_t) current)
 
 ///chainLink options
 #define LINK_NULL 0
