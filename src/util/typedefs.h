@@ -79,10 +79,13 @@ typedef enum {
     FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
 
     //---PSEUDO---
-    PC_NEXT_INST, NOP, SILENT_NOP, PATTERN_EMIT, MV, NOT, NEG, NEGW, SEXTW, SEQZ, SNEZ, SLTZ, SGTZ, LI
+    PC_NEXT_INST, SILENT_NOP, PATTERN_EMIT,
+
+    //To always have a count, don't insert below here
+    LAST_MNEM
 
 } t_risc_mnem;
-#define N_MNEM (LI + 1)
+#define N_MNEM (LAST_MNEM)
 
 typedef enum {
     E_UNKNOWN,

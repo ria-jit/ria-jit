@@ -255,7 +255,13 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_8(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the SEXTW instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 8: ADDIW 32b sign extension at 0x%lx\n", instr[0].addr);
 
     if (r_info->mapped[instr->reg_src_1]) {
@@ -288,22 +294,43 @@ void emit_pattern_9(const t_risc_instr instrs[static 4], const register_info *r_
     emit_pattern_6(&instrs[2], r_info);
 }
 
-void emit_pattern_10(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the NOP instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_10_NOP(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 10: ADDI as NOP at 0x%lx\n", instr->addr);
     err |= fe_enc64(&current, FE_NOP);
 }
 
-void emit_pattern_11(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the MV instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 11: ADDI as MV at 0x%lx\n", instr->addr);
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    storeRd(instr, r_info, regDest);
+    if (regDest != regSrc1 && regDest != FIRST_REG) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    }
+
+    storeRd(instr, r_info, regSrc1);
 }
 
-void emit_pattern_12(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the NOT instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_12_NOT(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 12: XORI as NOT at 0x%lx\n", instr->addr);
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -317,7 +344,13 @@ void emit_pattern_12(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_13(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the NEG instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_13_NEG(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 13: SUB as NEG at 0x%lx\n", instr->addr);
 
     FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
@@ -331,7 +364,13 @@ void emit_pattern_13(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_14(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the NEGW instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_14_NEGW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 14: SUBW as NEGW at 0x%lx\n", instr->addr);
 
     FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
@@ -346,7 +385,13 @@ void emit_pattern_14(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_15(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the SEQZ instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_15_SEQZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 15: SLTIU as SEQZ at 0x%lx\n", instr->addr);
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -360,7 +405,13 @@ void emit_pattern_15(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_16(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the SNEZ instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_16_SNEZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 16: SLTU as SNEZ at 0x%lx\n", instr->addr);
 
     FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
@@ -374,7 +425,13 @@ void emit_pattern_16(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_17(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the SLTZ instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_17_SLTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 17: SLT as SLTZ at 0x%lx\n", instr->addr);
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -389,7 +446,13 @@ void emit_pattern_17(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_18(const t_risc_instr *instr, const register_info *r_info) {
+/**
+ * Translate the SGTZ instruction.
+ * Description
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_18_SGTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 18: SLT as SGTZ at 0x%lx\n", instr->addr);
 
     FeReg regSrc2 = getRs2(instr, r_info, FIRST_REG);
@@ -403,7 +466,13 @@ void emit_pattern_18(const t_risc_instr *instr, const register_info *r_info) {
     storeRd(instr, r_info, regDest);
 }
 
-void emit_pattern_19(const t_risc_instr instrs[static 2], const register_info *r_info) {
+/**
+ * Translate the LI instruction.
+ * Loads the value in the immediate field into the destination register.
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_19_LI(const t_risc_instr *instrs, const register_info *r_info) {
     log_asm_out("emit pattern 19: LUI ADDI as LI at 0x%lx\n", instrs->addr);
 
     FeReg regDest = getRd(instrs, r_info, FIRST_REG);
@@ -426,17 +495,17 @@ const pattern patterns[] = {
         {p_4_elem,  2, &emit_pattern_4},  //AUIPC + LW
         {p_5_elem,  2, &emit_pattern_5},  //AUIPC + LD
         {p_6_elem,  2, &emit_pattern_6},  //SLLI + SRLI
-        {p_19_elem, 2, &emit_pattern_19}, //LUI + ADDI
-        {p_8_elem,  1, &emit_pattern_8},  //ADDIW SX only
-        {p_10_elem, 1, &emit_pattern_10}, //ADDI NOP
-        {p_11_elem, 1, &emit_pattern_11}, //ADDI MV
-        {p_12_elem, 1, &emit_pattern_12}, //XORI NOT
-        {p_13_elem, 1, &emit_pattern_13}, //SUB NEG
-        {p_14_elem, 1, &emit_pattern_14}, //SUBW NEGW
-        {p_15_elem, 1, &emit_pattern_15}, //SLTIU SEQZ
-        {p_16_elem, 1, &emit_pattern_16}, //SLTU SNEZ
-        {p_17_elem, 1, &emit_pattern_17}, //SLT SLTZ gcc seems to emit slti rd, rs, 0 instead
-        {p_18_elem, 1, &emit_pattern_18}, //SLT SGTZ
+        {p_19_elem, 2, &emit_pattern_19_LI}, //LUI + ADDI
+        {p_8_elem,  1, &emit_pattern_8_SEXTW},  //ADDIW SX only
+        {p_10_elem, 1, &emit_pattern_10_NOP}, //ADDI NOP
+        {p_11_elem, 1, &emit_pattern_11_MV}, //ADDI MV
+        {p_12_elem, 1, &emit_pattern_12_NOT}, //XORI NOT
+        {p_13_elem, 1, &emit_pattern_13_NEG}, //SUB NEG
+        {p_14_elem, 1, &emit_pattern_14_NEGW}, //SUBW NEGW
+        {p_15_elem, 1, &emit_pattern_15_SEQZ}, //SLTIU SEQZ
+        {p_16_elem, 1, &emit_pattern_16_SNEZ}, //SLTU SNEZ
+        {p_17_elem, 1, &emit_pattern_17_SLTZ}, //SLT SLTZ gcc seems to emit slti rd, rs, 0 instead
+        {p_18_elem, 1, &emit_pattern_18_SGTZ}, //SLT SGTZ
 
 
         {0,         0, 0},      //stopper

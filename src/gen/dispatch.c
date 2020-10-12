@@ -493,43 +493,10 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_FMVDX(instr, r_info);
             break;
         case PC_NEXT_INST:
-            translate_PC_NEXT_INST(instr->imm, r_info->base);
-            break;
-        case NOP:
-            translate_NOP(instr, r_info);
+            translate_PC_NEXT_INST((t_risc_addr) instr->imm, r_info->base);
             break;
         case SILENT_NOP:
             translate_SILENT_NOP(instr, r_info);
-            break;
-        case MV:
-            translate_MV(instr, r_info);
-            break;
-        case NOT:
-            translate_NOT(instr, r_info);
-            break;
-        case NEG:
-            translate_NEG(instr, r_info);
-            break;
-        case NEGW:
-            translate_NEGW(instr, r_info);
-            break;
-        case SEXTW:
-            translate_SEXTW(instr, r_info);
-            break;
-        case SEQZ:
-            translate_SEQZ(instr, r_info);
-            break;
-        case SNEZ:
-            translate_SNEZ(instr, r_info);
-            break;
-        case SLTZ:
-            translate_SLTZ(instr, r_info);
-            break;
-        case SGTZ:
-            translate_SGTZ(instr, r_info);
-            break;
-        case LI:
-            translate_LI(instr, r_info);
             break;
         default:
             critical_not_yet_implemented("UNKNOWN mnemonic");
