@@ -515,7 +515,3 @@ const pattern patterns[] = {
         {p_1_elem,  4, &emit_pattern_0},
         {0}
 };
-
-void init_patterns() {
-
-}
