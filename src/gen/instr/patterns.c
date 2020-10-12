@@ -232,6 +232,7 @@ void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_
             err |= fe_enc64(&current, FE_MOV64ri, FE_AX, addr);
             err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM(FE_AX, 0, 0, 0));
         }
+        err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), FE_AX);
     }
 }
 
