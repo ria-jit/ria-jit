@@ -39,6 +39,8 @@ char* errorcode_to_string(int errorcode){
 
 char *mnem_to_string(int mnem) {
     switch (mnem) {
+        case PATTERN_EMIT:
+            return "PATTERN";
         case LUI:
             return "LUI";
         case AUIPC:
@@ -351,30 +353,8 @@ char *mnem_to_string(int mnem) {
             return "FCVTDLU";
         case FMVDX:
             return "FMVDX";
-        case NOP:
-            return "NOP";
         case SILENT_NOP:
             return "SILENT_NOP";
-        case MV:
-            return "MV";
-        case NOT:
-            return "NOT";
-        case NEG:
-            return "NEG";
-        case NEGW:
-            return "NEGW";
-        case SEXTW:
-            return "SEXTW";
-        case SEQZ:
-            return "SEQZ";
-        case SNEZ:
-            return "SNEZ";
-        case SLTZ:
-            return "SLTZ";
-        case SGTZ:
-            return "SGTZ";
-        case LI:
-            return "LI";
         default:
             return "UNKNOWN";
     }

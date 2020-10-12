@@ -8,6 +8,6 @@
 #include <util/typedefs.h>
 #include <gen/translate.h>
 
-void dispatch_instr(const t_risc_instr *instr, const context_info *c_info);
+void dispatch_instr(t_risc_instr *instr, const context_info *c_info);
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_DISPATCH_H

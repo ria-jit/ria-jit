@@ -21,7 +21,7 @@ extern "C" {
 #define FAIL_HEAP_ALLOC 0x1000
 
 //add an access to reg to the profiler's data
-#define RECORD_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_usage_file() + 8 * reg))
+#define RECORD_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_usage_file() + 8 * (reg)))
 
 /*
  * Helper functions to extract FeRegs without handling every mapping case.
