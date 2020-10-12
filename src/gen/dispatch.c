@@ -15,7 +15,7 @@
 #include <gen/instr/pseudo/translate_pseudo.h>
 #include <gen/optimize.h>
 
-void dispatch_instr(const t_risc_instr *instr, const context_info *c_info) {
+void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
     register_info *r_info = c_info->r_info;
     switch (instr->mnem) {
         case PATTERN_EMIT:

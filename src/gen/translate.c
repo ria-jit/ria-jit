@@ -17,7 +17,7 @@
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
-void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info);
+void translate_risc_instr(t_risc_instr *instr, const context_info *c_info);
 
 int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
 
@@ -103,7 +103,7 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info) {
+void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
     //dispatch to translator functions
     dispatch_instr(instr, c_info);
 
@@ -167,13 +167,13 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  * @return the cached location of the generated block.
  */
 t_cache_loc
-translate_block_instructions(const t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
 
     ///initialize new block
     init_block();
 
     ///apply macro optimization
-    if(flag_translate_opt_fusion) {
+    if (flag_translate_opt_fusion) {
         optimize_patterns(block_cache, instructions_in_block);
     }
 
