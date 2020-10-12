@@ -107,10 +107,7 @@ void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
     if (instr->reg_dest != x0) {
         FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-        err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr);
-        if (instr->imm != 0) {
-            err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
-        }
+        err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr + instr->imm);
 
         storeRd(instr, r_info, regDest);
     }
