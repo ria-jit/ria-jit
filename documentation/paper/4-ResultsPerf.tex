@@ -1,12 +1,6 @@
-Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017}'s \texttt{intspeed} suite of benchmarks.
-This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the benchmark's translation.
+% todo expand this section with further details
 
-% todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
-The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
-Further context is provided by performance testing using the data compression utility gzip, where compression time is compared between runs on a native machine, in QEMU and in the DBT.
-
-\subsection{SPEC CPU 2017 Results}
-% todo benchmark results
+\begin{comment}
 % ======= EXAMPLE PLOT =======
 % Update, copy and modify as needed. Shows tikz usage.
 % todo remove before submission (obviously).
@@ -72,6 +66,244 @@ Further context is provided by performance testing using the data compression ut
 	\end{tikzpicture}
 	\caption{I am an example figure. If you're reading the submitted document, someone forgot to remove me.}
 \end{figure}
+\end{comment}
+
+
+Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017}'s \texttt{intspeed} suite of benchmarks.
+This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the benchmark's translation.
+
+% todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
+The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
+Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT.
+
+All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
+The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, which implies \texttt{-O3}.
+
+\subsection{SPEC CPU 2017 Results}
+% todo benchmark results
+
+
+% ======= SPEC CPU Results =======
+% Results of the intspeed SPEC CPU 2017 runs.
+% todo Keep up to date with performance-improving changes.
+% todo figure out which of the SPEC benchmarks to list here.
+% ================================
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {SPEC CPU 2017},
+			ybar,
+			area legend,
+			ylabel = {Execution time [s]},
+			xtick = data,
+			xtick style = {draw = none},
+			ytick = {0, 2500, 5000, 7500, 10000, 12500, 15000},
+			scaled y ticks = false,
+			symbolic x coords={602.gcc\_s, 605.mcf\_s, 620.omnetpp\_s, 631.deepsjeng\_s},
+			ymin = 0,
+			ymajorgrids = true,
+			height = 6.0cm,
+			width = 0.9\linewidth,
+			legend style = {
+				at = {(0.5, -0.25)},
+				anchor = north,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]	
+			\addplot+ [
+				fill=era-green,
+				draw=black
+			] coordinates {
+				(602.gcc\_s, 100)
+				(605.mcf\_s, 100)
+				(620.omnetpp\_s, 100)
+				(631.deepsjeng\_s, 100)
+			};
+			
+			\addplot+ [
+				fill=era-orange,
+				draw=black
+			] coordinates {
+				(602.gcc\_s, 3061)
+				(605.mcf\_s, 3182)
+				(620.omnetpp\_s, 2576)
+				(631.deepsjeng\_s, 2459)
+			};
+			
+			\addplot+ [
+				fill=era-red,
+				draw=black
+			] coordinates {
+				(602.gcc\_s, 8693)
+				(605.mcf\_s, 3558)
+				(620.omnetpp\_s, 7892)
+				(631.deepsjeng\_s, 10089)
+			};
+
+			
+			\legend{Native, QEMU, DBT}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[SPEC CPU 2017 Results]%
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed}.}
+\end{figure}
+% ================================
 
 \subsection{Data compression via gzip}
 % gzip results
+Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to measure the performance of the translator in real-world workloads by running data compression via \textit{gzip}.
+
+The native \textit{gzip} binary for the reference runs was obtained from the default package repositories.
+As there is no such executable available for the RISC-V architecture, the sources had to be manually compiled.
+% todo Simon? insert info here about compile settings for risc_gzip
+
+% ======= gzip execution time =======
+% Execution time of compression (500 MB, 10 runs).
+% todo keep up-to-date with performance improvements
+% ===================================
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Random Data Compression (\textit{gzip}, 500 MB, 10 runs)},
+			xbar,
+			area legend,
+			xlabel = {Execution time [s] (lower is better)},
+			symbolic y coords = {Native,QEMU,v1.2.2-61},
+			xmin = 0, xmax = 145,
+			bar shift = 0.0cm,
+			y dir = reverse,
+			xmajorgrids = true,
+			height = 4.5cm,
+			width = \linewidth,
+			legend style = {
+				at = {(0.5, -0.45)},
+				anchor = north,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]	
+			\addplot+ [
+				fill=era-green,
+				draw=black
+			] coordinates {
+				(44.14,Native)
+			};
+
+			\addplot+ [
+				fill=era-orange,
+				draw=black
+			] coordinates {
+				(121.83,QEMU)
+			};
+			
+			\addplot+ [
+				fill=era-red,
+				draw=black
+			] coordinates {
+				(136.77,v1.2.2-61)
+			};
+			
+			\legend{Native, QEMU, DBT}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[Execution time of gzip compression (500 MB, 10 runs)]%
+	{Execution time of gzip file compression (500 MB of random data, 10 runs) in seconds (lower is better).}
+	\label{fig:gzip-execution-time}
+\end{figure}
+% ===================================
+
+Figure \vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
+% todo add analysis as soon as results are finalized
+
+\subsection{Other performance metrics}
+By implementing optimisations to the DBT like a return address stack, recursive jump target translation and block chaining as discussed in section \vref{sec:optimise}, we are able to meaningfully increase the performance of the translator in certain workloads, to the point where we outperform \textit{QEMU} significantly.
+
+% ======= merge_sort execution time =======
+% Execution time of the merge_sort test.
+% todo keep up-to-date with performance improvements
+% =========================================
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Recursive Merge Sort (5000 runs)},
+			xbar,
+			area legend,
+			xlabel = {Execution time [ns] (lower is better)},
+			symbolic y coords = {Native,QEMU,DBT unoptimised,DBT optimised},
+			xmin = 0,
+			bar shift = 0.0cm,
+			y dir = reverse,
+			xmajorgrids = true,
+			height = 4.5cm,
+			width = 0.87\linewidth,
+			legend style = {
+				at = {(0.5, -0.45)},
+				anchor = north,
+				legend columns = 2,
+				column sep = 0.2cm
+			}
+		]	
+			\addplot+ [
+				fill=era-green,
+				draw=black
+			] coordinates {
+				(23385.65,Native)
+			};
+
+			\addplot+ [
+				fill=era-orange,
+				draw=black
+			] coordinates {
+				(67312.47,QEMU)
+			};
+			
+			\addplot+ [
+				fill=era-blue,
+				draw=black
+			] coordinates {
+				(302521.38,DBT unoptimised)
+			};
+			
+			\addplot+ [
+				fill=era-red,
+				draw=black
+			] coordinates {
+				(37565.99,DBT optimised)
+			};
+			
+			\legend{Native, QEMU, DBT (\texttt{--optimize=none}), DBT (optimized)}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[Execution time of merge sort (5000 runs)]%
+	{Execution time of merge sort (5000 runs) in nanoseconds (lower is better). Testing performed with v1.2.2-61.}
+	\label{fig:dbt-optimisations}
+\end{figure}
+% =========================================
+
+Figure \vref{fig:dbt-optimisations} shows a manifestation of these performance gains, as seen by executing a benchmark based on a recursive implementation of the merge sort algorithm.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
