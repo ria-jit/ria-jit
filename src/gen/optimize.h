@@ -8,8 +8,6 @@
 #include <util/typedefs.h>
 #include <main/context.h>
 
-void optimize_instr(t_risc_instr *block_cache, size_t index, size_t len);
-
 void optimize_patterns(t_risc_instr *block_cache, int len);
 
 void translate_pattern_emit(t_risc_instr *instr, const register_info *r_info);

@@ -3,8 +3,6 @@
 //
 
 #include "optimize.h"
-#include <common.h>
-#include <gen/translate.h>
 #include <gen/instr/patterns.h>
 
 /**
