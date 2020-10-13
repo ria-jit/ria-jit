@@ -62,6 +62,7 @@ static inline size_t getIndexForReg(FeReg replacement) {
  * It also frees the register for future usage - be sure to invalidate after loading the registers, otherwise your
  * free register might be overwritten (as it will be marked as free and clean, so it will be the first one chosen for
  * loading a new unmapped register).
+ * Only use when managing the dynamic replacement allocation manually.
  * @param r_info the static register mapping and dynamic allocation info
  * @param replacement the selected replacement to invalidate and write back
  */
@@ -69,7 +70,7 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
     size_t index = getIndexForReg(replacement);
 
     t_risc_reg currentContent = r_info->replacement_content[index];
-    
+
     //write back to register file
     if (currentContent != x0 && currentContent != INVALID_REG) {
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * currentContent), replacement);
@@ -155,13 +156,13 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
             //note access recency for register and return
             r_info->replacement_recency[i] = *r_info->current_recency;
             FeReg activeReplacement = getRegForIndex(i);
-            
+
             //zero register if x0 is requested, as it could have been written to previously
             //  checking whether zeroing is needed would likely be a bigger overhead than the single cycle XOR
             if (requested == x0) {
                 err |= fe_enc64(&current, FE_XOR64rr, activeReplacement, activeReplacement);
             }
-            
+
             return activeReplacement;
         }
     }
@@ -184,11 +185,11 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
                         FE_MEM_ADDR(r_info->base + 8 * currentlyPresent),
                         selectedReplacement);
     }
-    
+
     //note current replacement contents
     r_info->replacement_content[min] = requested;
     r_info->replacement_recency[min] = *r_info->current_recency;
-    
+
     //load the requested register into the selected replacement
     if (requireValue) {
         if (requested != x0) {
@@ -200,6 +201,86 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
 
     //register can now be used
     return selectedReplacement;
+}
+
+/**
+ * Load a register into a specific replacement register.
+ * Used for instructions that require a specific target register for translation (i.e. CX in shifting).
+ * If the requested destination register is free, it will be directly loaded.
+ * If not, a write-back will be performed. 
+ * In cases where the register is already mapped, the value will be exchanged to the requested destination.
+ * @param r_info the static register mapping and dynamic allocation info
+ * @param candidate the requested RISC-V register to map
+ * @param destination the specifically requested destination register
+ * @return the destination register passed as parameter, for cleaner code
+ */
+static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination) {
+    //increment access recency and get index
+    *r_info->current_recency += 1;
+    int8_t index = (int8_t) getIndexForReg(destination);
+
+    //check if the candidate is already mapped
+    bool alreadyMapped = false;
+    int8_t presentIndex = -1;
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        //check for already mapped
+        if (r_info->replacement_content[i] == candidate) {
+            alreadyMapped = true;
+            presentIndex = i;
+            break;
+        }
+    }
+
+    if (alreadyMapped) {
+        //if we already mapped it and it's in the correct spot, we're done
+        if (index == presentIndex) {
+            return destination;
+        } else {
+            //we have to shuffle the registers around (switch info as well as values), so
+            // we exchange the requested and present registers
+            if (r_info->replacement_recency[index] != 0) {
+                //we need to keep this value, so exchange
+                err |= fe_enc64(&current, FE_XCHG64rr, destination, getRegForIndex(presentIndex));
+            } else {
+                //the current value does not matter, so move
+                err |= fe_enc64(&current, FE_MOV64rr, destination, getRegForIndex(presentIndex));
+            }
+
+            //exchange the r_info values
+            uint64_t tmp_recency = r_info->replacement_recency[index];
+            r_info->replacement_recency[index] = r_info->replacement_recency[presentIndex];
+            r_info->replacement_recency[presentIndex] = tmp_recency;
+            uint64_t tmp_content = r_info->replacement_content[index];
+            r_info->replacement_content[index] = r_info->replacement_content[presentIndex];
+            r_info->replacement_content[presentIndex] = tmp_content;
+
+            //mark as young, so it won't get overwritten in case of misuse
+            r_info->replacement_recency[index] = *r_info->current_recency;
+        }
+    } else {
+        //if it's not mapped, we need to load it into this specific register
+        // (if it's dirty, we potentially need to write back)
+        if (r_info->replacement_recency[index] != 0 &&
+                (r_info->replacement_content[index] != x0 || r_info->replacement_content[index] != INVALID_REG)) {
+            //write back if we don't have x0 or invalid in there
+            err |= fe_enc64(&current,
+                            FE_MOV64mr,
+                            FE_MEM_ADDR(r_info->base + 8 * r_info->replacement_content[index]),
+                            destination);
+        }
+
+        //load the register into the correct spot
+        err |= fe_enc64(&current,
+                        FE_MOV64rm,
+                        destination,
+                        FE_MEM_ADDR(r_info->base + 8 * candidate));
+
+        //note the load
+        r_info->replacement_content[index] = candidate;
+        r_info->replacement_recency[index] = *r_info->current_recency;
+    }
+
+    return destination;
 }
 
 static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info) {

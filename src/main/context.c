@@ -101,8 +101,8 @@ context_info *init_map_context(void) {
         _exit(FAIL_HEAP_ALLOC);
     }
 
-    //start count (across blocks?) at 0
-    *current_recency = 0;
+    //start count (across blocks?) at 1
+    *current_recency = 1;
 
 
     /**
