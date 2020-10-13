@@ -81,6 +81,62 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
 }
 
 /**
+ * See above. Invalidates and cleans all replacement registers.
+ * @param r_info containing the dynamic allocation info
+ */
+static inline void invalidateAllReplacements(const register_info *r_info) {
+    invalidateReplacement(r_info, FIRST_REG);
+    invalidateReplacement(r_info, SECOND_REG);
+    invalidateReplacement(r_info, THIRD_REG);
+}
+
+/**
+ * Load all replacement registers according to r_info.
+ * Intended to be called on block boundaries (i.e. in finalize_block);
+ * however, it may be sensible to do this context-wide.
+ * @param r_info the register info containing the dynamic allocation specification
+ */
+static inline void loadReplacements(const register_info *r_info) {
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        t_risc_reg content = r_info->replacement_content[i];
+        FeReg replacement = getRegForIndex(i);
+
+        if (content == x0) {
+            err |= fe_enc64(&current, FE_XOR64rr, replacement, replacement);
+        } else if (content == INVALID_REG) {
+            continue;
+        } else {
+            err |= fe_enc64(&current,
+                            FE_MOV64rm,
+                            replacement,
+                            FE_MEM_ADDR(r_info->base + 8 * content));
+        }
+    }
+}
+
+/**
+ * Store all replacement registers according to r_info.
+ * Intended to be called on block boundaries (i.e. in finalize_block);
+ * however, it may be sensible to do this context-wide.
+ * @param r_info the register info containing the dynamic allocation specification
+ */
+static inline void storeReplacements(const register_info *r_info) {
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        t_risc_reg content = r_info->replacement_content[i];
+        FeReg replacement = getRegForIndex(i);
+
+        if (content == x0 || content == INVALID_REG) {
+            continue;
+        } else {
+            err |= fe_enc64(&current,
+                            FE_MOV64mr,
+                            FE_MEM_ADDR(r_info->base + 8 * content),
+                            replacement);
+        }
+    }
+}
+
+/**
  * Load the requested RISC-V register into a replacement GPR and return that.
  * Mark the load in the register_info contents for future instruction loads (--> cache register in GPR).
  * @param r_info the static register mapping and dynamic allocation info

@@ -183,6 +183,9 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
         optimize_patterns(block_cache, instructions_in_block);
     }
 
+    /// load the replacement registers (possibly context-wide?)
+    loadReplacements(c_info->r_info);
+
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -191,6 +194,9 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
         }
         translate_risc_instr(&block_cache[i], c_info);
     }
+
+    /// store the replacement registers (possibly context-wide?)
+    storeReplacements(c_info->r_info);
 
 
     t_cache_loc block;
