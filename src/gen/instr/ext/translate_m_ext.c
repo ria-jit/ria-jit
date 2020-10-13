@@ -25,13 +25,12 @@ void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MUL...\n");
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
     doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL64rr);
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -47,9 +46,9 @@ void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
     /// because of the IMUL)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
@@ -66,7 +65,6 @@ void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RDX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -93,23 +91,22 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
      * by treating rs2 as unsigned.
      */
     ///Uses RAX and RDX specifically because of the IMULs input/output.
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
 
     ///Handle special zero reg cases
     // TODO Wanted/Necessary? Would work for all multiplications, introduced here since this is a "long" instruction).
     //  Also possible for the dividend and result in division.
     if (instr->reg_src_1 == x0 || instr->reg_src_2 == x0) {
         err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
-        storeRd(instr, r_info, regDest);
         return;
     } else if (instr->reg_dest == x0) {
         err |= fe_enc64(&current, FE_NOP);
         return;
     }
 
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
     ///rs2 and rd can use same temporary since the original value of rd is not needed.
-    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
@@ -144,7 +141,6 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RDX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -160,9 +156,9 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
     /// because of the MULs input/output)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
@@ -178,7 +174,6 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RDX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -193,7 +188,7 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIV...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
@@ -204,8 +199,8 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regDest = getRd(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     if (regSrc1 != FE_AX) {
@@ -236,7 +231,6 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RAX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -250,7 +244,7 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate DIVU...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
@@ -261,8 +255,8 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regDest = getRd(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -293,7 +287,6 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RAX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_AX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -309,9 +302,9 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REM...\n");
 
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
     ///Uses RAX specifically because of IDIVs input
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
@@ -321,7 +314,7 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
     ///Uses RDX specifically because of IDIVs output
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     if (regSrc1 != FE_AX) {
@@ -352,7 +345,6 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RDX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -368,9 +360,9 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate REMU...\n");
 
     ///Uses RCX specifically since DIV uses RDX:RAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
     ///Uses RAX specifically because of DIVs input
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
@@ -380,7 +372,7 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
     ///Uses RDX specifically because of DIVs output
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -411,7 +403,6 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
         ///rd is mapped so move the result in RDX there.
         err |= fe_enc64(&current, FE_MOV64rr, regDest, FE_DX);
     }
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -427,16 +418,15 @@ void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
     ///rs1 and rd can use same temporary since the original value of rd is not needed.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
     doArithmCommutative(regSrc1, regSrc2, regDest, FE_IMUL32rr);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -454,7 +444,7 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
     ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
@@ -465,8 +455,8 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regDest = getRd(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     if (regSrc1 != FE_AX) {
@@ -496,7 +486,6 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -514,7 +503,7 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
     ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
@@ -525,8 +514,8 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
 
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the DIV)
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
-    FeReg regDest = getRd(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -556,7 +545,6 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -575,10 +563,10 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
     ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     ///Uses RAX specifically because of the IDIVs input
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
@@ -588,7 +576,7 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
     ///Uses RDX specifically because of the IDIVs output
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     if (regSrc1 != FE_AX) {
@@ -618,7 +606,6 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -637,9 +624,9 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
     ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
+    FeReg regSrc2 = getRs2(instr, r_info);
     ///Uses RAX specifically because of the DIVs input
-    FeReg regSrc1 = getRs1(instr, r_info, FE_AX);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
@@ -649,7 +636,7 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
 
     ///Uses RDX specifically because of the DIVs output
-    FeReg regDest = getRd(instr, r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -679,5 +666,4 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
 
-    storeRd(instr, r_info, regDest);
 }

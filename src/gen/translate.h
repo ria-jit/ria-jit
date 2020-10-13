@@ -24,6 +24,7 @@ extern "C" {
 
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
+#define THIRD_REG FE_CX
 
 extern uint8_t *current;
 extern int err;

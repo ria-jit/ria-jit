@@ -48,6 +48,62 @@ context_info *init_map_context(void) {
         mapped[i] = false;
     }
 
+    /**
+     * Allocate memory for the dynamic translate-time replacement mapping.
+     * These struct contents are used to lazily load values into replacement registers at translate time.
+     */
+    t_risc_reg *replacement_content = mmap(NULL,
+                                           N_REPLACE * sizeof(t_risc_reg),
+                                           PROT_READ | PROT_WRITE,
+                                           MAP_ANONYMOUS | MAP_PRIVATE,
+                                           -1,
+                                           0);
+
+    if (BAD_ADDR(replacement_content)) {
+        dprintf(2, "Failed to allocate replacement_content for context. Error %li", -(intptr_t) replacement_content);
+        _exit(FAIL_HEAP_ALLOC);
+    }
+
+    //fill with INVALID_REG to indicate unused
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        replacement_content[i] = INVALID_REG;
+    }
+
+    uint64_t *replacement_recency = mmap(NULL,
+                                         N_REPLACE * sizeof(uint64_t),
+                                         PROT_READ | PROT_WRITE,
+                                         MAP_ANONYMOUS | MAP_PRIVATE,
+                                         -1,
+                                         0);
+
+    if (BAD_ADDR(replacement_recency)) {
+        dprintf(2, "Failed to allocate replacement_recency for context. Error %li", -(intptr_t) replacement_recency);
+        _exit(FAIL_HEAP_ALLOC);
+    }
+
+    //fill with 0 to indicate clean (maybe not necessary?)
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        replacement_recency[i] = 0;
+    }
+
+
+    //Allocating here to keep r_info const in all translator functions.
+    //I am, however, aware this is not pretty. Maybe refactor in the future?
+    uint64_t *current_recency = mmap(NULL,
+                                     sizeof(uint64_t),
+                                     PROT_READ | PROT_WRITE,
+                                     MAP_ANONYMOUS | MAP_PRIVATE,
+                                     -1,
+                                     0);
+
+    if (BAD_ADDR(current_recency)) {
+        dprintf(2, "Failed to allocate current_recency for context. Error %li", -(intptr_t) current_recency);
+        _exit(FAIL_HEAP_ALLOC);
+    }
+
+    //start count (across blocks?) at 0
+    *current_recency = 0;
+
 
     /**
      * Any register mapping needs to take the translator functions into account.
@@ -108,6 +164,9 @@ context_info *init_map_context(void) {
     r_info->mapped = mapped;
     r_info->base = (uint64_t) get_gp_reg_file();
     r_info->csr_base = (uint64_t) get_csr_reg_file();
+    r_info->replacement_content = replacement_content;
+    r_info->replacement_recency = replacement_recency;
+    r_info->current_recency = current_recency;
 
     //generate switching functions
     t_cache_loc load_execute_save_context;

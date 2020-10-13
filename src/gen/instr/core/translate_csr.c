@@ -19,8 +19,8 @@
 void translate_CSRRW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRW...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (instr->reg_dest != x0) {
         //CSR value -> rd (CSR address is in immediate field)
@@ -40,8 +40,8 @@ void translate_CSRRW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_CSRRS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRS...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
@@ -61,8 +61,8 @@ void translate_CSRRS(const t_risc_instr *instr, const register_info *r_info) {
 void translate_CSRRC(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRC...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
@@ -85,7 +85,7 @@ void translate_CSRRC(const t_risc_instr *instr, const register_info *r_info) {
 void translate_CSRRWI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRWI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     if (instr->reg_dest != x0) {
         //CSR value -> rd (CSR address is in immediate field)
@@ -107,7 +107,7 @@ void translate_CSRRWI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_CSRRSI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRSI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
@@ -129,7 +129,7 @@ void translate_CSRRSI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_CSRRCI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate CSRRCI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     //CSR value -> rd (CSR address is in immediate field)
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));

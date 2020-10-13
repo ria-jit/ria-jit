@@ -262,8 +262,8 @@ void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_
 void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_info) {
     log_asm_out("emit pattern 7: ADDIW + SLLI + SRLI at 0x%lx\n", instr[0].addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     if (regSrc1 != regDest) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
@@ -271,7 +271,6 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
 
     err |= fe_enc64(&current, FE_ADD32ri, regDest, instr[0].imm);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -333,14 +332,13 @@ void emit_pattern_10_NOP(const t_risc_instr *instr, const register_info *r_info)
 void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 11: ADDI as MV at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     if (regDest != regSrc1 && regDest != FIRST_REG) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    storeRd(instr, r_info, regSrc1);
 }
 
 /**
@@ -352,15 +350,14 @@ void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) 
 void emit_pattern_12_NOT(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 12: XORI as NOT at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_NOT64r, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -372,15 +369,14 @@ void emit_pattern_12_NOT(const t_risc_instr *instr, const register_info *r_info)
 void emit_pattern_13_NEG(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 13: SUB as NEG at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     if (regDest != regSrc2) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc2);
     }
     err |= fe_enc64(&current, FE_NEG64r, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -392,8 +388,8 @@ void emit_pattern_13_NEG(const t_risc_instr *instr, const register_info *r_info)
 void emit_pattern_14_NEGW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 14: SUBW as NEGW at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     if (regDest != regSrc2) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc2);
@@ -401,7 +397,6 @@ void emit_pattern_14_NEGW(const t_risc_instr *instr, const register_info *r_info
     err |= fe_enc64(&current, FE_NEG32r, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -413,15 +408,14 @@ void emit_pattern_14_NEGW(const t_risc_instr *instr, const register_info *r_info
 void emit_pattern_15_SEQZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 15: SLTIU as SEQZ at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
     err |= fe_enc64(&current, FE_SETZ8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -433,15 +427,14 @@ void emit_pattern_15_SEQZ(const t_risc_instr *instr, const register_info *r_info
 void emit_pattern_16_SNEZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 16: SLTU as SNEZ at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
     err |= fe_enc64(&current, FE_SETNZ8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -453,8 +446,8 @@ void emit_pattern_16_SNEZ(const t_risc_instr *instr, const register_info *r_info
 void emit_pattern_17_SLTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 17: SLT as SLTZ at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc1 = getRs1(instr, r_info);
 
     if (regSrc1 != regDest) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
@@ -462,7 +455,6 @@ void emit_pattern_17_SLTZ(const t_risc_instr *instr, const register_info *r_info
     err |= fe_enc64(&current, FE_SHR64ri, 63);
 
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -474,15 +466,14 @@ void emit_pattern_17_SLTZ(const t_risc_instr *instr, const register_info *r_info
 void emit_pattern_18_SGTZ(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 18: SLT as SGTZ at 0x%lx\n", instr->addr);
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regDest);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
     err |= fe_enc64(&current, FE_SETG8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -494,11 +485,10 @@ void emit_pattern_18_SGTZ(const t_risc_instr *instr, const register_info *r_info
 void emit_pattern_19_LI(const t_risc_instr *instrs, const register_info *r_info) {
     log_asm_out("emit pattern 19: LUI ADDI as LI at 0x%lx\n", instrs->addr);
 
-    FeReg regDest = getRd(instrs, r_info, FIRST_REG);
+    FeReg regDest = getRd(instrs, r_info);
 
     err |= fe_enc64(&current, FE_MOV64ri, regDest, instrs[0].imm + instrs[1].imm);
 
-    storeRd(instrs, r_info, regDest);
 }
 
 
