@@ -183,7 +183,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
     //find minimum of recency (or some clean register with value 0)
     size_t min = 0;
     for (size_t i = 1; i < N_REPLACE; i++) {
-        if (r_info->current_recency[i] < r_info->current_recency[min]) {
+        if (r_info->replacement_recency[i] < r_info->replacement_recency[min]) {
             min = i;
         }
     }
