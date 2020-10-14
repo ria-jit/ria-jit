@@ -13,6 +13,9 @@
 #include <parser/parser.h>
 #include <main/context.h>
 #include <gen/optimize.h>
+#include <elf/loadElf.h>
+
+void *currentPos;
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -45,19 +48,9 @@ int err;
  * (e.g., before translating every basic block).
  */
 void init_block() {
-    void *addr = (void *) (lastUsedAddress - 4096lu);
-    //allocate a memory page for the next basic block that will be translated
-    void *buf = mmap(addr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
-                     -1, 0);
-    lastUsedAddress -= 4096lu;
-    //check for mmap fault and terminate
-    if (buf != addr) {
-        dprintf(2, "Memory allocation fault in assembly.\n");
-        _exit(-1);
-    }
 
     //set the block_head and current pointer and the failed status
-    block_head = (uint8_t *) buf;
+    block_head = (uint8_t *) currentPos;
     current = block_head;
     err = 0;
 #ifndef NDEBUG
@@ -80,6 +73,15 @@ t_cache_loc finalize_block(int chainLinkOp) {
 
     //emit the ret instruction as the final instruction in the block
     err |= fe_enc64(&current, FE_RET);
+
+    //Addtional over 16B alignment
+    uintptr_t offset = (uintptr_t) (current) & 0xf;
+    //Alignment Bytes wanted
+    uintptr_t alignment = (16 - offset) & 0xf;
+    for (size_t i = 0; i < alignment; ++i) {
+        fe_enc64(&current, FE_NOP);
+    }
+    currentPos = current;
 
     //check failed flag
     if (err != 0) {
@@ -529,6 +531,19 @@ void chain(t_cache_loc target) {
     if (chain_err != 0) {
         ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error in chain, exiting...\n");
+        _exit(-1);
+    }
+}
+
+
+void setupInstrMem() {
+    void *addr = (void *) (TRANSLATOR_BASE - STACK_OFFSET);
+    void *buf = mmap(addr, STACK_OFFSET, PROT_WRITE | PROT_READ | PROT_EXEC,
+                     MAP_FIXED_NOREPLACE | MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    currentPos = buf;
+
+    if (buf != addr) {
+        dprintf(2, "Memory allocation fault in assembly.\n");
         _exit(-1);
     }
 }

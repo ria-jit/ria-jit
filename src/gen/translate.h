@@ -42,6 +42,8 @@ translate_block_instructions(t_risc_instr block_cache[], int instructions_in_blo
 ///chaining
 void chain(t_cache_loc target);
 
+void setupInstrMem();
+
 #ifdef __cplusplus
 }
 #endif
