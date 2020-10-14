@@ -60,9 +60,10 @@ void init_block() {
     block_head = (uint8_t *) buf;
     current = block_head;
     err = 0;
-
+#ifndef NDEBUG
     //insert nop at the beginning so debugger step-into works as expected
     *(current++) = 0x90;
+#endif
 }
 
 /**
