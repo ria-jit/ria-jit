@@ -155,6 +155,7 @@ void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at 0x%lx\n", instr->addr);
 
     //TODO Check if address fits into 32bit and use non RIP-relative absolute
+    invalidateReplacement(r_info, FE_AX);
     err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm));
     err |= fe_enc64(&current, FE_ADD64mi, FE_MEM(FE_AX, 0, 0, 0), instr[2].imm);
 }
@@ -162,6 +163,7 @@ void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
 void emit_pattern_2(const t_risc_instr instrs[static 5], const register_info *r_info) {
     log_asm_out("emit pattern 2: inc m64 at 0x%lx\n", instrs[0].addr);
 
+    invalidateReplacement(r_info, FE_AX);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm + instrs[2].imm;
     if ((int64_t) addr == (int32_t) addr) {
         err |= fe_enc64(&current, FE_ADD32mi, FE_MEM(0, 0, 0, addr), instrs[3].imm);
@@ -179,6 +181,7 @@ void emit_pattern_3(const t_risc_instr instrs[static 2], const register_info *r_
         return;
     }
 
+    invalidateReplacement(r_info, FE_AX);
     t_risc_addr value = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instrs[0].reg_dest], value);
@@ -195,6 +198,7 @@ void emit_pattern_3(const t_risc_instr instrs[static 2], const register_info *r_
 void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 4: AUIPC + LW at 0x%lx\n", instrs[0].addr);
 
+    invalidateReplacement(r_info, FE_AX);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
@@ -217,6 +221,7 @@ void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_
 void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 5: AUIPC + LD at 0x%lx\n", instrs[0].addr);
 
+    invalidateReplacement(r_info, FE_AX);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
@@ -239,6 +244,7 @@ void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_
 void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 6: SLLI +  SRLI at 0x%lx\n", instrs[0].addr);
 
+    invalidateReplacement(r_info, FE_AX);
     if (r_info->mapped[instrs[0].reg_src_1]) {
         if (r_info->mapped[instrs[1].reg_dest]) {
             //sets high 32 to zero
@@ -270,7 +276,6 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
     }
 
     err |= fe_enc64(&current, FE_ADD32ri, regDest, instr[0].imm);
-
 }
 
 /**
@@ -286,6 +291,7 @@ void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info
         if (r_info->mapped[instr->reg_dest]) {
             err |= fe_enc64(&current, FE_MOVSXr64r32, r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
         } else {
+            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, r_info->map[instr->reg_src_1]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
         }
@@ -294,6 +300,7 @@ void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info
             err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instr->reg_dest],
                             FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
         } else {
+            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
         }
@@ -338,7 +345,6 @@ void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) 
     if (regDest != regSrc1 && regDest != FIRST_REG) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
-
 }
 
 /**
@@ -357,7 +363,6 @@ void emit_pattern_12_NOT(const t_risc_instr *instr, const register_info *r_info)
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_NOT64r, regDest);
-
 }
 
 /**
@@ -376,7 +381,6 @@ void emit_pattern_13_NEG(const t_risc_instr *instr, const register_info *r_info)
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc2);
     }
     err |= fe_enc64(&current, FE_NEG64r, regDest);
-
 }
 
 /**
@@ -396,7 +400,6 @@ void emit_pattern_14_NEGW(const t_risc_instr *instr, const register_info *r_info
     }
     err |= fe_enc64(&current, FE_NEG32r, regDest);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
 }
 
 /**
@@ -415,7 +418,6 @@ void emit_pattern_15_SEQZ(const t_risc_instr *instr, const register_info *r_info
     err |= fe_enc64(&current, FE_SETZ8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
 }
 
 /**
@@ -434,7 +436,6 @@ void emit_pattern_16_SNEZ(const t_risc_instr *instr, const register_info *r_info
     err |= fe_enc64(&current, FE_SETNZ8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
 }
 
 /**
@@ -453,8 +454,6 @@ void emit_pattern_17_SLTZ(const t_risc_instr *instr, const register_info *r_info
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SHR64ri, 63);
-
-
 }
 
 /**
@@ -473,7 +472,6 @@ void emit_pattern_18_SGTZ(const t_risc_instr *instr, const register_info *r_info
     err |= fe_enc64(&current, FE_SETG8r, regDest);
     //Implicit zero extension to 64bit
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
 }
 
 /**
@@ -488,7 +486,6 @@ void emit_pattern_19_LI(const t_risc_instr *instrs, const register_info *r_info)
     FeReg regDest = getRd(instrs, r_info);
 
     err |= fe_enc64(&current, FE_MOV64ri, regDest, instrs[0].imm + instrs[1].imm);
-
 }
 
 
