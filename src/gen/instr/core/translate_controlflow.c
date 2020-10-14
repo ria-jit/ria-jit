@@ -278,7 +278,6 @@ void translate_BGEU(const t_risc_instr *instr, const register_info *r_info) {
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info) {
-    invalidateAllReplacements(r_info);
 
     //add rs1, rs2 access to profiler
     if (flag_do_profile) {
@@ -287,48 +286,15 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
     }
 
     ///compare registers:
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
-    ///rs1 mapped?
-    if (r_info->mapped[instr->reg_src_1]) {
-        ///everything mapped
-        if (r_info->mapped[instr->reg_src_2]) {
-            err |= fe_enc64(&current, FE_CMP64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_2]);
-        }
-            ///else get rs2 from mem
-        else {
-            if (instr->reg_src_2 == x0) {
-                err |= fe_enc64(&current, FE_TEST64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_1]);
-            } else {
-
-                err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
-                                FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-            }
-        }
-    } else {
-        ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
-        if (r_info->mapped[instr->reg_src_2]) {
-            err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1),
-                            r_info->map[instr->reg_src_2]);
-
-        }
-            ///else get both from mem, rs1 in temp register
-        else {
-            if (instr->reg_src_2 == x0) {
-                err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), 0);
-            } else {
-
-                err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-                err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-            }
-        }
-    }
+    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
 }
 
 static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *noJmpLoc,
                               uint64_t jmpMnem) {
-    invalidateAllReplacements(r_info);
-
     ///set pc: BRANCH
     t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
@@ -339,6 +305,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     } else {
         ///write chainEnd to be chained by chainer
         if (flag_translate_opt_chain) {
+            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
@@ -365,6 +332,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     } else {
         ///write chainEnd to be chained by chainer
         if (flag_translate_opt_chain) {
+            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
