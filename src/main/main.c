@@ -92,6 +92,9 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
         begin = begin_measure();
     }
 
+    setupMmapHint();
+
+
     while (!finalize) {
         //check our previously translated code
         t_cache_loc cache_loc = lookup_cache_entry(next_pc);
