@@ -31,7 +31,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     ///push to return stack
     if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
-        rs_emit_push(instr);
+        rs_emit_push(instr, r_info);
     }
 
     ///set rd
@@ -51,6 +51,9 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     t_risc_addr target = instr->addr + instr->imm;
 
     t_cache_loc cache_loc;
+
+    //potentially write back the register used by the translated AUIPC instruction above
+    invalidateAllReplacements(r_info);
 
     if (!flag_translate_opt_chain || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
             cache_loc == (t_cache_loc) 1) {
@@ -123,22 +126,22 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
             if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 if (instr->reg_dest == instr->reg_src_1) {
                     ///push
-                    rs_emit_push(instr);
+                    rs_emit_push(instr, r_info);
                 } else {
                     //not tested
                     ///pop and push
-                    rs_emit_pop_RAX(false);
-                    rs_emit_push(instr);
-                    rs_jump_stack();
+                    rs_emit_pop_RAX(false, r_info);
+                    rs_emit_push(instr, r_info);
+                    rs_jump_stack(r_info);
                 }
             } else {
                 ///push
-                rs_emit_push(instr);
+                rs_emit_push(instr, r_info);
             }
         } else {
             if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 ///pop
-                rs_emit_pop_RAX(true);
+                rs_emit_pop_RAX(true, r_info);
             } else {
                 ///none
             }

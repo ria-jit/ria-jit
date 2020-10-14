@@ -20,7 +20,6 @@ void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -38,7 +37,6 @@ void translate_LH(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -56,7 +54,6 @@ void translate_LW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m32, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -74,7 +71,6 @@ void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVZXr32m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -92,7 +88,6 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVZXr32m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -162,7 +157,6 @@ void translate_LWU(const t_risc_instr *instr, const register_info *r_info) {
 
 
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**
@@ -180,7 +174,6 @@ void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
 }
 
 /**

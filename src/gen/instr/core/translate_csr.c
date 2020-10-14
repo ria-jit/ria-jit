@@ -73,7 +73,6 @@ void translate_CSRRC(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_AND64mr, FE_MEM_ADDR(r_info->csr_base + instr->imm), regSrc1);
         err |= fe_enc64(&current, FE_NOT64r, regSrc1); //does the rs1 value need to be preserved?
     }
-
 }
 
 /**
