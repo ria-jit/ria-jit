@@ -542,9 +542,13 @@ void chain(t_cache_loc target) {
 void setupInstrMem() {
     void *addr = (void *) (TRANSLATOR_BASE - STACK_OFFSET);
     void *buf = mmap(addr, STACK_OFFSET, PROT_WRITE | PROT_READ | PROT_EXEC,
-                     MAP_FIXED_NOREPLACE | MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+                     MAP_FIXED_NOREPLACE | MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
     currentPos = buf;
 
+    if (BAD_ADDR(buf)) {
+        dprintf(2, "Instruction memory allocation failed. Error %li", -(intptr_t) buf);
+        _exit(-1);
+    }
     if (buf != addr) {
         dprintf(2, "Memory allocation fault in assembly.\n");
         _exit(-1);
