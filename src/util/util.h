@@ -19,6 +19,7 @@ extern "C" {
 #define MAP_FIXED_NOREPLACE 0x200000
 #endif
 
+//todo: pull these into a specific error code file which better manages them and consolidates all _exit()s
 #define FAIL_HEAP_ALLOC 0x1000
 
 //add an access to reg to the profiler's data
@@ -28,6 +29,11 @@ extern "C" {
  * Helper functions to extract FeRegs without handling every mapping case.
  */
 
+/**
+ * Convert the r_info index to the respective FeReg.
+ * @param index the r_info index
+ * @return corresponding register
+ */
 static inline FeReg getRegForIndex(size_t index) {
     switch (index) {
         case 0:
@@ -42,6 +48,11 @@ static inline FeReg getRegForIndex(size_t index) {
     }
 }
 
+/**
+ * Convert the FeReg into the corresponding r_info index.
+ * @param replacement the register
+ * @return the corresponding index
+ */
 static inline size_t getIndexForReg(FeReg replacement) {
     switch (replacement) {
         case FIRST_REG:
@@ -143,7 +154,8 @@ static inline void storeReplacements(const register_info *r_info) {
  * @param r_info the static register mapping and dynamic allocation info
  * @param requested the RISC-V register requested by the instruction
  * @param requireValue when loading the register, load the value from the register file if true, else leave undefined.
- *                     Can be used when loading a destination register into memory.
+ *                     Can be used when loading a destination register into memory, the value of which will be
+ *                     overwritten by the instruction anyways.
  * @return the x86 register that contains the requested replacement
  */
 static inline FeReg loadIntoReplacement(const register_info *r_info, const t_risc_reg requested, bool requireValue) {
@@ -283,6 +295,13 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
     return destination;
 }
 
+/**
+ * Get or load the rs1 of the passed instruction.
+ * This call may load the value from the register file in memory.
+ * @param instr the instruction in question
+ * @param r_info current register info
+ * @return the x86 register containing the requested rs1
+ */
 static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
@@ -297,6 +316,13 @@ static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_inf
     }
 }
 
+/**
+ * Get or load the rs2 of the passed instruction.
+ * This call may load the value from the register file in memory.
+ * @param instr the instruction in question
+ * @param r_info current register info
+ * @return the x86 register containing the requested rs2
+ */
 static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
@@ -311,6 +337,13 @@ static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_inf
     }
 }
 
+/**
+ * Get or load the rd of the passed instruction.
+ * This call may load the value from the register file in memory.
+ * @param instr the instruction in question
+ * @param r_info current register info
+ * @return the x86 register containing the requested rd
+ */
 static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
@@ -323,6 +356,77 @@ static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info
         return loadIntoReplacement(r_info, instr->reg_dest, false);
     } else {
         return r_info->map[instr->reg_dest];
+    }
+}
+
+/**
+ * Get or load the rs1 of the passed instruction, hinted with a hardware register.
+ * This call may load the value from the register file in memory.
+ * The requested rs1 will be in the passed into register after this call.
+ * It will either be loaded into the register when not statically mapped,
+ * or it will be replaced into the register by writing back the current contents.
+ * @param instr the instruction in question
+ * @param r_info current register info
+ * @param into destination for the load
+ * @return the x86 register containing the requested rs1
+ */
+static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r_info, FeReg into) {
+    //log register access to profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_1);
+    }
+
+    //either return the mapped register, or load into the replacement
+    if (!r_info->mapped[instr->reg_src_1]) {
+        return loadIntoSpecific(r_info, instr->reg_src_1, into);
+    } else if (r_info->map[instr->reg_src_1] == into) {
+        //it is already statically mapped into the correct register, so we're done
+        return r_info->map[instr->reg_src_1];
+    } else {
+        //it is statically mapped, but into the wrong register
+        invalidateReplacement(r_info, into);
+
+        //move over to the correct replacement and note
+        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_1]);
+        *r_info->current_recency += 1;
+        r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
+        r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_1;
+    }
+}
+
+/**
+ * Get or load the rs2 of the passed instruction, hinted with a hardware register.
+ * This call may load the value from the register file in memory.
+ * The requested rs2 will be in the passed into register after this call.
+ * It will either be loaded into the register when not statically mapped,
+ * or it will be replaced into the register by writing back the current contents.
+ * @param instr the instruction in question
+ * @param r_info current register info
+ * @param into destination for the load
+ * @return the x86 register containing the requested rs2
+ */
+static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r_info, FeReg into) {
+    //log register access to profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_src_2);
+    }
+
+    //either return the mapped register, or load into the replacement
+    if (!r_info->mapped[instr->reg_src_2]) {
+        return loadIntoSpecific(r_info, instr->reg_src_2, into);
+    } else if (r_info->map[instr->reg_src_2] == into) {
+        //it is already statically mapped into the correct register, so we're done
+        return r_info->map[instr->reg_src_2];
+    } else {
+        //it is statically mapped, but into the wrong register
+        invalidateReplacement(r_info, into);
+
+        //move over to the correct replacement and note
+        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_2]);
+        *r_info->current_recency += 1;
+        r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
+        r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_2;
+        return into;
     }
 }
 
