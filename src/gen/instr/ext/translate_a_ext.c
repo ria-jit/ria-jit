@@ -10,7 +10,7 @@
  * I imagine this can be refactored into something more elegant without using three replacement registers.
  * However, I keep running into segmentation faults, so this works for now.
  */
-#define SCRATCH_REG THIRD_REG
+#define SCRATCH_REG FE_SP
 
 /*
  * Implemented without account for the atomicity of the instructions.
@@ -30,7 +30,6 @@ void translate_LRW(const t_risc_instr *instr, const register_info *r_info) {
 
     //not doing anything for fencing yet
     err |= fe_enc64(&current, FE_MOVSXr64m32, regDest, FE_MEM(regSrc1, 0, 0, 0));
-
 }
 
 /**
@@ -50,7 +49,6 @@ void translate_SCW(const t_risc_instr *instr, const register_info *r_info) {
 
     // we are not using any memory fences here, just simulate a successfull write (0 in rd)
     err |= fe_enc64(&current, FE_MOV64ri, regDest, 0);
-
 }
 
 /**
@@ -64,6 +62,7 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -78,6 +77,7 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -91,6 +91,7 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -101,6 +102,7 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_ADD32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -114,6 +116,7 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -124,6 +127,7 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_XOR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -137,6 +141,7 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -147,6 +152,7 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_AND32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -160,6 +166,7 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -170,6 +177,7 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_OR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -182,6 +190,7 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -199,6 +208,8 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -211,6 +222,7 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -228,6 +240,8 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -240,6 +254,7 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -257,6 +272,8 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -269,6 +286,7 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -286,6 +304,8 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -337,6 +357,7 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -347,6 +368,7 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -360,6 +382,7 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -370,6 +393,7 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_ADD64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -383,6 +407,7 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -393,6 +418,7 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_XOR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -406,6 +432,7 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -416,6 +443,7 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_AND64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -429,6 +457,7 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -439,6 +468,7 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_OR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
 
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -451,6 +481,7 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -468,6 +499,8 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -480,6 +513,7 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -497,6 +531,8 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -509,6 +545,8 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -526,6 +564,8 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }
 
 /**
@@ -538,6 +578,7 @@ void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+    saveScratchReg(SCRATCH_REG);
 
     //load [rs1] --> rd
     //apply binary operator rd • rs2 --> [rs1]
@@ -555,4 +596,6 @@ void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
     err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+
+    loadScratchReg(SCRATCH_REG);
 }

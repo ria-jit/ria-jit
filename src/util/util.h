@@ -444,6 +444,16 @@ static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDe
     }
 }
 
+#define SWAP_SCRATCH FE_MEM_ADDR((intptr_t) get_swap_file() + 8 * 6)
+
+static inline void saveScratchReg(FeReg scratch) {
+    err |= fe_enc64(&current, FE_MOV64mr, SWAP_SCRATCH, scratch);
+}
+
+static inline void loadScratchReg(FeReg scratch) {
+    err |= fe_enc64(&current, FE_MOV64rm, scratch, SWAP_SCRATCH);
+}
+
 #ifdef __cplusplus
 }
 #endif
