@@ -110,9 +110,6 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * @param instr the RISC instruction to translate
  */
 void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
-    //dispatch to translator functions
-    dispatch_instr(instr, c_info);
-
     //log instruction
     log_asm_in(
             "Instruction %s at 0x%lx (type %d) - (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
@@ -127,6 +124,9 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
             reg_to_alias(instr->reg_dest),
             instr->imm
     );
+
+    //dispatch to translator functions
+    dispatch_instr(instr, c_info);
 
     //make instruction boundaries visible in disassembly if required
     if (flag_verbose_disassembly) {
