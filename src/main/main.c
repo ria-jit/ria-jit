@@ -147,12 +147,13 @@ bool execute_cached(t_cache_loc loc, context_info *c_info) {
         dump_gp_registers();
     }
 
+#ifndef NDEBUG
     ///check for illegal x0 values
     if (*get_gp_reg_file() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;
     }
-
+#endif
     return true;
 }
