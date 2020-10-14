@@ -15,7 +15,7 @@
 #include <gen/optimize.h>
 #include <elf/loadElf.h>
 
-void *currentPos;
+void *currentPos = NULL;
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
@@ -49,6 +49,9 @@ int err;
  */
 void init_block() {
 
+    if (currentPos == NULL) {
+        setupInstrMem();
+    }
     //set the block_head and current pointer and the failed status
     block_head = (uint8_t *) currentPos;
     current = block_head;
