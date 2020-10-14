@@ -97,6 +97,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     ///1: compute target address
 
     ///mov rs1 to temp register
+    invalidateReplacement(r_info, FE_AX);
     if (r_info->mapped[instr->reg_src_1]) {
         err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
     } else {
