@@ -17,6 +17,7 @@
 
 context_info *init_map_context(void) {
     //register mapping as pulled from translate.c
+    log_context("Initializing context...\n");
 
     //create register allocation mapping
     FeReg *register_map = mmap(NULL,
@@ -145,6 +146,19 @@ context_info *init_map_context(void) {
     map_reg(s2, FE_R15);
 
 #undef map_reg
+
+    //log context setup
+    if (flag_log_context) {
+        log_context("Static mapping contents:\n");
+        for (t_risc_reg reg = x0; reg <= pc; reg++) {
+            if (mapped[reg]) {
+                log_context("%s/%s --> %s\n",
+                            reg_to_string(reg),
+                            reg_to_alias(reg),
+                            reg_x86_to_string(register_map[reg]));
+            }
+        }
+    }
 
     ///create info struct
     register_info *r_info =

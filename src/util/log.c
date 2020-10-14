@@ -15,6 +15,7 @@ bool flag_verbose_disassembly = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
 bool flag_log_cache_contents = false;
+bool flag_log_context = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
 bool flag_translate_opt = true;
@@ -110,6 +111,17 @@ void log_reg_dump(const char *format, ...) {
         va_list args;
         va_start(args, format);
         printf("[reg-dump] ");
+        vdprintf(1, format, args);
+        va_end(args);
+        return;
+    }
+}
+
+void log_context(const char *format, ...) {
+    if (flag_log_context) {
+        va_list args;
+        va_start(args, format);
+        printf("[context] ");
         vdprintf(1, format, args);
         va_end(args);
         return;

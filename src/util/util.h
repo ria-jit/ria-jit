@@ -19,6 +19,8 @@ extern "C" {
 #define MAP_FIXED_NOREPLACE 0x200000
 #endif
 
+#define bool_str(b) (b ? "yes" : "no")
+
 //todo: pull these into a specific error code file which better manages them and consolidates all _exit()s
 #define FAIL_HEAP_ALLOC 0x1000
 
@@ -79,8 +81,10 @@ static inline size_t getIndexForReg(FeReg replacement) {
  */
 static inline void invalidateReplacement(const register_info *r_info, FeReg replacement) {
     size_t index = getIndexForReg(replacement);
-
     t_risc_reg currentContent = r_info->replacement_content[index];
+    log_context("Invalidating replacement %s with content %s...\n",
+                reg_x86_to_string(replacement),
+                reg_to_string(currentContent));
 
     //write back to register file
     if (currentContent != x0 && currentContent != INVALID_REG) {
@@ -114,10 +118,12 @@ static inline void loadReplacements(const register_info *r_info) {
         FeReg replacement = getRegForIndex(i);
 
         if (content == x0) {
+            log_context("Loading x0 into %s...\n", reg_x86_to_string(replacement));
             err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
         } else if (content == INVALID_REG) {
             continue;
         } else {
+            log_context("Loading %s into %s...\n", reg_to_string(content), reg_x86_to_string(replacement));
             err |= fe_enc64(&current,
                             FE_MOV64rm,
                             replacement,
@@ -140,6 +146,7 @@ static inline void storeReplacements(const register_info *r_info) {
         if (content == x0 || content == INVALID_REG) {
             continue;
         } else {
+            log_context("Writing back %s from %s...\n", reg_to_string(content), reg_x86_to_string(replacement));
             err |= fe_enc64(&current,
                             FE_MOV64mr,
                             FE_MEM_ADDR(r_info->base + 8 * content),
@@ -159,6 +166,8 @@ static inline void storeReplacements(const register_info *r_info) {
  * @return the x86 register that contains the requested replacement
  */
 static inline FeReg loadIntoReplacement(const register_info *r_info, const t_risc_reg requested, bool requireValue) {
+    log_context("Loading %s into replacement (requireValue %s)...\n", reg_to_string(requested), bool_str(requireValue));
+
     //increment access recency
     *r_info->current_recency += 1;
 
@@ -168,10 +177,12 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
             //note access recency for register and return
             r_info->replacement_recency[i] = *r_info->current_recency;
             FeReg activeReplacement = getRegForIndex(i);
+            log_context("Already present in %s.\n", reg_x86_to_string(activeReplacement));
 
             //zero register if x0 is requested, as it could have been written to previously
             //  checking whether zeroing is needed would likely be a bigger overhead than the single cycle XOR
             if (requested == x0) {
+                log_context("Zeroing %s for requested x0...\n", reg_x86_to_string(activeReplacement));
                 err |= fe_enc64(&current, FE_XOR32rr, activeReplacement, activeReplacement);
             }
 
@@ -188,14 +199,18 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
         }
     }
 
+
     //write back that register to the file, if there is a valid value present
     t_risc_reg currentlyPresent = r_info->replacement_content[min];
     FeReg selectedReplacement = getRegForIndex(min);
+    log_context("Selected %s for %s (oldest or free).\n", reg_x86_to_string(selectedReplacement), reg_to_string(requested));
     if (currentlyPresent != x0 && currentlyPresent != INVALID_REG) {
         err |= fe_enc64(&current,
                         FE_MOV64mr,
                         FE_MEM_ADDR(r_info->base + 8 * currentlyPresent),
                         selectedReplacement);
+        log_context("Writing back %s from %s...\n", reg_to_string(currentlyPresent),
+                    reg_x86_to_string(selectedReplacement));
     }
 
     //note current replacement contents
@@ -204,6 +219,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
 
     //load the requested register into the selected replacement
     if (requireValue) {
+        log_context("Loading %s into %s...\n", reg_to_string(requested), reg_x86_to_string(selectedReplacement));
         if (requested != x0) {
             err |= fe_enc64(&current, FE_MOV64rm, selectedReplacement, FE_MEM_ADDR(r_info->base + 8 * requested));
         } else {
@@ -227,6 +243,8 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
  * @return the destination register passed as parameter, for cleaner code
  */
 static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination) {
+    log_context("Loading %s into specific replacement %s...\n", reg_to_string(candidate), reg_x86_to_string(destination));
+
     //increment access recency and get index
     *r_info->current_recency += 1;
     int8_t index = (int8_t) getIndexForReg(destination);
@@ -246,15 +264,20 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
     if (alreadyMapped) {
         //if we already mapped it and it's in the correct spot, we're done
         if (index == presentIndex) {
+            log_context("Register %s was already in %s.\n", reg_to_string(candidate), reg_x86_to_string(destination));
             return destination;
         } else {
             //we have to shuffle the registers around (switch info as well as values), so
             // we exchange the requested and present registers
             if (r_info->replacement_recency[index] != 0) {
                 //we need to keep this value, so exchange
+                log_context("Requested %s occupied. Swapping with %s...\n", reg_x86_to_string(destination),
+                            reg_x86_to_string(getRegForIndex(presentIndex)));
                 err |= fe_enc64(&current, FE_XCHG64rr, destination, getRegForIndex(presentIndex));
             } else {
                 //the current value does not matter, so move
+                log_context("Requested %s empty. Getting value from %s...\n", reg_x86_to_string(destination),
+                            reg_x86_to_string(getRegForIndex(presentIndex)));
                 err |= fe_enc64(&current, FE_MOV64rr, destination, getRegForIndex(presentIndex));
             }
 
@@ -275,6 +298,9 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
         if (r_info->replacement_recency[index] != 0 &&
                 (r_info->replacement_content[index] != x0 || r_info->replacement_content[index] != INVALID_REG)) {
             //write back if we don't have x0 or invalid in there
+            log_context("Writing back %s from %s to free specific replacement...\n",
+                        reg_to_string(r_info->replacement_content[index]),
+                        reg_x86_to_string(destination));
             err |= fe_enc64(&current,
                             FE_MOV64mr,
                             FE_MEM_ADDR(r_info->base + 8 * r_info->replacement_content[index]),
@@ -282,6 +308,9 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
         }
 
         //load the register into the correct spot
+        log_context("Loading %s into %s...\n",
+                    reg_to_string(candidate),
+                    reg_x86_to_string(destination));
         err |= fe_enc64(&current,
                         FE_MOV64rm,
                         destination,

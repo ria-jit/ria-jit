@@ -27,6 +27,7 @@ extern bool flag_verbose_disassembly;
 extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
 extern bool flag_log_cache_contents;
+extern bool flag_log_context;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
 extern bool flag_translate_opt;
@@ -58,6 +59,9 @@ void log_asm_out(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_reg_dump(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
+
+void log_context(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_cache(const char *format, ...)

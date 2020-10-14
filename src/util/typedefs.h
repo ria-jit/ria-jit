@@ -22,6 +22,8 @@ char *reg_to_string(int reg);
 
 char *reg_to_alias(int reg);
 
+char *reg_x86_to_string(FeReg reg);
+
 typedef enum {
     INVALID_MNEM,
 
