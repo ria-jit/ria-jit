@@ -88,6 +88,9 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
 
     //write back to register file
     if (currentContent != x0 && currentContent != INVALID_REG) {
+        log_context("Writing back %s from %s...\n",
+                    reg_to_string(currentContent),
+                    reg_x86_to_string(replacement));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * currentContent), replacement);
     }
 
