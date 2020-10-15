@@ -101,7 +101,7 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
 //    }
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
-    FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
+    getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     ///Uses RAX and RDX specifically because of the IMULs input/output.
     invalidateReplacement(r_info, FE_DX);
@@ -179,18 +179,18 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    getRs1Into(instr, r_info, FE_AX);
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
-    getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_C_SEP64);
@@ -232,18 +232,18 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    getRs1Into(instr, r_info, FE_AX);
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
-    getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -289,16 +289,16 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RAX specifically because of IDIVs input
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
+    ///Uses RDX specifically because of IDIVs output
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///Uses RDX specifically because of IDIVs output
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_C_SEP64);
@@ -344,16 +344,16 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RAX specifically because of DIVs input
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
+    ///Uses RDX specifically because of DIVs output
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///Uses RDX specifically because of DIVs output
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -423,18 +423,18 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the IDIV)
+    getRs1Into(instr, r_info, FE_AX);
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
-    getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_C_SEP32);
@@ -479,18 +479,18 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
+    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
+    /// of the DIV)
+    getRs1Into(instr, r_info, FE_AX);
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the DIV)
-    FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
@@ -539,16 +539,16 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RAX specifically because of the IDIVs input
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
+    ///Uses RDX specifically because of the IDIVs output
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///Uses RDX specifically because of the IDIVs output
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_C_SEP32);
@@ -596,16 +596,16 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RAX specifically because of the DIVs input
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
+    ///Uses RDX specifically because of the DIVs output
+    invalidateReplacement(r_info, FE_DX);
+    FeReg regDest = getRd(instr, r_info);
+
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
     //insert same forward jump here later
     uint8_t *jmpDivZeroBuf = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy jmp
-
-    ///Uses RDX specifically because of the DIVs output
-    invalidateReplacement(r_info, FE_DX);
-    FeReg regDest = getRd(instr, r_info);
 
     //do actual divide
     err |= fe_enc64(&current, FE_XOR32rr, FE_DX, FE_DX);
