@@ -24,7 +24,6 @@
 void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MUL...\n");
 
-    ///rs1 and rd can use same temporary since the original value of rd is not needed.
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
@@ -44,8 +43,7 @@ void translate_MUL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate MULH...\n");
 
-    ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
-    /// because of the IMUL)
+    ///Uses RAX and RDX specifically because of the IMUL, RCX because it will be preserved
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
     getRs1Into(instr, r_info, FE_AX);
@@ -90,21 +88,11 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
      */
 
 
-//    ///Handle special zero reg cases
-//    // TODO Wanted/Necessary? Would work for all multiplications, introduced here since this is a "long" instruction).
-//    //  Also possible for the dividend and result in division.
-//    if (instr->reg_src_1 == x0 || instr->reg_src_2 == x0) {
-//        err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
-//        return;
-//    } else if (instr->reg_dest == x0) {
-//        err |= fe_enc64(&current, FE_NOP);
-//        return;
-//    }
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
+    ///Uses RAX and RDX specifically because of the IMUL, RCX because it will be preserved
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
-    ///Uses RAX and RDX specifically because of the IMULs input/output.
     invalidateReplacement(r_info, FE_DX, true);
     invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
@@ -150,8 +138,7 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
 
     //TODO Optimization: Could also place rs2 in RAX if rs1 is mapped and rs2 is not since order does not matter
     // (overwritten by next suggestion)
-    ///rs2 and rd can use same temporary since the original value of rd is not needed. (Uses RAX and RDX specifically
-    /// because of the MULs input/output)
+    ///Uses RAX and RDX specifically because of the IMUL, RCX because it will be preserved
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     invalidateReplacement(r_info, FE_DX, true);
@@ -182,8 +169,7 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
+    ///Uses RAX specifically because of the IDIV
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
     invalidateReplacement(r_info, FE_AX, true);
@@ -236,8 +222,7 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses RDX:RAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
+    ///Uses RAX specifically because of the IDIV
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
     invalidateReplacement(r_info, FE_AX, true);
@@ -400,7 +385,6 @@ void translate_MULW(const t_risc_instr *instr, const register_info *r_info) {
 
     //TODO Minor optimization: Don't load the full 64bit registers for no reason (upper half is just ignored anyways,
     // so save the instruction prefixes)
-    ///rs1 and rd can use same temporary since the original value of rd is not needed.
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
@@ -429,8 +413,7 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since IDIV uses EDX:EAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the IDIV)
+    ///Uses RAX specifically because of the IDIV
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
     invalidateReplacement(r_info, FE_AX, true);
@@ -486,8 +469,7 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     ///Uses RCX specifically since DIV uses EDX:EAX as implicit input
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
 
-    ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
-    /// of the DIV)
+    ///Uses RAX specifically because of the DIV
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
     invalidateReplacement(r_info, FE_AX, true);
