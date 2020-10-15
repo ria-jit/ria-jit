@@ -296,10 +296,10 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }
@@ -379,10 +379,10 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }
@@ -410,10 +410,10 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }
@@ -579,10 +579,10 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }
@@ -612,10 +612,10 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }
@@ -645,10 +645,10 @@ void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
 
     if (regDest == regSrc2) {
         if (regSrc1 == FE_AX) {
-            invalidateReplacement(r_info, FE_DX);
+            invalidateReplacement(r_info, FE_DX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
         } else {
-            invalidateReplacement(r_info, FE_AX);
+            invalidateReplacement(r_info, FE_AX, true);
             regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
         }
     }

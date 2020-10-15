@@ -50,7 +50,7 @@ void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
     // (overwritten by next suggestion)
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
 
@@ -104,7 +104,7 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     ///Uses RAX and RDX specifically because of the IMULs input/output.
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
@@ -152,7 +152,7 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
     /// because of the MULs input/output)
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the MUL
@@ -182,7 +182,7 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -235,7 +235,7 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -290,7 +290,7 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
     ///Uses RDX specifically because of IDIVs output
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -345,7 +345,7 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
     ///Uses RDX specifically because of DIVs output
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -426,7 +426,7 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -482,7 +482,7 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     ///rs1 and rd can use same temporary since the original value of rd is not needed. (Uses RAX specifically because
     /// of the DIV)
     getRs1Into(instr, r_info, FE_AX);
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -540,7 +540,7 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
     ///Uses RDX specifically because of the IDIVs output
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -597,7 +597,7 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1Into(instr, r_info, FE_AX);
 
     ///Uses RDX specifically because of the DIVs output
-    invalidateReplacement(r_info, FE_DX);
+    invalidateReplacement(r_info, FE_DX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);

@@ -79,7 +79,7 @@ static inline size_t getIndexForReg(FeReg replacement) {
  * @param r_info the static register mapping and dynamic allocation info
  * @param replacement the selected replacement to invalidate and write back
  */
-static inline void invalidateReplacement(const register_info *r_info, FeReg replacement) {
+static inline void invalidateReplacement(const register_info *r_info, FeReg replacement, bool writeback) {
     size_t index = getIndexForReg(replacement);
     t_risc_reg currentContent = r_info->replacement_content[index];
     log_context("Invalidating replacement %s with content %s...\n",
@@ -87,7 +87,7 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
                 reg_to_string(currentContent));
 
     //write back to register file
-    if (currentContent != x0 && currentContent != INVALID_REG) {
+    if (writeback && currentContent != x0 && currentContent != INVALID_REG) {
         log_context("Writing back %s from %s...\n",
                     reg_to_string(currentContent),
                     reg_x86_to_string(replacement));
@@ -104,9 +104,9 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
  * @param r_info containing the dynamic allocation info
  */
 static inline void invalidateAllReplacements(const register_info *r_info) {
-    invalidateReplacement(r_info, FIRST_REG);
-    invalidateReplacement(r_info, SECOND_REG);
-    invalidateReplacement(r_info, THIRD_REG);
+    invalidateReplacement(r_info, FIRST_REG, true);
+    invalidateReplacement(r_info, SECOND_REG, true);
+    invalidateReplacement(r_info, THIRD_REG, true);
 }
 
 /**
@@ -416,7 +416,7 @@ static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r
         return r_info->map[instr->reg_src_1];
     } else {
         //it is statically mapped, but into the wrong register
-        invalidateReplacement(r_info, into);
+        invalidateReplacement(r_info, into, true);
 
         //move over to the correct replacement and note
         err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_1]);
@@ -452,7 +452,7 @@ static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r
         return r_info->map[instr->reg_src_2];
     } else {
         //it is statically mapped, but into the wrong register
-        invalidateReplacement(r_info, into);
+        invalidateReplacement(r_info, into, true);
 
         //move over to the correct replacement and note
         err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_2]);
