@@ -423,6 +423,7 @@ static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r
         *r_info->current_recency += 1;
         r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
         r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_1;
+        return into;
     }
 }
 
