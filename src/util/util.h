@@ -114,7 +114,7 @@ static inline void loadReplacements(const register_info *r_info) {
         FeReg replacement = getRegForIndex(i);
 
         if (content == x0) {
-            err |= fe_enc64(&current, FE_XOR64rr, replacement, replacement);
+            err |= fe_enc64(&current, FE_XOR32rr, replacement, replacement);
         } else if (content == INVALID_REG) {
             continue;
         } else {
@@ -172,7 +172,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
             //zero register if x0 is requested, as it could have been written to previously
             //  checking whether zeroing is needed would likely be a bigger overhead than the single cycle XOR
             if (requested == x0) {
-                err |= fe_enc64(&current, FE_XOR64rr, activeReplacement, activeReplacement);
+                err |= fe_enc64(&current, FE_XOR32rr, activeReplacement, activeReplacement);
             }
 
             return activeReplacement;
@@ -207,7 +207,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
         if (requested != x0) {
             err |= fe_enc64(&current, FE_MOV64rm, selectedReplacement, FE_MEM_ADDR(r_info->base + 8 * requested));
         } else {
-            err |= fe_enc64(&current, FE_XOR64rr, selectedReplacement, selectedReplacement);
+            err |= fe_enc64(&current, FE_XOR32rr, selectedReplacement, selectedReplacement);
         }
     }
 
