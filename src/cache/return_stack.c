@@ -12,7 +12,6 @@
 
 rs_entry *r_stack;
 volatile uint64_t rs_front;
-volatile uint64_t rs_back;
 
 void init_return_stack(void) {
     r_stack = mmap(NULL, 64 * sizeof(rs_entry), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -23,7 +22,6 @@ void init_return_stack(void) {
     }
 
     rs_front = 0;
-    rs_back = 0;
 }
 
 void rs_emit_push(const t_risc_instr *instr) {
@@ -53,12 +51,6 @@ void rs_emit_push(const t_risc_instr *instr) {
     err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (uintptr_t) cache_loc);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_DX, 8, FE_AX, 8), FE_CX);         //save x86 addr
     err |= fe_enc64(&current, FE_SHR64ri, FE_AX, 1);                                         //revert multiplying by 2
-    err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_back));     //front reached back?
-    uint8_t *rs_full_jmp = current;
-    err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);                                   //dummy
-    err |= fe_enc64(&current, FE_ADD64mi, FE_MEM_ADDR((uint64_t) &rs_back), 1);         //move back ahead
-    err |= fe_enc64(&current, FE_AND64mi, FE_MEM_ADDR((uint64_t) &rs_back), 0x3f);      //mod 64
-    err |= fe_enc64(&rs_full_jmp, FE_JNZ, (intptr_t) current);                               //replace dummy
 
     err |= fe_enc64(&current, FE_POPr, FE_AX);
 
@@ -71,12 +63,9 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
 
     ///stack empty
     err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR((intptr_t) &rs_front));    //get front
-    err |= fe_enc64(&current, FE_CMP64rm, FE_DX, FE_MEM_ADDR((intptr_t) &rs_back));     //front == back?
-    uint8_t *nullJMPempty = current;
-    err |= fe_enc64(&current, FE_JZ, (intptr_t) current);  //dummy
 
     //RAX: target
-    //RDX: front
+    //RDX: frontrs_back
 
     ///hit
     err |= fe_enc64(&current, FE_MOV64rm, FE_CX, FE_MEM_ADDR((intptr_t) &r_stack));    //get base
@@ -100,8 +89,7 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
         err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
     }
 
-    //replace miss dummys
-    err |= fe_enc64(&nullJMPempty, FE_JZ, (intptr_t) current);
+    //replace miss dummy
     err |= fe_enc64(&nullJMPmiss, FE_JNZ, (intptr_t) current);
 
     if (!jump_or_push) {

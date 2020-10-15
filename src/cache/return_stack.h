@@ -22,6 +22,5 @@ void rs_jump_stack();
 
 extern rs_entry *r_stack;
 extern volatile uint64_t rs_front;
-extern volatile uint64_t rs_back;
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RETURN_STACK_H
