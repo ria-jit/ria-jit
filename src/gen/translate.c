@@ -64,10 +64,13 @@ void init_block() {
 
 /**
  * Finalize the translated block.
- * This emits the ret instruction in order to have the translated basic block return to the main loop.
+ * Invalidates the replacement registers and prepares the block for chaining.
+ * Also emits the RET instruction at the end of the block.
  * @return the starting address of the function block, or the nullptr in case of error
  */
-t_cache_loc finalize_block(int chainLinkOp) {
+t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info) {
+    //invalidate all replacement registers used in this block
+    invalidateAllReplacements(r_info);
 
     ///write chainEnd to be chained by chainer
     if (flag_translate_opt_chain && chainLinkOp == LINK_NULL) {
@@ -188,7 +191,6 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  */
 t_cache_loc
 translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
-
     ///initialize new block
     init_block();
 
@@ -196,10 +198,6 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
     if (flag_translate_opt_fusion) {
         optimize_patterns(block_cache, instructions_in_block);
     }
-
-    /// load the replacement registers (possibly context-wide?)
-    loadReplacements(c_info->r_info);
-
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -209,19 +207,16 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
         translate_risc_instr(&block_cache[i], c_info);
     }
 
-    /// store the replacement registers (possibly context-wide?)
-    storeReplacements(c_info->r_info);
-
-
     t_cache_loc block;
     ///finalize block and return cached location
     if (
         //block_cache[instructions_in_block - 1].mnem == JALR ||
             block_cache[instructions_in_block - 1].mnem == ECALL) {
-        block = finalize_block(LINK_NULL);
+        block = finalize_block(LINK_NULL, c_info->r_info);
     } else {
-        block = finalize_block(DONT_LINK);
+        block = finalize_block(DONT_LINK, c_info->r_info);
     }
+
     return block;
 }
 

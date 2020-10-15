@@ -32,7 +32,7 @@ extern int err;
 //basic block translation management
 void init_block();
 
-t_cache_loc finalize_block(int chainLinkOp);
+t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info);
 
 ///basic block translation
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);

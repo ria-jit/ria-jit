@@ -22,7 +22,7 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_pattern_emit(instr, r_info);
             break;
         case INVALID_MNEM:
-            translate_INVALID(instr);
+            translate_INVALID(instr, r_info);
             break;
         case LUI:
             translate_LUI(instr, r_info);

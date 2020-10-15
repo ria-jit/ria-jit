@@ -207,7 +207,7 @@ context_info *init_map_context(void) {
         err |= fe_enc64(&current, FE_MOV64rm, FE_R14, SWAP_R14);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R15, SWAP_R15);
 
-        save_context = finalize_block(DONT_LINK);
+        save_context = finalize_block(DONT_LINK, r_info);
     }
 
     {
@@ -245,7 +245,7 @@ context_info *init_map_context(void) {
 
         err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
 
-        load_execute_save_context = finalize_block(DONT_LINK);
+        load_execute_save_context = finalize_block(DONT_LINK, r_info);
     }
 
     //create context info struct

@@ -97,7 +97,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     ///1: compute target address
 
     ///mov rs1 to temp register
-    invalidateReplacement(r_info, FE_AX);
+    invalidateAllReplacements(r_info);
     if (r_info->mapped[instr->reg_src_1]) {
         err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
     } else {
@@ -296,6 +296,8 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
 static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *noJmpLoc,
                               uint64_t jmpMnem) {
+    invalidateAllReplacements(r_info);
+
     ///set pc: BRANCH
     t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
@@ -306,7 +308,6 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     } else {
         ///write chainEnd to be chained by chainer
         if (flag_translate_opt_chain) {
-            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
@@ -333,7 +334,6 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     } else {
         ///write chainEnd to be chained by chainer
         if (flag_translate_opt_chain) {
-            invalidateReplacement(r_info, FE_AX);
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
         }
@@ -348,8 +348,9 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     err |= fe_enc64(&endJmpLoc, FE_JMP, (intptr_t) current); //replace dummy
 }
 
-void translate_INVALID(const t_risc_instr *instr) {
+void translate_INVALID(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate INVALID_OP\n");
+    invalidateReplacement(r_info, FE_DX);
     ///call error handler
     err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
     err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
