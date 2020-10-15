@@ -92,7 +92,7 @@ void dump_gp_registers(void) {
 /**
  * Dump the profiler register usage data.
  */
-void dump_profiler_data(void) {
+void dump_register_stats(void) {
     log_profile("Register hits (unsorted):\n");
     log_profile("==============\n");
 

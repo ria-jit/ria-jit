@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 //shortcut for memory operands
-#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, addr - (intptr_t) current)
+#define FE_MEM_ADDR(addr) FE_MEM(FE_IP, 0, 0, (addr) - (intptr_t) current)
 
 ///chainLink options
 #define LINK_NULL 0
@@ -37,10 +37,12 @@ t_cache_loc finalize_block(int chainLinkOp);
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);
 
 t_cache_loc
-translate_block_instructions(const t_risc_instr block_cache[], int instructions_in_block, const context_info *c_info);
+translate_block_instructions(t_risc_instr block_cache[], int instructions_in_block, const context_info *c_info);
 
 ///chaining
 void chain(t_cache_loc target);
+
+void setupInstrMem();
 
 #ifdef __cplusplus
 }

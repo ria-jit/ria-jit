@@ -1,0 +1,588 @@
+valid,0
+
+"SPEC CPU2017 Floating Point Speed Result"
+
+"Full Results Table"
+
+Benchmark,"Base # Threads","Est. Base Run Time","Est. Base Ratio","Base Selected","Base Status","Peak # Threads","Est. Peak Run Time","Est. Peak Ratio","Peak Selected","Peak Status",Description
+603.bwaves_s,1,0.341673,--,0,RE,,,,,,"test iteration #1"
+607.cactuBSSN_s,1,0.316421,--,0,RE,,,,,,"test iteration #1"
+619.lbm_s,1,67.380871,--,1,S,,,,,,"test iteration #1"
+621.wrf_s,1,--,--,0,CE,,,,,,"test iteration #1"
+627.cam4_s,1,0.447419,--,0,RE,,,,,,"test iteration #1"
+628.pop2_s,1,0.482439,--,0,RE,,,,,,"test iteration #1"
+638.imagick_s,1,0.318841,--,0,RE,,,,,,"test iteration #1"
+644.nab_s,1,0.268771,--,0,RE,,,,,,"test iteration #1"
+649.fotonik3d_s,1,0.281207,--,0,RE,,,,,,"test iteration #1"
+654.roms_s,1,0.278388,--,0,RE,,,,,,"test iteration #1"
+
+"Selected Results Table"
+
+Benchmark,"Base # Threads","Est. Base Run Time","Est. Base Ratio","Base Selected","Base Status","Peak # Threads","Est. Peak Run Time","Est. Peak Ratio","Peak Selected","Peak Status",Description
+603.bwaves_s,,,,,NR,,,,,NR
+607.cactuBSSN_s,,,,,NR,,,,,NR
+619.lbm_s,1,67.380871,--,1,S,,,,,NR,"SelectedIteration (base #1; peak NR)"
+621.wrf_s,,,,,NR,,,,,NR
+627.cam4_s,,,,,NR,,,,,NR
+628.pop2_s,,,,,NR,,,,,NR
+638.imagick_s,,,,,NR,,,,,NR
+644.nab_s,,,,,NR,,,,,NR
+649.fotonik3d_s,,,,,NR,,,,,NR
+654.roms_s,,,,,NR,,,,,NR
+
+SPECspeed2017_fp_base,0,,0
+SPECspeed2017_fp_peak,"Not Run",,,,,,,"Not Run"
+
+"Run number:",146.0
+"runcpu command:","/u/home/schmidtf/spec/bin/harness/runcpu --configfile RISC-V-float --noreportable --size test --noreportable --nopower --runmode speed --tune base --size test fpspeed"
+"output root:","not used"
+
+"Hardware Vendor:","not applicable"
+"Hardware Model:",
+"Date tested:",Oct-2020
+"CPU2017 License:","nnn (Your SPEC license number)"
+"Test sponsor:","not applicable"
+"Tested by:","not applicable"
+"Hardware avail:",
+"Software avail:",
+
+
+HARDWARE
+
+"CPU Name","Intel Xeon Bronze 3106"
+"  Max MHz"," "
+"  Nominal"," "
+Enabled," cores, 1 chip,  threads/core"
+Orderable," "
+"Cache L1"," "
+"  L2"," "
+"  L3"," "
+"  Other"," "
+Memory,"78.334 GB fixme: If using DDR4, the format is:"
+,"'N GB (N x N GB nRxn PC4-nnnnX-X)'"
+Storage,"6.9 TB  add more disk info here"
+Other," "
+
+SOFTWARE
+
+OS,"Ubuntu 18.04.3 LTS"
+,4.15.0-70-generic
+Compiler,"C/C++/Fortran: Version 10.1.0 of GCC, the"
+,"GNU Compiler Collection"
+Parallel,Yes
+Firmware," "
+"File System",nfs
+"System State","Run level 5 (add definition here)"
+"Base Pointers",64-bit
+"Peak Pointers","Not Applicable"
+Other," "
+"Power Management",--
+
+"Submit Notes"
+
+"The config file option 'submit' was used."
+
+"Environment Variables Notes"
+
+"Environment variables set by runcpu before the start of the run:"
+"LD_LIBRARY_PATH ="
+"     ""/u/home/schmidtf/riscv-float-toolchain/build/lib64/:/u/home/schmidtf/ri"
+"     scv-float-toolchain/build/lib/:/lib64"""
+"OMP_STACKSIZE = ""120M"""
+
+
+"Platform Notes"
+
+
+" Sysinfo program /u/home/schmidtf/spec/bin/sysinfo"
+" Rev: r6365 of 2019-08-21 295195f888a3d7edb1e6e46a485a0011"
+" running on sksmall Wed Oct  7 14:23:50 2020"
+
+" SUT (System Under Test) info as seen by some common utilities."
+" For more information on this section, see"
+"    https://www.spec.org/cpu2017/Docs/config.html#sysinfo"
+
+" From /proc/cpuinfo"
+"    model name : Intel(R) Xeon(R) Bronze 3106 CPU @ 1.70GHz"
+"       1  ""physical id""s (chips)"
+"       8 ""processors"""
+"    cores, siblings (Caution: counting these is hw and system dependent. The following"
+"    excerpts from /proc/cpuinfo might not be reliable.  Use with caution.)"
+"       cpu cores : 8"
+"       siblings  : 8"
+"       physical 0: cores 0 1 2 3 4 5 6 7"
+
+" From lscpu:"
+"      Architecture:        x86_64"
+"      CPU op-mode(s):      32-bit, 64-bit"
+"      Byte Order:          Little Endian"
+"      CPU(s):              8"
+"      On-line CPU(s) list: 0-7"
+"      Thread(s) per core:  1"
+"      Core(s) per socket:  8"
+"      Socket(s):           1"
+"      NUMA node(s):        1"
+"      Vendor ID:           GenuineIntel"
+"      CPU family:          6"
+"      Model:               85"
+"      Model name:          Intel(R) Xeon(R) Bronze 3106 CPU @ 1.70GHz"
+"      Stepping:            4"
+"      CPU MHz:             1668.056"
+"      CPU max MHz:         1700.0000"
+"      CPU min MHz:         800.0000"
+"      BogoMIPS:            3400.00"
+"      Virtualization:      VT-x"
+"      L1d cache:           32K"
+"      L1i cache:           32K"
+"      L2 cache:            1024K"
+"      L3 cache:            11264K"
+"      NUMA node0 CPU(s):   0-7"
+"      Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov"
+"      pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp"
+"      lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid"
+"      aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16"
+"      xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave"
+"      avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3"
+"      invpcid_single pti intel_ppin ssbd mba ibrs ibpb stibp tpr_shadow vnmi flexpriority"
+"      ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a"
+"      avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl"
+"      xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local"
+"      dtherm arat pln pts hwp hwp_act_window hwp_pkg_req pku ospke md_clear flush_l1d"
+
+" /proc/cpuinfo cache data"
+"    cache size : 11264 KB"
+
+" From numactl --hardware  WARNING: a numactl 'node' might or might not correspond to a"
+" physical chip."
+
+" From /proc/meminfo"
+"    MemTotal:       82139464 kB"
+"    HugePages_Total:       0"
+"    Hugepagesize:       2048 kB"
+
+" /usr/bin/lsb_release -d"
+"    Ubuntu 18.04.3 LTS"
+
+" From /etc/*release* /etc/*version*"
+"    debian_version: buster/sid"
+"    os-release:"
+"       NAME=""Ubuntu"""
+"       VERSION=""18.04.3 LTS (Bionic Beaver)"""
+"       ID=ubuntu"
+"       ID_LIKE=debian"
+"       PRETTY_NAME=""Ubuntu 18.04.3 LTS"""
+"       VERSION_ID=""18.04"""
+"       HOME_URL=""https://www.ubuntu.com/"""
+"       SUPPORT_URL=""https://help.ubuntu.com/"""
+
+" uname -a:"
+"    Linux sksmall 4.15.0-70-generic #79-Ubuntu SMP Tue Nov 12 10:36:11 UTC 2019 x86_64"
+"    x86_64 x86_64 GNU/Linux"
+
+" Kernel self-reported vulnerability status:"
+
+" itlb_multihit:                            KVM: Mitigation: Split huge pages"
+" CVE-2018-3620 (L1 Terminal Fault):        Mitigation: PTE Inversion; VMX: conditional"
+"                                           cache flushes, SMT disabled"
+" Microarchitectural Data Sampling:         Mitigation: Clear CPU buffers; SMT disabled"
+" CVE-2017-5754 (Meltdown):                 Mitigation: PTI"
+" CVE-2018-3639 (Speculative Store Bypass): Mitigation: Speculative Store Bypass disabled"
+"                                           via prctl and seccomp"
+" CVE-2017-5753 (Spectre variant 1):        Mitigation: usercopy/swapgs barriers and __user"
+"                                           pointer sanitization"
+" CVE-2017-5715 (Spectre variant 2):        Mitigation: Full generic retpoline, IBPB:"
+"                                           conditional, IBRS_FW, STIBP: disabled, RSB"
+"                                           filling"
+" tsx_async_abort:                          Mitigation: Clear CPU buffers; SMT disabled"
+
+" run-level 5 Nov 28 09:46"
+
+" SPEC is set to: /u/home/schmidtf/spec"
+"    Filesystem                                       Type  Size  Used Avail Use% Mounted"
+"    on"
+"    nasil10.informatik.tu-muenchen.de:/srv/il10/home nfs   6.9T  4.2T  2.5T  63% /u/home"
+
+" From /sys/devices/virtual/dmi/id"
+"     BIOS:    HPE U32 11/13/2019"
+"     Vendor:  HPE"
+"     Product: ProLiant DL360 Gen10"
+"     Product Family: ProLiant"
+
+" Cannot run dmidecode; consider saying (as root)"
+"    chmod +s /usr/sbin/dmidecode"
+
+" (End of data from sysinfo program)"
+
+"Compiler Version Notes"
+
+==============================================================================
+"C               | 619.lbm_s(base) 638.imagick_s(base) 644.nab_s(base)"
+------------------------------------------------------------------------------
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+------------------------------------------------------------------------------
+
+==============================================================================
+"C++, C, Fortran | 607.cactuBSSN_s(base)"
+------------------------------------------------------------------------------
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-g++
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+------------------------------------------------------------------------------
+
+==============================================================================
+"Fortran         | 603.bwaves_s(base) 649.fotonik3d_s(base) 654.roms_s(base)"
+------------------------------------------------------------------------------
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+------------------------------------------------------------------------------
+
+==============================================================================
+"Fortran, C      | 627.cam4_s(base) 628.pop2_s(base)"
+------------------------------------------------------------------------------
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gfortran
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+"Using built-in specs."
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+"Target: riscv64-unknown-linux-gnu"
+"Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure"
+"  --target=riscv64-unknown-linux-gnu"
+"  --prefix=/u/home/schmidtf/riscv-float-toolchain/build"
+"  --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot"
+"  --with-system-zlib --enable-shared --enable-tls"
+"  --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp"
+"  --disable-libquadmath --disable-libsanitizer --disable-nls"
+"  --disable-bootstrap --src=.././riscv-gcc --disable-multilib"
+"  --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket"
+"  'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2  "
+"  -mcmodel=medlow'"
+"Thread model: posix"
+"Supported LTO compression algorithms: zlib"
+"gcc version 10.1.0 (GCC) "
+------------------------------------------------------------------------------
+
+"Base Runtime Environment"
+603.bwaves_s," No flags used"
+607.cactuBSSN_s," No flags used"
+619.lbm_s," No flags used"
+621.wrf_s
+627.cam4_s," No flags used"
+628.pop2_s," No flags used"
+638.imagick_s," No flags used"
+644.nab_s," No flags used"
+649.fotonik3d_s," No flags used"
+654.roms_s," No flags used"
+
+"Base Compiler Invocation"
+603.bwaves_s," gfortran"," gfortran"
+607.cactuBSSN_s," g++"," gcc"," g++"," gfortran"
+619.lbm_s," gcc"," gcc"
+621.wrf_s
+627.cam4_s," gfortran"," gcc"," gfortran"
+628.pop2_s," gfortran"," gcc"," gfortran"
+638.imagick_s," gcc"," gcc"
+644.nab_s," gcc"," gcc"
+649.fotonik3d_s," gfortran"," gfortran"
+654.roms_s," gfortran"," gfortran"
+
+"Base Portability Flags"
+603.bwaves_s," -static"," -DSPEC_LP64"
+607.cactuBSSN_s," -static"," -DSPEC_LP64"
+619.lbm_s," -static"," -DSPEC_LP64"
+621.wrf_s
+627.cam4_s," -static"," -DSPEC_CASE_FLAG"," -DSPEC_LP64"
+628.pop2_s," -static"," -DSPEC_CASE_FLAG"," -fconvert=big-endian"," -DSPEC_LP64"
+638.imagick_s," -static"," -DSPEC_LP64"
+644.nab_s," -static"," -DSPEC_LP64"
+649.fotonik3d_s," -static"," -DSPEC_LP64"
+654.roms_s," -static"," -DSPEC_LP64"
+
+"Base Optimization Flags"
+603.bwaves_s," -DSPEC_SUPPRESS_OPENMP"," -g"," -O3"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+607.cactuBSSN_s," -std=c++03"," -std=c99"," -std=c++03"," -g"," -O3"," -DSPEC_SUPPRESS_OPENMP"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+619.lbm_s," -std=c99"," -std=c99"," -g"," -O3"," -DSPEC_SUPPRESS_OPENMP"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+621.wrf_s
+627.cam4_s," -std=c99"," -DSPEC_SUPPRESS_OPENMP"," -g"," -O3"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+628.pop2_s," -std=c99"," -DSPEC_SUPPRESS_OPENMP"," -g"," -O3"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+638.imagick_s," -std=c99"," -std=c99"," -g"," -O3"," -DSPEC_SUPPRESS_OPENMP"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+644.nab_s," -std=c99"," -std=c99"," -g"," -O3"," -DSPEC_SUPPRESS_OPENMP"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+649.fotonik3d_s," -DSPEC_SUPPRESS_OPENMP"," -g"," -O3"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+654.roms_s," -DSPEC_SUPPRESS_OPENMP"," -g"," -O3"," -fno-unsafe-math-optimizations"," -fno-tree-loop-vectorize"," -fno-openmp"
+
+"Base Other Flags"
+603.bwaves_s," -fcommon"," -fallow-argument-mismatch"
+607.cactuBSSN_s," -fcommon"," -fallow-argument-mismatch"
+619.lbm_s," -fcommon"," -fallow-argument-mismatch"
+621.wrf_s
+627.cam4_s," -fcommon"," -fallow-argument-mismatch"
+628.pop2_s," -fcommon"," -fallow-argument-mismatch"
+638.imagick_s," -fcommon"," -fallow-argument-mismatch"
+644.nab_s," -fcommon"," -fallow-argument-mismatch"
+649.fotonik3d_s," -fcommon"," -fallow-argument-mismatch"
+654.roms_s," -fcommon"," -fallow-argument-mismatch"
+
+"Base Forbidden Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Base Unknown Flags"
+603.bwaves_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+607.cactuBSSN_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+619.lbm_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+621.wrf_s
+627.cam4_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+628.pop2_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+638.imagick_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+644.nab_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+649.fotonik3d_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+654.roms_s," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"," /u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-"
+
+"Peak Runtime Environment"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Compiler Invocation"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Portability Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Optimization Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Other Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Forbidden Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+"Peak Unknown Flags"
+603.bwaves_s
+607.cactuBSSN_s
+619.lbm_s
+621.wrf_s
+627.cam4_s
+628.pop2_s
+638.imagick_s
+644.nab_s
+649.fotonik3d_s
+654.roms_s
+
+ERRORS
+
+##############################################################################
+"#   INVALID RUN INVALID RUN INVALID RUN INVALID RUN INVALID RUN INVALID RUN  #"
+"#                                                                            #"
+"# 'reportable' flag not set during run                                       #"
+"# 644.nab_s (base) did not have enough runs!                                 #"
+"# 627.cam4_s (base) did not have enough runs!                                #"
+"# 638.imagick_s (base) did not have enough runs!                             #"
+"# 619.lbm_s (base) did not have enough runs!                                 #"
+"# 607.cactuBSSN_s (base) did not have enough runs!                           #"
+"# 628.pop2_s (base) did not have enough runs!                                #"
+"# 649.fotonik3d_s (base) did not have enough runs!                           #"
+"# 621.wrf_s (base) did not have enough runs!                                 #"
+"# 654.roms_s (base) did not have enough runs!                                #"
+"# 603.bwaves_s (base) did not have enough runs!                              #"
+"# 644.nab_s (base) had invalid runs!                                         #"
+"# 627.cam4_s (base) had invalid runs!                                        #"
+"# 638.imagick_s (base) had invalid runs!                                     #"
+"# 607.cactuBSSN_s (base) had invalid runs!                                   #"
+"# 628.pop2_s (base) had invalid runs!                                        #"
+"# 649.fotonik3d_s (base) had invalid runs!                                   #"
+"# 621.wrf_s (base) had invalid runs!                                         #"
+"# 654.roms_s (base) had invalid runs!                                        #"
+"# 603.bwaves_s (base) had invalid runs!                                      #"
+"# Input set must be 'refspeed' for a valid run (set to 'test' for this run)  #"
+"# Run of 603.bwaves_s (base) was not valid; status is RE                     #"
+"# Run of 607.cactuBSSN_s (base) was not valid; status is RE                  #"
+"# Run of 621.wrf_s (base) was not valid; status is CE                        #"
+"# Run of 627.cam4_s (base) was not valid; status is RE                       #"
+"# Run of 628.pop2_s (base) was not valid; status is RE                       #"
+"# Run of 638.imagick_s (base) was not valid; status is RE                    #"
+"# Run of 644.nab_s (base) was not valid; status is RE                        #"
+"# Run of 649.fotonik3d_s (base) was not valid; status is RE                  #"
+"# Run of 654.roms_s (base) was not valid; status is RE                       #"
+"# Unknown flags were used! See                                               #"
+"#      https://www.spec.org/cpu2017/Docs/runcpu.html#flagsurl                #"
+"# for information about how to get rid of this error.                        #"
+"# Error 603.bwaves_s: copy 0 non-zero return code (exit code=134, signal=0)  #"
+"# Error 607.cactuBSSN_s: copy 0 non-zero return code (exit code=134, signal=0) #"
+"# Error 621.wrf_s: Error with make!                                          #"
+"# Error 627.cam4_s: copy 0 non-zero return code (exit code=134, signal=0)    #"
+"# Error 628.pop2_s: copy 0 non-zero return code (exit code=134, signal=0)    #"
+"# Error 638.imagick_s: copy 0 non-zero return code (exit code=134, signal=0) #"
+"# Error 644.nab_s: copy 0 non-zero return code (exit code=134, signal=0)     #"
+"# Error 649.fotonik3d_s: copy 0 non-zero return code (exit code=134, signal=0) #"
+"# Error 654.roms_s: copy 0 non-zero return code (exit code=134, signal=0)    #"
+"#                                                                            #"
+"#   INVALID RUN INVALID RUN INVALID RUN INVALID RUN INVALID RUN INVALID RUN  #"
+##############################################################################
+----------------
+"For questions about","this result, please","contact the tester.",
+"For other inquiries,","please contact",info@spec.org.,
+"Copyright 2017-2020 Standard","Performance Evaluation",Corporation,
+"Tested with SPEC CPU2017",v1.1.0.
+"Result run on","2020-10-07 14:23:48+0000."
+"Report generated on","2020-10-07 14:57:39","by SPEC CPU2017 CSV","formatter v6253."

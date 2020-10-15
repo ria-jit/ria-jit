@@ -71,6 +71,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     init_hash_table();
     init_return_stack();
 
+    setupInstrMem();
     context_info *c_info = init_map_context();
 
     set_value(pc, next_pc);
@@ -90,6 +91,9 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     if (flag_do_benchmark) {
         begin = begin_measure();
     }
+
+    setupMmapHint();
+
 
     while (!finalize) {
         //check our previously translated code
@@ -123,7 +127,8 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     //display the profiler's data
     if (flag_do_profile) {
         log_profile("Profiler data collection finished.\n");
-        dump_profiler_data();
+        dump_register_stats();
+        dump_cache_stats();
     }
 
     return guest_exit_status;
@@ -146,12 +151,13 @@ bool execute_cached(t_cache_loc loc, context_info *c_info) {
         dump_gp_registers();
     }
 
+#ifndef NDEBUG
     ///check for illegal x0 values
     if (*get_gp_reg_file() != 0) {
         dprintf(2, "riscV register x0 != 0 after executing block\n");
         dprintf(2, "Terminating...");
         return false;
     }
-
+#endif
     return true;
 }

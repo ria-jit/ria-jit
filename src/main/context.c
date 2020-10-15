@@ -9,6 +9,7 @@
 #include <common.h>
 #include <linux/mman.h>
 #include <util/util.h>
+#include <env/opt.h>
 
 /*
  * Dynamically generated switching blocks should give us the freedom to change the mapping more flexibly.
@@ -190,6 +191,10 @@ context_info *init_map_context(void) {
     c_info->r_info = r_info;
     c_info->load_execute_save_context = load_execute_save_context;
     c_info->save_context = save_context;
+    if (perfFd >= 0) {
+        dprintf(perfFd, "%lx %lx context_switch_load_execute\n", (uintptr_t) load_execute_save_context, 4096lu);
+        dprintf(perfFd, "%lx %lx context_switch_save\n", (uintptr_t) save_context, 4096lu);
+    }
 
     return c_info;
 }

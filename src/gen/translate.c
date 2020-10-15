@@ -13,11 +13,14 @@
 #include <parser/parser.h>
 #include <main/context.h>
 #include <gen/optimize.h>
+#include <elf/loadElf.h>
+
+void *currentPos = NULL;
 
 t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
-void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info);
+void translate_risc_instr(t_risc_instr *instr, const context_info *c_info);
 
 int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
 
@@ -45,24 +48,18 @@ int err;
  * (e.g., before translating every basic block).
  */
 void init_block() {
-    void *addr = (void *) (lastUsedAddress - 4096lu);
-    //allocate a memory page for the next basic block that will be translated
-    void *buf = mmap(addr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE | MAP_FIXED_NOREPLACE,
-                     -1, 0);
-    lastUsedAddress -= 4096lu;
-    //check for mmap fault and terminate
-    if (buf != addr) {
-        dprintf(2, "Memory allocation fault in assembly.\n");
-        _exit(-1);
-    }
 
+    if (currentPos == NULL) {
+        setupInstrMem();
+    }
     //set the block_head and current pointer and the failed status
-    block_head = (uint8_t *) buf;
+    block_head = (uint8_t *) currentPos;
     current = block_head;
     err = 0;
-
+#ifndef NDEBUG
     //insert nop at the beginning so debugger step-into works as expected
     *(current++) = 0x90;
+#endif
 }
 
 /**
@@ -79,6 +76,15 @@ t_cache_loc finalize_block(int chainLinkOp) {
 
     //emit the ret instruction as the final instruction in the block
     err |= fe_enc64(&current, FE_RET);
+
+    //Addtional over 16B alignment
+    uintptr_t offset = (uintptr_t) (current) & 0xf;
+    //Alignment Bytes wanted
+    uintptr_t alignment = (16 - offset) & 0xf;
+    for (size_t i = 0; i < alignment; ++i) {
+        fe_enc64(&current, FE_NOP);
+    }
+    currentPos = current;
 
     //check failed flag
     if (err != 0) {
@@ -103,7 +109,7 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * to the current x86 block.
  * @param instr the RISC instruction to translate
  */
-void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info) {
+void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
     //dispatch to translator functions
     dispatch_instr(instr, c_info);
 
@@ -123,7 +129,7 @@ void translate_risc_instr(const t_risc_instr *instr, const context_info *c_info)
     );
 
     //make instruction boundaries visible in disassembly if required
-    if (flag_log_asm_out) {
+    if (flag_verbose_disassembly) {
         err |= fe_enc64(&current, FE_NOP);
         err |= fe_enc64(&current, FE_NOP);
         err |= fe_enc64(&current, FE_NOP);
@@ -167,16 +173,21 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  * @return the cached location of the generated block.
  */
 t_cache_loc
-translate_block_instructions(const t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
 
     ///initialize new block
     init_block();
+
+    ///apply macro optimization
+    if (flag_translate_opt_fusion) {
+        optimize_patterns(block_cache, instructions_in_block);
+    }
 
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
         if (flag_translate_opt_fusion) {
-            optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
+            //optimize_instr((t_risc_instr *) block_cache, i, instructions_in_block);
         }
         translate_risc_instr(&block_cache[i], c_info);
     }
@@ -184,7 +195,9 @@ translate_block_instructions(const t_risc_instr *block_cache, int instructions_i
 
     t_cache_loc block;
     ///finalize block and return cached location
-    if (block_cache[instructions_in_block - 1].mnem == JALR || block_cache[instructions_in_block - 1].mnem == ECALL) {
+    if (
+            //block_cache[instructions_in_block - 1].mnem == JALR ||
+            block_cache[instructions_in_block - 1].mnem == ECALL) {
         block = finalize_block(LINK_NULL);
     } else {
         block = finalize_block(DONT_LINK);
@@ -343,9 +356,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 }
                             }
 
-
-
                             goto PARSE_DONE;
+
                         } else if (parse_buf[parse_pos].reg_dest != x0) {
                             instructions_in_block++;
 
@@ -396,9 +408,11 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         break;
 
                     case JALR : {
-                        if (flag_translate_opt_jump &&
+
+                        if (flag_translate_opt_ras &&
                                 (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
-                            ///2: recursively translate return addr (+4)
+
+                            ///1: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
                                 t_risc_addr ret_target = risc_addr + 4;
@@ -412,6 +426,59 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                     set_cache_entry(ret_target, cache_loc);
                                 }
                             }
+                        }
+
+                        if(     flag_translate_opt_jump &&
+                                instructions_in_block > 0 &&
+                                parse_buf[parse_pos - 1].mnem == AUIPC &&
+                                parse_buf[parse_pos - 1].reg_dest != x0 &&
+                                parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos - 1].reg_dest
+                                )
+                        {
+                            //printf("AUIPC + JALR: %p\n", risc_addr);
+
+                            //check if pop will happen
+                            if( (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                                    parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
+                                log_asm_out("---------WRONG POP JALR------------\n");
+                            }
+
+                            ///1: recursively translate return addr (+4)
+                            //dead ends could arise here
+                            {
+                                t_risc_addr ret_target = risc_addr + 4;
+                                t_cache_loc cache_loc = lookup_cache_entry(ret_target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
+                                                (void *) risc_addr, (void *) ret_target);
+                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(ret_target, c_info);
+                                    set_cache_entry(ret_target, cache_loc);
+                                }
+                            }
+
+                            ///2: recursively translate target
+                            {
+                                t_risc_addr target = (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
+
+                                t_cache_loc cache_loc = lookup_cache_entry(target);
+
+                                if (cache_loc == UNSEEN_CODE) {
+                                    log_asm_out("Recursion in JALR from (riscv)%p to target (riscv)%p\n",
+                                                (void *) risc_addr, (void *) target);
+                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
+                                    cache_loc = translate_block(target, c_info);
+                                    set_cache_entry(target, cache_loc);
+                                }
+                            }
+
+                            ///3: tell translate_JALR to chain
+                            parse_buf[parse_pos].reg_src_2 = 1;
+
+                        } else {
+                            ///2: tell translate_JALR not to chain
+                            parse_buf[parse_pos].reg_src_2 = 0;
                         }
 
                         ///destination address unknown at translate time, stop parsing
@@ -467,6 +534,23 @@ void chain(t_cache_loc target) {
     if (chain_err != 0) {
         ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error in chain, exiting...\n");
+        _exit(-1);
+    }
+}
+
+
+void setupInstrMem() {
+    void *addr = (void *) (TRANSLATOR_BASE - STACK_OFFSET);
+    void *buf = mmap(addr, STACK_OFFSET, PROT_WRITE | PROT_READ | PROT_EXEC,
+                     MAP_FIXED_NOREPLACE | MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
+    currentPos = buf;
+
+    if (BAD_ADDR(buf)) {
+        dprintf(2, "Instruction memory allocation failed. Error %li", -(intptr_t) buf);
+        _exit(-1);
+    }
+    if (buf != addr) {
+        dprintf(2, "Memory allocation fault in assembly.\n");
         _exit(-1);
     }
 }

@@ -23,6 +23,7 @@
 #include <util/util.h>
 #include <common.h>
 #include <linux/mman.h>
+#include <env/opt.h>
 
 #define INITIAL_SIZE 8192
 #define SMALLTLB 0x20
@@ -39,6 +40,9 @@ size_t count_entries = 0;
 t_cache_entry *tlb;
 // size of the tlb
 size_t tlb_size = SMALLTLB;
+
+//count accesses for profiling
+static size_t count_lookups = 0;
 
 
 /**
@@ -103,6 +107,8 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc) {
  * @return code cache address of that instruction, or NULL if nonexistent
  */
 t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
+    if (flag_do_profile) count_lookups++;
+
     size_t smallHash = smallhash(risc_addr);
     if (tlb[smallHash].risc_addr == risc_addr) {
         return tlb[smallHash].cache_loc;
@@ -121,7 +127,9 @@ t_cache_loc lookup_cache_entry(t_risc_addr risc_addr) {
 
 void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
     size_t index = find_lin_slot(risc_addr);
-
+    if (perfFd >= 0) {
+        dprintf(perfFd, "%lx %lx src_0x%lx\n", (uintptr_t) cache_loc, 4096lu, risc_addr);
+    }
     //reallocate if we have filled more than half of the available space
     if (count_entries >= table_size >> 1) {
         //double the table size
@@ -206,4 +214,8 @@ void print_values(void) {
         }
     }
     log_cache("Now contains %lu block(s).\n", blocks);
+}
+
+void dump_cache_stats(void) {
+    log_profile("Logged %lu cache lookups, total block count %lu.\n", count_lookups, count_entries);
 }

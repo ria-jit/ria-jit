@@ -10,6 +10,8 @@
 #include <common.h>
 #include <util/util.h>
 
+#include <parser/parser.h>
+
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info);
 
@@ -105,8 +107,16 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     //why??? not aligned to 4 bit boundary would throw exception anyway...
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, -2);
 
+    ///2: write addr of next instruction in rd
+    if (instr->reg_dest != x0) {
+        if (r_info->mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], instr->addr + 4);
+        } else {
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
+        }
+    }
 
-    ///2: check return stack
+    ///3: check return stack
     if (flag_translate_opt_ras) {
 
         if (instr->reg_dest == x1 || instr->reg_dest == x5) {
@@ -136,30 +146,43 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
      }
 
 
-    ///3: prepare return to transcode loop
+    if (instr->reg_src_2 == 1 && flag_translate_opt_chain) {
 
-    ///write target addr to pc
+        //TODO: more efficient way of obtaining target (without parsing)
+
+        t_risc_instr tmp_p_instr = {};
+        tmp_p_instr.addr = instr->addr - 4;
+
+        parse_instruction(&tmp_p_instr);
+
+        t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.imm + instr->imm;
+
+        t_cache_loc cache_loc = 0;
+        if((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
+            ///4: write chainEnd to be chained by chainer
+            log_asm_out("CHAIN JALR\n");
+            err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
+            err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+        } else {
+            log_asm_out("DIRECT JUMP JALR\n");
+            err |= fe_enc64(&current, FE_MOV64ri, FE_CX, cache_loc);
+            err |= fe_enc64(&current, FE_JMPr, FE_CX);
+        }
+
+    } else {
+        ///dont chain
+        log_asm_out("DON'T CHAIN JALR\n");
+        if (flag_translate_opt) {
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
+        }
+    }
+
+    ///5: write target addr to pc
     if (r_info->mapped[pc]) {
         err |= fe_enc64(&current, FE_MOV64rr, r_info->map[pc], FE_AX);
     } else {
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * pc), FE_AX);
     }
-
-    ///write addr of next instruction in rd
-    if (instr->reg_dest != x0) {
-        if (r_info->mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], instr->addr + 4);
-        } else {
-            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
-        }
-    }
-
-    /*
-    ///write chainEnd to be chained by chainer
-    if (flag_translate_opt) {
-        err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
-    }
-    */
 
 }
 
@@ -268,8 +291,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
         }
             ///else get rs2 from mem
         else {
-            err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
-                            FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            if (instr->reg_src_2 == x0) {
+                err |= fe_enc64(&current, FE_TEST64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_1]);
+            } else {
+
+                err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
+                                FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            }
         }
     } else {
         ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
@@ -280,8 +308,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
         }
             ///else get both from mem, rs1 in temp register
         else {
-            err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-            err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            if (instr->reg_src_2 == x0) {
+                err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), 0);
+            } else {
+
+                err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
+                err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
+            }
         }
     }
 }

@@ -76,7 +76,7 @@ void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOVZXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    err |= fe_enc64(&current, FE_MOVZXr32m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 
     storeRd(instr, r_info, regDest);
 }
@@ -95,7 +95,7 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
     FeReg regDest = getRd(instr, r_info, FIRST_REG);
 
-    err |= fe_enc64(&current, FE_MOVZXr64m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    err |= fe_enc64(&current, FE_MOVZXr32m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 
     storeRd(instr, r_info, regDest);
 }

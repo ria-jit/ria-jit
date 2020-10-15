@@ -11,6 +11,7 @@ bool flag_log_general = false;
 bool flag_log_syscall = false;
 bool flag_log_asm_in = false;
 bool flag_log_asm_out = false;
+bool flag_verbose_disassembly = false;
 bool flag_log_reg_dump = false;
 bool flag_log_cache = false;
 bool flag_log_cache_contents = false;
@@ -28,7 +29,7 @@ bool flag_do_benchmark = false;
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
-const char *const translator_version = "1.2.2";
+const char *const translator_version = "1.2.3";
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);

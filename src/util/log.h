@@ -23,6 +23,7 @@ extern bool flag_log_general;
 extern bool flag_log_syscall;
 extern bool flag_log_asm_in;
 extern bool flag_log_asm_out;
+extern bool flag_verbose_disassembly;
 extern bool flag_log_reg_dump;
 extern bool flag_log_cache;
 extern bool flag_log_cache_contents;

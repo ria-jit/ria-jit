@@ -26,7 +26,7 @@ void set_value(t_risc_reg reg, t_risc_reg_val val);
 
 void dump_gp_registers(void);
 
-void dump_profiler_data(void);
+void dump_register_stats(void);
 
 #ifdef __cplusplus
 }
