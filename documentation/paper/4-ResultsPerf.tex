@@ -34,7 +34,7 @@
 			}
 		]	
 			\addplot+ [
-				fill=era-red,
+				fill=era-dbt-1,
 				draw=black
 			] coordinates {
 				(First category, 3061)
@@ -43,7 +43,7 @@
 			};
 			
 			\addplot+ [
-				fill=era-orange,
+				fill=era-qemu,
 				draw=black
 			] coordinates {
 				(First category, 3061)
@@ -52,7 +52,7 @@
 			};
 			
 			\addplot+ [
-				fill=era-green,
+				fill=era-native,
 				draw=black
 			] coordinates {
 				(First category, 4043)
@@ -86,69 +86,142 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, wh
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
 % todo Keep up to date with performance-improving changes.
-% todo figure out which of the SPEC benchmarks to list here.
+% todo normalise the results
 % ================================
 \begin{figure}[h]
 	\centering
-	\begin{tikzpicture}
-		\begin{axis}[%
-			title = {SPEC CPU 2017},
-			ybar,
-			area legend,
-			ylabel = {Execution time [s]},
-			xtick = data,
-			xtick style = {draw = none},
-			ytick = {0, 2500, 5000, 7500, 10000, 12500, 15000},
-			scaled y ticks = false,
-			symbolic x coords={602.gcc\_s, 605.mcf\_s, 620.omnetpp\_s, 631.deepsjeng\_s},
-			ymin = 0,
-			ymajorgrids = true,
-			height = 6.0cm,
-			width = 0.9\linewidth,
-			legend style = {
-				at = {(0.5, -0.25)},
-				anchor = north,
-				legend columns = 3,
-				column sep = 0.2cm
-			}
-		]	
-			% Native results
-			\addplot+ [
-				fill=era-green,
-				draw=black
-			] coordinates {
-				(602.gcc\_s, 1002)
-				(605.mcf\_s, 1406)
-				(620.omnetpp\_s, 886)
-				(631.deepsjeng\_s, 770)
-			};
-			
-			% QEMU results
-			\addplot+ [
-				fill=era-orange,
-				draw=black
-			] coordinates {
-				(602.gcc\_s, 3061)
-				(605.mcf\_s, 3182)
-				(620.omnetpp\_s, 2576)
-				(631.deepsjeng\_s, 2459)
-			};
-			
-			% DBT results
-			\addplot+ [
-				fill=era-red,
-				draw=black
-			] coordinates {
-				(602.gcc\_s, 8693)
-				(605.mcf\_s, 3558)
-				(620.omnetpp\_s, 7892)
-				(631.deepsjeng\_s, 10089)
-			};
+	% 1/2
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[%
+				title = {SPEC CPU 2017 \texttt{intspeed} Results},
+				ybar,
+				area legend,
+				ylabel = {Execution time [s]},
+				xtick = data,
+				xtick style = {draw = none},
+				scaled y ticks = false,
+				symbolic x coords={600.perlbench, 602.gcc, 605.mcf, 620.omnetpp, 623.xalancbmk},
+				ymin = 0,
+				ymajorgrids = true,
+				height = 6.0cm,
+				width = 0.9\linewidth,
+				legend style = {
+					at = {(0.5, -0.25)},
+					anchor = north,
+					legend columns = 3,
+					column sep = 0.2cm
+				}
+			]	
+				% Native results
+				\addplot+ [
+					fill=era-native,
+					draw=black
+				] coordinates {
+					(600.perlbench, 654)
+					(602.gcc, 953)
+					(605.mcf, 1409)
+					(620.omnetpp, 779)
+					(623.xalancbmk, 533)
+				};
+				
+				% DBT results
+				\addplot+ [
+					fill=era-dbt-1,
+					draw=black
+				] coordinates {
+					(600.perlbench, 2222)
+					(602.gcc, 1956)
+					(605.mcf, 2695)
+					(620.omnetpp, 1768)
+					(623.xalancbmk, 1178)
+				};
+				
+				% QEMU results
+				\addplot+ [
+					fill=era-qemu,
+					draw=black
+				] coordinates {
+					(600.perlbench, 3061)
+					(602.gcc, 3390)
+					(605.mcf, 3182)
+					(620.omnetpp, 2576)
+					(623.xalancbmk, 1711)
+				};
+	
+				\legend{Native, DBT, QEMU}
+			\end{axis}
+		\end{tikzpicture}
+		\caption	{Partial benchmark results.}
+	\end{subfigure}
+	
+	% 2/2
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[%
+				title = {~},
+				ybar,
+				area legend,
+				ylabel = {Execution time [s]},
+				xtick = data,
+				xtick style = {draw = none},
+				ytick = {0, 2500, 5000, 7500, 10000, 12500, 15000},
+				scaled y ticks = false,
+				symbolic x coords={625.x264, 631.deepsjeng, 641.leela, 648.exchange2, 657.xz},
+				ymin = 0,
+				ymajorgrids = true,
+				height = 6.0cm,
+				width = 0.9\linewidth,
+				legend style = {
+					at = {(0.5, -0.25)},
+					anchor = north,
+					legend columns = 3,
+					column sep = 0.2cm
+				}
+			]	
+				% Native results
+				\addplot+ [
+					fill=era-native,
+					draw=black
+				] coordinates {
+					(625.x264, 554)
+					(631.deepsjeng, 773)
+					(641.leela, 1045)
+					(648.exchange2, 780)
+					(657.xz, 4665)
+				};
+				
+				% DBT results
+				\addplot+ [
+					fill=era-dbt-1,
+					draw=black
+				] coordinates {
+					(625.x264, 2590)
+					(631.deepsjeng, 1603)
+					(641.leela, 2080)
+					(648.exchange2, 1575)
+					(657.xz, 11083)
+				};
+				
+				% QEMU results
+				\addplot+ [
+					fill=era-qemu,
+					draw=black
+				] coordinates {
+					(625.x264, 2921)
+					(631.deepsjeng, 2459)
+					(641.leela, 3171)
+					(648.exchange2, 2213)
+					(657.xz, 8915)
+				};
 
-			
-			\legend{Native, QEMU, DBT}
-		\end{axis}
-	\end{tikzpicture}
+				\legend{Native, DBT, QEMU}
+			\end{axis}
+		\end{tikzpicture}
+		\caption	{Partial benchmark results.}
+	\end{subfigure}
 	\caption[SPEC CPU 2017 Results]%
 	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed}.}
 \end{figure}
@@ -189,21 +262,21 @@ As there is no such executable available for the RISC-V architecture, the source
 			}
 		]	
 			\addplot+ [
-				fill=era-green,
+				fill=era-native,
 				draw=black
 			] coordinates {
 				(44.14,Native)
 			};
 
 			\addplot+ [
-				fill=era-orange,
+				fill=era-qemu,
 				draw=black
 			] coordinates {
 				(121.83,QEMU)
 			};
 			
 			\addplot+ [
-				fill=era-red,
+				fill=era-dbt-1,
 				draw=black
 			] coordinates {
 				(136.77,v1.2.2-61)
@@ -251,34 +324,34 @@ By implementing optimisations to the DBT like a return address stack, recursive 
 			}
 		]	
 			\addplot+ [
-				fill=era-green,
+				fill=era-native,
 				draw=black
 			] coordinates {
 				(23385.65,Native)
 			};
 
 			\addplot+ [
-				fill=era-orange,
+				fill=era-qemu,
 				draw=black
 			] coordinates {
 				(67312.47,QEMU)
 			};
 			
 			\addplot+ [
-				fill=era-blue,
+				fill=era-dbt-2,
 				draw=black
 			] coordinates {
 				(302521.38,DBT unoptimised)
 			};
 			
 			\addplot+ [
-				fill=era-red,
+				fill=era-dbt-1,
 				draw=black
 			] coordinates {
 				(37565.99,DBT optimised)
 			};
 			
-			\legend{Native, QEMU, DBT (\texttt{--optimize=none}), DBT (optimized)}
+			\legend{Native, QEMU, DBT (\texttt{----optimize=none}), DBT (optimized)}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[Execution time of merge sort (5000 runs)]%
