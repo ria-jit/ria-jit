@@ -188,7 +188,7 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINW...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -201,8 +201,8 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVL32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -220,7 +220,7 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXW...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -233,8 +233,8 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVG32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -252,7 +252,7 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINUW...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -265,8 +265,8 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVC32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -284,7 +284,7 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
 void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXUW...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -297,8 +297,8 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP32rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV32rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVA32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -479,7 +479,7 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMIND...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -492,8 +492,8 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVL64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -511,7 +511,7 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXD...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -524,8 +524,8 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVG64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -543,7 +543,7 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMINUD...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
 
     saveScratchReg(SCRATCH_REG);
@@ -557,8 +557,8 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore. (CMOVC = CMOVB and there is only one mnemonic available.)
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVC64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
@@ -576,7 +576,7 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
 void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AMOMAXUD...\n");
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regSrc2 = getRs2Into(instr, r_info, SECOND_REG);
     FeReg regDest = getRd(instr, r_info);
     saveScratchReg(SCRATCH_REG);
 
@@ -589,8 +589,8 @@ void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMP64rr, SCRATCH_REG, regSrc2);
     ///Can use SECOND_REG as a second scratch reg here since it is not stored back if used before and its old value is
     /// only overwritten if not needed anymore.
-    if (regSrc2 != SECOND_REG) {
-        err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc2);
+    if (regDest != regSrc2) {
+        invalidateReplacement(r_info, SECOND_REG, true);
     }
     err |= fe_enc64(&current, FE_CMOVA64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
