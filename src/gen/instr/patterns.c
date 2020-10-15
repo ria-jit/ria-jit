@@ -75,22 +75,22 @@ const pattern_element p_2_elem[] = {
 
 const pattern_element p_3_elem[] = {
         {AUIPC, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
-        {ADDI, rd_h1, DONT_CARE, rd_h1, 0, 0, 0, 0}
+        {ADDI,  rd_h1,     DONT_CARE, rd_h1,     0, 0, 0, 0}
 };
 
 const pattern_element p_4_elem[] = {
         {AUIPC, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
-        {LW, rd_h1, DONT_CARE, rd_h1, 0, 0, 0, 0}
+        {LW,    rd_h1,     DONT_CARE, rd_h1,     0, 0, 0, 0}
 };
 
 const pattern_element p_5_elem[] = {
         {AUIPC, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
-        {LD, rd_h1, DONT_CARE, rd_h1, 0, 0, 0, 0}
+        {LD,    rd_h1,     DONT_CARE, rd_h1,     0, 0, 0, 0}
 };
 
 const pattern_element p_6_elem[] = {
         {SLLI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 32},    //rd == rs1???
-        {SRLI, rd_h1, DONT_CARE, rd_h1, 0, 0, 1, 32}
+        {SRLI, rd_h1,     DONT_CARE, rd_h1,     0, 0, 1, 32}
 };
 
 const pattern_element p_7_elem[] = {
@@ -153,17 +153,17 @@ const pattern_element p_19_elem[] = {
 
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at 0x%lx\n", instr->addr);
+    invalidateAllReplacements(r_info);
 
     //TODO Check if address fits into 32bit and use non RIP-relative absolute
-    invalidateReplacement(r_info, FE_AX, true);
     err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm));
     err |= fe_enc64(&current, FE_ADD64mi, FE_MEM(FE_AX, 0, 0, 0), instr[2].imm);
 }
 
 void emit_pattern_2(const t_risc_instr instrs[static 5], const register_info *r_info) {
     log_asm_out("emit pattern 2: inc m64 at 0x%lx\n", instrs[0].addr);
+    invalidateAllReplacements(r_info);
 
-    invalidateReplacement(r_info, FE_AX, true);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm + instrs[2].imm;
     if ((int64_t) addr == (int32_t) addr) {
         err |= fe_enc64(&current, FE_ADD32mi, FE_MEM(0, 0, 0, addr), instrs[3].imm);
@@ -175,13 +175,13 @@ void emit_pattern_2(const t_risc_instr instrs[static 5], const register_info *r_
 
 void emit_pattern_3(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 3: AUIPC + ADDI at 0x%lx\n", instrs[0].addr);
+    invalidateAllReplacements(r_info);
 
     if (instrs[1].reg_dest == x0) {
         log_asm_out("pattern 3: addi x0 at %p\n", (void *) current);
         return;
     }
 
-    invalidateReplacement(r_info, FE_AX, true);
     t_risc_addr value = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instrs[0].reg_dest], value);
@@ -197,8 +197,8 @@ void emit_pattern_3(const t_risc_instr instrs[static 2], const register_info *r_
 
 void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 4: AUIPC + LW at 0x%lx\n", instrs[0].addr);
+    invalidateAllReplacements(r_info);
 
-    invalidateReplacement(r_info, FE_AX, true);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
@@ -220,8 +220,8 @@ void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_
 
 void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 5: AUIPC + LD at 0x%lx\n", instrs[0].addr);
+    invalidateAllReplacements(r_info);
 
-    invalidateReplacement(r_info, FE_AX, true);
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
     if (r_info->mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
@@ -243,8 +243,8 @@ void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_
 
 void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_info) {
     log_asm_out("emit pattern 6: SLLI +  SRLI at 0x%lx\n", instrs[0].addr);
+    invalidateAllReplacements(r_info);
 
-    invalidateReplacement(r_info, FE_AX, true);
     if (r_info->mapped[instrs[0].reg_src_1]) {
         if (r_info->mapped[instrs[1].reg_dest]) {
             //sets high 32 to zero
@@ -286,12 +286,12 @@ void emit_pattern_7(const t_risc_instr instr[static 3], const register_info *r_i
  */
 void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 8: ADDIW 32b sign extension at 0x%lx\n", instr[0].addr);
+    invalidateAllReplacements(r_info);
 
     if (r_info->mapped[instr->reg_src_1]) {
         if (r_info->mapped[instr->reg_dest]) {
             err |= fe_enc64(&current, FE_MOVSXr64r32, r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
         } else {
-            invalidateReplacement(r_info, FE_AX, true);
             err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, r_info->map[instr->reg_src_1]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
         }
@@ -300,7 +300,6 @@ void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info
             err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instr->reg_dest],
                             FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
         } else {
-            invalidateReplacement(r_info, FE_AX, true);
             err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
         }
