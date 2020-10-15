@@ -294,6 +294,16 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
+
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
@@ -367,6 +377,16 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
+
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
@@ -387,6 +407,16 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
@@ -547,6 +577,16 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
+
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
@@ -570,6 +610,16 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
+
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
@@ -592,6 +642,16 @@ void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
+
+    if (regDest == regSrc2) {
+        if (regSrc1 == FE_AX) {
+            invalidateReplacement(r_info, FE_DX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX);
+        } else {
+            invalidateReplacement(r_info, FE_AX);
+            regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX);
+        }
+    }
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
