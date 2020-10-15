@@ -51,12 +51,12 @@ void translate_MULH(const t_risc_instr *instr, const register_info *r_info) {
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
     err |= fe_enc64(&current, FE_IMUL64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //we want the upper XLEN bits (in RDX) here
     if (regDest != FE_DX) {
@@ -106,12 +106,12 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     ///Uses RAX and RDX specifically because of the IMULs input/output.
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the IMUL
     // But we need rs2 again
     err |= fe_enc64(&current, FE_IMUL64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     //insert same forward jump here later
@@ -155,11 +155,11 @@ void translate_MULHU(const t_risc_instr *instr, const register_info *r_info) {
     getRs1Into(instr, r_info, FE_AX);
     FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     //TODO Optimization: Could get rid of one of the memory loads potentially by using a memory operand for the MUL
     err |= fe_enc64(&current, FE_MUL64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //we want the upper XLEN (in RDX) bits here
     if (regDest != FE_DX) {
@@ -186,6 +186,7 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -200,7 +201,6 @@ void translate_DIV(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //insert same forward jump here later
     uint8_t *jmpNotDivZeroBuf = current;
@@ -240,8 +240,8 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
-
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
 
     ///Special case for div by zero
@@ -254,7 +254,6 @@ void translate_DIVU(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_DIV64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //insert same forward jump here later
     uint8_t *jmpNotDivZeroBuf = current;
@@ -296,6 +295,7 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
 
     ///Uses RDX specifically because of IDIVs output
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -310,7 +310,6 @@ void translate_REM(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //insert same forward jump here later
     uint8_t *jmpNotDivZeroBuf = current;
@@ -352,6 +351,7 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///Uses RDX specifically because of DIVs output
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST64rr, regSrc2, regSrc2);
@@ -366,7 +366,6 @@ void translate_REMU(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_DIV64r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //insert same forward jump here later
     uint8_t *jmpNotDivZeroBuf = current;
@@ -434,6 +433,7 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     /// of the IDIV)
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -448,7 +448,6 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
@@ -491,6 +490,7 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     /// of the DIV)
     getRs1Into(instr, r_info, FE_AX);
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -505,7 +505,6 @@ void translate_DIVUW(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_DIV32r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
@@ -550,6 +549,7 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
 
     ///Uses RDX specifically because of the IDIVs output
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -564,7 +564,6 @@ void translate_REMW(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_IDIV32r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_DX);
@@ -608,6 +607,7 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
 
     ///Uses RDX specifically because of the DIVs output
     invalidateReplacement(r_info, FE_DX, true);
+    invalidateReplacement(r_info, FE_AX, true);
     FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_TEST32rr, regSrc2, regSrc2);
@@ -622,7 +622,6 @@ void translate_REMUW(const t_risc_instr *instr, const register_info *r_info) {
     // Loading rs2 into register always, if not already mapped, should be the better choice, since it is needed more
     // than once.
     err |= fe_enc64(&current, FE_DIV32r, regSrc2);
-    invalidateReplacement(r_info, FE_AX, false);
 
     //If rd is not mapped this will only be an inplace sign extend otherwise will also do the mov
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_DX);
