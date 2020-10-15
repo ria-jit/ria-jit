@@ -342,7 +342,7 @@ void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) 
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1 && regDest != FIRST_REG) {
+    if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 }
