@@ -291,13 +291,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
     FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
+
+    invalidateAllReplacements(r_info);
 }
 
 static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *noJmpLoc,
                               uint64_t jmpMnem) {
-    invalidateAllReplacements(r_info);
-
     ///set pc: BRANCH
     t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
