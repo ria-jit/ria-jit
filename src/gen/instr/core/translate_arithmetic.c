@@ -20,10 +20,10 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    }
-
-    if (instr->imm != 0) {
+        //Address size prefix
+        *(current++) = 0x67;
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    } else if (instr->imm != 0) {
         err |= fe_enc64(&current, FE_ADD32ri, regDest, instr->imm);
     }
 
@@ -82,10 +82,8 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    }
-
-    if (instr->imm != 0) {
+        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    } else if (instr->imm != 0) {
         err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
     }
 }
@@ -256,7 +254,11 @@ void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD64rr);
+    if (regSrc1 != regDest && regSrc2 != regDest) {
+        fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 1, regSrc2, 0));
+    } else {
+        doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD64rr);
+    }
 }
 
 /**
@@ -544,8 +546,13 @@ void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
-
-    doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD32rr);
+    if (regSrc1 != regDest && regSrc2 != regDest) {
+        //Address size override prefix
+        *(current++) = 0x67;
+        fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 1, regSrc2, 0));
+    } else {
+        doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD32rr);
+    }
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
