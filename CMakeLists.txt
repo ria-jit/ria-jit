@@ -3,23 +3,6 @@ project(DynamicBinaryTranslatorRISCV64->x86-64)
 
 set(CMAKE_C_STANDARD 99)
 
-find_package(Git REQUIRED)
-
-execute_process(
-        COMMAND "${GIT_EXECUTABLE}" describe --tags --always
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        RESULT_VARIABLE res
-        OUTPUT_VARIABLE MYAPP_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-set_property(GLOBAL APPEND
-        PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${CMAKE_SOURCE_DIR}/.git/index")
-
-message("${MYAPP_VERSION}")
-add_definitions(-DTRANSLATOR_VERSION="${MYAPP_VERSION}")
-
-
 #Create CMake Constant TRANSLATOR_BASE
 set(TRANSLATOR_BASE 0x780000000000)
 #Tell compiler and linker that we want to relocate to TRANSLATOR_BASE
@@ -64,9 +47,19 @@ ExternalProject_Add(fadec
         TEST_COMMAND meson test -v
         BUILD_BYPRODUCTS ${FADEC_BYPRODUCTS})
 
+#Will always be regenerated
+add_custom_target(
+        version
+        ${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/src/util/version.h.in
+        -D DST=${CMAKE_BINARY_DIR}/src/util/version.h
+        -P ${CMAKE_SOURCE_DIR}/version.cmake
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
+)
+
 include_directories(src)
 include_directories(lib)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 
 set(TRANSLATOR_SOURCES
         src/main/main.c src/main/main.h
@@ -103,7 +96,9 @@ set(TRANSLATOR_SOURCES
         lib/ryu/ryu.h
         src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h
         src/gen/optimize.c src/gen/optimize.h
-        src/gen/instr/patterns.h src/gen/instr/patterns.c)
+        src/gen/instr/patterns.h src/gen/instr/patterns.c
+        ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
+        )
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
@@ -135,7 +130,7 @@ set_target_properties(fadecLib PROPERTIES
 add_dependencies(fadecLib fadec)
 
 #Make sure fadecLib is built before translator or test
-add_dependencies(translator fadecLib)
+add_dependencies(translator fadecLib version)
 add_dependencies(test fadecLib)
 
 target_link_libraries("translator" fadecLib)

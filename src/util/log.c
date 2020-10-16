@@ -6,6 +6,7 @@
 #include "typedefs.h"
 #include <common.h>
 #include <stdbool.h>
+#include <util/version.h>
 
 bool flag_log_general = false;
 bool flag_log_syscall = false;
@@ -30,7 +31,7 @@ bool flag_do_benchmark = false;
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
-const char *const translator_version = TRANSLATOR_VERSION;
+const char *const translator_version = VERSION;
 
 void not_yet_implemented(const char *info) {
     log_general("%s - not yet implemented\n", info);
