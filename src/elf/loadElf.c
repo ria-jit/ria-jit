@@ -47,6 +47,18 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         return INVALID_ELF_MAP;
     }
 
+    if (header.e_machine != EM_RISCV) {
+        dprintf(2, "Tried to translate a non-RISCV binary.");
+        _exit(1);
+    }
+    if (header.e_ident[EI_CLASS] != ELFCLASS64) {
+        dprintf(2, "Tried executing a non-64bit binary.");
+        _exit(1);
+    }
+    if (header.e_type != ET_EXEC) {
+        dprintf(2, "Tried executing a non-static binary.");
+        _exit(1);
+    }
 
     Elf64_Half ph_count = header.e_phnum;
     Elf64_Off ph_offset = header.e_phoff;
@@ -154,7 +166,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 }
                 break;
             }
-            case PT_DYNAMIC: //Fallthrough
             case PT_INTERP: {
                 dprintf(2, "Bad. Got file that needs dynamic linking.");
                 return INVALID_ELF_MAP;
