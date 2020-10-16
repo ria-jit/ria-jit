@@ -197,7 +197,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 case 'h':
                 default:
                 HELP:
-                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
+                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator %s\n", translator_version);
                     dprintf(1,
                             "Usage: translator [translator option(s)] -f <filename> [guest options]\n"
                             "\n"
