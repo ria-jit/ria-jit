@@ -59,7 +59,7 @@ void init_block(register_info *r_info) {
 
 #ifndef NDEBUG
     //insert nop at the beginning so debugger step-into works as expected
-    *(current++) = 0x90;
+    fe_enc64(&current, FE_NOP);
 #endif
 
     //make sure all replacement registers are written back as a precaution
