@@ -572,7 +572,7 @@ void emit_pattern_23(const t_risc_instr instrs[static 2], const register_info *r
         err |= fe_enc64(&current, FE_ADD32ri, regDest, instrs[0].imm);
     }
     //zero-extending to 32-bit implicitly zeroes the upper 32 bits of the 64-bit register
-    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regSrc1);
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
 }
 
 
