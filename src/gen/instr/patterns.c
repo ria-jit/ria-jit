@@ -160,6 +160,10 @@ const pattern_element p_21_elem[] = {
         {SRLI, rd_h1,     DONT_CARE, rd_h1,     0, 0, 0, 0}
 };
 
+const pattern_element p_22_elem[] = {
+        {ANDI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 0xff}
+};
+
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at 0x%lx\n", instr->addr);
     invalidateAllReplacements(r_info);
@@ -529,6 +533,19 @@ void emit_pattern_21(const t_risc_instr instrs[static 2], const register_info *r
     }
 }
 
+/**
+ * Translate a zero-extension from 8-bit to 64-bit.
+ * @param instr the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_22(const t_risc_instr *instr, const register_info *r_info) {
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
+
+    //zero-extending to 32-bit implicitly zeroes the upper 32 bits of the 64-bit register
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regSrc1);
+}
+
 
 //order = length, descending
 //order is important because longer patterns can contain shorter ones,
@@ -547,6 +564,7 @@ const pattern patterns[] = {
         {p_11_elem, 1, &emit_pattern_11_MV}, //ADDI MV
         {p_20_elem, 1, &emit_pattern_20_small_LI}, //ADDI small LI
         {p_8_elem,  1, &emit_pattern_8_SEXTW},  //ADDIW SX only
+        {p_22_elem, 1, &emit_pattern_22}, //ANDI zero-extend 0xff
         {p_10_elem, 1, &emit_pattern_10_NOP}, //ADDI NOP
         {p_12_elem, 1, &emit_pattern_12_NOT}, //XORI NOT
         {p_13_elem, 1, &emit_pattern_13_NEG}, //SUB NEG

@@ -193,11 +193,20 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    if ((uint32_t) instr->imm == (uint64_t) instr->imm) {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_AND32ri, regDest, instr->imm);
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_AND64ri, regDest, instr->imm);
     }
 
-    err |= fe_enc64(&current, FE_AND64ri, regDest, instr->imm);
 }
 
 /**
