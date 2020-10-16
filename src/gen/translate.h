@@ -30,7 +30,7 @@ extern uint8_t *current;
 extern int err;
 
 //basic block translation management
-void init_block();
+void init_block(register_info *r_info);
 
 t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info);
 

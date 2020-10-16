@@ -46,9 +46,9 @@ int err;
  * Initializes a new translatable block of code.
  * Call this before translating any instructions that belong together in the same execution run
  * (e.g., before translating every basic block).
+ * @param r_info the register mapping info for invalidating the replacements
  */
-void init_block() {
-
+void init_block(register_info *r_info) {
     if (currentPos == NULL) {
         setupInstrMem();
     }
@@ -56,10 +56,14 @@ void init_block() {
     block_head = (uint8_t *) currentPos;
     current = block_head;
     err = 0;
+
 #ifndef NDEBUG
     //insert nop at the beginning so debugger step-into works as expected
     *(current++) = 0x90;
 #endif
+
+    //make sure all replacement registers are written back as a precaution
+    invalidateAllReplacements(r_info);
 }
 
 /**
@@ -192,7 +196,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
 t_cache_loc
 translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
     ///initialize new block
-    init_block();
+    init_block(c_info->r_info);
 
     ///apply macro optimization
     if (flag_translate_opt_fusion) {
