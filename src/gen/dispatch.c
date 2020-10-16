@@ -22,7 +22,7 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_pattern_emit(instr, r_info);
             break;
         case INVALID_MNEM:
-            translate_INVALID(instr);
+            translate_INVALID(instr, r_info);
             break;
         case LUI:
             translate_LUI(instr, r_info);
@@ -493,7 +493,7 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_FMVDX(instr, r_info);
             break;
         case PC_NEXT_INST:
-            translate_PC_NEXT_INST((t_risc_addr) instr->imm, r_info->base);
+            translate_PC_NEXT_INST((t_risc_addr) instr->imm, r_info);
             break;
         case SILENT_NOP:
             translate_SILENT_NOP(instr, r_info);

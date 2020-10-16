@@ -16,12 +16,10 @@ void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LB...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -35,12 +33,10 @@ void translate_LH(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LH...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -54,12 +50,10 @@ void translate_LW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LW...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVSXr64m32, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -73,12 +67,10 @@ void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LBU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVZXr32m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -92,12 +84,10 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LHU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOVZXr32m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -110,8 +100,8 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SB(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SB...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV8mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
@@ -126,8 +116,8 @@ void translate_SB(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SH(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SH...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV16mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
@@ -142,8 +132,8 @@ void translate_SH(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SW...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
@@ -159,16 +149,14 @@ void translate_LWU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LWU...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     ///All instructions with 32bit register targets on x86-64 automatically zero extend. Hence there is no movzx r64,
     /// r/m32. Instead you use mov r32, r/m32
 
 
     err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -182,12 +170,10 @@ void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate LD...\n");
 
     ///Can use same reg since temporary rs1 is not needed afterwards.
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -200,8 +186,8 @@ void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SD...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }

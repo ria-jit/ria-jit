@@ -31,7 +31,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     ///push to return stack
     if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
-        rs_emit_push(instr);
+        rs_emit_push(instr, r_info);
     }
 
     ///set rd
@@ -51,6 +51,9 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     t_risc_addr target = instr->addr + instr->imm;
 
     t_cache_loc cache_loc;
+
+    //potentially write back the register used by the translated AUIPC instruction above
+    invalidateAllReplacements(r_info);
 
     if (!flag_translate_opt_chain || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
             cache_loc == (t_cache_loc) 1) {
@@ -94,6 +97,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     ///1: compute target address
 
     ///mov rs1 to temp register
+    invalidateAllReplacements(r_info);
     if (r_info->mapped[instr->reg_src_1]) {
         err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
     } else {
@@ -123,22 +127,22 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
             if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 if (instr->reg_dest == instr->reg_src_1) {
                     ///push
-                    rs_emit_push(instr);
+                    rs_emit_push(instr, r_info);
                 } else {
                     //not tested
                     ///pop and push
-                    rs_emit_pop_RAX(false);
-                    rs_emit_push(instr);
-                    rs_jump_stack();
+                    rs_emit_pop_RAX(false, r_info);
+                    rs_emit_push(instr, r_info);
+                    rs_jump_stack(r_info);
                 }
             } else {
                 ///push
-                rs_emit_push(instr);
+                rs_emit_push(instr, r_info);
             }
         } else {
             if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 ///pop
-                rs_emit_pop_RAX(true);
+                rs_emit_pop_RAX(true, r_info);
             } else {
                 ///none
             }
@@ -275,6 +279,7 @@ void translate_BGEU(const t_risc_instr *instr, const register_info *r_info) {
 
 static inline void
 translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info *r_info) {
+
     //add rs1, rs2 access to profiler
     if (flag_do_profile) {
         RECORD_PROFILER(instr->reg_src_1);
@@ -282,41 +287,12 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
     }
 
     ///compare registers:
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
 
-    ///rs1 mapped?
-    if (r_info->mapped[instr->reg_src_1]) {
-        ///everything mapped
-        if (r_info->mapped[instr->reg_src_2]) {
-            err |= fe_enc64(&current, FE_CMP64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_2]);
-        }
-            ///else get rs2 from mem
-        else {
-            if (instr->reg_src_2 == x0) {
-                err |= fe_enc64(&current, FE_TEST64rr, r_info->map[instr->reg_src_1], r_info->map[instr->reg_src_1]);
-            } else {
+    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
 
-                err |= fe_enc64(&current, FE_CMP64rm, r_info->map[instr->reg_src_1],
-                                FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-            }
-        }
-    } else {
-        ///rs2 mapped && order of compare doesn't matter -> get rs1 from mem
-        if (r_info->mapped[instr->reg_src_2]) {
-            err |= fe_enc64(&current, FE_CMP64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1),
-                            r_info->map[instr->reg_src_2]);
-
-        }
-            ///else get both from mem, rs1 in temp register
-        else {
-            if (instr->reg_src_2 == x0) {
-                err |= fe_enc64(&current, FE_CMP64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1), 0);
-            } else {
-
-                err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
-                err |= fe_enc64(&current, FE_CMP64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_2));
-            }
-        }
-    }
+    invalidateAllReplacements(r_info);
 }
 
 static inline void
@@ -372,8 +348,9 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     err |= fe_enc64(&endJmpLoc, FE_JMP, (intptr_t) current); //replace dummy
 }
 
-void translate_INVALID(const t_risc_instr *instr) {
+void translate_INVALID(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate INVALID_OP\n");
+    invalidateReplacement(r_info, FE_DX, true);
     ///call error handler
     err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
     err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);

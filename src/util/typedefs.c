@@ -4,7 +4,7 @@
 
 #include "typedefs.h"
 
-char* errorcode_to_string(int errorcode){
+char *errorcode_to_string(int errorcode) {
     switch (errorcode) {
         case E_UNKNOWN:
             return "unknown";
@@ -497,6 +497,131 @@ char *reg_to_alias(int reg) {
             return "t5";
         case t6:
             return "t6";
+        default:
+            return "INVALID";
+    }
+}
+
+char *reg_x86_to_string(FeReg reg) {
+    switch (reg) {
+        case FE_AX:
+            return "AX";
+        case FE_CX:
+            return "CX";
+        case FE_DX:
+            return "DX";
+        case FE_BX:
+            return "BX";
+        case FE_SP:
+            return "SP";
+        case FE_BP:
+            return "BP";
+        case FE_SI:
+            return "SI";
+        case FE_DI:
+            return "DI";
+        case FE_R8:
+            return "R8";
+        case FE_R9:
+            return "R9";
+        case FE_R10:
+            return "R10";
+        case FE_R11:
+            return "R11";
+        case FE_R12:
+            return "R12";
+        case FE_R13:
+            return "R13";
+        case FE_R14:
+            return "R14";
+        case FE_R15:
+            return "R15";
+        case FE_IP:
+            return "IP";
+        case FE_AH:
+            return "AH";
+        case FE_CH:
+            return "CH";
+        case FE_DH:
+            return "DH";
+        case FE_BH:
+            return "BH";
+        case FE_ES:
+            return "ES";
+        case FE_CS:
+            return "CS";
+        case FE_SS:
+            return "SS";
+        case FE_DS:
+            return "DS";
+        case FE_FS:
+            return "FS";
+        case FE_GS:
+            return "GS";
+        case FE_ST0:
+            return "ST0";
+        case FE_ST1:
+            return "ST1";
+        case FE_ST2:
+            return "ST2";
+        case FE_ST3:
+            return "ST3";
+        case FE_ST4:
+            return "ST4";
+        case FE_ST5:
+            return "ST5";
+        case FE_ST6:
+            return "ST6";
+        case FE_ST7:
+            return "ST7";
+        case FE_MM0:
+            return "MM0";
+        case FE_MM1:
+            return "MM1";
+        case FE_MM2:
+            return "MM2";
+        case FE_MM3:
+            return "MM3";
+        case FE_MM4:
+            return "MM4";
+        case FE_MM5:
+            return "MM5";
+        case FE_MM6:
+            return "MM6";
+        case FE_MM7:
+            return "MM7";
+        case FE_XMM0:
+            return "XMM0";
+        case FE_XMM1:
+            return "XMM1";
+        case FE_XMM2:
+            return "XMM2";
+        case FE_XMM3:
+            return "XMM3";
+        case FE_XMM4:
+            return "XMM4";
+        case FE_XMM5:
+            return "XMM5";
+        case FE_XMM6:
+            return "XMM6";
+        case FE_XMM7:
+            return "XMM7";
+        case FE_XMM8:
+            return "XMM8";
+        case FE_XMM9:
+            return "XMM9";
+        case FE_XMM10:
+            return "XMM10";
+        case FE_XMM11:
+            return "XMM11";
+        case FE_XMM12:
+            return "XMM12";
+        case FE_XMM13:
+            return "XMM13";
+        case FE_XMM14:
+            return "XMM14";
+        case FE_XMM15:
+            return "XMM15";
         default:
             return "INVALID";
     }

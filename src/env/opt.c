@@ -71,6 +71,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             } else if (strncmp(option_string, "verbose-disasm", 11) == 0) {
                                 flag_verbose_disassembly = true;
                                 option_string += 11;
+                            } else if (strncmp(option_string, "context", 7) == 0) {
+                                flag_log_context = true;
+                                option_string += 7;
                             } else {
                                 if (strncmp(option_string, "help", 4) != 0) {
                                     dprintf(2, "Warning: Unknown logging category %s...\n", option_string);
@@ -81,6 +84,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\tasm_out\t\t\tShow generated x86 code.\n"
                                        "\tverbose-disasm\tSeparate instruction translations in output assembly.\n"
                                        "\treg\t\t\t\tDump register contents after every block (warning: lots of logs).\n"
+                                       "\tcontext\t\t\tLog execution context and mapped registers for instructions.\n"
                                        "\tcache\t\t\tLog events involving the block cache.\n"
                                        "\tcache-contents\tLog cache contents after every cache update (implies cache).\n"
                                        "\tstrace\t\t\tLog all emulated syscalls.\n");
@@ -126,7 +130,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\tno-ras\t\t\tDisable return address stack.\n"
                                        "\tno-chain\t\tDisable block chaining.\n"
                                        "\tno-jump\t\t\tDisable recursive translation of jump targets (implies no-ras).\n"
-                                       "\tno-fusion\t\t\tDisable macro opcode fusion/conversion\n"
+                                       "\tno-fusion\t\tDisable macro opcode fusion/conversion\n"
                                        "\tnone\t\t\tAll of the above.\n"
                                        "\tsinglestep\t\tEnable single stepping mode.\n"
                                        "\t\t\t\t\tTranslates each RISC-V instruction into its own block.\n");
@@ -136,12 +140,17 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                         } while (*(option_string++) == ',');
                     } else if (strncmp(option_string, "perf", 4) == 0) {
                         perfFd = open_perfmap();
+                    } else if (strncmp(option_string, "help", 4) == 0) {
+                        goto HELP;
+                    } else if (strncmp(option_string, "version", 7) == 0) {
+                        goto VERSION;
                     }
                     goto NEXT;
                 case 'a':
                     flag_do_analyze = true;
                     break;
                 case 'v':
+                VERSION:
                     printf("RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
                     parse_result.status = 1;
                     return parse_result;
@@ -233,9 +242,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
 
     log_general("Translator version %s\n", translator_version);
     log_general("Command line options:\n");
-    log_general("Logging: general %d, asm_in %d, asm_out %d, reg %d, cache %d, cache-contents %d, strace %d, verbose-disassembly %d\n",
+    log_general("Logging: general %d, asm_in %d, asm_out %d, reg %d, cache %d, cache-contents %d, strace %d, verbose-disassembly %d, context %d\n",
                 flag_log_general, flag_log_asm_in, flag_log_asm_out, flag_log_reg_dump, flag_log_cache,
-                flag_log_cache_contents, flag_log_syscall, flag_verbose_disassembly);
+                flag_log_cache_contents, flag_log_syscall, flag_verbose_disassembly, flag_log_context);
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
     log_general("Translate opt: general %d, ras %d, chaining %d, recurse jumps %d, singlestep %d\n", flag_translate_opt,

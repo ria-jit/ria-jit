@@ -24,14 +24,15 @@ extern "C" {
 
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
+#define THIRD_REG FE_CX
 
 extern uint8_t *current;
 extern int err;
 
 //basic block translation management
-void init_block();
+void init_block(register_info *r_info);
 
-t_cache_loc finalize_block(int chainLinkOp);
+t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info);
 
 ///basic block translation
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);

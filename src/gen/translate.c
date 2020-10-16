@@ -46,9 +46,9 @@ int err;
  * Initializes a new translatable block of code.
  * Call this before translating any instructions that belong together in the same execution run
  * (e.g., before translating every basic block).
+ * @param r_info the register mapping info for invalidating the replacements
  */
-void init_block() {
-
+void init_block(register_info *r_info) {
     if (currentPos == NULL) {
         setupInstrMem();
     }
@@ -56,18 +56,25 @@ void init_block() {
     block_head = (uint8_t *) currentPos;
     current = block_head;
     err = 0;
+
 #ifndef NDEBUG
     //insert nop at the beginning so debugger step-into works as expected
     *(current++) = 0x90;
 #endif
+
+    //make sure all replacement registers are written back as a precaution
+    invalidateAllReplacements(r_info);
 }
 
 /**
  * Finalize the translated block.
- * This emits the ret instruction in order to have the translated basic block return to the main loop.
+ * Invalidates the replacement registers and prepares the block for chaining.
+ * Also emits the RET instruction at the end of the block.
  * @return the starting address of the function block, or the nullptr in case of error
  */
-t_cache_loc finalize_block(int chainLinkOp) {
+t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info) {
+    //invalidate all replacement registers used in this block
+    invalidateAllReplacements(r_info);
 
     ///write chainEnd to be chained by chainer
     if (flag_translate_opt_chain && chainLinkOp == LINK_NULL) {
@@ -110,9 +117,6 @@ t_cache_loc finalize_block(int chainLinkOp) {
  * @param instr the RISC instruction to translate
  */
 void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
-    //dispatch to translator functions
-    dispatch_instr(instr, c_info);
-
     //log instruction
     log_asm_in(
             "Instruction %s at 0x%lx (type %d) - (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
@@ -127,6 +131,23 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
             reg_to_alias(instr->reg_dest),
             instr->imm
     );
+
+    //log context details
+    log_context("Static mapping of %s - (rs1: %s/%s %s) - (rs2: %s/%s %s) - (rd: %s/%s %s)\n",
+                mnem_to_string(instr->mnem),
+                reg_to_string(instr->reg_src_1),
+                reg_to_alias(instr->reg_src_1),
+                bool_str(c_info->r_info->mapped[instr->reg_src_1]),
+                reg_to_string(instr->reg_src_2),
+                reg_to_alias(instr->reg_src_2),
+                bool_str(c_info->r_info->mapped[instr->reg_src_2]),
+                reg_to_string(instr->reg_dest),
+                reg_to_alias(instr->reg_dest),
+                bool_str(c_info->r_info->mapped[instr->reg_dest])
+    );
+
+    //dispatch to translator functions
+    dispatch_instr(instr, c_info);
 
     //make instruction boundaries visible in disassembly if required
     if (flag_verbose_disassembly) {
@@ -174,15 +195,13 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  */
 t_cache_loc
 translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
-
     ///initialize new block
-    init_block();
+    init_block(c_info->r_info);
 
     ///apply macro optimization
     if (flag_translate_opt_fusion) {
         optimize_patterns(block_cache, instructions_in_block);
     }
-
 
     /// translate structs
     for (int i = 0; i < instructions_in_block; i++) {
@@ -192,16 +211,16 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
         translate_risc_instr(&block_cache[i], c_info);
     }
 
-
     t_cache_loc block;
     ///finalize block and return cached location
     if (
-            //block_cache[instructions_in_block - 1].mnem == JALR ||
+        //block_cache[instructions_in_block - 1].mnem == JALR ||
             block_cache[instructions_in_block - 1].mnem == ECALL) {
-        block = finalize_block(LINK_NULL);
+        block = finalize_block(LINK_NULL, c_info->r_info);
     } else {
-        block = finalize_block(DONT_LINK);
+        block = finalize_block(DONT_LINK, c_info->r_info);
     }
+
     return block;
 }
 
@@ -233,7 +252,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                 goto PARSE_DONE;
             }
 
-            ///branch? or syscall?
+                ///branch? or syscall?
             case SYSTEM : //fallthrough Potential program end stop parsing
             {
                 switch (parse_buf[parse_pos].mnem) {
@@ -428,17 +447,16 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             }
                         }
 
-                        if(     flag_translate_opt_jump &&
+                        if (flag_translate_opt_jump &&
                                 instructions_in_block > 0 &&
                                 parse_buf[parse_pos - 1].mnem == AUIPC &&
                                 parse_buf[parse_pos - 1].reg_dest != x0 &&
                                 parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos - 1].reg_dest
-                                )
-                        {
+                                ) {
                             //printf("AUIPC + JALR: %p\n", risc_addr);
 
                             //check if pop will happen
-                            if( (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                            if ((parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
                                     parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
@@ -460,7 +478,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
                             ///2: recursively translate target
                             {
-                                t_risc_addr target = (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
+                                t_risc_addr target =
+                                        (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
 
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 

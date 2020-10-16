@@ -24,7 +24,8 @@ void init_return_stack(void) {
     rs_front = 0;
 }
 
-void rs_emit_push(const t_risc_instr *instr) {
+void rs_emit_push(const t_risc_instr *instr, const register_info *r_info) {
+    invalidateAllReplacements(r_info);
 
     ///push to return stack
     t_risc_addr ret_target = instr->addr + 4;
@@ -58,7 +59,9 @@ void rs_emit_push(const t_risc_instr *instr) {
     NOT_CACHED:;
 }
 
-void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
+void rs_emit_pop_RAX(bool jump_or_push, const register_info *r_info) {   //true -> jump
+    invalidateAllReplacements(r_info);
+
     //RAX: target
 
     ///stack empty
@@ -100,7 +103,8 @@ void rs_emit_pop_RAX(bool jump_or_push) {   //true -> jump
 
 }
 
-void rs_jump_stack() {
+void rs_jump_stack(const register_info *r_info) {
+    invalidateAllReplacements(r_info);
     err |= fe_enc64(&current, FE_POPr, FE_CX);      //load jump target
     err |= fe_enc64(&current, FE_CMP64ri, FE_CX, 0);
     uint8_t *noJump = current;
