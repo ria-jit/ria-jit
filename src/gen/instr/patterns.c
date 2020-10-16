@@ -520,6 +520,8 @@ void emit_pattern_20_small_LI(const t_risc_instr *instr, const register_info *r_
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void emit_pattern_21(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 21: SLLI + SRLI used as zero-extend multiplication at 0x%lx\n", instrs[0].addr);
+
     FeReg regSrc1 = getRs1(&instrs[0], r_info);
     FeReg regDest = getRd(&instrs[0], r_info);
 
@@ -539,6 +541,8 @@ void emit_pattern_21(const t_risc_instr instrs[static 2], const register_info *r
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void emit_pattern_22(const t_risc_instr *instr, const register_info *r_info) {
+    log_asm_out("emit pattern 22: ANDI zero-extension at 0x%lx\n", instr->addr);
+
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
