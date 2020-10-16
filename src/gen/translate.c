@@ -115,7 +115,7 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
 
     //log instruction
     log_asm_in(
-            "Instruction %s at 0x%lx (type %d) – (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
+            "Instruction %s at 0x%lx (type %d) - (rs1: %s/%s) - (rs2: %s/%s) - (rd: %s/%s) - (imm: 0x%lx)\n",
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
