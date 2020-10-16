@@ -185,6 +185,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_translate_opt_jump = false;
                     flag_translate_opt_chain = false;
                     flag_translate_opt_ras = false;
+                    flag_translate_opt_fusion = false;
                     break;
                 case 'b':
                     flag_do_benchmark = true;
