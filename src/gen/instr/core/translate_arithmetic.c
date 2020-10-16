@@ -43,11 +43,16 @@ void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    }
+    t_risc_imm masked_imm = instr->imm & 0b111111;
+    if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
+        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        }
 
-    err |= fe_enc64(&current, FE_SHL64ri, regDest, instr->imm & 0b111111);
+        err |= fe_enc64(&current, FE_SHL64ri, regDest, masked_imm);
+    }
 }
 
 /**
@@ -471,10 +476,19 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+    t_risc_imm masked_imm = instr->imm & 0b11111;
+    if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
+        //emit address size prefix 67H to use the 32-bit rs1 register in the memory address
+        *(current++) = 0x67;
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_SHL32ri, regDest, masked_imm);
     }
-    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b11111);
+
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
