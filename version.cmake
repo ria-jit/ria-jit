@@ -8,7 +8,7 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ##Update this on Release so the fallback is right.
-if (${res})
+if (res)
     set(VERSION "v1.2.3")
 endif ()
 
