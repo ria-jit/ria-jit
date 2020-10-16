@@ -164,6 +164,11 @@ const pattern_element p_22_elem[] = {
         {ANDI, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 1, 0xff}
 };
 
+const pattern_element p_23_elem[] = {
+        {ADDIW, DONT_CARE, DONT_CARE, DONT_CARE, 0, 0, 0, 0},
+        {ANDI,  rd_h1,     DONT_CARE, rd_h1,     0, 0, 1, 0xff}
+};
+
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at 0x%lx\n", instr->addr);
     invalidateAllReplacements(r_info);
@@ -550,6 +555,26 @@ void emit_pattern_22(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regSrc1);
 }
 
+/**
+ * Translate zero extended 8bit immediate add.
+ * @param instrs the RISC-V instruction to translate
+ * @param r_info the runtime register mapping (RISC-V -> x86)
+ */
+void emit_pattern_23(const t_risc_instr instrs[static 2], const register_info *r_info) {
+    log_asm_out("emit pattern 20: ADDIW ANDI 0xff as ZX 8B add imm at 0x%lx\n", instrs[0].addr);
+    FeReg regSrc1 = getRs1(instrs, r_info);
+    FeReg regDest = getRd(instrs, r_info);
+
+    //32 bit instructions should be most efficient and do the same
+    if (regSrc1 != regDest) {
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instrs[0].imm));
+    } else {
+        err |= fe_enc64(&current, FE_ADD32ri, regDest, instrs[0].imm);
+    }
+    //zero-extending to 32-bit implicitly zeroes the upper 32 bits of the 64-bit register
+    err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regSrc1);
+}
+
 
 //order = length, descending
 //order is important because longer patterns can contain shorter ones,
@@ -565,6 +590,7 @@ const pattern patterns[] = {
         {p_21_elem, 2, &emit_pattern_21}, //zero-extend, then multiply
         {p_6_elem,  2, &emit_pattern_6},  //SLLI + SRLI
         {p_19_elem, 2, &emit_pattern_19_LI}, //LUI + ADDI
+        {p_23_elem, 2, &emit_pattern_23},  //ADDIW + ANDI 0xff
         {p_11_elem, 1, &emit_pattern_11_MV}, //ADDI MV
         {p_20_elem, 1, &emit_pattern_20_small_LI}, //ADDI small LI
         {p_8_elem,  1, &emit_pattern_8_SEXTW},  //ADDIW SX only
