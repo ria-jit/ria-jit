@@ -20,8 +20,6 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        //Address size prefix
-        *(current++) = 0x67;
         err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
     } else if (instr->imm != 0) {
         err |= fe_enc64(&current, FE_ADD32ri, regDest, instr->imm);
@@ -480,8 +478,6 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
 
     t_risc_imm masked_imm = instr->imm & 0b11111;
     if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
-        //emit address size prefix 67H to use the 32-bit rs1 register in the memory address
-        *(current++) = 0x67;
         err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
     } else {
         if (regDest != regSrc1) {
@@ -547,8 +543,6 @@ void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getRs2(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
     if (regSrc1 != regDest && regSrc2 != regDest) {
-        //Address size override prefix
-        *(current++) = 0x67;
         fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 1, regSrc2, 0));
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD32rr);
