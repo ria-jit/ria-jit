@@ -151,7 +151,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     break;
                 case 'v':
                 VERSION:
-                    printf("RISC-V -> x86-64 Dynamic Binary Translator v%s\n", translator_version);
+                    printf("RISC-V -> x86-64 Dynamic Binary Translator %s\n", translator_version);
                     parse_result.status = 1;
                     return parse_result;
                 case 'g':
