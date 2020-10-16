@@ -19,7 +19,7 @@ void translate_LB(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOVSXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOVSXr64m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -36,7 +36,7 @@ void translate_LH(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOVSXr64m16, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOVSXr64m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -53,7 +53,7 @@ void translate_LW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOVSXr64m32, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOVSXr64m32, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -70,7 +70,7 @@ void translate_LBU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOVZXr32m8, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOVZXr32m8, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -87,7 +87,7 @@ void translate_LHU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOVZXr32m16, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOVZXr32m16, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -103,7 +103,7 @@ void translate_SB(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV8mr, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_MOV8mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
 
 /**
@@ -119,7 +119,7 @@ void translate_SH(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV16mr, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_MOV16mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
 
 /**
@@ -135,7 +135,7 @@ void translate_SW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
 
 /**
@@ -156,7 +156,7 @@ void translate_LWU(const t_risc_instr *instr, const register_info *r_info) {
     /// r/m32. Instead you use mov r32, r/m32
 
 
-    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOV32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -173,7 +173,7 @@ void translate_LD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm));
+    err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
 }
 
 /**
@@ -189,5 +189,5 @@ void translate_SD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getRs2(instr, r_info);
 
-    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, instr->op_field.op.imm), regSrc2);
+    err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }

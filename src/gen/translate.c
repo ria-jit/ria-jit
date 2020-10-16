@@ -143,27 +143,27 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
-            reg_to_string(instr->op_field.op.reg_src_1),
-            reg_to_alias(instr->op_field.op.reg_src_1),
-            reg_to_string(instr->op_field.op.reg_src_2),
-            reg_to_alias(instr->op_field.op.reg_src_2),
-            reg_to_string(instr->op_field.op.reg_dest),
-            reg_to_alias(instr->op_field.op.reg_dest),
-            instr->op_field.op.imm
+            reg_to_string(instr->reg_src_1),
+            reg_to_alias(instr->reg_src_1),
+            reg_to_string(instr->reg_src_2),
+            reg_to_alias(instr->reg_src_2),
+            reg_to_string(instr->reg_dest),
+            reg_to_alias(instr->reg_dest),
+            instr->imm
     );
 
     //log context details
     log_context("Static mapping of %s - (rs1: %s/%s %s) - (rs2: %s/%s %s) - (rd: %s/%s %s)\n",
                 mnem_to_string(instr->mnem),
-                reg_to_string(instr->op_field.op.reg_src_1),
-                reg_to_alias(instr->op_field.op.reg_src_1),
-                bool_str(c_info->r_info->mapped[instr->op_field.op.reg_src_1]),
-                reg_to_string(instr->op_field.op.reg_src_2),
-                reg_to_alias(instr->op_field.op.reg_src_2),
-                bool_str(c_info->r_info->mapped[instr->op_field.op.reg_src_2]),
-                reg_to_string(instr->op_field.op.reg_dest),
-                reg_to_alias(instr->op_field.op.reg_dest),
-                bool_str(c_info->r_info->mapped[instr->op_field.op.reg_dest])
+                reg_to_string(instr->reg_src_1),
+                reg_to_alias(instr->reg_src_1),
+                bool_str(c_info->r_info->mapped[instr->reg_src_1]),
+                reg_to_string(instr->reg_src_2),
+                reg_to_alias(instr->reg_src_2),
+                bool_str(c_info->r_info->mapped[instr->reg_src_2]),
+                reg_to_string(instr->reg_dest),
+                reg_to_alias(instr->reg_dest),
+                bool_str(c_info->r_info->mapped[instr->reg_dest])
     );
 
     //dispatch to translator functions
@@ -284,7 +284,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         parse_pos--; //decrement for next loop cycle
                         break;
                     case EBREAK : {
-                        parse_buf[parse_pos].op_field.op.imm = 0;
+                        parse_buf[parse_pos].imm = 0;
                         parse_buf[parse_pos].mnem = INVALID_MNEM;
                         parse_buf[parse_pos].optype = INVALID_INSTRUCTION;
 
@@ -325,13 +325,13 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             goto PARSE_DONE;
                         }
 
-                        if (parse_buf[parse_pos].op_field.op.reg_dest == x1 || parse_buf[parse_pos].op_field.op.reg_dest == x5) {
+                        if (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5) {
                             ///could follow, but cache
                             instructions_in_block++;
 
                             ///1: recursively translate target
                             {
-                                t_risc_addr target = risc_addr + parse_buf[parse_pos].op_field.op.imm;
+                                t_risc_addr target = risc_addr + parse_buf[parse_pos].imm;
 
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
@@ -362,12 +362,12 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
                             goto PARSE_DONE;
 
-                        } else if (parse_buf[parse_pos].op_field.op.reg_dest != x0) {
+                        } else if (parse_buf[parse_pos].reg_dest != x0) {
                             instructions_in_block++;
 
                             ///1: recursively translate target
                             {
-                                t_risc_addr target = risc_addr + parse_buf[parse_pos].op_field.op.imm;
+                                t_risc_addr target = risc_addr + parse_buf[parse_pos].imm;
 
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
@@ -391,7 +391,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         //is done before this step: in parse_instruction()
                         //where AUIPC is parsed as IMMEDIATE instead of UPPER_IMMEDIATE
 
-                        t_risc_imm temp = parse_buf[parse_pos].op_field.op.imm;
+                        t_risc_imm temp = parse_buf[parse_pos].imm;
 
                         parse_buf[parse_pos] = (t_risc_instr) {
                                 risc_addr,
@@ -399,7 +399,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 IMMEDIATE,
                                 x0,
                                 x0,
-                                parse_buf[parse_pos].op_field.op.reg_dest,
+                                parse_buf[parse_pos].reg_dest,
                                 4
                         };
 
@@ -414,7 +414,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                     case JALR : {
 
                         if (flag_translate_opt_ras &&
-                                (parse_buf[parse_pos].op_field.op.reg_dest == x1 || parse_buf[parse_pos].op_field.op.reg_dest == x5)) {
+                                (parse_buf[parse_pos].reg_dest == x1 || parse_buf[parse_pos].reg_dest == x5)) {
 
                             ///1: recursively translate return addr (+4)
                             //dead ends could arise here
@@ -435,14 +435,14 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                         if (flag_translate_opt_jump &&
                                 instructions_in_block > 0 &&
                                 parse_buf[parse_pos - 1].mnem == AUIPC &&
-                                parse_buf[parse_pos - 1].op_field.op.reg_dest != x0 &&
-                                parse_buf[parse_pos].op_field.op.reg_src_1 == parse_buf[parse_pos - 1].op_field.op.reg_dest
+                                parse_buf[parse_pos - 1].reg_dest != x0 &&
+                                parse_buf[parse_pos].reg_src_1 == parse_buf[parse_pos - 1].reg_dest
                                 ) {
                             //printf("AUIPC + JALR: %p\n", risc_addr);
 
                             //check if pop will happen
-                            if ((parse_buf[parse_pos].op_field.op.reg_src_1 == x1 || parse_buf[parse_pos].op_field.op.reg_src_1 == x5) &&
-                                    parse_buf[parse_pos].op_field.op.reg_src_1 != parse_buf[parse_pos].op_field.op.reg_dest) {
+                            if ((parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                                    parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
 
@@ -464,7 +464,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             ///2: recursively translate target
                             {
                                 t_risc_addr target =
-                                        (risc_addr - 4) + parse_buf[parse_pos - 1].op_field.op.imm + parse_buf[parse_pos].op_field.op.imm;
+                                        (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
 
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
@@ -478,11 +478,11 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             }
 
                             ///3: tell translate_JALR to chain
-                            parse_buf[parse_pos].op_field.op.reg_src_2 = 1;
+                            parse_buf[parse_pos].reg_src_2 = 1;
 
                         } else {
                             ///2: tell translate_JALR not to chain
-                            parse_buf[parse_pos].op_field.op.reg_src_2 = 0;
+                            parse_buf[parse_pos].reg_src_2 = 0;
                         }
 
                         ///destination address unknown at translate time, stop parsing
@@ -511,7 +511,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
     ///loop ended at BLOCK_CACHE_SIZE -> set pc for next instruction
     ///insert Pseudo instruction (has the address for the next PC in immediate field) for this
-    parse_buf[maxCount - 1] = (t_risc_instr) {.op_field.op.imm=risc_addr, .mnem=PC_NEXT_INST, .optype=PSEUDO};
+    parse_buf[maxCount - 1] = (t_risc_instr) {.imm=risc_addr, .mnem=PC_NEXT_INST, .optype=PSEUDO};
     instructions_in_block++;
 
     ///loop ended at BRANCH: skip setting pc

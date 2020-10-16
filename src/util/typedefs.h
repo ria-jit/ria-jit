@@ -32,54 +32,195 @@ typedef enum {
     AUIPC, //register = Imm
 
     //control flow
-    JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU,
+    JAL,
+    JALR,
+    BEQ,
+    BNE,
+    BLT,
+    BGE,
+    BLTU,
+    BGEU,
 
     //load & store
-    LB, LH, LW, LBU, LHU, SB, SH, SW,
+    LB,
+    LH,
+    LW,
+    LBU,
+    LHU,
+    SB,
+    SH,
+    SW,
 
     //Arithmetic
-    ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND,
+    ADDI,
+    SLTI,
+    SLTIU,
+    XORI,
+    ORI,
+    ANDI,
+    SLLI,
+    SRLI,
+    SRAI,
+    ADD,
+    SUB,
+    SLL,
+    SLT,
+    SLTU,
+    XOR,
+    SRL,
+    SRA,
+    OR,
+    AND,
 
     //??????
-    FENCE, ECALL, EBREAK, FENCE_I,
+    FENCE,
+    ECALL,
+    EBREAK,
+    FENCE_I,
 
     //CSRR
-    CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI,
+    CSRRW,
+    CSRRS,
+    CSRRC,
+    CSRRWI,
+    CSRRSI,
+    CSRRCI,
 
     //---RV64I---
     //load & store
-    LWU, LD, SD,
+    LWU,
+    LD,
+    SD,
 
     //Arithmetic
     //SLLI,
     //SRLI,
     //SRAI,
-    ADDIW, SLLIW, SRLIW, SRAIW, ADDW, SUBW, SLLW, SRLW, SRAW,
+    ADDIW,
+    SLLIW,
+    SRLIW,
+    SRAIW,
+    ADDW,
+    SUBW,
+    SLLW,
+    SRLW,
+    SRAW,
 
     //---RV32M---
-    MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU,
+    MUL,
+    MULH,
+    MULHSU,
+    MULHU,
+    DIV,
+    DIVU,
+    REM,
+    REMU,
 
     //---RV64M---
-    MULW, DIVW, DIVUW, REMW, REMUW,
+    MULW,
+    DIVW,
+    DIVUW,
+    REMW,
+    REMUW,
 
     //---RV32A---
-    LRW, SCW, AMOSWAPW, AMOADDW, AMOXORW, AMOANDW, AMOORW, AMOMINW, AMOMAXW, AMOMINUW, AMOMAXUW,
+    LRW,
+    SCW,
+    AMOSWAPW,
+    AMOADDW,
+    AMOXORW,
+    AMOANDW,
+    AMOORW,
+    AMOMINW,
+    AMOMAXW,
+    AMOMINUW,
+    AMOMAXUW,
 
     //---RV64A---
-    LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD,
+    LRD,
+    SCD,
+    AMOSWAPD,
+    AMOADDD,
+    AMOXORD,
+    AMOANDD,
+    AMOORD,
+    AMOMIND,
+    AMOMAXD,
+    AMOMINUD,
+    AMOMAXUD,
 
     //---RV32F---
-    FLW, FSW, FMADDS, FMSUBS, FNMSUBS, FNMADDS, FADDS, FSUBS, FMULS, FDIVS, FSQRTS, FSGNJS, FSGNJNS, FSGNJXS, FMINS, FMAXS, FCVTWS, FCVTWUS, FMVXW, FEQS, FLTS, FLES, FCLASSS, FCVTSW, FCVTSWU, FMVWX,
+    FLW,
+    FSW,
+    FMADDS,
+    FMSUBS,
+    FNMSUBS,
+    FNMADDS,
+    FADDS,
+    FSUBS,
+    FMULS,
+    FDIVS,
+    FSQRTS,
+    FSGNJS,
+    FSGNJNS,
+    FSGNJXS,
+    FMINS,
+    FMAXS,
+    FCVTWS,
+    FCVTWUS,
+    FMVXW,
+    FEQS,
+    FLTS,
+    FLES,
+    FCLASSS,
+    FCVTSW,
+    FCVTSWU,
+    FMVWX,
 
     //---RV64F---
-    FCVTLS, FCVTLUS, FCVTSL, FCVTSLU,
+    FCVTLS,
+    FCVTLUS,
+    FCVTSL,
+    FCVTSLU,
 
     //---RV32D--- + //---RV64D--- //reordering for easier parser design
-    FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTWD, FCVTWUD, FMVXD, FEQD, FLTD, FLED, FCLASSD, FCVTDW, FCVTDWU, FMVDX,
-    FCVTLD, FCVTLUD, FCVTDL, FCVTDLU, FCVTSD, FCVTDS,
+    FLD,
+    FSD,
+    FMADDD,
+    FMSUBD,
+    FNMSUBD,
+    FNMADDD,
+    FADDD,
+    FSUBD,
+    FMULD,
+    FDIVD,
+    FSQRTD,
+    FSGNJD,
+    FSGNJND,
+    FSGNJXD,
+    FMIND,
+    FMAXD,
+    FCVTWD,
+    FCVTWUD,
+    FMVXD,
+    FEQD,
+    FLTD,
+    FLED,
+    FCLASSD,
+    FCVTDW,
+    FCVTDWU,
+    FMVDX,
+    FCVTLD,
+    FCVTLUD,
+    FCVTDL,
+    FCVTDLU,
+    FCVTSD,
+    FCVTDS,
 
     //---PSEUDO---
-    PC_NEXT_INST, SILENT_NOP, PATTERN_EMIT,
+    PC_NEXT_INST,
+    SILENT_NOP,
+    PATTERN_EMIT,
 
     //To always have a count, don't insert below here
     LAST_MNEM
@@ -184,13 +325,13 @@ typedef union {
     uint64_t i;
 } t_risc_fp_reg_val;
 
-static inline t_risc_fp_reg_val get_fVal(float f){
+static inline t_risc_fp_reg_val get_fVal(float f) {
     t_risc_fp_reg_val ret;
     ret.f = f;
     return ret;
 }
 
-static inline t_risc_fp_reg_val get_dVal(double d){
+static inline t_risc_fp_reg_val get_dVal(double d) {
     t_risc_fp_reg_val ret;
     ret.d = d;
     return ret;
@@ -208,31 +349,21 @@ typedef int64_t t_risc_imm;
 typedef uintptr_t t_risc_addr;
 
 typedef struct {
-    t_risc_reg reg_src_1;
-    t_risc_reg reg_src_2;
-    t_risc_reg reg_dest;
-    t_risc_imm imm;
-} t_operand_field;
-
-typedef struct {
-    t_risc_fp_reg reg_src_1;
-    t_risc_fp_reg reg_src_2;
-    t_risc_fp_reg reg_dest;
-    uint32_t reg_src_3;
-    uint32_t rounding_mode;
-} t_f_operand_field;
-
-typedef union {
-    t_operand_field op;
-    t_f_operand_field f_op;
-} t_op_field;
-
-
-typedef struct {
     t_risc_addr addr;
     t_risc_mnem mnem;
     t_risc_optype optype;
-    t_op_field op_field;
+    t_risc_reg reg_src_1;
+    t_risc_reg reg_src_2;
+    t_risc_reg reg_dest;
+    union {
+        struct {
+            t_risc_imm imm;
+        };
+        struct {
+            uint32_t reg_src_3;
+            uint32_t rounding_mode;
+        };
+    };
 } t_risc_instr;
 
 /**

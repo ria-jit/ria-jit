@@ -311,12 +311,12 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
 
     //update statistics
     mnem_count[cur.mnem]++;
-    reg_count[cur.op_field.op.reg_src_1]++;
-    reg_count[cur.op_field.op.reg_src_2]++;
-    reg_count[cur.op_field.op.reg_dest]++;
+    reg_count[cur.reg_src_1]++;
+    reg_count[cur.reg_src_2]++;
+    reg_count[cur.reg_dest]++;
 
-    if (prev.op_field.op.reg_dest == cur.op_field.op.reg_src_1 ||
-            prev.op_field.op.reg_dest == cur.op_field.op.reg_src_2) {
+    if (prev.reg_dest == cur.reg_src_1 ||
+            prev.reg_dest == cur.reg_src_2) {
         t_secondLevel **lvl2Ptr;
         lvl2Ptr = array[prev.mnem].followingMnem + cur.mnem;
         if (*lvl2Ptr == NULL) {
@@ -331,14 +331,14 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
             struct bitfield asBitField;
         } flags;
         flags.asBitField = (struct bitfield) {
-                prev.op_field.op.reg_dest == prev.op_field.op.reg_src_1,
-                prev.op_field.op.reg_dest == prev.op_field.op.reg_src_2,
-                prev.op_field.op.reg_src_1 == prev.op_field.op.reg_src_2,
-                prev.op_field.op.reg_dest == cur.op_field.op.reg_src_1,
-                cur.op_field.op.reg_dest ==
-                        (prev.op_field.op.reg_dest == cur.op_field.op.reg_src_1 ? cur.op_field.op.reg_src_1 :
-                                cur.op_field.op.reg_src_2),
-                cur.op_field.op.reg_src_1 == cur.op_field.op.reg_src_2};
+                prev.reg_dest == prev.reg_src_1,
+                prev.reg_dest == prev.reg_src_2,
+                prev.reg_src_1 == prev.reg_src_2,
+                prev.reg_dest == cur.reg_src_1,
+                cur.reg_dest ==
+                        (prev.reg_dest == cur.reg_src_1 ? cur.reg_src_1 :
+                                cur.reg_src_2),
+                cur.reg_src_1 == cur.reg_src_2};
 
         t_secondLevel *lvl2 = *lvl2Ptr;
         lvl2->count++;
@@ -357,7 +357,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
         t_node *curNode = lvl3->immediateList.head;
         t_node *prevNode = NULL;
         while (curNode != NULL &&
-                (curNode->imm1 != (uint32_t) prev.op_field.op.imm || curNode->imm2 != (uint32_t) cur.op_field.op.imm)) {
+                (curNode->imm1 != (uint32_t) prev.imm || curNode->imm2 != (uint32_t) cur.imm)) {
             prevNode = curNode;
             curNode = (t_node *) curNode->next;
         }
@@ -370,8 +370,8 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
                 prevNode->next = (struct node *) curNode;
             }
 
-            curNode->imm1 = prev.op_field.op.imm;
-            curNode->imm2 = cur.op_field.op.imm;
+            curNode->imm1 = prev.imm;
+            curNode->imm2 = cur.imm;
             curNode->count = 0;
             curNode->next = NULL;
         }

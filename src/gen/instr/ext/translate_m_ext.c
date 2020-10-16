@@ -108,9 +108,9 @@ void translate_MULHSU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///Special cases for "Sign"-bit in rs2 is set
     ///add signed rs1 to the upper half of the result, if the "sign"-bit in rs2 is set
-    if (!r_info->mapped[instr->op_field.op.reg_src_1]) {
+    if (!r_info->mapped[instr->reg_src_1]) {
         ///temporary rs1 was overwritten, so need to load it again
-        err |= fe_enc64(&current, FE_ADD64rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->op_field.op.reg_src_1));
+        err |= fe_enc64(&current, FE_ADD64rm, FE_DX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
     } else {
         err |= fe_enc64(&current, FE_ADD64rr, FE_DX, r_info->map[instr->reg_src_1]);
     }

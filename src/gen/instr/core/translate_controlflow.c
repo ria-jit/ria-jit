@@ -27,11 +27,11 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     //add rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->op_field.op.reg_dest);
+        RECORD_PROFILER(instr->reg_dest);
     }
 
     ///push to return stack
-    if (flag_translate_opt_ras && (instr->op_field.op.reg_dest == x1 || instr->op_field.op.reg_dest == x5)) {
+    if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
         rs_emit_push(instr, r_info, false);
     }
 
@@ -42,14 +42,14 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
             IMMEDIATE,
             x0,
             x0,
-            instr->op_field.op.reg_dest,
+            instr->reg_dest,
             4
     };
 
     translate_AUIPC(&aupicInstr, r_info);
 
     ///jump...
-    t_risc_addr target = instr->addr + instr->op_field.op.imm;
+    t_risc_addr target = instr->addr + instr->imm;
 
     t_cache_loc cache_loc;
 
@@ -70,10 +70,10 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
         ///set pc
         if (r_info->mapped[pc]) {
             err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc],
-                            instr->addr + instr->op_field.op.imm);
+                            instr->addr + instr->imm);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
-                            instr->addr + instr->op_field.op.imm);
+                            instr->addr + instr->imm);
         }
     } else {
         log_asm_out("DIRECT JUMP JAL\n");
@@ -92,42 +92,42 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
     //add rs1, rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->op_field.op.reg_src_1);
-        RECORD_PROFILER(instr->op_field.op.reg_dest);
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_dest);
     }
 
     ///1: compute target address
 
     ///mov rs1 to temp register
     invalidateAllReplacements(r_info);
-    if (r_info->mapped[instr->op_field.op.reg_src_1]) {
-        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->op_field.op.reg_src_1]);
+    if (r_info->mapped[instr->reg_src_1]) {
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
     } else {
-        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->op_field.op.reg_src_1));
+        err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
     }
 
     ///add immediate to rs1
-    err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr->op_field.op.imm);
+    err |= fe_enc64(&current, FE_ADD64ri, FE_AX, instr->imm);
 
     ///set last bit to zero
     //why??? not aligned to 4 bit boundary would throw exception anyway...
     err |= fe_enc64(&current, FE_AND64ri, FE_AX, -2);
 
     ///2: write addr of next instruction in rd
-    if (instr->op_field.op.reg_dest != x0) {
-        if (r_info->mapped[instr->op_field.op.reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->op_field.op.reg_dest], instr->addr + 4);
+    if (instr->reg_dest != x0) {
+        if (r_info->mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], instr->addr + 4);
         } else {
-            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->op_field.op.reg_dest), instr->addr + 4);
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
         }
     }
 
     ///3: check return stack
     if (flag_translate_opt_ras) {
 
-        if (instr->op_field.op.reg_dest == x1 || instr->op_field.op.reg_dest == x5) {
-            if (instr->op_field.op.reg_src_1 == x1 || instr->op_field.op.reg_src_1 == x5) {
-                if (instr->op_field.op.reg_dest == instr->op_field.op.reg_src_1) {
+        if (instr->reg_dest == x1 || instr->reg_dest == x5) {
+            if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
+                if (instr->reg_dest == instr->reg_src_1) {
                     ///push
                     rs_emit_push(instr, r_info, true);
                 } else {
@@ -142,7 +142,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
                 rs_emit_push(instr, r_info, true);
             }
         } else {
-            if(instr->op_field.op.reg_src_1 == x1 || instr->op_field.op.reg_src_1 == x5) {
+            if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 ///pop
                 rs_emit_pop_RAX(true, r_info);
             } else {
@@ -152,7 +152,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     }
 
 
-    if (instr->op_field.op.reg_src_2 == 1 && flag_translate_opt_chain) {
+    if (instr->reg_src_2 == 1 && flag_translate_opt_chain) {
 
         //TODO: more efficient way of obtaining target (without parsing)
 
@@ -161,7 +161,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
         parse_instruction(&tmp_p_instr);
 
-        t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.op_field.op.imm + instr->op_field.op.imm;
+        t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.imm + instr->imm;
 
         t_cache_loc cache_loc = 0;
         if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
@@ -286,13 +286,13 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
 
     //add rs1, rs2 access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->op_field.op.reg_src_1);
-        RECORD_PROFILER(instr->op_field.op.reg_src_2);
+        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_PROFILER(instr->reg_src_2);
     }
 
     ///compare registers:
     FeReg regSrc1 = getRs1(instr, r_info);
-    if (instr->op_field.op.reg_src_2 == x0) {
+    if (instr->reg_src_2 == x0) {
         err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
     } else {
         FeReg regSrc2 = getRs2(instr, r_info);
@@ -306,7 +306,7 @@ static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *noJmpLoc,
                               uint64_t jmpMnem) {
     ///set pc: BRANCH
-    t_risc_addr target = instr->addr + instr->op_field.op.imm;
+    t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
     if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
             cache_loc != (t_cache_loc) 1) {
@@ -321,10 +321,10 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
         }
 
         if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], (instr->addr + ((int64_t) (instr->op_field.op.imm))));
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], (instr->addr + ((int64_t) (instr->imm))));
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
-                            instr->addr + (int64_t) instr->op_field.op.imm);
+                            instr->addr + (int64_t) instr->imm);
         }
     }
 
@@ -364,8 +364,8 @@ void translate_INVALID(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate INVALID_OP\n");
     invalidateReplacement(r_info, FE_DX, true);
     ///call error handler
-    err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->op_field.op.reg_dest);
-    err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->op_field.op.imm);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_DI, (uint64_t) instr->reg_dest);
+    err |= fe_enc64(&current, FE_MOV64ri, FE_SI, (uint64_t) instr->imm);
     err |= fe_enc64(&current, FE_MOV64ri, FE_DX, (uint64_t) instr->addr);
     err |= fe_enc64(&current, FE_AND64ri, FE_SP, 0xFFFFFFFFFFFFFFF0);   //16 byte align
     err |= fe_enc64(&current, FE_SUB64ri, FE_SP, 8); //these 8 byte + return addr from call = 16
