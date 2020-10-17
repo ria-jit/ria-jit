@@ -14,6 +14,7 @@
 #include <main/context.h>
 #include <gen/optimize.h>
 #include <elf/loadElf.h>
+#include <fadec/fadec.h>
 
 void *currentPos = NULL;
 
@@ -102,10 +103,26 @@ t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info) {
 
     //if that's fine, then we log and return
     if (flag_log_asm_out) {
+        //print hex block contents
         log_asm_out("Generated block code: ");
-
         log_print_mem((char *) block_head, current - block_head);
         printf("\n");
+
+        //print generated assembly
+        log_asm_out("Generated assembly:\n");
+        uint8_t *read_pos = block_head;
+
+        while (read_pos != current) {
+            FdInstr decoded;
+            int ret = fd_decode(read_pos, current - read_pos, 64, (uintptr_t) read_pos, &decoded);
+            read_pos += ret;
+
+            if (ret <= 0) break;
+
+            char buf[128];
+            fd_format(&decoded, buf, 128);
+            log_asm_out("\t%s\n", buf);
+        }
     }
 
     return (t_cache_loc) block_head;
