@@ -119,6 +119,8 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/double_tests/test_double_fp_to_gp.cpp
         test/unit_tests/float_tests/test_float_gp_to_fp.cpp
         test/unit_tests/float_tests/test_float_fp_to_gp.cpp
+        test/unit_tests/float_double_tests/test_float_to_double.cpp
+        test/unit_tests/float_double_tests/test_double_to_float.cpp
         test/unit_tests/test_parser_param.cpp)
 
 #include the googletest testing framework
