@@ -573,7 +573,7 @@ void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SSrr, regDest, regSrc1);
 
-    storeRd(instr, r_info, regDest);
+    setFpReg(instr->reg_dest, r_info, regDest);
 }
 
 /**
