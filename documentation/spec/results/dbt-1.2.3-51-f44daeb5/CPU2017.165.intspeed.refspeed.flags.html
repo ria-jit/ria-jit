@@ -1,0 +1,2246 @@
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="generator" content="SPEC CPU2017 Tools v6247 (flags v5178)" />
+<meta http-equiv="Content-type" content="text/html;charset=utf-8" />
+<style type="text/css" id="internalScreen" media="screen">
+<!--
+body {
+  margin:  1em;
+  border:  0;
+  padding: 0;
+  background: white;
+  color:      black;
+  font-family: "Times Roman", times, serif;
+}
+
+.tt {
+  font-family: monospace;
+}
+
+div.flagClass > h2 {
+  border-bottom: 1px dotted black;
+  width: 80%;
+  font-family: sans-serif;
+}
+
+div.flagDesc {
+  clear: both;
+  background-color: rgb(255, 245, 220);
+  border: 1px solid blue; /* XXX This is for debugging */ 
+  margin: 0 auto;
+  width: 90%;
+}
+
+li.flagName {
+  font-weight: bold;
+  width: 100%;
+  border-bottom: 1px solid black;
+  display: block;
+  margin: 0.5em 0 0.5em 0;
+  font-size: 125%;
+  white-space: nowrap;
+}
+
+/* (presumably short) informationals all get grouped together near the top
+ * of the flag description block.
+ */
+.flagOrigin, .flagDescClass, .flagDescCompiler, .flagDescRE, .flagDescParallel, .flagVar {
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  float: left;
+  padding: 0.25em;
+  margin: 0 0 0.25em 0;
+}
+
+.flagDescClass::before {
+  content: "Flag Class: ";
+}
+.flagDescCompiler::before {
+  content: "Compilers that recognize this flag: ";
+}
+.flagDescRE::before {
+  content: "Regular Expression: ";
+}
+.flagDescParallel::before {
+  content: "Indicates automatic parallelization: ";
+}
+.flagVar::before {
+  content: "Found In: ";
+}
+
+span.flagDescInc {
+  border-bottom: 1px solid black;
+}
+
+/* The description text stands alone. */
+.descText {
+  clear: both;
+  padding: 0.5em 1em 0.5em 1em;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin: 0.5em 0 0.5em 0;
+}
+
+/* This is a separate class so that in the print style sheet it can
+ * be ignored.
+ * Also, 'style="clear:both;"' is longer than 'class="clear"'
+ */
+.clear {
+  clear: both;
+}
+
+/* This is really for the link _to_ the flag report */
+li.unknown > a:link, a:visited { text-decoration: none; }
+
+.monospace {
+  font-family: Courier, "Courier New", monospace;
+}
+
+ul.flagDescList {
+  clear: both;
+  list-style-type: none;
+}
+
+/* Arrange for each flag description to have some headroom. */
+ul.flagDescList > li {
+  margin: 2em 0 0 0;
+}
+
+ul.flagDesc {
+  list-style-type: none;
+}
+
+div.flagTOC {
+  border: 1px solid white;
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  width: 95%;
+}
+
+ul.flagTOC {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.flagTOC > li {
+  border: thin dotted lightgray;
+  margin: 0 1em 0 0;
+  padding: 0.25em 0 0.25em 0;
+  float: left;
+  display: inline-block; /* Fix IE bug; compliant browsers will ignore this */
+  width: 22.3%;
+  min-height: 1.5em;
+  overflow: hidden; /* If the table gets squeezed too much, don't let the
+                     * text overlap
+                     */
+}
+
+ul.flagTOC > li > a {
+   color:blue;
+   text-decoration:none;
+}
+
+ul.SubMenu li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+}
+
+ul.SubMenu {
+  display: none;
+  position: absolute;
+  list-style-type: none;
+  border: 1px solid black;
+  background-color: white;
+  margin: 0 0 0 2em;
+  padding: 0.25em 5em 0.25em 0.5em;
+  white-space: nowrap;
+}
+
+li:hover > ul.SubMenu, ul.SubMenu:hover {
+  display: block;
+}
+
+ul.SubMenu > li:hover, ul.flagTOC > li:hover {
+  background-color: rgb(176, 196, 238); /* lightsteelgray... almost */
+  border: 1px solid rgb(128, 128, 128);
+}
+
+
+.resultpage a:link, .resultpage a:visited {
+  text-decoration: none;
+  border-bottom: 1px dashed black;
+  color: inherit;
+}
+
+.resultpage {
+  margin: auto;
+  padding: 0;
+  width: 1000px;
+}
+
+.resultpage_landscape {
+  width: 1200px;
+}
+
+div.logo {
+  float: left;
+  width: 38px;
+  height: 57px;
+}
+
+.titlebarcontainer, .resultstable, .ncsection {
+  border: solid 1px;
+  width: 100%;
+  float: left;
+}
+
+.ncsection {
+  background-color: white;
+  color: black;
+}
+
+.titlebar {
+  float: left;
+  padding: 0em 1em 0em 1em;
+  text-align: center;
+  width: 91%;
+}
+
+div.titlebar > h1, div.titlebar > p {
+  margin: 0 1em 0 1em;
+}
+
+div.ncsection {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.systembar {
+  width: 65%;
+  font-size: 150%;
+  margin: 0;
+}
+
+td.systembar {
+  padding: 0.2em;
+}
+
+.metricbar {
+  margin: 0;
+  font-size: 120%;
+}
+
+/* CSS for the old-style div-based systembar */
+
+div.systembar {
+  float: left;
+  padding: 0.1em;
+  border-right: solid 1px black;
+}
+
+div.metricbar {
+  padding: 0.1em;
+  float: right;
+  width: 33%;
+  height: 50%;
+}
+
+.base, .metricbar#base {
+  background-color: #c8c8c8;
+  color: black;
+}
+
+.peak, .metricbar#peak {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+}
+
+.metricbar p {
+  margin: 0;
+  padding: 0.2em;
+}
+
+.datebar p, .systembar p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Datebar stuff for older results */
+.datebar p {
+  float: left;
+  border-left: solid 1px black;
+}
+
+span.item {
+  float: left;
+  margin: 0;
+  padding: 0.1em 0 0.1em 0.5em;
+}
+
+span.value {
+  float: right;
+  padding: 0.1em 0.5em 0.1em 0;
+}
+
+div.datebar {
+  width: 100%;
+  float: left;
+  min-height: 100%;
+  border: solid 1px black;
+}
+
+p#test_sponsor         { width: 48%; }
+p#tester               { width: 48%; }
+p#license_num          { width: 24%; }
+p#test_date            { width: 23%; }
+p#hw_avail, p#sw_avail { width: 25%; }
+
+/* Table-based datebar and systembar on newer results */
+table.datebar, table.titlebarcontainer {
+  float: left;
+  width: 100%;
+  min-height: 100%;
+  border-collapse: collapse;
+  border: solid 1px black;
+  table-layout: fixed;
+}
+
+table.datebar th {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 0.5em;
+  padding: 0 0.5em 0 0.25em;
+}
+
+table.datebar td {
+  text-align: left;
+  padding: 0 0.5em 0 0;
+}
+
+table.titlebarcontainer tr {
+  vertical-align: top;
+}
+table.titlebarcontainer td {
+  border-right: 1px solid black;
+}
+
+th#license_num          { width: 17%; }
+th#test_sponsor         { width: 17%; }
+th#tester               { width: 17%; }
+th#test_date            { width: 22%; }
+th#hw_avail             { width: 22%; }
+th#sw_avail             { width: 22%; }
+td#license_num_val      { width: 52%; }
+td#test_sponsor_val     { width: 52%; }
+td#tester_val           { width: 52%; }
+td#test_date_val        { width: 13%; white-space: nowrap; }
+td#hw_avail_val         { width: 13%; white-space: nowrap; }
+td#sw_avail_val         { width: 13%; white-space: nowrap; }
+
+
+div.graph {
+  width: 100%
+  margin: auto;
+}
+
+div.sysdesc > h2 {
+  text-align: center;
+  background-color: #c8c8c8;
+  color: black;
+  padding: 0.5em 0 0.5em 0;
+  margin: 0;
+} 
+  
+div.sysdesc {
+  margin: 0.5em 0 0.5em 0;
+}
+
+div.infobox, div.sysdesc {
+  float: left;
+  width: 100%;
+  padding: 0;
+  border: solid 1px black;
+}
+
+div.infobox table {
+  width: 49%;
+  float: left;
+}
+
+div.infobox table tr {
+  vertical-align: top;
+}
+
+div.infobox table#Hardware,
+div.infobox table#BenchmarkSoftware {
+  width: 50%;
+  border-right: 1px solid black;
+}
+
+div.infobox table#Systems {
+  width: 100%;
+}
+
+div.infobox table#Power {
+  width: 100%;
+  border-top: 1px solid black;
+}
+
+div.infobox table#Systems tbody th {
+  width: 20%;
+}
+
+div.infobox thead th {
+  font-size: 200%;
+}
+
+div.infobox tbody th {
+  text-align: left;
+}
+
+.resultstable h2, div.notes h2 {
+  text-align: center;
+  margin: 0.1em;
+}
+
+div.notes h3 {
+  margin: 0.1em;
+}
+
+div.notes table {
+  width: 100%;
+}
+
+div.notes table tr td {
+  text-align: right;
+  vertical-align: top;
+}
+
+/* Alas, IE6... if only you didn't suck so much...
+div.notes table tr td + td {
+*/
+div.notes table td.al {
+  text-align: left;
+  width: 85%;
+}
+
+div.notes table tr td {
+  padding-bottom: 1em;
+}
+
+div.notes table.portability tr td {
+  padding: 0em;
+}
+
+div.notes table.portability {
+  padding: 1em;
+}
+
+.resultstable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resultstable th.basecol, .resultstable th.peakcol {
+  padding: 0.1em;
+  font-size: 90%;
+}
+
+.resultstable th {
+  border: solid 2px black;
+}
+
+.resultstable td {
+  border: solid 1px #b8b8b8;
+}
+
+td.bm, th.bm { 
+  border-right: solid 2px black;
+  border-left: solid 2px black;
+}
+
+td.l_edge { 
+  border-left: solid 2px black;
+}
+
+td.r_edge { 
+  border-right: solid 2px black;
+}
+
+.resultstable tfoot td {
+  text-align: center;
+  border: solid 2px black;
+}
+
+tr.table_metrics > td {
+  text-align: right;
+}
+
+th.basecol {
+  background-color: #c8c8c8;
+  color: black;
+}
+td.basecol {
+  text-align: right;
+  background-color: transparent;
+  color: black;
+}
+
+th.peakcol {
+  text-align: center;
+}
+
+.peakcol {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+  text-align: right;
+}
+
+td.bm {
+  /* Basically, the benchmark name and copies columns */
+  background-color: #c8c8c8;
+  color: black;
+}
+
+span.selected {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.selected a:link, .selected a:visited {
+  border-bottom: 0;
+}
+
+div.notes {
+  width: 100%;
+  float: left;
+  border: solid 1px black;
+}
+
+div.flagfooter {
+  text-align: center;
+}
+
+div.errors {
+  border: solid 2px red;
+}
+div.errors h2 {
+  background-color: transparent;
+  color: red;
+}
+
+div.footer {
+  border: none;
+}
+
+/* People find the "double underline" confusing.  And Safari 1.3 doesn't deal
+ * well with attempting to disable the border for userflag links.  So just
+ * give up and don't decorate user flags specially.
+********************
+span.userflag {
+  text-decoration: underline;
+}
+
+.userflag a:link {
+  border-bottom: 0;
+}
+********************
+*/
+
+/* Keep flags from being wrapped */
+span.userflag, span.flagtext {
+  white-space: nowrap;
+}
+/* Most of the screen-specific CSS is also the common CSS */
+
+/* Style for the non-image W3C marking at the bottom of the page, courtesy of
+ * Marek Prokop (http://www.sovavsiti.cz/css/w3c_buttons.html)
+ */
+.w3cbutton3 {
+  margin: 1em 1em 0 0;
+  width: 9em;
+  border: 1px solid #ccc;
+  font-family: helvetica,arial,sans-serif;
+  font-size: 70%;
+  font-weight: bold;
+  float: left;
+}
+.w3cbutton3 a {
+  display: block;
+  width: 100%;
+}
+.w3cbutton3 a:link,
+.w3cbutton3 a:visited,
+.w3cbutton3 a:hover {
+  background-color: #fc6;
+  color: #000;
+  text-decoration: none;
+  border-bottom: none;
+}
+.w3cbutton3 span.w3c {
+  padding: 0 0.4em;
+  background-color: #fff;
+  color: #0c479d;
+}
+
+-->
+</style>
+<style type="text/css" id="internalPrint" media="print">
+<!--
+body {
+  margin:  1em;
+  border:  0;
+  padding: 0;
+  background: white;
+  color:      black;
+  font-family: "Times Roman", times, serif;
+}
+
+.tt {
+  font-family: monospace;
+}
+
+div.flagClass > h2 {
+  border-bottom: 1px dotted black;
+  width: 80%;
+  font-family: sans-serif;
+}
+
+div.flagDesc {
+  clear: both;
+  background-color: rgb(255, 245, 220);
+  border: 1px solid blue; /* XXX This is for debugging */ 
+  margin: 0 auto;
+  width: 90%;
+}
+
+li.flagName {
+  font-weight: bold;
+  width: 100%;
+  border-bottom: 1px solid black;
+  display: block;
+  margin: 0.5em 0 0.5em 0;
+  font-size: 125%;
+  white-space: nowrap;
+}
+
+/* (presumably short) informationals all get grouped together near the top
+ * of the flag description block.
+ */
+.flagOrigin, .flagDescClass, .flagDescCompiler, .flagDescRE, .flagDescParallel, .flagVar {
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  float: left;
+  padding: 0.25em;
+  margin: 0 0 0.25em 0;
+}
+
+.flagDescClass::before {
+  content: "Flag Class: ";
+}
+.flagDescCompiler::before {
+  content: "Compilers that recognize this flag: ";
+}
+.flagDescRE::before {
+  content: "Regular Expression: ";
+}
+.flagDescParallel::before {
+  content: "Indicates automatic parallelization: ";
+}
+.flagVar::before {
+  content: "Found In: ";
+}
+
+span.flagDescInc {
+  border-bottom: 1px solid black;
+}
+
+/* The description text stands alone. */
+.descText {
+  clear: both;
+  padding: 0.5em 1em 0.5em 1em;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin: 0.5em 0 0.5em 0;
+}
+
+/* This is a separate class so that in the print style sheet it can
+ * be ignored.
+ * Also, 'style="clear:both;"' is longer than 'class="clear"'
+ */
+.clear {
+  clear: both;
+}
+
+/* This is really for the link _to_ the flag report */
+li.unknown > a:link, a:visited { text-decoration: none; }
+
+.monospace {
+  font-family: Courier, "Courier New", monospace;
+}
+
+ul.flagDescList {
+  clear: both;
+  list-style-type: none;
+}
+
+/* Arrange for each flag description to have some headroom. */
+ul.flagDescList > li {
+  margin: 2em 0 0 0;
+}
+
+ul.flagDesc {
+  list-style-type: none;
+}
+
+div.flagTOC {
+  border: 1px solid white;
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  width: 95%;
+}
+
+ul.flagTOC {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.flagTOC > li {
+  border: thin dotted lightgray;
+  margin: 0 1em 0 0;
+  padding: 0.25em 0 0.25em 0;
+  float: left;
+  display: inline-block; /* Fix IE bug; compliant browsers will ignore this */
+  width: 22.3%;
+  min-height: 1.5em;
+  overflow: hidden; /* If the table gets squeezed too much, don't let the
+                     * text overlap
+                     */
+}
+
+ul.flagTOC > li > a {
+   color:blue;
+   text-decoration:none;
+}
+
+ul.SubMenu li {
+  border: 1px solid white; /* rgb(211, 211, 211); */
+}
+
+ul.SubMenu {
+  display: none;
+  position: absolute;
+  list-style-type: none;
+  border: 1px solid black;
+  background-color: white;
+  margin: 0 0 0 2em;
+  padding: 0.25em 5em 0.25em 0.5em;
+  white-space: nowrap;
+}
+
+li:hover > ul.SubMenu, ul.SubMenu:hover {
+  display: block;
+}
+
+ul.SubMenu > li:hover, ul.flagTOC > li:hover {
+  background-color: rgb(176, 196, 238); /* lightsteelgray... almost */
+  border: 1px solid rgb(128, 128, 128);
+}
+
+
+.resultpage a:link, .resultpage a:visited {
+  text-decoration: none;
+  border-bottom: 1px dashed black;
+  color: inherit;
+}
+
+.resultpage {
+  margin: auto;
+  padding: 0;
+  width: 1000px;
+}
+
+.resultpage_landscape {
+  width: 1200px;
+}
+
+div.logo {
+  float: left;
+  width: 38px;
+  height: 57px;
+}
+
+.titlebarcontainer, .resultstable, .ncsection {
+  border: solid 1px;
+  width: 100%;
+  float: left;
+}
+
+.ncsection {
+  background-color: white;
+  color: black;
+}
+
+.titlebar {
+  float: left;
+  padding: 0em 1em 0em 1em;
+  text-align: center;
+  width: 91%;
+}
+
+div.titlebar > h1, div.titlebar > p {
+  margin: 0 1em 0 1em;
+}
+
+div.ncsection {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.systembar {
+  width: 65%;
+  font-size: 150%;
+  margin: 0;
+}
+
+td.systembar {
+  padding: 0.2em;
+}
+
+.metricbar {
+  margin: 0;
+  font-size: 120%;
+}
+
+/* CSS for the old-style div-based systembar */
+
+div.systembar {
+  float: left;
+  padding: 0.1em;
+  border-right: solid 1px black;
+}
+
+div.metricbar {
+  padding: 0.1em;
+  float: right;
+  width: 33%;
+  height: 50%;
+}
+
+.base, .metricbar#base {
+  background-color: #c8c8c8;
+  color: black;
+}
+
+.peak, .metricbar#peak {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+}
+
+.metricbar p {
+  margin: 0;
+  padding: 0.2em;
+}
+
+.datebar p, .systembar p {
+  margin: 0;
+  padding: 0;
+}
+
+/* Datebar stuff for older results */
+.datebar p {
+  float: left;
+  border-left: solid 1px black;
+}
+
+span.item {
+  float: left;
+  margin: 0;
+  padding: 0.1em 0 0.1em 0.5em;
+}
+
+span.value {
+  float: right;
+  padding: 0.1em 0.5em 0.1em 0;
+}
+
+div.datebar {
+  width: 100%;
+  float: left;
+  min-height: 100%;
+  border: solid 1px black;
+}
+
+p#test_sponsor         { width: 48%; }
+p#tester               { width: 48%; }
+p#license_num          { width: 24%; }
+p#test_date            { width: 23%; }
+p#hw_avail, p#sw_avail { width: 25%; }
+
+/* Table-based datebar and systembar on newer results */
+table.datebar, table.titlebarcontainer {
+  float: left;
+  width: 100%;
+  min-height: 100%;
+  border-collapse: collapse;
+  border: solid 1px black;
+  table-layout: fixed;
+}
+
+table.datebar th {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 0.5em;
+  padding: 0 0.5em 0 0.25em;
+}
+
+table.datebar td {
+  text-align: left;
+  padding: 0 0.5em 0 0;
+}
+
+table.titlebarcontainer tr {
+  vertical-align: top;
+}
+table.titlebarcontainer td {
+  border-right: 1px solid black;
+}
+
+th#license_num          { width: 17%; }
+th#test_sponsor         { width: 17%; }
+th#tester               { width: 17%; }
+th#test_date            { width: 22%; }
+th#hw_avail             { width: 22%; }
+th#sw_avail             { width: 22%; }
+td#license_num_val      { width: 52%; }
+td#test_sponsor_val     { width: 52%; }
+td#tester_val           { width: 52%; }
+td#test_date_val        { width: 13%; white-space: nowrap; }
+td#hw_avail_val         { width: 13%; white-space: nowrap; }
+td#sw_avail_val         { width: 13%; white-space: nowrap; }
+
+
+div.graph {
+  width: 100%
+  margin: auto;
+}
+
+div.sysdesc > h2 {
+  text-align: center;
+  background-color: #c8c8c8;
+  color: black;
+  padding: 0.5em 0 0.5em 0;
+  margin: 0;
+} 
+  
+div.sysdesc {
+  margin: 0.5em 0 0.5em 0;
+}
+
+div.infobox, div.sysdesc {
+  float: left;
+  width: 100%;
+  padding: 0;
+  border: solid 1px black;
+}
+
+div.infobox table {
+  width: 49%;
+  float: left;
+}
+
+div.infobox table tr {
+  vertical-align: top;
+}
+
+div.infobox table#Hardware,
+div.infobox table#BenchmarkSoftware {
+  width: 50%;
+  border-right: 1px solid black;
+}
+
+div.infobox table#Systems {
+  width: 100%;
+}
+
+div.infobox table#Power {
+  width: 100%;
+  border-top: 1px solid black;
+}
+
+div.infobox table#Systems tbody th {
+  width: 20%;
+}
+
+div.infobox thead th {
+  font-size: 200%;
+}
+
+div.infobox tbody th {
+  text-align: left;
+}
+
+.resultstable h2, div.notes h2 {
+  text-align: center;
+  margin: 0.1em;
+}
+
+div.notes h3 {
+  margin: 0.1em;
+}
+
+div.notes table {
+  width: 100%;
+}
+
+div.notes table tr td {
+  text-align: right;
+  vertical-align: top;
+}
+
+/* Alas, IE6... if only you didn't suck so much...
+div.notes table tr td + td {
+*/
+div.notes table td.al {
+  text-align: left;
+  width: 85%;
+}
+
+div.notes table tr td {
+  padding-bottom: 1em;
+}
+
+div.notes table.portability tr td {
+  padding: 0em;
+}
+
+div.notes table.portability {
+  padding: 1em;
+}
+
+.resultstable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resultstable th.basecol, .resultstable th.peakcol {
+  padding: 0.1em;
+  font-size: 90%;
+}
+
+.resultstable th {
+  border: solid 2px black;
+}
+
+.resultstable td {
+  border: solid 1px #b8b8b8;
+}
+
+td.bm, th.bm { 
+  border-right: solid 2px black;
+  border-left: solid 2px black;
+}
+
+td.l_edge { 
+  border-left: solid 2px black;
+}
+
+td.r_edge { 
+  border-right: solid 2px black;
+}
+
+.resultstable tfoot td {
+  text-align: center;
+  border: solid 2px black;
+}
+
+tr.table_metrics > td {
+  text-align: right;
+}
+
+th.basecol {
+  background-color: #c8c8c8;
+  color: black;
+}
+td.basecol {
+  text-align: right;
+  background-color: transparent;
+  color: black;
+}
+
+th.peakcol {
+  text-align: center;
+}
+
+.peakcol {
+  background-color: transparent;
+  color: #2626b3;       /* peak blue */
+  text-align: right;
+}
+
+td.bm {
+  /* Basically, the benchmark name and copies columns */
+  background-color: #c8c8c8;
+  color: black;
+}
+
+span.selected {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.selected a:link, .selected a:visited {
+  border-bottom: 0;
+}
+
+div.notes {
+  width: 100%;
+  float: left;
+  border: solid 1px black;
+}
+
+div.flagfooter {
+  text-align: center;
+}
+
+div.errors {
+  border: solid 2px red;
+}
+div.errors h2 {
+  background-color: transparent;
+  color: red;
+}
+
+div.footer {
+  border: none;
+}
+
+/* People find the "double underline" confusing.  And Safari 1.3 doesn't deal
+ * well with attempting to disable the border for userflag links.  So just
+ * give up and don't decorate user flags specially.
+********************
+span.userflag {
+  text-decoration: underline;
+}
+
+.userflag a:link {
+  border-bottom: 0;
+}
+********************
+*/
+
+/* Keep flags from being wrapped */
+span.userflag, span.flagtext {
+  white-space: nowrap;
+}
+/* Classes that contain links - useless on paper */
+.flagTOC, .SubMenu, .NoPrint {
+  display: none;
+}
+
+/* Don't decorate links - they're not clickable */
+a {
+  text-decoration: none;
+  background: inherit;
+  color: inherit;
+}
+
+.resultpage {
+  width: 100%;
+}
+
+.w3cbutton3 {
+  display: none;
+}
+-->
+</style>
+<style type="text/css" id="user">
+
+   
+   body { background: white; }
+   
+
+</style>
+<title>CPU2017 Result Flag Description</title>
+</head>
+<body>
+<h1>CPU2017 Flag Description<br />not applicable </h1>
+
+
+<h2>Flag descriptions for GCC, the GNU Compiler Collection</h2>
+
+<p id="gnote"><b>Note:</b> The GNU Compiler Collection provides a wide array of compiler options, described in detail and readily
+   available at <a href="https://gcc.gnu.org/onlinedocs/gcc/Option-Index.html#Option-Index">
+      https://gcc.gnu.org/onlinedocs/gcc/Option-Index.html#Option-Index</a> and <a
+      href="https://gcc.gnu.org/onlinedocs/gfortran/">https://gcc.gnu.org/onlinedocs/gfortran/</a>.  This SPEC CPU flags file
+   contains excerpts from and brief summaries of portions of that documentation.</p>
+
+<p>SPEC's modifications are:<br />
+   Copyright (C) 2006-2019 Standard Performance Evaluation Corporation</p>
+
+<p>Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License,
+   Version 1.3 or any later version published by the Free Software Foundation; with the Invariant Sections being "Funding Free
+   Software", the Front-Cover Texts being (a) (see below), and with the Back-Cover Texts being (b) (see below).  A copy of the
+   license is included in your SPEC CPU kit at <samp>$SPEC/Docs/licenses/FDL.v1.3.txt</samp> and on the web at <a
+      href="http://www.spec.org/cpu2017/Docs/licenses/FDL.v1.3.txt">http://www.spec.org/cpu2017/Docs/licenses/FDL.v1.3.txt</a>.
+   A copy of "Funding Free Software" is on your SPEC CPU kit at <samp>$SPEC/Docs/licenses/FundingFreeSW.txt</samp> and on the web at <a
+      href="http://www.spec.org/cpu2017/Docs/licenses/FundingFreeSW.txt">http://www.spec.org/cpu2017/Docs/licenses/FundingFreeSW.txt</a>.</p>
+
+<p>(a) The FSF's Front-Cover Text is:</p>
+
+     <p style="margin-left:3em;">A GNU Manual</p>
+
+<p>(b) The FSF's Back-Cover Text is:</p>
+
+<p style="margin-left:3em;">You have freedom to copy and modify this GNU Manual, like GNU software.  Copies published by the Free
+   Software Foundation raise funds for GNU development.</p>
+
+
+
+<hr />
+<div class="unknownflags">
+<h2>Base Unknown Flags</h2>
+<h3><a name="unknown600.perlbench_sbase">600.perlbench_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CC600.perlbench_sbase">CC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD600.perlbench_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown602.gcc_sbase">602.gcc_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CC602.gcc_sbase">CC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD602.gcc_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown605.mcf_sbase">605.mcf_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CC605.mcf_sbase">CC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD605.mcf_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown620.omnetpp_sbase">620.omnetpp_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CXX620.omnetpp_sbase">CXX</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD620.omnetpp_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown623.xalancbmk_sbase">623.xalancbmk_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CXX623.xalancbmk_sbase">CXX</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD623.xalancbmk_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown625.x264_sbase">625.x264_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CC625.x264_sbase">CC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD625.x264_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown631.deepsjeng_sbase">631.deepsjeng_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CXX631.deepsjeng_sbase">CXX</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD631.deepsjeng_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown641.leela_sbase">641.leela_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CXX641.leela_sbase">CXX</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD641.leela_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown648.exchange2_sbase">648.exchange2_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="FC648.exchange2_sbase">FC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD648.exchange2_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+<h3><a name="unknown657.xz_sbase">657.xz_s (base)</a></h3>
+<ul class="flagDescList">
+<li><a name="CC657.xz_sbase">CC</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+<li><a name="LD657.xz_sbase">LD</a>: <span class="monospace">/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-</span></li>
+</ul>
+</div>
+<hr />
+
+<div class="compilerflags">
+<h2>Base Compiler Invocation</h2>
+<h3><a name="CCbasecompiler">C benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_gcc" id="user_CCbase_gcc">gcc</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">CC, LD</li>
+<li class="descText">
+<p>Invokes the GNU C compiler.  </p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="CXXbasecompiler">C++ benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_gxx" id="user_CXXbase_gxx">g++</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">CXX, LD</li>
+<li class="descText">
+<p>Invokes the GNU C++ compiler.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="FCbasecompiler">Fortran benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_gfortran" id="user_FCbase_gfortran">gfortran</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">FC, LD</li>
+<li class="descText">
+<p>Invokes the GNU Fortran compiler.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<hr />
+
+<div class="portabilityflags">
+<h2>Base Portability Flags</h2>
+<h4><a name="portability600.perlbench_sbase">600.perlbench_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE600_perlbench_s_F-static" id="user_baseOPTIMIZE600_perlbench_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b600.perlbench_s_basePORTABILITY_DSPEC_LINUX_X64" id="b600.perlbench_s_basePORTABILITY_DSPEC_LINUX_X64">-DSPEC_LINUX_X64</a></li>
+<li class="flagOrigin"><a href="#benchmarkOrigin"><img src="https://www.spec.org/auto/cpu2017/images/benchmark.png" alt="[benchmark]" /></a></li>
+<li class="flagVar">PORTABILITY</li>
+<li class="descText">
+<p>
+This macro indicates that the benchmark is being compiled on an AMD64-compatible
+system running the Linux operating system.
+</p>
+</li>
+<li class="flagDescInc"><span class="flagDescInc">Includes:</span>
+ <ul class="flagTOC">
+  <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DSPEC_LINUX">-DSPEC_LINUX</a>
+   <ul class="SubMenu">
+    <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DI_TIME">-DI_TIME</a></li>
+   </ul>
+  </li>
+  <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DSPEC_X64">-DSPEC_X64</a>
+   <ul class="SubMenu">
+    <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DSPEC_LITTLEENDIAN">-DSPEC_LITTLEENDIAN</a></li>
+    <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DMYSWAP">-DMYSWAP</a></li>
+    <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DNEED_VA_COPY">-DNEED_VA_COPY</a></li>
+    <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DSPEC_NO_NV_PRESERVES_UV">-DSPEC_NO_NV_PRESERVES_UV</a></li>
+   </ul>
+  </li>
+ </ul>
+<div class="clear"></div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b600.perlbench_s_baseEXTRA_PORTABILITY_DSPEC_LP64" id="b600.perlbench_s_baseEXTRA_PORTABILITY_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#benchmarkOrigin"><img src="https://www.spec.org/auto/cpu2017/images/benchmark.png" alt="[benchmark]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This macro specifies that the target system uses the LP64 data model;
+specifically, that integers are 32 bits, while longs and pointers are 64 bits.
+</p>
+</li>
+<li class="flagDescInc"><span class="flagDescInc">Includes:</span>
+ <ul class="flagTOC">
+  <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_SPEC_INT32_T">-DSPEC_INT32_T=XXX</a></li>
+  <li><a href="https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/600.perlbench_s.flags.html#b600.perlbench_s_DUSE_64_BIT_INT">-DUSE_64_BIT_INT</a></li>
+ </ul>
+<div class="clear"></div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability602.gcc_sbase">602.gcc_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE602_gcc_s_F-static" id="user_baseOPTIMIZE602_gcc_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY602_gcc_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY602_gcc_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability605.mcf_sbase">605.mcf_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE605_mcf_s_F-static" id="user_baseOPTIMIZE605_mcf_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY605_mcf_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY605_mcf_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability620.omnetpp_sbase">620.omnetpp_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE620_omnetpp_s_F-static" id="user_baseOPTIMIZE620_omnetpp_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY620_omnetpp_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY620_omnetpp_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability623.xalancbmk_sbase">623.xalancbmk_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE623_xalancbmk_s_F-static" id="user_baseOPTIMIZE623_xalancbmk_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="b623.xalancbmk_s_basePORTABILITY_DSPEC_LINUX" id="b623.xalancbmk_s_basePORTABILITY_DSPEC_LINUX">-DSPEC_LINUX</a></li>
+<li class="flagOrigin"><a href="#benchmarkOrigin"><img src="https://www.spec.org/auto/cpu2017/images/benchmark.png" alt="[benchmark]" /></a></li>
+<li class="flagVar">PORTABILITY</li>
+<li class="descText">
+<p>
+This flag can be set for SPEC compilation for LINUX using default compiler.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY623_xalancbmk_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY623_xalancbmk_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability625.x264_sbase">625.x264_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE625_x264_s_F-static" id="user_baseOPTIMIZE625_x264_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY625_x264_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY625_x264_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability631.deepsjeng_sbase">631.deepsjeng_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE631_deepsjeng_s_F-static" id="user_baseOPTIMIZE631_deepsjeng_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY631_deepsjeng_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY631_deepsjeng_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability641.leela_sbase">641.leela_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE641_leela_s_F-static" id="user_baseOPTIMIZE641_leela_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY641_leela_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY641_leela_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability648.exchange2_sbase">648.exchange2_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE648_exchange2_s_F-static" id="user_baseOPTIMIZE648_exchange2_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY648_exchange2_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY648_exchange2_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h4><a name="portability657.xz_sbase">657.xz_s</a></h4>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName poclass"><a name="user_baseOPTIMIZE657_xz_s_F-static" id="user_baseOPTIMIZE657_xz_s_F-static">-static</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Link the compiled binaries statically.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_baseEXTRA_PORTABILITY657_xz_s_DSPEC_LP64" id="suite_baseEXTRA_PORTABILITY657_xz_s_DSPEC_LP64">-DSPEC_LP64</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">EXTRA_PORTABILITY</li>
+<li class="descText">
+<p>
+This option is used to indicate that the host system's integers are 32-bits
+wide, and longs and pointers are 64-bits wide.  Not all benchmarks
+recognize this macro, but the preferred practice for data model selection
+applies the flags to all benchmarks; this flag description is a placeholder
+for those benchmarks that do not recognize this macro.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<p><span class="pomismatch">Some portability flags</span> were found in optimization variables.</p>
+</div>
+<hr />
+
+<div class="optimizationflags">
+<h2>Base Optimization Flags</h2>
+<h3><a name="CCbaseoptimization">C benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_std-c99-gcc_b483f20141260605300df3a95df05c104fc3b8b9e7126624f06b7a673b28c400f0009b411e0a9f72a46bab5fa1d96dd55e2b47e35e742f19a92c2442f3891f52" id="user_CCbase_std-c99-gcc_b483f20141260605300df3a95df05c104fc3b8b9e7126624f06b7a673b28c400f0009b411e0a9f72a46bab5fa1d96dd55e2b47e35e742f19a92c2442f3891f52">-std=c99</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescCompiler">gcc</li>
+<li class="flagVar">CC, LD</li>
+<li class="descText">
+<p>
+      Sets the language dialect to include syntax from the C99 standard, such as <samp>bool</samp> and other features used in CPU 2017
+      benchmarks.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782" id="user_CCbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782">-O3</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescCompiler">gcc,gfortran,gxx</li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Increases optimization levels: the higher the number, the more optimization is done.  Higher levels of optimization may
+      require additional compilation time, in the hopes of reducing execution time.  At -O, basic optimizations are performed, 
+      such as constant merging and elimination of dead code.  At -O2, additional optimizations are added, such as common
+      subexpression elimination and strict aliasing.  At -O3, even more optimizations are performed, such as function inlining and
+      vectorization.
+      <br /><a href="#gnote">Many more details are available</a>.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_CCbase_DSPEC_SUPPRESS_OPENMP" id="suite_CCbase_DSPEC_SUPPRESS_OPENMP">-DSPEC_SUPPRESS_OPENMP</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+Definition of this macro indicates that compilation for parallel operation
+  is disabled, and that any OpenMP directives or pragmas will not be visible
+  to the compiler.  This macro overrides the behavior of -DSPEC_OPENMP when
+  they both appear in the list of compilation flags.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fno-unsafe-math-optimizations" id="user_CCbase_F-fno-unsafe-math-optimizations">-fno-unsafe-math-optimizations</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>The switch <samp>-funsafe-math-optimizations</samp> allows the compiler to make certain(*) aggressive assumptions, such as
+         disregarding the programmer's intended order of operations. The run rules allow such re-ordering <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#reordering">
+            http://www.spec.org/cpu2017/Docs/runrules.html#reordering</a>.  The rules also point out that you must get answers
+         that pass SPEC's validation requirements.  In some cases, that will mean that some optimizations must be turned off.
+      </p>
+      <p><samp>-fno-unsafe-math-optimizations</samp> turns off these(*) optimizations.  You may need to use this flag in order to get
+         certain benchmarks to validate.  Note that this is an <i>optimization</i> switch, not a portability switch.  If it is
+         needed, then in base you will need to use it consistently.  See: <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags">
+            http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags</a> and <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate">
+            http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate</a>.  </p>
+      <p style="margin-left:2em;">(*) Much more detail about which optimizations is <a href="#gnote">available</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fno-openmp" id="user_CCbase_F-fno-openmp">-fno-openmp</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescParallel"><span class="tt">Yes</span></li>
+<li class="flagVar">EXTRA_OPTIMIZE</li>
+<li class="descText">
+<p>
+Disable OpenMP.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fno-strict-aliasing" id="user_CCbase_F-fno-strict-aliasing">-fno-strict-aliasing</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">EXTRA_COPTIMIZE</li>
+<li class="descText">
+<p>The language standards set aliasing requirements: programmers are expected to follow conventions so that the
+         compiler can keep track of memory.  If a program violates the requirements (for example, using pointer arithmetic),
+         programs may crash, or (worse) wrong answers may be silently produced.</p>
+      <p>Unfortunately, the aliasing requirements from the standards are not always well understood.</p>
+      <p>Sometimes, the aliasing requirements are understood and nevertheless intentionally violated by smart programmers who
+         know what they are doing, such as the programmer responsible for the inner workings of Perl storage allocation and
+         variable handling.</p>
+      <p>The <samp>-fno-strict-aliasing</samp> switch instructs the optimizer that it must not assume that the aliasing
+         requirements from the standard are met by the current program.  You will probably need it for 500.perlbench_r and
+         600.perlbench_s.  Note that this is an <i>optimization</i> switch, not a portability switch.  When running
+         SPECint2017_rate_base or SPECint2017_speed_base, you must use the same optimization switches for all the C modules
+         in base; see 
+         <a href="http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags">
+            http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags</a>  
+         and 
+         <a href="http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate">
+            http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate</a>.  
+      </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fgnu89-inline" id="user_CCbase_F-fgnu89-inline">-fgnu89-inline</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">EXTRA_COPTIMIZE</li>
+<li class="descText">
+<p> Tells GCC to use the GNU semantics for "inline" functions, that is, the behavior prior to the C99 standard.
+      This switch may resolve duplicate symbol errors, as noted in the <a
+         href="http://www.spec.org/cpu2017/Docs/benchmarks/502.gcc_r.html#inline">502.gcc_r benchmark description</a>.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="CXXbaseoptimization">C++ benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_std-cxx03-gcc" id="user_CXXbase_std-cxx03-gcc">-std=c++03</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescCompiler">gxx</li>
+<li class="flagVar">CXX, LD</li>
+<li class="descText">
+<p>
+      Sets the language dialect to include syntax from the 1998 ISO C++ standard plus the 2003 technical corrigendum.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782" id="user_CXXbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782">-O3</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescCompiler">gcc,gfortran,gxx</li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Increases optimization levels: the higher the number, the more optimization is done.  Higher levels of optimization may
+      require additional compilation time, in the hopes of reducing execution time.  At -O, basic optimizations are performed, 
+      such as constant merging and elimination of dead code.  At -O2, additional optimizations are added, such as common
+      subexpression elimination and strict aliasing.  At -O3, even more optimizations are performed, such as function inlining and
+      vectorization.
+      <br /><a href="#gnote">Many more details are available</a>.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_CXXbase_DSPEC_SUPPRESS_OPENMP" id="suite_CXXbase_DSPEC_SUPPRESS_OPENMP">-DSPEC_SUPPRESS_OPENMP</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+Definition of this macro indicates that compilation for parallel operation
+  is disabled, and that any OpenMP directives or pragmas will not be visible
+  to the compiler.  This macro overrides the behavior of -DSPEC_OPENMP when
+  they both appear in the list of compilation flags.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_F-fno-unsafe-math-optimizations" id="user_CXXbase_F-fno-unsafe-math-optimizations">-fno-unsafe-math-optimizations</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>The switch <samp>-funsafe-math-optimizations</samp> allows the compiler to make certain(*) aggressive assumptions, such as
+         disregarding the programmer's intended order of operations. The run rules allow such re-ordering <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#reordering">
+            http://www.spec.org/cpu2017/Docs/runrules.html#reordering</a>.  The rules also point out that you must get answers
+         that pass SPEC's validation requirements.  In some cases, that will mean that some optimizations must be turned off.
+      </p>
+      <p><samp>-fno-unsafe-math-optimizations</samp> turns off these(*) optimizations.  You may need to use this flag in order to get
+         certain benchmarks to validate.  Note that this is an <i>optimization</i> switch, not a portability switch.  If it is
+         needed, then in base you will need to use it consistently.  See: <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags">
+            http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags</a> and <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate">
+            http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate</a>.  </p>
+      <p style="margin-left:2em;">(*) Much more detail about which optimizations is <a href="#gnote">available</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_F-fno-openmp" id="user_CXXbase_F-fno-openmp">-fno-openmp</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescParallel"><span class="tt">Yes</span></li>
+<li class="flagVar">EXTRA_OPTIMIZE</li>
+<li class="descText">
+<p>
+Disable OpenMP.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="FCbaseoptimization">Fortran benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="suite_FCbase_DSPEC_SUPPRESS_OPENMP" id="suite_FCbase_DSPEC_SUPPRESS_OPENMP">-DSPEC_SUPPRESS_OPENMP</a></li>
+<li class="flagOrigin"><a href="#suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+Definition of this macro indicates that compilation for parallel operation
+  is disabled, and that any OpenMP directives or pragmas will not be visible
+  to the compiler.  This macro overrides the behavior of -DSPEC_OPENMP when
+  they both appear in the list of compilation flags.
+</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782" id="user_FCbase_Olevel-gcc_2a8c613e11e2962ae78d693398304d6f1c12fa10320380cff05dd109643c60bb04214353a55f02d8022371d19f6dd940085da69c3a4516b2b7029e64f867e782">-O3</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescCompiler">gcc,gfortran,gxx</li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Increases optimization levels: the higher the number, the more optimization is done.  Higher levels of optimization may
+      require additional compilation time, in the hopes of reducing execution time.  At -O, basic optimizations are performed, 
+      such as constant merging and elimination of dead code.  At -O2, additional optimizations are added, such as common
+      subexpression elimination and strict aliasing.  At -O3, even more optimizations are performed, such as function inlining and
+      vectorization.
+      <br /><a href="#gnote">Many more details are available</a>.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_F-fno-unsafe-math-optimizations" id="user_FCbase_F-fno-unsafe-math-optimizations">-fno-unsafe-math-optimizations</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>The switch <samp>-funsafe-math-optimizations</samp> allows the compiler to make certain(*) aggressive assumptions, such as
+         disregarding the programmer's intended order of operations. The run rules allow such re-ordering <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#reordering">
+            http://www.spec.org/cpu2017/Docs/runrules.html#reordering</a>.  The rules also point out that you must get answers
+         that pass SPEC's validation requirements.  In some cases, that will mean that some optimizations must be turned off.
+      </p>
+      <p><samp>-fno-unsafe-math-optimizations</samp> turns off these(*) optimizations.  You may need to use this flag in order to get
+         certain benchmarks to validate.  Note that this is an <i>optimization</i> switch, not a portability switch.  If it is
+         needed, then in base you will need to use it consistently.  See: <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags">
+            http://www.spec.org/cpu2017/Docs/runrules.html#BaseFlags</a> and <a
+            href="http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate">
+            http://www.spec.org/cpu2017/Docs/runrules.html#MustValidate</a>.  </p>
+      <p style="margin-left:2em;">(*) Much more detail about which optimizations is <a href="#gnote">available</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_F-fno-openmp" id="user_FCbase_F-fno-openmp">-fno-openmp</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagDescParallel"><span class="tt">Yes</span></li>
+<li class="flagVar">EXTRA_OPTIMIZE</li>
+<li class="descText">
+<p>
+Disable OpenMP.
+</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<hr />
+
+<div class="otherflags">
+<h2>Base Other Flags</h2>
+<h3><a name="CCbaseother">C benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fcommon" id="user_CCbase_F-fcommon">-fcommon</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Place uninitialized global variables in a common block. Needed for GCC 10 portability with 625.x264_s.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CCbase_F-fallow-argument-mismatch" id="user_CCbase_F-fallow-argument-mismatch">-fallow-argument-mismatch</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Needed for GCC 10 portability with multiple fpspeed benchmarks.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="CXXbaseother">C++ benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_F-fcommon" id="user_CXXbase_F-fcommon">-fcommon</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Place uninitialized global variables in a common block. Needed for GCC 10 portability with 625.x264_s.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_CXXbase_F-fallow-argument-mismatch" id="user_CXXbase_F-fallow-argument-mismatch">-fallow-argument-mismatch</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Needed for GCC 10 portability with multiple fpspeed benchmarks.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+<h3><a name="FCbaseother">Fortran benchmarks</a></h3>
+<ul class="flagDescList">
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_F-fcommon" id="user_FCbase_F-fcommon">-fcommon</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Place uninitialized global variables in a common block. Needed for GCC 10 portability with 625.x264_s.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<div class="flagDesc">
+<ul class="flagDesc">
+<li class="flagName"><a name="user_FCbase_F-fallow-argument-mismatch" id="user_FCbase_F-fallow-argument-mismatch">-fallow-argument-mismatch</a></li>
+<li class="flagOrigin"><a href="#userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></li>
+<li class="flagVar">OPTIMIZE</li>
+<li class="descText">
+<p>
+      Needed for GCC 10 portability with multiple fpspeed benchmarks.
+   </p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<hr />
+<h2><a name="submitCommand">Commands and Options Used to Submit Benchmark Runs</a></h2>
+
+   
+   <p>SPECrate runs might use one of these methods to bind processes to specific processors, depending on the config file.</p>
+   <ul>
+      <li><p>Linux systems: the <samp>numactl</samp> command is commonly used.     Here is a brief guide to understanding the specific
+            command which will be found in the config file: </p>
+         <ul>
+            <li>syntax: <samp>numactl [--interleave=nodes] [--preferred=node] [--physcpubind=cpus] [--cpunodebind=nodes]
+                  [--membind=nodes] [--localalloc] command args ...</samp></li>
+            <li><samp>numactl</samp> runs processes with a specific NUMA scheduling or memory placement policy.  The policy is set for a
+               command and inherited by all of its children. </li>
+            <li><samp>--localalloc</samp> instructs numactl to keep a process memory on the local node while <samp>-m</samp> specifies which node(s) to
+               place a process memory.  </li>
+            <li><samp>--physcpubind</samp> specifies which core(s) to bind the process. In this case, copy 0 is bound to processor 0
+               etc.</li>
+            <li> For full details on using numactl, please refer to your Linux documentation, <samp>man numactl</samp></li>
+         </ul>
+      </li>
+      <li><p>Solaris systems: The <samp>pbind</samp> command is commonly used, via  
+            <br /> <b><kbd>submit=echo 'pbind -b...' > dobmk; sh dobmk</kbd></b> <br />
+            The specific command may be found in the config file; here is a brief guide to understanding that command: </p>
+         <ul>
+            <li><kbd><b>submit=</b></kbd> causes the SPEC tools to use this line when submitting jobs.</li>
+            <li><kbd><b>echo ...&gt; dobmk</b></kbd> causes the generated commands to be written to a file, namely
+               <kbd>dobmk</kbd>.</li>
+            <li><p><kbd><b>pbind -b</b></kbd> causes this copy's processes to be bound to the CPU specified by the expression that
+                  follows it.  See the config file used in the run for the exact syntax, which tends to be cumbersome because of
+                  the need to carefully quote parts of the expression.  When all expressions are evaluated, the jobs are typically
+                  distributed evenly across the system, with each chip running the same number of jobs as all other chips, and each
+                  core running the same number of jobs as all other cores.  </p>
+               <p>The pbind expression may include various elements from the SPEC toolset and from standard Unix commands, such
+                  as:</p>
+               <ul>
+                  <li><kbd><b>$BIND</b></kbd>: a reference to a value from the bind line, a line of the form
+                     "<samp>bind&nbsp;=&nbsp;n&nbsp;n&nbsp;n&nbsp;n</samp>", where each "n" is a processor number.  See <a
+                        href="http://www.spec.org/cpu2017/Docs/config.html#bind">http://www.spec.org/cpu2017/Docs/config.html#bind</a>
+                     for details on this feature.</li>
+                  <li><kbd><b>$$</b></kbd>: the current process id</li>
+                  <li><kbd><b>$SPECCOPYNUM</b></kbd>: the SPEC tools-assigned number for this copy of the benchmark.</li>
+                  <li><kbd><b>psrinfo</b></kbd>: find out what processors are available</li>
+                  <li><kbd><b>grep on-line</b></kbd>: search the <kbd>psrinfo</kbd> output for information regarding on-line cpus</li>
+                  <li><kbd><b>expr</b></kbd>: Calculate simple arithmetic expressions.  For example, the effect of binding jobs to a
+                     (quote-resolved) expression such as: <br /><samp>expr ( $SPECCOPYNUM / 4 ) * 8 + ($SPECCOPYNUM % 4 ) )</samp>
+                     <br />would be to send the jobs to processors whose numbers are:
+                     <br /><samp>0,1,2,3, 8,9,10,11, 16,17,18,19 ...</samp></li>
+                  <li><kbd><b>awk...print \$1</b></kbd>: Pick out the line corresponding to this copy of the benchmark and use the CPU
+                     number mentioned at the start of this line.</li>
+            </ul></li>
+            <li><kbd><b>sh dobmk</b></kbd> actually runs the benchmark.</li>
+      </ul></li>
+   </ul>
+   
+
+<hr />
+<h2><a name="fdoSettings">Commands and Options Used for Feedback-Directed Optimization</a></h2>
+
+   
+   <p>No special commands are needed for feedback-directed optimization, other than the compiler <a
+         href="#user_F-fprofile-generate">profile</a>&nbsp;&nbsp;<a href="#user_F-fprofile-use">flags</a>.</p>
+   
+
+<hr />
+<h2><a name="softwareEnvironment">Shell, Environment, and Other Software Settings</a></h2>
+
+   
+   <p>One or more of the following may have been used in the run.  If so, it will be listed in the notes sections.  Here
+      is a brief guide to understanding them:</p>
+   <ul>
+
+      <li><p><b><kbd>LD_LIBRARY_PATH=&lt;directories&gt;</kbd></b>  (set via config file <samp>preENV</samp>)
+            <br />LD_LIBRARY_PATH controls the search order for libraries.  Often, it can be defaulted.  Sometimes, it is
+            explicitly set (as documented in the notes in the submission), in order to ensure that the correct versions of
+            libraries are picked up.  </p></li>
+      <li><p><b><kbd>OMP_STACKSIZE=N</kbd></b> (set via config file <samp>preENV</samp>)
+            <br />Set the stack size for subordinate threads.</p></li>
+      <li><p> <b><kbd>ulimit -s N</kbd></b><br />
+            <b><kbd>ulimit -s unlimited</kbd></b><br />
+            'ulimit' is a Unix commands, entered prior to the run.  It sets the stack size for the main process, either
+            to N kbytes or to no limit.</p> </li>
+   </ul>
+   
+
+<hr />
+<div class="flagorigins">
+ <p>Flag description origin markings:</p>
+ <table>
+  <tr>
+   <td><a name="userOrigin"><img src="https://www.spec.org/auto/cpu2017/images/user.png" alt="[user]" /></a></td>
+   <td>Indicates that the flag description came from the user flags file.</td>
+  </tr>
+  <tr>
+   <td><a name="suiteOrigin"><img src="https://www.spec.org/auto/cpu2017/images/suite.png" alt="[suite]" /></a></td>
+   <td>Indicates that the flag description came from the suite-wide flags file.</td>
+  </tr>
+  <tr>
+   <td><a name="benchmarkOrigin"><img src="https://www.spec.org/auto/cpu2017/images/benchmark.png" alt="[benchmark]" /></a></td>
+   <td>Indicates that the flag description came from a per-benchmark flags file.</td>
+  </tr>
+ </table>
+</div>
+<hr />
+<p style="text-align: left">For questions about the meanings of these flags, please contact the tester.<br />
+For other inquiries, please contact <a href="mailto:info@spec.org">info@spec.org</a><br />
+Copyright 2017-2020 Standard Performance Evaluation Corporation<br />
+Tested with SPEC CPU2017 v1.1.0.<br />
+Report generated on 2020-10-16 23:26:19 by SPEC CPU2017 flags formatter v5178.</p>
+</body>
+</html>
