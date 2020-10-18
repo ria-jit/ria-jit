@@ -51,7 +51,6 @@ void insertionSort(t_node **head);
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count);
 
 void analyze(const char *file_path) {
-
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
         _exit(2);
@@ -83,153 +82,161 @@ void analyze(const char *file_path) {
         add_instruction(addr, mnem, reg);
     }
 
-    ///rank mnem by usage
-    int mnemRanked[N_MNEM];
-    for (int i = 0; i < N_MNEM; i++) {
-        mnemRanked[i] = i;
-    }
-    ///insertion sort:
-    {
-        int key, j;
-        for (int i = 1; i < N_MNEM; i++) {
-            key = mnemRanked[i];
-            j = i - 1;
-
-            ///move move elements with index < i && element > i one to the left
-            while (j >= 0 && mnem[mnemRanked[j]] < mnem[key]) {
-                mnemRanked[j + 1] = mnemRanked[j];
-                j--;
-            }
-
-            ///insert former element i to correct position
-            mnemRanked[j + 1] = key;
+    if (flag_do_analyze_mnem) {
+        ///rank mnem by usage
+        int mnemRanked[N_MNEM];
+        for (int i = 0; i < N_MNEM; i++) {
+            mnemRanked[i] = i;
         }
-    }
+        ///insertion sort:
+        {
+            int key, j;
+            for (int i = 1; i < N_MNEM; i++) {
+                key = mnemRanked[i];
+                j = i - 1;
 
-    //rank registers by usage
-    int regRanked[N_REG];
-    for (int i = 0; i < N_REG; i++) {
-        regRanked[i] = i;
-    }
-    ///insertion sort:
-    {
-        int key, j;
-        for (int i = 1; i < N_REG; i++) {
-            key = regRanked[i];
-            j = i - 1;
+                ///move move elements with index < i && element > i one to the left
+                while (j >= 0 && mnem[mnemRanked[j]] < mnem[key]) {
+                    mnemRanked[j + 1] = mnemRanked[j];
+                    j--;
+                }
 
-            ///move move elements with index < i && element > i one to the left
-            while (j >= 0 && reg[regRanked[j]] < reg[key]) {
-                regRanked[j + 1] = regRanked[j];
-                j--;
+                ///insert former element i to correct position
+                mnemRanked[j + 1] = key;
             }
-
-            ///insert former element i to correct position
-            regRanked[j + 1] = key;
         }
+
+        log_analyze("Mnemonics...\n");
+        log_analyze("==========\n");
+        for (int i = 0; i < N_MNEM; i++) {
+            if (mnem[mnemRanked[i]] == 0) break;
+            log_analyze("Mnem %s is used %li times.\n", mnem_to_string(mnemRanked[i]), mnem[mnemRanked[i]]);
+        }
+        log_analyze("\n");
     }
 
-    log_analyze("Mnemonics...\n");
-    log_analyze("==========\n");
-    for (int i = 0; i < N_MNEM; i++) {
-        if (mnem[mnemRanked[i]] == 0) break;
-        log_analyze("Mnem %s is used %li times.\n", mnem_to_string(mnemRanked[i]), mnem[mnemRanked[i]]);
+    if (flag_do_analyze_reg) {
+        //rank registers by usage
+        int regRanked[N_REG];
+        for (int i = 0; i < N_REG; i++) {
+            regRanked[i] = i;
+        }
+        ///insertion sort:
+        {
+            int key, j;
+            for (int i = 1; i < N_REG; i++) {
+                key = regRanked[i];
+                j = i - 1;
+
+                ///move move elements with index < i && element > i one to the left
+                while (j >= 0 && reg[regRanked[j]] < reg[key]) {
+                    regRanked[j + 1] = regRanked[j];
+                    j--;
+                }
+
+                ///insert former element i to correct position
+                regRanked[j + 1] = key;
+            }
+        }
+
+        log_analyze("Registers...\n");
+        log_analyze("==========\n");
+        for (int i = 0; i < N_REG; i++) {
+            if (reg[regRanked[i]] == 0) break;
+            log_analyze("Register %s (%s) is used %li times.\n", reg_to_string(regRanked[i]),
+                        reg_to_alias(regRanked[i]),
+                        reg[regRanked[i]]);
+        }
+        log_analyze("\n");
     }
-    log_analyze("\n");
 
-    log_analyze("Registers...\n");
-    log_analyze("==========\n");
-    for (int i = 0; i < N_REG; i++) {
-        if (reg[regRanked[i]] == 0) break;
-        log_analyze("Register %s (%s) is used %li times.\n", reg_to_string(regRanked[i]), reg_to_alias(regRanked[i]),
-                    reg[regRanked[i]]);
-    }
 
-    log_analyze("\n");
-    log_analyze("Combinations...\n");
-    log_analyze("==========\n");
+    if (flag_do_analyze_pattern) {
+        log_analyze("Combinations...\n");
+        log_analyze("==========\n");
 
-    long lvl2Count = 0;
-    for (int i = 0; i < N_MNEM; ++i) {
-        for (int j = 0; j < N_MNEM; ++j) {
-            t_secondLevel *lvl2 = array[i].followingMnem[j];
-            t_thirdLevel **lvl3 = lvl2->arr;
-            if (lvl2 != NULL) {
-                lvl2Count++;
-                //Mnem combination i; j happened
-                int k = 1;
-                while (k < (1 << 6)) {
-                    t_thirdLevel *x = lvl3[k];
-                    if (x != NULL) {
-                        insertionSort(&x->immediateList.head);
-                        int l = k - 1;
-                        while (l >= 0 && (lvl3[l] == NULL || lvl3[l]->immediateList.count < x->immediateList.count)) {
-                            lvl3[l + 1] = lvl3[l];
-                            l--;
+        long lvl2Count = 0;
+        for (int i = 0; i < N_MNEM; ++i) {
+            for (int j = 0; j < N_MNEM; ++j) {
+                t_secondLevel *lvl2 = array[i].followingMnem[j];
+                t_thirdLevel **lvl3 = lvl2->arr;
+                if (lvl2 != NULL) {
+                    lvl2Count++;
+                    //Mnem combination i; j happened
+                    int k = 1;
+                    while (k < (1 << 6)) {
+                        t_thirdLevel *x = lvl3[k];
+                        if (x != NULL) {
+                            insertionSort(&x->immediateList.head);
+                            int l = k - 1;
+                            while (l >= 0 &&
+                                    (lvl3[l] == NULL || lvl3[l]->immediateList.count < x->immediateList.count)) {
+                                lvl3[l + 1] = lvl3[l];
+                                l--;
+                            }
+                            lvl3[l + 1] = x;
                         }
-                        lvl3[l + 1] = x;
+                        k++;
                     }
+                }
+            }
+        }
+
+        struct sortedlvl2 {
+            t_secondLevel *lvl2;
+            t_risc_mnem firstLvlMnem;
+            t_risc_mnem secondLvlMnem;
+        };
+        struct sortedlvl2 sortedlvl2[lvl2Count];
+        memset(sortedlvl2, 0, lvl2Count * sizeof(struct sortedlvl2));
+
+        long k = 0;
+        for (t_risc_mnem i = 0; i < N_MNEM; ++i) {
+            for (t_risc_mnem j = 0; j < N_MNEM; ++j) {
+                t_secondLevel *lvl2 = array[i].followingMnem[j];
+                struct sortedlvl2 *A = sortedlvl2;
+                if (lvl2 != NULL) {
+                    //Mnem combination i; j happened
+
+                    long l = k - 1;
+                    while (l >= 0 && (A[l].lvl2 == NULL || A[l].lvl2->count < lvl2->count)) {
+                        A[l + 1] = A[l];
+                        l--;
+                    }
+                    A[l + 1] = (struct sortedlvl2) {.lvl2=lvl2, .firstLvlMnem=i, .secondLvlMnem=j};
                     k++;
                 }
             }
         }
-    }
 
-    struct sortedlvl2 {
-        t_secondLevel *lvl2;
-        t_risc_mnem firstLvlMnem;
-        t_risc_mnem secondLvlMnem;
-    };
-    struct sortedlvl2 sortedlvl2[lvl2Count];
-    memset(sortedlvl2, 0, lvl2Count * sizeof(struct sortedlvl2));
 
-    long k = 0;
-    for (t_risc_mnem i = 0; i < N_MNEM; ++i) {
-        for (t_risc_mnem j = 0; j < N_MNEM; ++j) {
-            t_secondLevel *lvl2 = array[i].followingMnem[j];
-            struct sortedlvl2 *A = sortedlvl2;
-            if (lvl2 != NULL) {
-                //Mnem combination i; j happened
-
-                long l = k - 1;
-                while (l >= 0 && (A[l].lvl2 == NULL || A[l].lvl2->count < lvl2->count)) {
-                    A[l + 1] = A[l];
-                    l--;
-                }
-                A[l + 1] = (struct sortedlvl2) {.lvl2=lvl2, .firstLvlMnem=i, .secondLvlMnem=j};
-                k++;
+        for (int i = 0; i < lvl2Count; ++i) {
+            if (i > 200) {
+                log_analyze("List limited to first 200 combinations\n");
+                break;
             }
-        }
-    }
-
-
-    for (int i = 0; i < lvl2Count; ++i) {
-        if (i > 200) {
-            log_analyze("List limited to first 200 combinations\n");
-            break;
-        }
-        log_analyze("Mnemonic combination %s %s occured %li times. Of which:\n",
-                    mnem_to_string(sortedlvl2[i].firstLvlMnem),
-                    mnem_to_string(sortedlvl2[i].secondLvlMnem), sortedlvl2[i].lvl2->count);
-        for (t_thirdLevel **arr = sortedlvl2[i].lvl2->arr; arr[0]; arr++) {
-            struct bitfield flags = arr[0]->flags;
-            log_analyze(
-                    "\t\t%li had: rd_1 == rs1_1: %i; rd_1 == rs2_1: %i; rs1_1 == rs2_1: %i; rd_1 == rs1_2: %i; rd_2 == (rs1_2 || rs2_2): %i, rs1_2 == rs2_2: %i. The most used immediate values were: ",
-                    arr[0]->immediateList.count, flags.rd1EqRs11Flag, flags.rd1EqRs21Flag, flags.rs11EqRs21Flag,
-                    flags.rd1EqRs12ORs22Flag, flags.rd2EqRsx2Flag, flags.rs12EqRs22Flag);
-            int j = 0;
-            for (t_node *node = arr[0]->immediateList.head; node; node = (t_node *) node->next) {
-                printf("0x%x, 0x%x (%li times); ", node->imm1, node->imm2, node->count);
-                if (++j > 7) {
-                    break;
+            log_analyze("Mnemonic combination %s %s occured %li times. Of which:\n",
+                        mnem_to_string(sortedlvl2[i].firstLvlMnem),
+                        mnem_to_string(sortedlvl2[i].secondLvlMnem), sortedlvl2[i].lvl2->count);
+            for (t_thirdLevel **arr = sortedlvl2[i].lvl2->arr; arr[0]; arr++) {
+                struct bitfield flags = arr[0]->flags;
+                log_analyze(
+                        "\t\t%li had: rd_1 == rs1_1: %i; rd_1 == rs2_1: %i; rs1_1 == rs2_1: %i; rd_1 == rs1_2: %i; rd_2 == (rs1_2 || rs2_2): %i, rs1_2 == rs2_2: %i. The most used immediate values were: ",
+                        arr[0]->immediateList.count, flags.rd1EqRs11Flag, flags.rd1EqRs21Flag, flags.rs11EqRs21Flag,
+                        flags.rd1EqRs12ORs22Flag, flags.rd2EqRsx2Flag, flags.rs12EqRs22Flag);
+                int j = 0;
+                for (t_node *node = arr[0]->immediateList.head; node; node = (t_node *) node->next) {
+                    printf("0x%x, 0x%x (%li times); ", node->imm1, node->imm2, node->count);
+                    if (++j > 7) {
+                        break;
+                    }
                 }
+                printf("\n");
             }
-            printf("\n");
         }
     }
 
     //check for unsupported instructions
-
     //CSRR
     //CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI,
     bool usesCSRR = false;
@@ -239,8 +246,6 @@ void analyze(const char *file_path) {
             break;
         }
     }
-
-
 
     //---RV32A---
     //LRW, SCW, AMOSWAPW, AMOADDW, AMOXORW, AMOANDW, AMOORW, AMOMINW, AMOMAXW, AMOMINUW, AMOMAXUW,

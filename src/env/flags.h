@@ -25,7 +25,9 @@ extern bool flag_translate_opt_chain;
 extern bool flag_translate_opt_jump;
 extern bool flag_translate_opt_fusion;
 extern bool flag_do_benchmark;
-extern bool flag_do_analyze;
+extern bool flag_do_analyze_mnem;
+extern bool flag_do_analyze_reg;
+extern bool flag_do_analyze_pattern;
 extern bool flag_do_profile;
 
 #include <stdint.h>

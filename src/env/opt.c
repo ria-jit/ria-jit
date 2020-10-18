@@ -148,15 +148,27 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     } else if (strncmp(option_string, "file", 4) == 0) {
                         goto FILE;
                     } else if (strncmp(option_string, "benchmark", 9) == 0) {
-                        goto BENCHMARK;
-                    } else if (strncmp(option_string, "profile-registers", 17) == 0) {
-                        goto PROFILE;
+                        flag_do_benchmark = true;
+                    } else if (strncmp(option_string, "profile", 7) == 0) {
+                        flag_do_profile = true;
                     } else if (strncmp(option_string, "fail-silently", 13) == 0) {
                         goto FAIL_SILENTLY;
+                    } else if (strncmp(option_string, "analyze-all", 11) == 0) {
+                        flag_do_analyze_mnem = true;
+                        flag_do_analyze_reg = true;
+                        flag_do_analyze_pattern = true;
+                    } else if (strncmp(option_string, "analyze-mnem", 12) == 0) {
+                        flag_do_analyze_mnem = true;
+                    } else if (strncmp(option_string, "analyze-reg", 11) == 0) {
+                        flag_do_analyze_reg = true;
+                    } else if (strncmp(option_string, "analyze-pattern", 15) == 0) {
+                        flag_do_analyze_pattern = true;
                     }
                     goto NEXT;
                 case 'a':
-                    flag_do_analyze = true;
+                    flag_do_analyze_mnem = true;
+                    flag_do_analyze_reg = true;
+                    flag_do_analyze_pattern = true;
                     break;
                 case 'v':
                 VERSION:
@@ -199,11 +211,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_translate_opt_fusion = false;
                     break;
                 case 'b':
-                BENCHMARK:
                     flag_do_benchmark = true;
                     break;
                 case 'p':
-                PROFILE:
                     flag_do_profile = true;
                     break;
                 case ':':
@@ -212,19 +222,21 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 HELP:
                     dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator %s\n", translator_version);
                     dprintf(1,
-                            "Usage: translator [translator option(s)] -f <filename> [guest options]\n"
+                            "Usage: ./translator [translator option(s)] -f <filename> [guest options]\n"
                             "\n"
                             "Options:\n"
                             "\t-v, --version\n"
                             "\t\tShow translator version.\n"
                             "\t-f, --file <executable>\n"
                             "\t\tSpecify executable. All options after the file path are passed to the guest.\n"
-                            "\t-a\tAnalyze binary. Does not execute the guest program.\n"
-                            "\t\tInspects passed program binary and shows various statistics.\n"
+                            "\t-a, --analyze-all\n"
+                            "\t--analyze-mnem, --analyze-reg, --analyze-pattern\n"
+                            "\t\tAnalyze the binary. Does not execute the guest program.\n"
+                            "\t\tInspects passed program binary and shows the selected statistics.\n"
                             "\t-b, --benchmark\n"
                             "\t\tBenchmark execution. Times the execution of the program,\n"
                             "\t\texcluding mapping the binary into memory.\n"
-                            "\t-p, --profile-registers\n"
+                            "\t-p, --profile\n"
                             "\t\tProfile register usage. Display dynamic register usage statistics.\n"
                             "\t--perf\n"
                             "\t\tLog the generated blocks to /tmp/perf-<pid>.map for externally profiling\n"
@@ -269,7 +281,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
     log_general("Single stepping: %d\n", flag_single_step);
     log_general("Translate opt: general %d, ras %d, chaining %d, recurse jumps %d, singlestep %d\n", flag_translate_opt,
                 flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_single_step);
-    log_general("Do analyze: %d\n", flag_do_analyze);
+    log_general("Do analyze: mnem %d, reg %d, pattern %d\n", flag_do_analyze_mnem, flag_do_analyze_reg, flag_do_analyze_pattern);
     log_general("Do benchmarking: %d\n", flag_do_benchmark);
     log_general("Do profiling: %d\n", flag_do_profile);
     log_general("File path: %s\n", file_path);
