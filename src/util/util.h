@@ -9,6 +9,7 @@
 #include <gen/translate.h>
 #include <runtime/register.h>
 #include <common.h>
+#include <env/flags.h>
 
 #ifdef __cplusplus
 extern "C" {

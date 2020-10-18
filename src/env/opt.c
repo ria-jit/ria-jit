@@ -6,6 +6,7 @@
 #include <util/log.h>
 #include <common.h>
 #include "opt.h"
+#include <env/flags.h>
 
 int perfFd = -1;
 

@@ -3,6 +3,7 @@
 //
 
 #include "context.h"
+#include <env/flags.h>
 
 #include <runtime/register.h>
 #include <gen/translate.h>

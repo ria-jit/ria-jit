@@ -15,6 +15,7 @@
 #include <util/tools/perf.h>
 #include <main/context.h>
 #include <cache/return_stack.h>
+#include <env/flags.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;

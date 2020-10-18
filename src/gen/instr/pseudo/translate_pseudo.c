@@ -5,6 +5,7 @@
 #include <gen/translate.h>
 #include <util/util.h>
 #include "translate_pseudo.h"
+#include <env/flags.h>
 
 ///set the pc to next addr after inst
 /**

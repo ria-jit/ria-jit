@@ -3,6 +3,7 @@
 //
 
 #include "translate_controlflow.h"
+#include <env/flags.h>
 #include <gen/instr/core/translate_arithmetic.h>
 #include <util/log.h>
 #include <fadec/fadec-enc.h>

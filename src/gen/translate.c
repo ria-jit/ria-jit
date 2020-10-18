@@ -3,6 +3,7 @@
 //
 
 #include "translate.h"
+#include <env/flags.h>
 #include <gen/dispatch.h>
 #include <fadec/fadec-enc.h>
 #include <common.h>

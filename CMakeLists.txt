@@ -98,7 +98,7 @@ set(TRANSLATOR_SOURCES
         src/gen/optimize.c src/gen/optimize.h
         src/gen/instr/patterns.h src/gen/instr/patterns.c
         ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
-        )
+        src/env/flags.c src/env/flags.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
