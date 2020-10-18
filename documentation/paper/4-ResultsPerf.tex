@@ -85,59 +85,77 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, wh
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
-% todo update ordering to sorted by ours from bad to best
 % ================================
 \pgfplotstableread[col sep=comma]{native.csv}\nativetable
+\pgfplotstableread[col sep=comma]{dbt.csv}\dbttable
+\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
+
+\pgfplotstablesort[sort key = ratio, sort cmp=float >]\sorteddbttable{\dbttable}
+
+%Extract xticklabels from file
+\makeatletter
+\pgfplotsset{
+/pgfplots/flexible xticklabels from table/.code n args={2}{%
+\pgfplotstablegetcolumn{#2}\of{#1}\to\pgfplots@xticklabels
+\renewcommand{\pgfplots@xticklabel}\pgfplots@user@ticklabel@list@x
+}
+}
+\makeatother
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}[%
-			title = {SPEC CPU 2017 \texttt{intspeed} Results},
-			ybar,
-			area legend,
-			ylabel = {Execution time [ratio to native]},
-			xtick = data,
-			xtick style = {draw = none},
-			xticklabel style = {
-				inner sep = 0pt,
-				anchor = north east,
-				rotate = 60
-			},
-			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
-			scaled y ticks = false,
-			symbolic x coords={600.perlbench, 602.gcc, 605.mcf, 620.omnetpp, 623.xalancbmk, 625.x264, 631.deepsjeng, 641.leela, 648.exchange2, 657.xz},
-			ymin = 0, ymax = 6.5,
-			ymajorgrids = true,
-			bar width = 5pt,
-			height = 7.0cm,
-			width = 0.9\linewidth,
-			legend style = {
-				at = {(1.0, 1.0)},
-				anchor = north east,
-				legend columns = 3,
-				column sep = 0.2cm
-			}
-		]	
+		title = {SPEC CPU 2017 \texttt{intspeed} Results},
+		ybar,
+		area legend,
+		ylabel = {Execution time [ratio to native]},
+		xtick = data,
+		xtick style = {draw = none},
+		xticklabel style = {
+		inner sep = 0pt,
+		anchor = north east,
+		rotate = 60
+		},
+		ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
+		scaled y ticks = false,
+		flexible xticklabels from table={\sorteddbttable}{Benchmark},
+%			symbolic x coords={600.perlbench, 602.gcc, 605.mcf, 620.omnetpp, 623.xalancbmk, 625.x264, 631.deepsjeng, 641.leela, 648.exchange2, 657.xz},
+%			xticklabels from table,
+		ymin = 0, ymax = 6.5,
+		ymajorgrids = true,
+		bar width = 5pt,
+		height = 7.0cm,
+		width = 0.9\linewidth,
+		legend style = {
+		at = {(1.0, 1.0)},
+		anchor = north east,
+		legend columns = 3,
+		column sep = 0.2cm
+		}
+		]
 			% Native results
 			\pgfplotstableread[col sep=comma]{native.csv}\nativelocaltable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
-			\addplot+[fill=era-native, draw=black] table [x=Benchmark, y expr={\thisrow{Est. Base Run Time} / \thisrow{native}}] \nativelocaltable;
-			
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
+			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\nativelocalsortedtable{\nativelocaltable}
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocalsortedtable;
+
 			% QEMU results
 			\pgfplotstableread[col sep=comma]{qemu.csv}\qemutable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
-			\addplot+[fill=era-qemu, draw=black] table [x=Benchmark, y expr={\thisrow{Est. Base Run Time} / \thisrow{native}}] \qemutable;
-			
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
+			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\qemusortedtable{\qemutable}
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemusortedtable;
+
 			% DBT results
-			\pgfplotstableread[col sep=comma]{dbt.csv}\dbttable
-			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
-			\addplot+[fill=era-dbt-1, draw=black] table [x=Benchmark, y expr={\thisrow{Est. Base Run Time} / \thisrow{native}}] \dbttable;
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \sorteddbttable;
 
 			\legend{Native, QEMU, DBT}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[SPEC CPU 2017 Results]%
-	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised).}
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised).}\label{fig:figure}
 \end{figure}
 % ================================
 
