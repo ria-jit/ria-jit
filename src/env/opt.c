@@ -68,7 +68,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             } else if (strncmp(option_string, "strace", 6) == 0) {
                                 flag_log_syscall = true;
                                 option_string += 6;
-                            } else if (strncmp(option_string, "verbose-disasm", 11) == 0) {
+                            } else if (strncmp(option_string, "verbose_disasm", 11) == 0) {
                                 flag_verbose_disassembly = true;
                                 option_string += 11;
                             } else if (strncmp(option_string, "context", 7) == 0) {
@@ -82,7 +82,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                        "\tgeneral\t\t\tGeneral logging that fits no other categories.\n"
                                        "\tasm_in\t\t\tShow parsed and raw RISC-V instructions.\n"
                                        "\tasm_out\t\t\tShow generated x86 code.\n"
-                                       "\tverbose-disasm\tSeparate instruction translations in output assembly.\n"
+                                       "\tverbose_disasm\tSeparate instruction translations in output assembly.\n"
                                        "\treg\t\t\t\tDump register contents after every block (warning: lots of logs).\n"
                                        "\tcontext\t\t\tLog execution context and mapped registers for instructions.\n"
                                        "\tcache\t\t\tLog events involving the block cache.\n"
@@ -144,6 +144,14 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                         goto HELP;
                     } else if (strncmp(option_string, "version", 7) == 0) {
                         goto VERSION;
+                    } else if (strncmp(option_string, "file", 4) == 0) {
+                        goto FILE;
+                    } else if (strncmp(option_string, "benchmark", 9) == 0) {
+                        goto BENCHMARK;
+                    } else if (strncmp(option_string, "profile-registers", 17) == 0) {
+                        goto PROFILE;
+                    } else if (strncmp(option_string, "fail-silently", 13) == 0) {
+                        goto FAIL_SILENTLY;
                     }
                     goto NEXT;
                 case 'a':
@@ -172,9 +180,11 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_log_cache = true;
                     break;
                 case 'f':
+                FILE:
                     file_path = argv[optind];
                     goto END_PARSING;
                 case 's':
+                FAIL_SILENTLY:
                     flag_fail_silently = true;
                     break;
                 case 'd':
@@ -188,9 +198,11 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_translate_opt_fusion = false;
                     break;
                 case 'b':
+                BENCHMARK:
                     flag_do_benchmark = true;
                     break;
                 case 'p':
+                PROFILE:
                     flag_do_profile = true;
                     break;
                 case ':':
@@ -202,27 +214,33 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             "Usage: translator [translator option(s)] -f <filename> [guest options]\n"
                             "\n"
                             "Options:\n"
-                            "\t-v\tShow translator version.\n"
-                            "\t-f\tSpecify executable. All options after the file path are passed to the guest.\n"
+                            "\t-v, --version\n"
+                            "\t\tShow translator version.\n"
+                            "\t-f, --file <executable>\n"
+                            "\t\tSpecify executable. All options after the file path are passed to the guest.\n"
                             "\t-a\tAnalyze binary. Does not execute the guest program.\n"
-                            "\t\tInspects passed program binary and shows statistics.\n"
-                            "\t-b\tBenchmark execution. Times the execution of the program,\n"
+                            "\t\tInspects passed program binary and shows various statistics.\n"
+                            "\t-b, --benchmark\n"
+                            "\t\tBenchmark execution. Times the execution of the program,\n"
                             "\t\texcluding mapping the binary into memory.\n"
-                            "\t-p\tProfile execution. Display dynamic register usage statistics.\n"
+                            "\t-p, --profile-registers\n"
+                            "\t\tProfile register usage. Display dynamic register usage statistics.\n"
                             "\t--perf\n"
                             "\t\tLog the generated blocks to /tmp/perf-<pid>.map for externally profiling\n"
                             "\t\tthe execution in perf.\n"
-                            "\t-s\tFail silently for some error conditions.\n"
+                            "\t-s, --fail-silently\n"
+                            "\t\tFail silently for some error conditions.\n"
                             "\t\tAllows continued execution, but the client "
                             "program may enter undefined states.\n"
-                            "\t-h\tShow this help.\n"
+                            "\t-h, --help\n"
+                            "\t\tShow this help.\n"
                             "\n"
                             "Logging:\n"
                             "\t--log=category,[...]\n"
                             "\t\tEnable logging for certain categories. See --log=help for more info.\n"
                             "\t-g\tDisplay general verbose info (--log=general,strace)\n"
                             "\t-i\tDisplay parsed RISC-V input assembly (--log=asm_in)\n"
-                            "\t-o\tDisplay translated output x86 assembly (--log=asm_out,verbose-disasm)\n"
+                            "\t-o\tDisplay translated output x86 assembly (--log=asm_out,verbose_disasm)\n"
                             "\t-r\tDump registers on basic block boundaries (--log=reg)\n"
                             "\t-c\tDisplay cache info (--log=cache)\n"
                             "\n"
