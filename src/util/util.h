@@ -101,6 +101,33 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
 }
 
 /**
+ * See above. Invalidates and cleans the oldest replacement register,
+ * or does nothing if there is already a free register.
+ * In any case, after this call, at least one replacement register will be free to use.
+ * One of these free registers is returned for convenience, and can be safely used as scratch.
+ * Keep in mind future load calls may overwrite that value again.
+ * @param r_info containing the dynamic allocation info
+ * @return a free replacement register for convenience (may be ignored safely)
+ */
+static inline FeReg invalidateOldest(const register_info *r_info) {
+    //find minimum of recency (or some clean register with value 0)
+    size_t min = 0;
+    for (size_t i = 1; i < N_REPLACE; i++) {
+        if (r_info->replacement_recency[i] < r_info->replacement_recency[min]) {
+            min = i;
+        }
+    }
+
+    //if the oldest replacement contains a RISC-V register, invalidate that before returning
+    FeReg oldest = getRegForIndex(min);
+    if (r_info->replacement_recency[min] != 0 && r_info->replacement_content[min] != INVALID_REG) {
+        invalidateReplacement(r_info, oldest, true);
+    }
+
+    return oldest;
+}
+
+/**
  * See above. Invalidates and cleans all replacement registers.
  * @param r_info containing the dynamic allocation info
  */
@@ -244,9 +271,11 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
  * @param r_info the static register mapping and dynamic allocation info
  * @param candidate the requested RISC-V register to map
  * @param destination the specifically requested destination register
+ * @param requireValue load the value of the register from memory, if needed
  * @return the destination register passed as parameter, for cleaner code
  */
-static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination) {
+static inline FeReg
+loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination, bool requireValue) {
     log_context("Loading %s into specific replacement %s...\n", reg_to_string(candidate), reg_x86_to_string(destination));
 
     //increment access recency and get index
@@ -273,16 +302,24 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
         } else {
             //we have to shuffle the registers around (switch info as well as values), so
             // we exchange the requested and present registers
-            if (r_info->replacement_recency[index] != 0) {
+            if (r_info->replacement_recency[index] != 0 && requireValue) {
                 //we need to keep this value, so exchange
                 log_context("Requested %s occupied. Swapping with %s...\n", reg_x86_to_string(destination),
                             reg_x86_to_string(getRegForIndex(presentIndex)));
                 err |= fe_enc64(&current, FE_XCHG64rr, destination, getRegForIndex(presentIndex));
-            } else {
-                //the current value does not matter, so move
+            } else if (r_info->replacement_recency[index] != 0 && !requireValue) {
+                //we need to keep this value, but the other value does not matter, so just move
+                log_context("Requested %s occupied. Overwriting redundant value of %s...\n", reg_x86_to_string(destination),
+                            reg_x86_to_string(getRegForIndex(presentIndex)));
+                err |= fe_enc64(&current, FE_MOV64rr, getRegForIndex(presentIndex), destination);
+            } else if (requireValue) {
+                //the current value does not matter, so move the required value over
                 log_context("Requested %s empty. Getting value from %s...\n", reg_x86_to_string(destination),
                             reg_x86_to_string(getRegForIndex(presentIndex)));
                 err |= fe_enc64(&current, FE_MOV64rr, destination, getRegForIndex(presentIndex));
+            } else {
+                //both values are not needed
+                log_context("No moves required.\n");
             }
 
             //exchange the r_info values
@@ -312,13 +349,15 @@ static inline FeReg loadIntoSpecific(const register_info *r_info, t_risc_reg can
         }
 
         //load the register into the correct spot
-        log_context("Loading %s into %s...\n",
-                    reg_to_string(candidate),
-                    reg_x86_to_string(destination));
-        err |= fe_enc64(&current,
-                        FE_MOV64rm,
-                        destination,
-                        FE_MEM_ADDR(r_info->base + 8 * candidate));
+        if (requireValue) {
+            log_context("Loading %s into %s...\n",
+                        reg_to_string(candidate),
+                        reg_x86_to_string(destination));
+            err |= fe_enc64(&current,
+                            FE_MOV64rm,
+                            destination,
+                            FE_MEM_ADDR(r_info->base + 8 * candidate));
+        }
 
         //note the load
         r_info->replacement_content[index] = candidate;
@@ -411,7 +450,7 @@ static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r
 
     //either return the mapped register, or load into the replacement
     if (!r_info->mapped[instr->reg_src_1]) {
-        return loadIntoSpecific(r_info, instr->reg_src_1, into);
+        return loadIntoSpecific(r_info, instr->reg_src_1, into, true);
     } else if (r_info->map[instr->reg_src_1] == into) {
         //it is already statically mapped into the correct register, so we're done
         return r_info->map[instr->reg_src_1];
@@ -447,7 +486,7 @@ static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r
 
     //either return the mapped register, or load into the replacement
     if (!r_info->mapped[instr->reg_src_2]) {
-        return loadIntoSpecific(r_info, instr->reg_src_2, into);
+        return loadIntoSpecific(r_info, instr->reg_src_2, into, true);
     } else if (r_info->map[instr->reg_src_2] == into) {
         //it is already statically mapped into the correct register, so we're done
         return r_info->map[instr->reg_src_2];
@@ -461,6 +500,32 @@ static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r
         r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
         r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_2;
         return into;
+    }
+}
+
+/**
+ * Get the requested rd.
+ * After this call, the rd may or may not be inside the passed hint register.
+ * If the register is statically mapped, the mapped register will be returned.
+ * Otherwise, the register will be loaded or shuffled into the hint.
+ * @param instr the RISC-V instruction in question
+ * @param r_info the current register info
+ * @param hint the requested hint for when the register is not mapped
+ * @return the x86 register containing the requested rd
+ */
+static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *r_info, FeReg hint) {
+    //log register access to the profile if requested
+    if (flag_do_profile) {
+        RECORD_PROFILER(instr->reg_dest);
+    }
+
+    //return the mapped register, or load into replacement
+    if (!r_info->mapped[instr->reg_dest]) {
+        //value is not required, as we're loading a destination register
+        return loadIntoSpecific(r_info, instr->reg_dest, hint, false);
+    } else {
+        //it is statically mapped, so we don't touch it and return that
+        return r_info->map[instr->reg_dest];
     }
 }
 
