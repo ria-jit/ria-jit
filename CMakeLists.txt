@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.15)
 project(DynamicBinaryTranslatorRISCV64->x86-64)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 
 #Create CMake Constant TRANSLATOR_BASE
 set(TRANSLATOR_BASE 0x780000000000)
@@ -98,7 +98,8 @@ set(TRANSLATOR_SOURCES
         src/gen/optimize.c src/gen/optimize.h
         src/gen/instr/patterns.h src/gen/instr/patterns.c
         ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
-        src/env/flags.c src/env/flags.h src/env/exit.c src/env/exit.h)
+        src/env/flags.c src/env/flags.h
+        src/env/exit.c src/env/exit.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
