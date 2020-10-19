@@ -132,7 +132,7 @@ add_dependencies(fadecLib fadec)
 
 #Make sure fadecLib is built before translator or test
 add_dependencies(translator fadecLib version)
-add_dependencies(test fadecLib)
+add_dependencies(test fadecLib version)
 
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)
