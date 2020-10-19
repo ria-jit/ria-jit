@@ -89,7 +89,7 @@ register_info *DoubleToFloatTest::r_info = nullptr;
 
 TEST_P(DoubleToFloatTest, AllDifferent) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
-    blockCache[0].rounding_mode = DYN;
+    blockCache[0].rounding_mode = RNE;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 

@@ -14,9 +14,9 @@
  */
 void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLD...\n");
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSDrm,regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    err |= fe_enc64(&current, FE_SSE_MOVSDrm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
     setFpReg(instr->reg_dest, r_info, FIRST_FP_REG);
 }
 
@@ -29,9 +29,9 @@ void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FSD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FSD...\n");
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_MOVSDmr,FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM(regSrc1, 0, 0, instr->imm), regSrc2);
 }
 
 /**
@@ -326,23 +326,26 @@ void translate_FSGNJD(const t_risc_instr *instr, const register_info *r_info) {
             err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
         }
     } else {
+        invalidateReplacement(r_info, FIRST_REG, true);
+        invalidateReplacement(r_info, SECOND_REG, true);
+        invalidateReplacement(r_info, THIRD_REG, true);
         FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
 
         err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-        err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
+        err |= fe_enc64(&current, FE_SSE_MOVQrr, THIRD_REG, regSrc2);
 
         //load bitmask
         err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
         err |= fe_enc64(&current, FE_ROR64ri, SECOND_REG, 0x1);
 
         //mask sign from second
-        err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
+        err |= fe_enc64(&current, FE_AND64rr, THIRD_REG, SECOND_REG);
 
         //remove sign from first
         err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
 
         //merge
-        err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
+        err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, THIRD_REG);
         //move back to fp_reg
         err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
     }
@@ -361,10 +364,13 @@ void translate_FSGNJND(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    invalidateReplacement(r_info, FIRST_REG, true);
+    invalidateReplacement(r_info, SECOND_REG, true);
+    invalidateReplacement(r_info, THIRD_REG, true);
 
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, THIRD_REG, regSrc2);
 
     //load bitmask
     err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
@@ -374,13 +380,13 @@ void translate_FSGNJND(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
 
     //flip second (negate sign)
-    err |= fe_enc64(&current, FE_NOT64r, FE_R8);
+    err |= fe_enc64(&current, FE_NOT64r, THIRD_REG);
 
 
     //mask sign from second
-    err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
+    err |= fe_enc64(&current, FE_AND64rr, THIRD_REG, SECOND_REG);
     //merge
-    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
+    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, THIRD_REG);
     //move back to fp_reg
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
 
@@ -400,25 +406,28 @@ void translate_FSGNJXD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
+    invalidateReplacement(r_info, FIRST_REG, true);
+    invalidateReplacement(r_info, SECOND_REG, true);
+    invalidateReplacement(r_info, THIRD_REG, true);
 
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, FE_R8, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, THIRD_REG, regSrc2);
 
     //load bitmask
     err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0x1);
     err |= fe_enc64(&current, FE_ROR64ri, SECOND_REG, 0x1);
 
     //xor first and second sign
-    err |= fe_enc64(&current, FE_XOR64rr, FE_R8, FIRST_REG);
+    err |= fe_enc64(&current, FE_XOR64rr, THIRD_REG, FIRST_REG);
 
     //remove sign from first
     err |= fe_enc64(&current, FE_BTR64ri, FIRST_REG, 63);
 
     //mask sign from second
-    err |= fe_enc64(&current, FE_AND64rr, FE_R8, SECOND_REG);
+    err |= fe_enc64(&current, FE_AND64rr, THIRD_REG, SECOND_REG);
     //merge
-    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, FE_R8);
+    err |= fe_enc64(&current, FE_OR64rr, FIRST_REG, THIRD_REG);
     //move back to fp_reg
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, FIRST_REG);
 
@@ -442,7 +451,7 @@ void translate_FMIND(const t_risc_instr *instr, const register_info *r_info) {
     if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
         if (regDest != regSrc1) {
             //move src1 in dest
-            err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+            err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
         }
     } else {
         if (regSrc2 == regDest) {//rs2 needs to be first operand, thus, check rs1
@@ -465,7 +474,7 @@ void translate_FMIND(const t_risc_instr *instr, const register_info *r_info) {
 
             //move src1 in dest
             if (regSrc1 != regDest) {
-                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
             }
             err |= fe_enc64(&current, FE_SSE_MINSDrr, regDest, regSrc2); //if regSrc1 is NaN regSrc2 will be returned
 
@@ -478,7 +487,7 @@ void translate_FMIND(const t_risc_instr *instr, const register_info *r_info) {
                 err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
                 err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
 
-                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
                 err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
             }
         }
@@ -504,7 +513,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
     if (regSrc1 == regSrc2) { // we don't need any comparison in this case, because they are the same
         if (regDest != regSrc1) {
             //move src1 in dest
-            err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+            err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
         }
     } else {
         if (regSrc2 == regDest) {//rs2 needs to be first operand, thus, check rs1
@@ -527,7 +536,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
 
             //move src1 in dest
             if (regSrc1 != regDest) {
-                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
             }
             err |= fe_enc64(&current, FE_SSE_MAXSDrr, regDest, regSrc2); //if regSrc1 is NaN regSrc2 will be returned
 
@@ -540,7 +549,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
                 err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
                 err |= fe_enc64(&jmpBufNaN, FE_JP, (intptr_t) current);
 
-                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1); //TODO check encoding
+                err |= fe_enc64(&current, FE_SSE_MOVSDrr, regDest, regSrc1);
                 err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
             }
         }
@@ -558,7 +567,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != 0) critical_not_yet_implemented("Rounding mode needs to be 0 for FCVTSD");
+    if (instr->rounding_mode != RNE) critical_not_yet_implemented("Rounding mode needs to be RNE for FCVTSD");
     log_asm_out("Translate FCVTSD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -576,7 +585,7 @@ void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != 0) critical_not_yet_implemented("Rounding mode needs to be 0 for FCVTDS");
+    if (instr->rounding_mode != RNE) critical_not_yet_implemented("Rounding mode needs to be RNE for FCVTDS");
     log_asm_out("Translate FCVTDS...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -599,15 +608,18 @@ void translate_FEQD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg scratch = SECOND_REG;
+    if (scratch == regDest) {
+        scratch = FIRST_REG;
+    }
+    invalidateReplacement(r_info, scratch, true);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, regSrc2);
-    err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, 0);
+    err |= fe_enc64(&current, FE_MOV64ri, scratch, 0);
     err |= fe_enc64(&current, FE_SETNP8r, regDest);
-    err |= fe_enc64(&current, FE_CMOVNZ64rr, regDest, SECOND_REG);
-
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_CMOVNZ64rr, regDest, scratch);
 }
 
 /**
@@ -622,13 +634,11 @@ void translate_FLTD(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc2, regSrc1);
     err |= fe_enc64(&current, FE_SETA8r, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -642,13 +652,11 @@ void translate_FLED(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FLED...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc2, regSrc1);
     err |= fe_enc64(&current, FE_SETNC8r, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -766,13 +774,11 @@ void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI32rr, regDest, regSrc1);
     //sign extend
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest,regDest);
-
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
 /**
@@ -787,12 +793,10 @@ void translate_FCVTWUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTWUD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI64rr, regDest, regSrc1);
     err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -805,7 +809,7 @@ void translate_FCVTDW(const t_risc_instr *instr, const register_info *r_info) {
     if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDW");
     log_asm_out("Translate FCVTDW...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_XORPDrr, regDest, regDest); //needs to be done because of cvtsi2ss design
@@ -824,14 +828,20 @@ void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
     if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDWU");
     log_asm_out("Translate FCVTDWU...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg scratch = SECOND_REG;
+    if (scratch == regSrc1) {
+        scratch = FIRST_REG;
+    }
+    invalidateReplacement(r_info, scratch, true);
+
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    //zero upper bits by moving into FIRST_REG
-    err |= fe_enc64(&current, FE_MOV32rr, FIRST_REG, regSrc1);
+    //zero upper bits by moving into regSrc1
+    err |= fe_enc64(&current, FE_MOV32rr, scratch, regSrc1);
 
     err |= fe_enc64(&current, FE_SSE_XORPDrr, regDest, regDest); //needs to be done because of cvtsi2ss design
     err |= fe_enc64(&current, FE_SSE_CVTSI2SD64rr, regDest,
-                    FIRST_REG); //use 64 bit convert to get a unsigned conversion
+                    scratch); //use 64 bit convert to get a unsigned conversion
 
     setFpReg(instr->reg_dest, r_info, regDest);
 }
@@ -847,11 +857,9 @@ void translate_FCVTLD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_SSE_CVTSD2SI64rr, regDest, regSrc1);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -865,17 +873,20 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTLUD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg scratch = FIRST_REG;
+    invalidateReplacement(r_info, scratch, true);
 
     //constant saved here
     const unsigned long C0 = 0x43E0000000000000lu;
     //load const into register
-    err |= fe_enc64(&current, FE_MOV64ri, SECOND_REG, C0);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_FP_REG, SECOND_REG);
+    err |= fe_enc64(&current, FE_MOV64ri, scratch, C0);
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, SECOND_FP_REG, scratch);
 
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, SECOND_FP_REG);
     uint8_t *jmpBufCOM = current;
     err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy
+
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_SSE_CVTTSD2SI64rr, regDest, regSrc1);
 
@@ -888,8 +899,6 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_SSE_CVTTSD2SI64rr, regDest, regSrc1);
     err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -901,11 +910,9 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_FMVXD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMVXD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, regSrc1);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -918,7 +925,7 @@ void translate_FCVTDL(const t_risc_instr *instr, const register_info *r_info) {
     if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDL");
     log_asm_out("Translate FCVTDL...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_XORPDrr, regDest, regDest); //needs to be done because of cvtsi2ss design
@@ -937,7 +944,14 @@ void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
     if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDLU");
     log_asm_out("Translate FCVTDLU...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg scratch1 = FIRST_REG;
+    FeReg scratch2 = SECOND_REG;
+    if (scratch2 == regSrc1) {
+        FeReg scratch1 = SECOND_REG;
+        FeReg scratch2 = FIRST_REG;
+    }
+    invalidateReplacement(r_info, scratch2, true);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_XORPDrr, regDest, regDest); //needs to be done because of cvtsi2ss design
@@ -953,14 +967,14 @@ void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
     //set jump address
     err |= fe_enc64(&jmpBufSign, FE_JS, (intptr_t) current);
 
-    if (regSrc1 != FIRST_REG) {
-        err |= fe_enc64(&current, FE_MOV64rr, FIRST_REG, regSrc1);
-    }
-    err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, regSrc1);
-    err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, 0x1);
-    err |= fe_enc64(&current, FE_SHR64ri, SECOND_REG, 0x1);
-    err |= fe_enc64(&current, FE_OR64rr, SECOND_REG, FIRST_REG);
-    err |= fe_enc64(&current, FE_SSE_CVTSI2SD64rr, regDest, SECOND_REG);
+    err |= fe_enc64(&current, FE_MOV64rr, scratch2, regSrc1);
+
+    invalidateReplacement(r_info, scratch1, true);
+
+    err |= fe_enc64(&current, FE_AND32ri, scratch1, 0x1);
+    err |= fe_enc64(&current, FE_SHR64ri, scratch2, 0x1);
+    err |= fe_enc64(&current, FE_OR64rr, scratch2, scratch1);
+    err |= fe_enc64(&current, FE_SSE_CVTSI2SD64rr, regDest, scratch2);
     err |= fe_enc64(&current, FE_SSE_ADDSDrr, regDest, regDest);
 
 
@@ -980,7 +994,7 @@ void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FMVDX(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FMVDX...\n");
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
 
     err |= fe_enc64(&current, FE_SSE_MOVQrr, regDest, regSrc1);
