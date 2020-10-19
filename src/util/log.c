@@ -8,6 +8,7 @@
 #include <common.h>
 #include <stdbool.h>
 #include <util/version.h>
+#include <env/exit.h>
 
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
@@ -24,7 +25,7 @@ void critical_not_yet_implemented(const char *info) {
     } else {
         //fail fast, so write to stderr, then quit
         dprintf(2, "Critical: %s - not yet implemented\n", info);
-        _exit(1);
+        panic(FAIL_NOT_IMPL);
     }
 }
 
@@ -158,5 +159,5 @@ void log_print_mem(const char *ptr, long int len) {
 void invalid_error_handler(int32_t errorcode, int32_t raw_instr, t_risc_addr addr) {
     dprintf(2, "Critical: tried to execute invalid code 0x%x at %p\n"
                "error: %s\n", raw_instr, (void *) addr, errorcode_to_string(errorcode));
-    _exit(1);
+    panic(FAIL_INVALID_CODE);
 }

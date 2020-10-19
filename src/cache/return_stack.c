@@ -9,6 +9,7 @@
 #include <fadec/fadec-enc.h>
 #include <gen/translate.h>
 #include <util/util.h>
+#include <env/exit.h>
 
 rs_entry *r_stack;
 volatile uint32_t rs_front; //= front * 16:   (2 * 8) = struct entry size
@@ -18,7 +19,7 @@ void init_return_stack(void) {
 
     if (BAD_ADDR(r_stack)) {
         dprintf(2, "Bad. Return Stack memory allocation failed.");
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     rs_front = 0;

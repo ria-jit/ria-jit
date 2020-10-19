@@ -25,6 +25,7 @@
 #include <common.h>
 #include <linux/mman.h>
 #include <env/opt.h>
+#include <env/exit.h>
 
 #define INITIAL_SIZE 8192
 #define SMALLTLB 0x20
@@ -59,7 +60,7 @@ void init_hash_table(void) {
     //check for heap memory allocation fail
     if (BAD_ADDR(cache_table)) {
         dprintf(2, "Bad. Cache memory allocation failed.");
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     tlb = mmap(NULL, tlb_size * sizeof(t_cache_entry), PROT_READ | PROT_WRITE,
@@ -67,7 +68,7 @@ void init_hash_table(void) {
     //check for heap memory allocation fail
     if (tlb == NULL) {
         dprintf(2, "Bad. TLB memory allocation failed.");
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 }
 
@@ -144,7 +145,7 @@ void set_cache_entry(t_risc_addr risc_addr, t_cache_loc cache_loc) {
         //check heap allocation
         if (BAD_ADDR(copy_buf)) {
             dprintf(2, "Bad. Memory allocation failed.\n");
-            _exit(FAIL_HEAP_ALLOC);
+            panic(FAIL_HEAP_ALLOC);
         }
 
         //set cache table to new buffer in order to use the existing methods for insertion

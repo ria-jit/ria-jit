@@ -16,6 +16,7 @@
 #include <gen/optimize.h>
 #include <elf/loadElf.h>
 #include <fadec/fadec.h>
+#include <env/exit.h>
 
 void *currentPos = NULL;
 
@@ -99,7 +100,7 @@ t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info) {
     if (err != 0) {
         //terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error after generating basic block.\n");
-        _exit(-1);
+        panic(FAIL_ASSEMBLY_ERR);
     }
 
     //if that's fine, then we log and return
@@ -189,7 +190,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
 
     if (BAD_ADDR(block_cache)) {
         dprintf(2, "Failed to allocate cache for parsing instructions");
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info);
@@ -295,7 +296,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                     default:
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
-                        _exit(1);
+                        panic(FAIL_INVALID_STATE);
                 }
             }
                 break;
@@ -526,7 +527,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                     default: {
                         ///should not get here
                         printf("Oops: line %d in %s\n", __LINE__, __FILE__);
-                        _exit(1);
+                        panic(FAIL_INVALID_STATE);
                     }
                 }
             }
@@ -571,7 +572,7 @@ void chain(t_cache_loc target) {
     if (chain_err != 0) {
         ///terminate if we encounter errors. this most likely is a bug in a RISC-V instruction's translation
         dprintf(2, "Assembly error in chain, exiting...\n");
-        _exit(-1);
+        panic(FAIL_ASSEMBLY_ERR);
     }
 }
 
@@ -584,10 +585,10 @@ void setupInstrMem() {
 
     if (BAD_ADDR(buf)) {
         dprintf(2, "Instruction memory allocation failed. Error %li", -(intptr_t) buf);
-        _exit(-1);
+        panic(FAIL_HEAP_ALLOC);
     }
     if (buf != addr) {
         dprintf(2, "Memory allocation fault in assembly.\n");
-        _exit(-1);
+        panic(FAIL_HEAP_ALLOC);
     }
 }

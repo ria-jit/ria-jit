@@ -10,6 +10,7 @@
 #include <runtime/register.h>
 #include <common.h>
 #include <env/flags.h>
+#include <env/exit.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +22,6 @@ extern "C" {
 #endif
 
 #define bool_str(b) (b ? "yes" : "no")
-
-//todo: pull these into a specific error code file which better manages them and consolidates all _exit()s
-#define FAIL_HEAP_ALLOC 0x1000
 
 //add an access to reg to the profiler's data
 #define RECORD_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_usage_file() + 8 * (reg)))
@@ -47,7 +45,7 @@ static inline FeReg getRegForIndex(size_t index) {
             return THIRD_REG;
         default:
             dprintf(2, "Bad. Invalid replacement register index %li.", index);
-            _exit(index);
+            panic(FAIL_INVALID_STATE);
     }
 }
 
@@ -66,7 +64,7 @@ static inline size_t getIndexForReg(FeReg replacement) {
             return 2;
         default:
             dprintf(2, "Bad. Invalid replacement register index %u.", replacement);
-            _exit(replacement);
+            panic(FAIL_INVALID_STATE);
     }
 }
 

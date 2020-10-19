@@ -9,6 +9,7 @@
 #include <common.h>
 #include <stdbool.h>
 #include <linux/mman.h>
+#include <env/exit.h>
 
 
 typedef struct {
@@ -53,13 +54,13 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
 void analyze(const char *file_path) {
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
-        _exit(2);
+        panic(FAIL_INVALID_PATH);
     }
 
     t_risc_elf_map_result result = mapIntoMemory(file_path);
     if (!result.valid) {
         dprintf(2, "Bad. Failed to map into memory.\n");
-        _exit(1);
+        panic(FAIL_MAP_FILE);
     }
 
     t_risc_addr startAddr = result.execStart;
@@ -283,7 +284,7 @@ t_node *getOrAllocateNode() {
         nextFree = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
         if (BAD_ADDR(nextFree)) {
             dprintf(2, "Memory allocation fault");
-            _exit(1);
+            panic(FAIL_HEAP_ALLOC);
         }
         lastOfAlloc = (t_node *) ((uintptr_t) nextFree + 4096);
     }
@@ -317,7 +318,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
             *lvl2Ptr = mmap(NULL, sizeof(t_secondLevel), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
             if (BAD_ADDR(*lvl2Ptr)) {
                 dprintf(2, "Memory allocation fault");
-                _exit(1);
+                panic(FAIL_HEAP_ALLOC);
             }
         }
         union flagUnion {
@@ -339,7 +340,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
             *lvl3ptr = mmap(NULL, sizeof(t_thirdLevel), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
             if (BAD_ADDR(*lvl3ptr)) {
                 dprintf(2, "Memory allocation fault");
-                _exit(1);
+                panic(FAIL_HEAP_ALLOC);
             }
         }
 

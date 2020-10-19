@@ -30,7 +30,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(register_map)) {
         dprintf(2, "Failed to allocate register_map for context. Error %li", -(intptr_t) register_map);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     bool *mapped = mmap(NULL,
@@ -42,7 +42,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(mapped)) {
         dprintf(2, "Failed to allocate mapped for context. Error %li", -(intptr_t) mapped);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     //fill boolean array with 0
@@ -63,7 +63,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(replacement_content)) {
         dprintf(2, "Failed to allocate replacement_content for context. Error %li", -(intptr_t) replacement_content);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     //fill with INVALID_REG to indicate unused
@@ -80,7 +80,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(replacement_recency)) {
         dprintf(2, "Failed to allocate replacement_recency for context. Error %li", -(intptr_t) replacement_recency);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     //fill with 0 to indicate clean (maybe not necessary?)
@@ -100,7 +100,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(current_recency)) {
         dprintf(2, "Failed to allocate current_recency for context. Error %li", -(intptr_t) current_recency);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     //start count (across blocks?) at 1
@@ -172,7 +172,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(r_info)) {
         dprintf(2, "Failed to allocate r_info for context. Error %li", -(intptr_t) r_info);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     r_info->map = register_map;
@@ -259,7 +259,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(c_info)) {
         dprintf(2, "Failed to allocate c_info for context. Error %li", -(intptr_t) c_info);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     c_info->r_info = r_info;

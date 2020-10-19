@@ -7,6 +7,7 @@
 #include <common.h>
 #include <linux/mman.h>
 #include <linux/fs.h>
+#include <env/exit.h>
 #include "loadElf.h"
 
 //Apparently not included in the headers on my version.
@@ -49,15 +50,15 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
 
     if (header.e_machine != EM_RISCV) {
         dprintf(2, "Tried to translate a non-RISCV binary.");
-        _exit(1);
+        panic(FAIL_INCOMPATIBLE);
     }
     if (header.e_ident[EI_CLASS] != ELFCLASS64) {
         dprintf(2, "Tried executing a non-64bit binary.");
-        _exit(1);
+        panic(FAIL_INCOMPATIBLE);
     }
     if (header.e_type != ET_EXEC) {
         dprintf(2, "Tried executing a non-static binary.");
-        _exit(1);
+        panic(FAIL_INCOMPATIBLE);
     }
 
     Elf64_Half ph_count = header.e_phnum;
