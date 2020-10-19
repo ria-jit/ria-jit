@@ -771,26 +771,27 @@ void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
      * Assembler code for the following instructions
      */
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    invalidateReplacement(r_info, FIRST_REG, true);
+
+    FeReg destReg = getRdHinted(instr, r_info, FIRST_REG);
     invalidateReplacement(r_info, SECOND_REG, true);
     invalidateReplacement(r_info, THIRD_REG, true);
-    err |= fe_enc64(&current, FE_SSE_MOVQrr, FIRST_REG, regSrc1);
-    err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, FIRST_REG);//save for later
+    err |= fe_enc64(&current, FE_SSE_MOVQrr, destReg, regSrc1);
+    err |= fe_enc64(&current, FE_MOV64rr, SECOND_REG, destReg);//save for later
     err |= fe_enc64(&current, FE_TEST32rr, SECOND_REG, SECOND_REG);//check sign bit
     err |= fe_enc64(&current, FE_SETNS8r, THIRD_REG); //sign bit saved in third reg 1 if positive
-    err |= fe_enc64(&current, FE_AND32ri, FIRST_REG, 0x7f800000);//check if exponent is all zeroes
+    err |= fe_enc64(&current, FE_AND32ri, destReg, 0x7f800000);//check if exponent is all zeroes
     //jump jz
     uint8_t *jmpBufEAZ = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy
-    err |= fe_enc64(&current, FE_CMP32ri, FIRST_REG, 0x7f800000);//check if exponent is all ones
+    err |= fe_enc64(&current, FE_CMP32ri, destReg, 0x7f800000);//check if exponent is all ones
     // jump je
     uint8_t *jmpBufEAO = current;
     err |= fe_enc64(&current, FE_JZ, (intptr_t) current); //dummy
     //must be normal here, set right sign
-    err |= fe_enc64(&current, FE_MOV64ri, FIRST_REG, 0b1000000); //6th bit
+    err |= fe_enc64(&current, FE_MOV64ri, destReg, 0b1000000); //6th bit
     err |= fe_enc64(&current, FE_DEC8r, THIRD_REG);
     err |= fe_enc64(&current, FE_AND8ri, THIRD_REG, 5); //SECOND_REG will be 5 or zero (if positive) afterwards
-    err |= fe_enc64(&current, FE_SHR8rr, FIRST_REG, THIRD_REG); //6th or 1st bit will be set now
+    err |= fe_enc64(&current, FE_SHR8rr, destReg, THIRD_REG); //6th or 1st bit will be set now
     // jump to end
     uint8_t *jmpBufEnd0 = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
@@ -801,17 +802,17 @@ void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
     // jump to subnormal jnz
     uint8_t *jmpBufSubNormal = current;
     err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy
-    err |= fe_enc64(&current, FE_MOV64ri, FIRST_REG, 0b1000); //3rd bit negative zero
-    err |= fe_enc64(&current, FE_SHL8rr, FIRST_REG, THIRD_REG); //3rd or 4th bit will be set now
+    err |= fe_enc64(&current, FE_MOV64ri, destReg, 0b1000); //3rd bit negative zero
+    err |= fe_enc64(&current, FE_SHL8rr, destReg, THIRD_REG); //3rd or 4th bit will be set now
     // jump to end
     uint8_t *jmpBufEnd1 = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
     // subnormal
     err |= fe_enc64(&jmpBufSubNormal, FE_JNZ, (intptr_t) current); //fill jump
-    err |= fe_enc64(&current, FE_MOV64ri, FIRST_REG, 0b100000); //5th bit positive subnormal
+    err |= fe_enc64(&current, FE_MOV64ri, destReg, 0b100000); //5th bit positive subnormal
     err |= fe_enc64(&current, FE_DEC8r, THIRD_REG);
     err |= fe_enc64(&current, FE_AND8ri, THIRD_REG, 3); //THIRD_REG will be 3 or zero (if positive) afterwards
-    err |= fe_enc64(&current, FE_SHR8rr, FIRST_REG, THIRD_REG); //5th or second bit will be set now
+    err |= fe_enc64(&current, FE_SHR8rr, destReg, THIRD_REG); //5th or second bit will be set now
     // jump to end
     uint8_t *jmpBufEnd2 = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
@@ -822,10 +823,10 @@ void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
     // jump to NAN
     uint8_t *jmpBufNAN = current;
     err |= fe_enc64(&current, FE_JNZ, (intptr_t) current); //dummy
-    err |= fe_enc64(&current, FE_MOV64ri, FIRST_REG, 0b10000000); //7th bit positive INFINITE
+    err |= fe_enc64(&current, FE_MOV64ri, destReg, 0b10000000); //7th bit positive INFINITE
     err |= fe_enc64(&current, FE_DEC8r, THIRD_REG);
     err |= fe_enc64(&current, FE_AND8ri, THIRD_REG, 7); //THIRD_REG will be 7 or zero (if positive) afterwards
-    err |= fe_enc64(&current, FE_SHR8rr, FIRST_REG, THIRD_REG);
+    err |= fe_enc64(&current, FE_SHR8rr, destReg, THIRD_REG);
     // jump to end
     uint8_t *jmpBufEnd3 = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
@@ -833,9 +834,9 @@ void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&jmpBufNAN, FE_JNZ, (intptr_t) current); //fill jump
     err |= fe_enc64(&current, FE_TEST32rr, SECOND_REG, SECOND_REG);//check highest bit of mantissa
     // if nsf => signaling else silent
-    err |= fe_enc64(&current, FE_MOV64ri, FIRST_REG, 0b100000000); //8th bit signaling NAN
+    err |= fe_enc64(&current, FE_MOV64ri, destReg, 0b100000000); //8th bit signaling NAN
     err |= fe_enc64(&current, FE_SETS8r, THIRD_REG); //byte set if silent
-    err |= fe_enc64(&current, FE_SHL16rr, FIRST_REG, THIRD_REG);
+    err |= fe_enc64(&current, FE_SHL16rr, destReg, THIRD_REG);
 
     //end
     //set all jump pointer
@@ -844,8 +845,6 @@ void translate_FCLASSS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&jmpBufEnd2, FE_JMP, (intptr_t) current);
     err |= fe_enc64(&jmpBufEnd3, FE_JMP, (intptr_t) current);
 
-    FeReg destReg = getRdHinted(instr, r_info, SECOND_REG);
-    err |= fe_enc64(&current, FE_MOV64rr, destReg, FIRST_REG);
 }
 
 /**
