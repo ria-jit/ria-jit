@@ -96,10 +96,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     } else if (strncmp(option_string, "optimize=", 9) == 0) {
                         option_string += 9;
                         do {
-                            if (strncmp(option_string, "no-general", 10) == 0) {
-                                option_string += 10;
-                                flag_translate_opt = true;
-                            } else if (strncmp(option_string, "no-ras", 6) == 0) {
+                            if (strncmp(option_string, "no-ras", 6) == 0) {
                                 option_string += 6;
                                 flag_translate_opt_ras = false;
                             } else if (strncmp(option_string, "no-chain", 8) == 0) {
@@ -121,13 +118,11 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_translate_opt_chain = false;
                                 flag_translate_opt_jump = false;
                                 flag_translate_opt_fusion = false;
-                                flag_translate_opt = false;
                             } else {
                                 if (strncmp(option_string, "help", 4) == 0) {
                                     dprintf(2, "Warning: Unknown optimization option %s...\n", option_string);
                                 }
                                 printf("Optimization options: --optimize=...\n"
-                                       "\tno-general\t\tDisable general optimizations.\n"
                                        "\tno-ras\t\t\tDisable return address stack.\n"
                                        "\tno-chain\t\tDisable block chaining.\n"
                                        "\tno-jump\t\t\tDisable recursive translation of jump targets (implies no-ras).\n"
@@ -204,7 +199,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     flag_single_step = true;
                     break;
                 case 'm':
-                    flag_translate_opt = false;
                     flag_translate_opt_jump = false;
                     flag_translate_opt_chain = false;
                     flag_translate_opt_ras = false;
@@ -279,7 +273,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 flag_log_cache_contents, flag_log_syscall, flag_verbose_disassembly, flag_log_context);
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
-    log_general("Translate opt: general %d, ras %d, chaining %d, recurse jumps %d, singlestep %d\n", flag_translate_opt,
+    log_general("Translate opt: ras %d, chaining %d, recurse jumps %d, singlestep %d\n",
                 flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_single_step);
     log_general("Do analyze: mnem %d, reg %d, pattern %d\n", flag_do_analyze_mnem, flag_do_analyze_reg, flag_do_analyze_pattern);
     log_general("Do benchmarking: %d\n", flag_do_benchmark);

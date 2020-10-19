@@ -302,51 +302,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                 break;
             case BRANCH : {    ///BEQ, BNE, BLT, BGE, BLTU, BGEU, syscalls
                 ///destination address unknown at translate time, stop parsing
-
-                /* if'ed out for now because it's not really improving performance
-                 * -> not finished
-                 * also using '1' as "translation-started-flag" is a bit sketchy
-                 *
-                 * recursive translation (of cond. jumps) may become entirely obsolete when chaining in main works
-                 * */
-
-#define DISABLE_RECURSIVE_CONDJMP_TRANSLATION
-#ifndef DISABLE_RECURSIVE_CONDJMP_TRANSLATION
-                if (!flag_translate_opt) {
-#endif
                 instructions_in_block++;
                 goto PARSE_DONE;
-#ifndef DISABLE_RECURSIVE_CONDJMP_TRANSLATION
-                }
-
-                instructions_in_block++;
-
-                t_risc_addr
-                        target_cm = risc_addr + ((int64_t) (parse_buf[parse_pos].imm));              //ConditionMet
-                t_risc_addr target_cnm = risc_addr + 4; //ConditionNotMet
-
-                t_cache_loc cache_loc_cm = lookup_cache_entry(target_cm);
-                t_cache_loc cache_loc_cnm = lookup_cache_entry(target_cnm);
-
-
-                if (cache_loc_cm == UNSEEN_CODE) {
-                    log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cm);
-                    set_cache_entry(target_cm, (t_cache_loc) 1); //translation-started-flag
-                    cache_loc_cm = translate_block(target_cm, c_info);
-                    set_cache_entry(target_cm, cache_loc_cm);
-                }
-
-                if (cache_loc_cnm == UNSEEN_CODE) {
-                    log_asm_out("Reursion b from (riscv)%p to (riscv)%p\n", risc_addr, target_cnm);
-                    set_cache_entry(target_cnm, (t_cache_loc) 1); //translation-started-flag
-                    cache_loc_cnm = translate_block(target_cnm, c_info);
-                    set_cache_entry(target_cnm, cache_loc_cnm);
-                }
-
-
-                goto PARSE_DONE;
-#endif
-
             }
 
                 ///unconditional jump? -> follow

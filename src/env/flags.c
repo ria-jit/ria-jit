@@ -20,7 +20,6 @@ bool flag_log_cache_contents = false;
 bool flag_log_context = false;
 bool flag_fail_silently = false;
 bool flag_single_step = false;
-bool flag_translate_opt = true;
 bool flag_translate_opt_ras = true;
 bool flag_translate_opt_chain = true;
 bool flag_translate_opt_jump = true;

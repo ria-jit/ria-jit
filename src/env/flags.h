@@ -19,7 +19,6 @@ extern bool flag_log_cache_contents;
 extern bool flag_log_context;
 extern bool flag_fail_silently;
 extern bool flag_single_step;
-extern bool flag_translate_opt;
 extern bool flag_translate_opt_ras;
 extern bool flag_translate_opt_chain;
 extern bool flag_translate_opt_jump;

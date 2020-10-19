@@ -177,7 +177,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
     } else {
         ///dont chain
         log_asm_out("DON'T CHAIN JALR\n");
-        if (flag_translate_opt) {
+        if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
         }
     }
