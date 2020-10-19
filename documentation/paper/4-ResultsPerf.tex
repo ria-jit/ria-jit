@@ -165,7 +165,9 @@ Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to 
 
 The native \textit{gzip} binary for the reference runs was obtained from the default package repositories.
 As there is no such executable available for the RISC-V architecture, the sources had to be manually compiled.
-% todo Simon? insert info here about compile settings for risc_gzip
+The compiler optimisation level \texttt{-O3} was used alongside the linker flag \texttt{-static}.
+The RISC-V ABI was setup as \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
+% todo Use -O3 and -static for native.
 
 % ======= gzip execution time =======
 % Execution time of compression (500 MB, 10 runs).
