@@ -113,6 +113,7 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/float_tests/test_float_fused_arithm.cpp
         test/unit_tests/float_tests/test_float_con.cpp
         test/unit_tests/float_tests/test_f_and_d_ext_load_store.cpp
+        test/unit_tests/float_tests/test_f_class.cpp
         test/unit_tests/double_tests/test_double_arithm.cpp
         test/unit_tests/double_tests/test_double_fused_arithm.cpp
         test/unit_tests/double_tests/test_double_con.cpp

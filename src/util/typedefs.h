@@ -336,6 +336,11 @@ static inline t_risc_fp_reg_val get_dVal(double d) {
     ret.d = d;
     return ret;
 }
+static inline t_risc_fp_reg_val get_iVal(uint64_t i) {
+    t_risc_fp_reg_val ret;
+    ret.i = i;
+    return ret;
+}
 
 //RISC-V operation types (for later optimization)
 typedef enum {
