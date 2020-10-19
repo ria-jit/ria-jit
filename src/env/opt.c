@@ -49,10 +49,10 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             if (strncmp(option_string, "general", 7) == 0) {
                                 flag_log_general = true;
                                 option_string += 7;
-                            } else if (strncmp(option_string, "asm_in", 6) == 0) {
+                            } else if (strncmp(option_string, "asm-in", 6) == 0) {
                                 flag_log_asm_in = true;
                                 option_string += 6;
-                            } else if (strncmp(option_string, "asm_out", 7) == 0) {
+                            } else if (strncmp(option_string, "asm-out", 7) == 0) {
                                 flag_log_asm_out = true;
                                 flag_verbose_disassembly = true;
                                 option_string += 7;
@@ -69,7 +69,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             } else if (strncmp(option_string, "strace", 6) == 0) {
                                 flag_log_syscall = true;
                                 option_string += 6;
-                            } else if (strncmp(option_string, "verbose_disasm", 11) == 0) {
+                            } else if (strncmp(option_string, "verbose-disasm", 11) == 0) {
                                 flag_verbose_disassembly = true;
                                 option_string += 11;
                             } else if (strncmp(option_string, "context", 7) == 0) {
@@ -81,9 +81,9 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 }
                                 printf("Logging categories: --log=...\n"
                                        "\tgeneral\t\t\tGeneral logging that fits no other categories.\n"
-                                       "\tasm_in\t\t\tShow parsed and raw RISC-V instructions.\n"
-                                       "\tasm_out\t\t\tShow generated x86 code.\n"
-                                       "\tverbose_disasm\tSeparate instruction translations in output assembly.\n"
+                                       "\tasm-in\t\t\tShow parsed and raw RISC-V instructions.\n"
+                                       "\tasm-out\t\t\tShow generated x86 code.\n"
+                                       "\tverbose-disasm\tSeparate instruction translations in output assembly.\n"
                                        "\treg\t\t\t\tDump register contents after every block (warning: lots of logs).\n"
                                        "\tcontext\t\t\tLog execution context and mapped registers for instructions.\n"
                                        "\tcache\t\t\tLog events involving the block cache.\n"
@@ -118,7 +118,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                                 flag_translate_opt_jump = false;
                                 flag_translate_opt_fusion = false;
                             } else {
-                                if (strncmp(option_string, "help", 4) == 0) {
+                                if (strncmp(option_string, "help", 4) != 0) {
                                     dprintf(2, "Warning: Unknown optimization option %s...\n", option_string);
                                 }
                                 printf("Optimization options: --optimize=...\n"
@@ -244,8 +244,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                             "\t--log=category,[...]\n"
                             "\t\tEnable logging for certain categories. See --log=help for more info.\n"
                             "\t-g\tDisplay general verbose info (--log=general,strace)\n"
-                            "\t-i\tDisplay parsed RISC-V input assembly (--log=asm_in)\n"
-                            "\t-o\tDisplay translated output x86 assembly (--log=asm_out,verbose_disasm)\n"
+                            "\t-i\tDisplay parsed RISC-V input assembly (--log=asm-in)\n"
+                            "\t-o\tDisplay translated output x86 assembly (--log=asm-out,verbose-disasm)\n"
                             "\t-r\tDump registers on basic block boundaries (--log=reg)\n"
                             "\t-c\tDisplay cache info (--log=cache)\n"
                             "\n"
@@ -266,7 +266,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
 
     log_general("Translator version %s\n", translator_version);
     log_general("Command line options:\n");
-    log_general("Logging: general %d, asm_in %d, asm_out %d, reg %d, cache %d, cache-contents %d, strace %d, verbose-disassembly %d, context %d\n",
+    log_general("Logging: general %d, asm-in %d, asm-out %d, reg %d, cache %d, cache-contents %d, strace %d, verbose-disassembly %d, context %d\n",
                 flag_log_general, flag_log_asm_in, flag_log_asm_out, flag_log_reg_dump, flag_log_cache,
                 flag_log_cache_contents, flag_log_syscall, flag_verbose_disassembly, flag_log_context);
     log_general("Fail silently: %d\n", flag_fail_silently);
