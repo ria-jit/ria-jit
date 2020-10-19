@@ -146,7 +146,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     } else if (strncmp(option_string, "profile", 7) == 0) {
                         flag_do_profile = true;
                     } else if (strncmp(option_string, "fail-silently", 13) == 0) {
-                        goto FAIL_SILENTLY;
+                        flag_fail_silently = true;
                     } else if (strncmp(option_string, "analyze-all", 11) == 0) {
                         flag_do_analyze_mnem = true;
                         flag_do_analyze_reg = true;
@@ -191,7 +191,6 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     file_path = argv[optind];
                     goto END_PARSING;
                 case 's':
-                FAIL_SILENTLY:
                     flag_fail_silently = true;
                     break;
                 case 'd':
