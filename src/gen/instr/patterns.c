@@ -333,8 +333,8 @@ void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_
         */
     } else {
         //sets high 32 to zero
-        FeReg regDest = getRd(&instrs[1], r_info);
         FeReg regSrc1 = getRs1(&instrs[0], r_info);
+        FeReg regDest = getRd(&instrs[1], r_info);
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);  //sets high 32 to zero
 
         /*
@@ -416,10 +416,17 @@ void emit_pattern_10_NOP(const t_risc_instr *instr, const register_info *r_info)
 void emit_pattern_11_MV(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 11: ADDI as MV at 0x%lx\n", instr->addr);
 
-    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc1 = 0;
+
+    if (instr->reg_src_1 != 0) {
+        regSrc1 = getRs1(instr, r_info);
+    }
+
     FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
+    if(instr->reg_src_1 == 0) {
+        err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
+    } else if(regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 }
