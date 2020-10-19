@@ -86,8 +86,8 @@ register_info *FpToGpFloatTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(FpToGpFloatTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].rounding_mode = RTZ;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -103,9 +103,9 @@ INSTANTIATE_TEST_SUITE_P(FMVXW,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FMVXW),
-                                 testing::Values(-1.f, 20.123f, 300.4f,-1232.123f),
+                                 testing::Values(-1.f, 20.123f, 300.4f, -1232.123f),
                                  testing::Values([](float rs1) {
-                                     int32_t float_bits =  *(int32_t *)((float*)&rs1);
+                                     int32_t float_bits = *(int32_t *) ((float *) &rs1);
                                      int64_t sign_extended_bits = (int64_t) float_bits;
                                      return (uint64_t) sign_extended_bits;
                                  }),
@@ -113,14 +113,13 @@ INSTANTIATE_TEST_SUITE_P(FMVXW,
                                  testing::Values(false)));
 
 
-
 INSTANTIATE_TEST_SUITE_P(FCVTWS,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTWS),
-                                 testing::Values(-1, 20.123, 300.4,1232.123),
+                                 testing::Values(-1, 20.123, 300.4, 1232.123),
                                  testing::Values([](float rs1) {
-                                     return (uint64_t )(int32_t)rs1;
+                                     return (uint64_t) (int32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -129,9 +128,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTWUS,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTWUS),
-                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values(1, 20.123, 300.4, -1232.123, -0.111),
                                  testing::Values([](float rs1) {
-                                     return (uint64_t )(uint32_t)rs1;
+                                     return (uint64_t) (uint32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -140,19 +139,21 @@ INSTANTIATE_TEST_SUITE_P(FCVTLS,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTLS),
-                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
+                                 testing::Values(1, 20.123, 300.4, -1232.123, -0.111),
                                  testing::Values([](float rs1) {
-                                     return (uint64_t )(int64_t)rs1;
+                                     return (uint64_t) (int64_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
+
 INSTANTIATE_TEST_SUITE_P(FCVTLUS,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTLUS),
-                                 testing::Values(1, 20.123, 300.4,-1232.123,-0.111, 10000000000000000000.0,-10000000000000000.0),
+                                 testing::Values(1, 20.123, 300.4, -1232.123, -0.111, 10000000000000000000.0,
+                                                 -10000000000000000.0),
                                  testing::Values([](float rs1) {
-                                     return (uint64_t)rs1;
+                                     return (uint64_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));

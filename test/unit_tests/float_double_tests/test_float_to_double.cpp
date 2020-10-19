@@ -88,8 +88,8 @@ register_info *FloatToDoubleTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(FloatToDoubleTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -105,7 +105,7 @@ INSTANTIATE_TEST_SUITE_P(FCVTSD,
                          FloatToDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTSD),
-                                 testing::Values(1,-200,12312.12),
+                                 testing::Values(1, -200, 12312.12),
                                  testing::Values([](float rs1) {
                                      return (double) rs1;
                                  }),

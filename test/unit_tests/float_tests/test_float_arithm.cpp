@@ -97,8 +97,8 @@ register_info *ArithmFloatTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(ArithmFloatTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -113,8 +113,8 @@ TEST_P(ArithmFloatTest, AllDifferent) {
 }
 
 TEST_P(ArithmFloatTest, Rs1RdSame) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -124,47 +124,49 @@ TEST_P(ArithmFloatTest, Rs1RdSame) {
     execute_in_guest_context(c_info, loc);
 
     EXPECT_EQ(expectedRd, get_fpvalue(rs1).f);
-        EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
+    EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
 }
 
 TEST_P(ArithmFloatTest, Rs2RdSame) {
-        blockCache[0] =
-                t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
+    blockCache[0].rounding_mode = DYN;
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, {rs1StartValue});
-        set_fpvalue(rs2, {rs2StartValue});
+    set_fpvalue(rs1, {rs1StartValue});
+    set_fpvalue(rs2, {rs2StartValue});
 
-        execute_in_guest_context(c_info, loc);
+    execute_in_guest_context(c_info, loc);
 
-        EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
-        EXPECT_EQ(expectedRd, get_fpvalue(rs2).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(expectedRd, get_fpvalue(rs2).f);
 }
 
 TEST_P(ArithmFloatTest, Rs1Rs2Same) {
-        blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].rounding_mode = DYN;
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, {rs1StartValue});
+    set_fpvalue(rs1, {rs1StartValue});
 
-        execute_in_guest_context(c_info, loc);
+    execute_in_guest_context(c_info, loc);
 
-        EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
-        EXPECT_EQ(resFunc(rs1StartValue, rs1StartValue), get_fpvalue(rd).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(resFunc(rs1StartValue, rs1StartValue), get_fpvalue(rd).f);
 }
 
 TEST_P(ArithmFloatTest, AllSame) {
-        blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
+    blockCache[0].rounding_mode = DYN;
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
-        set_fpvalue(rs1, {rs1StartValue});
+    set_fpvalue(rs1, {rs1StartValue});
 
-        execute_in_guest_context(c_info, loc);
+    execute_in_guest_context(c_info, loc);
 
-        EXPECT_EQ(resFunc(rs1StartValue, rs1StartValue), get_fpvalue(rs1).f);
+    EXPECT_EQ(resFunc(rs1StartValue, rs1StartValue), get_fpvalue(rs1).f);
 }
 
 INSTANTIATE_TEST_SUITE_P(FADDS,
@@ -173,7 +175,7 @@ INSTANTIATE_TEST_SUITE_P(FADDS,
                                  testing::Values(FADDS),
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values([](float rs1, float rs2) {
                                      return rs1 + rs2;
                                  }),
                                  testing::Values(false),
@@ -186,7 +188,7 @@ INSTANTIATE_TEST_SUITE_P(FSUBS,
                                  testing::Values(FSUBS),
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values([](float rs1, float rs2) {
                                      return rs1 - rs2;
                                  }),
                                  testing::Values(false),
@@ -199,7 +201,7 @@ INSTANTIATE_TEST_SUITE_P(FMULS,
                                  testing::Values(FMULS),
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values([](float rs1, float rs2) {
                                      return rs1 * rs2;
                                  }),
                                  testing::Values(false),
@@ -212,7 +214,7 @@ INSTANTIATE_TEST_SUITE_P(FDIVS,
                                  testing::Values(FDIVS),
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values([](float rs1, float rs2) {
                                      return rs1 / rs2;
                                  }),
                                  testing::Values(false),
@@ -223,9 +225,9 @@ INSTANTIATE_TEST_SUITE_P(FSQRTS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FSQRTS),
-                                 testing::Values(1, 5,64,2601),
+                                 testing::Values(1, 5, 64, 2601),
                                  testing::Values(0),
-                                 testing::Values([](float rs1,float rs2 attr_unused) {
+                                 testing::Values([](float rs1, float rs2 attr_unused) {
                                      return sqrt(rs1);
                                  }),
                                  testing::Values(false),
@@ -237,11 +239,11 @@ INSTANTIATE_TEST_SUITE_P(FSGNJS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FSGNJS),
-                                 testing::Values(1,-1),
-                                 testing::Values(-5,5),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values(1, -1),
+                                 testing::Values(-5, 5),
+                                 testing::Values([](float rs1, float rs2) {
                                      //get signs
-                                     if((rs2 >= 0 && rs1 < 0) || (rs2 < 0 && rs1 >= 0)){
+                                     if ((rs2 >= 0 && rs1 < 0) || (rs2 < 0 && rs1 >= 0)) {
                                          return -rs1;
                                      }
                                      return rs1;
@@ -255,11 +257,11 @@ INSTANTIATE_TEST_SUITE_P(FSGNJNS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FSGNJNS),
-                                 testing::Values(1,-1),
-                                 testing::Values(-5,5),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values(1, -1),
+                                 testing::Values(-5, 5),
+                                 testing::Values([](float rs1, float rs2) {
                                      //get signs
-                                     if((rs2 >= 0 && rs1 >= 0) || (rs2 < 0 && rs1 < 0)){
+                                     if ((rs2 >= 0 && rs1 >= 0) || (rs2 < 0 && rs1 < 0)) {
                                          return -rs1;
                                      }
                                      return rs1;
@@ -272,11 +274,11 @@ INSTANTIATE_TEST_SUITE_P(FSGNJXS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FSGNJXS),
-                                 testing::Values(1,-1),
-                                 testing::Values(-5,5),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values(1, -1),
+                                 testing::Values(-5, 5),
+                                 testing::Values([](float rs1, float rs2) {
                                      //get signs
-                                     if((rs2 < 0 && rs1 >= 0) || (rs2 < 0 && rs1 < 0)){
+                                     if ((rs2 < 0 && rs1 >= 0) || (rs2 < 0 && rs1 < 0)) {
                                          return -rs1;
                                      }
                                      return rs1;
@@ -289,9 +291,9 @@ INSTANTIATE_TEST_SUITE_P(FMINS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FMINS),
-                                 testing::Values(1,-1),
-                                 testing::Values(-5,5),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values(1, -1),
+                                 testing::Values(-5, 5),
+                                 testing::Values([](float rs1, float rs2) {
                                      //return smaller
                                      return rs1 < rs2 ? rs1 : rs2;
                                  }),
@@ -303,9 +305,9 @@ INSTANTIATE_TEST_SUITE_P(FMAXS,
                          ArithmFloatTest,
                          testing::Combine(
                                  testing::Values(FMAXS),
-                                 testing::Values(1,-1),
-                                 testing::Values(-5,5),
-                                 testing::Values([](float rs1,float rs2) {
+                                 testing::Values(1, -1),
+                                 testing::Values(-5, 5),
+                                 testing::Values([](float rs1, float rs2) {
                                      //return bigger
                                      return rs1 > rs2 ? rs1 : rs2;
                                  }),

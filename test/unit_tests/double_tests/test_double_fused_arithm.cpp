@@ -11,7 +11,7 @@
 
 #define attr_unused __attribute__((__unused__))
 
-typedef double (*t_farithmResFunc)(double, double,double);
+typedef double (*t_farithmResFunc)(double, double, double);
 
 /**
  * Parameterized using the following parameters:
@@ -98,9 +98,9 @@ register_info *FusedArithmDoubleTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(FusedArithmDoubleTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -117,9 +117,9 @@ TEST_P(FusedArithmDoubleTest, AllDifferent) {
 }
 
 TEST_P(FusedArithmDoubleTest, Rs1RdSame) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -135,9 +135,9 @@ TEST_P(FusedArithmDoubleTest, Rs1RdSame) {
 }
 
 TEST_P(FusedArithmDoubleTest, Rs2RdSame) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -159,7 +159,7 @@ INSTANTIATE_TEST_SUITE_P(FMADDD,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](double rs1,double rs2,double rs3) {
+                                 testing::Values([](double rs1, double rs2, double rs3) {
                                      return rs1 * rs2 + rs3;
                                  }),
                                  testing::Values(false),
@@ -174,7 +174,7 @@ INSTANTIATE_TEST_SUITE_P(FNMADDD,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](double rs1,double rs2,double rs3) {
+                                 testing::Values([](double rs1, double rs2, double rs3) {
                                      return -rs1 * rs2 - rs3;
                                  }),
                                  testing::Values(false),
@@ -189,7 +189,7 @@ INSTANTIATE_TEST_SUITE_P(FMSUBD,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](double rs1,double rs2,double rs3) {
+                                 testing::Values([](double rs1, double rs2, double rs3) {
                                      return rs1 * rs2 - rs3;
                                  }),
                                  testing::Values(false),
@@ -204,8 +204,8 @@ INSTANTIATE_TEST_SUITE_P(FNMSUBD,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(4, 8, -10),
-                                 testing::Values([](double rs1,double rs2,double rs3) {
-                                     return - rs1 * rs2 + rs3;
+                                 testing::Values([](double rs1, double rs2, double rs3) {
+                                     return -rs1 * rs2 + rs3;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false),

@@ -13,8 +13,8 @@
 
 typedef double (*t_i2dResFunc)(t_risc_reg_val);
 
-inline t_risc_reg_val doubleToIntRep(double d){
-    return *(t_risc_reg_val *)((double*)&d);
+inline t_risc_reg_val doubleToIntRep(double d) {
+    return *(t_risc_reg_val *) ((double *) &d);
 }
 
 /**
@@ -92,8 +92,8 @@ register_info *GpToFpDoubleTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(GpToFpDoubleTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -109,9 +109,9 @@ INSTANTIATE_TEST_SUITE_P(FMVDX,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FMVDX),
-                                 testing::Values(doubleToIntRep(1),doubleToIntRep(-200),doubleToIntRep(12312.12)),
+                                 testing::Values(doubleToIntRep(1), doubleToIntRep(-200), doubleToIntRep(12312.12)),
                                  testing::Values([](uint64_t rs1) {
-                                     return *(double *)((uint64_t*)&rs1);
+                                     return *(double *) ((uint64_t *) &rs1);
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -121,9 +121,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTDW,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTDW),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (double)(int32_t)rs1;
+                                     return (double) (int32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -132,9 +132,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTDWU,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTDWU),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (double)(uint32_t)rs1;
+                                     return (double) (uint32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -143,9 +143,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTDL,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTDL),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (double)(int64_t)rs1;
+                                     return (double) (int64_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -154,9 +154,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTDLU,
                          GpToFpDoubleTest,
                          testing::Combine(
                                  testing::Values(FCVTDLU),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (double)rs1;
+                                     return (double) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));

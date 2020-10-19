@@ -41,6 +41,7 @@ void translate_FSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMADDD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FMADDD");
     log_asm_out("Translate FMADDD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, SECOND_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
@@ -74,6 +75,7 @@ void translate_FMADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMSUBD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FMSUBD");
     log_asm_out("Translate FMSUBD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, SECOND_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
@@ -115,6 +117,7 @@ void translate_FMSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FNMSUBD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FNMSUBD");
     log_asm_out("Translate FNMSUBD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, SECOND_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
@@ -151,6 +154,7 @@ void translate_FNMSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FNMADDD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FNMADDD");
     log_asm_out("Translate FNMADDD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, SECOND_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
@@ -194,6 +198,7 @@ void translate_FNMADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FADDD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FADDD");
     log_asm_out("Translate FADDD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
@@ -211,6 +216,7 @@ void translate_FADDD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSUBD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FSUBD");
     log_asm_out("Translate FSUBD...\n");
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
 
@@ -244,6 +250,7 @@ void translate_FSUBD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FMULD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FMULD");
     log_asm_out("Translate FMULD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -262,6 +269,7 @@ void translate_FMULD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FDIVD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FDIVD");
     log_asm_out("Translate FDIVD...\n");
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
@@ -290,6 +298,7 @@ void translate_FDIVD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FSQRTD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FSQRTD");
     log_asm_out("Translate FSQRTD...\n");
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
@@ -549,6 +558,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTSD");
     log_asm_out("Translate FCVTSD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -566,6 +576,7 @@ void translate_FCVTSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDS");
     log_asm_out("Translate FCVTDS...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -751,6 +762,7 @@ void translate_FCLASSD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTWD");
     log_asm_out("Translate FCVTWD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -771,6 +783,7 @@ void translate_FCVTWD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWUD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTWUD");
     log_asm_out("Translate FCVTWUD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -789,6 +802,7 @@ void translate_FCVTWUD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDW(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDW");
     log_asm_out("Translate FCVTDW...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -807,6 +821,7 @@ void translate_FCVTDW(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDWU");
     log_asm_out("Translate FCVTDWU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -828,6 +843,7 @@ void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTLD");
     log_asm_out("Translate FCVTLD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -845,6 +861,7 @@ void translate_FCVTLD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTLUD");
     log_asm_out("Translate FCVTLUD...\n");
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
@@ -898,6 +915,7 @@ void translate_FMVXD(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDL(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDL");
     log_asm_out("Translate FCVTDL...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
@@ -916,6 +934,7 @@ void translate_FCVTDL(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTDLU(const t_risc_instr *instr, const register_info *r_info) {
+    if (instr->rounding_mode != DYN) critical_not_yet_implemented("Rounding mode needs to be dynamic for FCVTDLU");
     log_asm_out("Translate FCVTDLU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);

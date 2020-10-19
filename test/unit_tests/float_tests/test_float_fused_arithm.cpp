@@ -9,7 +9,7 @@
 #include <runtime/register.h>
 #include "math.h"
 
-typedef float (*t_farithmResFunc)(float, float,float);
+typedef float (*t_farithmResFunc)(float, float, float);
 
 /**
  * Parameterized using the following parameters:
@@ -96,9 +96,9 @@ register_info *FusedArithmFloatTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(FusedArithmFloatTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -115,9 +115,9 @@ TEST_P(FusedArithmFloatTest, AllDifferent) {
 }
 
 TEST_P(FusedArithmFloatTest, Rs1RdSame) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -133,9 +133,9 @@ TEST_P(FusedArithmFloatTest, Rs1RdSame) {
 }
 
 TEST_P(FusedArithmFloatTest, Rs2RdSame) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
     blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -157,7 +157,7 @@ INSTANTIATE_TEST_SUITE_P(FMADDS,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2,float rs3) {
+                                 testing::Values([](float rs1, float rs2, float rs3) {
                                      return rs1 * rs2 + rs3;
                                  }),
                                  testing::Values(false),
@@ -172,7 +172,7 @@ INSTANTIATE_TEST_SUITE_P(FNMADDS,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2,float rs3) {
+                                 testing::Values([](float rs1, float rs2, float rs3) {
                                      return -rs1 * rs2 - rs3;
                                  }),
                                  testing::Values(false),
@@ -187,7 +187,7 @@ INSTANTIATE_TEST_SUITE_P(FMSUBS,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(2, -5, 1),
-                                 testing::Values([](float rs1,float rs2,float rs3) {
+                                 testing::Values([](float rs1, float rs2, float rs3) {
                                      return rs1 * rs2 - rs3;
                                  }),
                                  testing::Values(false),
@@ -202,8 +202,8 @@ INSTANTIATE_TEST_SUITE_P(FNMSUBS,
                                  testing::Values(1, -1),
                                  testing::Values(2, -5, 1),
                                  testing::Values(4, 8, -10),
-                                 testing::Values([](float rs1,float rs2,float rs3) {
-                                     return - rs1 * rs2 + rs3;
+                                 testing::Values([](float rs1, float rs2, float rs3) {
+                                     return -rs1 * rs2 + rs3;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false),

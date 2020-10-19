@@ -13,8 +13,8 @@
 
 typedef float (*t_i2fResFunc)(t_risc_reg_val);
 
-inline t_risc_reg_val floatToIntRep(float f){
-    return *(t_risc_reg_val *)((float*)&f);
+inline t_risc_reg_val floatToIntRep(float f) {
+    return *(t_risc_reg_val *) ((float *) &f);
 }
 
 /**
@@ -92,8 +92,8 @@ register_info *GpToFpFloatTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(GpToFpFloatTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].rounding_mode = DYN;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -109,9 +109,9 @@ INSTANTIATE_TEST_SUITE_P(FMVWX,
                          GpToFpFloatTest,
                          testing::Combine(
                                  testing::Values(FMVWX),
-                                 testing::Values(floatToIntRep(1),floatToIntRep(-200),floatToIntRep(12312.12)),
+                                 testing::Values(floatToIntRep(1), floatToIntRep(-200), floatToIntRep(12312.12)),
                                  testing::Values([](uint64_t rs1) {
-                                     return *(float *)((uint64_t*)&rs1);
+                                     return *(float *) ((uint64_t *) &rs1);
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -121,9 +121,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTSW,
                          GpToFpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTSW),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (float)(int32_t)rs1;
+                                     return (float) (int32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -132,9 +132,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTSWU,
                          GpToFpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTSWU),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (float)(uint32_t)rs1;
+                                     return (float) (uint32_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -143,9 +143,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTSL,
                          GpToFpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTSL),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (float)(int64_t)rs1;
+                                     return (float) (int64_t) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
@@ -154,9 +154,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTSLU,
                          GpToFpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTSLU),
-                                 testing::Values(-1, 20, 300,-1232,0),
+                                 testing::Values(-1, 20, 300, -1232, 0),
                                  testing::Values([](uint64_t rs1) {
-                                     return (float)rs1;
+                                     return (float) rs1;
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));

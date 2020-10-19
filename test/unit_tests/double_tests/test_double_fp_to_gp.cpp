@@ -86,8 +86,8 @@ register_info *FpToGpDoubleTest::r_info = nullptr;
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 TEST_P(FpToGpDoubleTest, AllDifferent) {
-    blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0] =            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1,rd, 0};
+    blockCache[0].rounding_mode = RTZ;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
