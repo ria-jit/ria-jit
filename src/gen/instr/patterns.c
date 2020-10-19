@@ -169,11 +169,12 @@ const pattern_element p_23_elem[] = {
         {ANDI,  rd_h1,     DONT_CARE, rd_h1,     0, 0, 1, 0xff}
 };
 
+/* unused */
 void emit_pattern_0(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("emit pattern 0: inc mem64 at 0x%lx\n", instr->addr);
     invalidateAllReplacements(r_info);
 
-    //TODO Check if address fits into 32bit and use non RIP-relative absolute
+    //potantially check if address fits into 32bit and use non RIP-relative absolute
     err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (instr->addr + instr->imm));
     err |= fe_enc64(&current, FE_ADD64mi, FE_MEM(FE_AX, 0, 0, 0), instr[2].imm);
 }

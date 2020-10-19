@@ -65,8 +65,6 @@ int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
 int32_t parse_instruction(t_risc_instr *p_instr_struct) {
-    //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
-
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);

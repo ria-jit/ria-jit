@@ -91,7 +91,6 @@ void translate_CSRRWI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rm, regDest, FE_MEM_ADDR(r_info->csr_base + instr->imm));
     }
 
-    //todo if this is parsed correctly, the uimm[4:0] value should be cleanly inside the reg_src_1 field of the struct
     //uimm[4:0] value -> CSR
     uint8_t uimm_val = instr->reg_src_1;
     err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->csr_base + instr->imm), uimm_val);
