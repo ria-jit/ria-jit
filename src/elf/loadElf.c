@@ -7,6 +7,7 @@
 #include <common.h>
 #include <linux/mman.h>
 #include <linux/fs.h>
+#include <env/exit.h>
 #include "loadElf.h"
 
 //Apparently not included in the headers on my version.
@@ -47,6 +48,18 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
         return INVALID_ELF_MAP;
     }
 
+    if (header.e_machine != EM_RISCV) {
+        dprintf(2, "Tried to translate a non-RISCV binary.");
+        panic(FAIL_INCOMPATIBLE);
+    }
+    if (header.e_ident[EI_CLASS] != ELFCLASS64) {
+        dprintf(2, "Tried executing a non-64bit binary.");
+        panic(FAIL_INCOMPATIBLE);
+    }
+    if (header.e_type != ET_EXEC) {
+        dprintf(2, "Tried executing a non-static binary.");
+        panic(FAIL_INCOMPATIBLE);
+    }
 
     Elf64_Half ph_count = header.e_phnum;
     Elf64_Off ph_offset = header.e_phoff;
@@ -154,7 +167,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
                 }
                 break;
             }
-            case PT_DYNAMIC: //Fallthrough
             case PT_INTERP: {
                 dprintf(2, "Bad. Got file that needs dynamic linking.");
                 return INVALID_ELF_MAP;

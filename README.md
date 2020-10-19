@@ -18,7 +18,46 @@ We can execute binaries compiled via the [RISC-V toolchain gcc](https://github.c
 ## Usage
 
 ```sh
-./translator [translator option(s)] -f <filename> [guest options]
+Usage: ./translator [translator option(s)] -f <filename> [guest options]
+
+Options:
+	-v, --version
+		Show translator version.
+	-f, --file <executable>
+		Specify executable. All options after the file path are passed to the guest.
+	-a, --analyze-all
+	--analyze-mnem, --analyze-reg, --analyze-pattern
+		Analyze the binary. Does not execute the guest program.
+		Inspects passed program binary and shows the selected statistics.
+	-b, --benchmark
+		Benchmark execution. Times the execution of the program,
+		excluding mapping the binary into memory.
+	-p, --profile
+		Profile register usage. Display dynamic register usage statistics.
+	--perf
+		Log the generated blocks to /tmp/perf-<pid>.map for externally profiling
+		the execution in perf.
+	-s, --fail-silently
+		Fail silently for some error conditions.
+		Allows continued execution, but the client program may enter undefined states.
+	-h, --help
+		Show this help.
+
+Logging:
+	--log=category,[...]
+		Enable logging for certain categories. See --log=help for more info.
+	-g	Display general verbose info (--log=general,strace)
+	-i	Display parsed RISC-V input assembly (--log=asm_in)
+	-o	Display translated output x86 assembly (--log=asm_out,verbose_disasm)
+	-r	Dump registers on basic block boundaries (--log=reg)
+	-c	Display cache info (--log=cache)
+
+Optimization:
+	--optimize=category,[...]
+		Disable certain optimization categories. See --optimize=help for more info.
+	-d	Enable Single stepping mode.
+		Each instruction will be its own block. (--optimize=singlestep)
+	-m	Disable all translation optimization features. (--optimize=none)
 ```
 
 ## Run tests

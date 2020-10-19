@@ -14,14 +14,13 @@ typedef struct {
 
 void init_return_stack(void);
 
-void rs_emit_push(const t_risc_instr *instr);
+void rs_emit_push(const t_risc_instr *instr, const register_info *r_info);
 
-void rs_emit_pop_RAX(bool jump_or_push);
+void rs_emit_pop_RAX(bool jump_or_push, const register_info *r_info);
 
-void rs_jump_stack();
+void rs_jump_stack(const register_info *r_info);
 
 extern rs_entry *r_stack;
-extern volatile uint64_t rs_front;
-extern volatile uint64_t rs_back;
+extern volatile uint32_t rs_front;
 
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_RETURN_STACK_H

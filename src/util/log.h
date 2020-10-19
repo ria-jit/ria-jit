@@ -16,28 +16,6 @@ extern "C" {
 
 extern const char *const translator_version;
 
-/**
-* Verbose logging flags used by the main.c and logging methods.
-*/
-extern bool flag_log_general;
-extern bool flag_log_syscall;
-extern bool flag_log_asm_in;
-extern bool flag_log_asm_out;
-extern bool flag_verbose_disassembly;
-extern bool flag_log_reg_dump;
-extern bool flag_log_cache;
-extern bool flag_log_cache_contents;
-extern bool flag_fail_silently;
-extern bool flag_single_step;
-extern bool flag_translate_opt;
-extern bool flag_translate_opt_ras;
-extern bool flag_translate_opt_chain;
-extern bool flag_translate_opt_jump;
-extern bool flag_translate_opt_fusion;
-extern bool flag_do_benchmark;
-extern bool flag_do_analyze;
-extern bool flag_do_profile;
-
 void critical_not_yet_implemented(const char *info);
 
 void not_yet_implemented(const char *info);
@@ -58,6 +36,9 @@ void log_asm_out(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_reg_dump(const char *format, ...)
+__attribute__((__format__(printf, 1, 2)));
+
+void log_context(const char *format, ...)
 __attribute__((__format__(printf, 1, 2)));
 
 void log_cache(const char *format, ...)

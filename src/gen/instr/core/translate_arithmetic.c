@@ -16,20 +16,16 @@ void translate_ADDIW(const t_risc_instr *instr, const register_info *r_info) {
     // add rd, instr->imm
     log_asm_out("Translate ADDIW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    }
-
-    if (instr->imm != 0) {
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    } else if (instr->imm != 0) {
         err |= fe_enc64(&current, FE_ADD32ri, regDest, instr->imm);
     }
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -42,16 +38,19 @@ void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     //shl rd, (instr->imm & 0x3F)
     log_asm_out("Translate SLLI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    t_risc_imm masked_imm = instr->imm & 0b111111;
+    if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
+        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_SHL64ri, regDest, masked_imm);
     }
-
-    err |= fe_enc64(&current, FE_SHL64ri, regDest, instr->imm & 0b111111);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -63,11 +62,9 @@ void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
     //mov rd, extended
     log_asm_out("Translate LUI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->imm);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -79,18 +76,14 @@ void translate_LUI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ADDI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
-    }
-
-    if (instr->imm != 0) {
+        err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
+    } else if (instr->imm != 0) {
         err |= fe_enc64(&current, FE_ADD64ri, regDest, instr->imm);
     }
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -105,11 +98,9 @@ void translate_ADDI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AUIPC...\n");
     if (instr->reg_dest != x0) {
-        FeReg regDest = getRd(instr, r_info, FIRST_REG);
+        FeReg regDest = getRd(instr, r_info);
 
         err |= fe_enc64(&current, FE_MOV64ri, regDest, instr->addr + instr->imm);
-
-        storeRd(instr, r_info, regDest);
     }
 }
 
@@ -123,14 +114,12 @@ void translate_AUIPC(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTI...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
     err |= fe_enc64(&current, FE_SETL8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -143,14 +132,12 @@ void translate_SLTI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTIU...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_CMP64ri, regSrc1, instr->imm);
     err |= fe_enc64(&current, FE_SETC8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -163,16 +150,14 @@ void translate_SLTIU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate XORI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_XOR64ri, regDest, instr->imm);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -185,16 +170,14 @@ void translate_XORI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ORI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_OR64ri, regDest, instr->imm);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -207,16 +190,23 @@ void translate_ORI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ANDI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+    if ((uint32_t) instr->imm == (uint64_t) instr->imm) {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_AND32ri, regDest, instr->imm);
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_AND64ri, regDest, instr->imm);
     }
 
-    err |= fe_enc64(&current, FE_AND64ri, regDest, instr->imm);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -228,16 +218,14 @@ void translate_ANDI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRLI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_SHR64ri, regDest, instr->imm & 0b111111);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -249,16 +237,14 @@ void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRAI...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
     err |= fe_enc64(&current, FE_SAR64ri, regDest, instr->imm & 0b111111);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -271,13 +257,15 @@ void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ADD...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
-    doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD64rr);
-
-    storeRd(instr, r_info, regDest);
+    if (regSrc1 != regDest && regSrc2 != regDest) {
+        fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(regSrc1, 1, regSrc2, 0));
+    } else {
+        doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD64rr);
+    }
 }
 
 /**
@@ -290,9 +278,9 @@ void translate_ADD(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SUB...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest == regSrc2) {
         if (regDest == regSrc1) {
@@ -304,8 +292,6 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         doArithmCommutative(regSrc1, regSrc2, regDest, FE_SUB64rr);
     }
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -318,22 +304,25 @@ void translate_SUB(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLL...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHL64rr, regDest, FE_CX);
-
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_SHL64rr, regDest, regSrc2);
 }
 
 /**
@@ -345,15 +334,13 @@ void translate_SLL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLT...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_SETL8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -365,15 +352,13 @@ void translate_SLT(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLTU...\n");
 
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, SECOND_REG);
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_SETC8r, regDest);
     err |= fe_enc64(&current, FE_MOVZXr32r8, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -385,13 +370,11 @@ void translate_SLTU(const t_risc_instr *instr, const register_info *r_info) {
 void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate XOR...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     doArithmCommutative(regSrc1, regSrc2, regDest, FE_XOR64rr);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -404,22 +387,26 @@ void translate_XOR(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRL...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
+
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHR64rr, regDest, FE_CX);
-
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_SHR64rr, regDest, regSrc2);
 }
 
 /**
@@ -432,22 +419,26 @@ void translate_SRL(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRA...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
+
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SAR64rr, regDest, FE_CX);
-
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_SAR64rr, regDest, regSrc2);
 }
 
 /**
@@ -459,13 +450,11 @@ void translate_SRA(const t_risc_instr *instr, const register_info *r_info) {
 void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate OR...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     doArithmCommutative(regSrc1, regSrc2, regDest, FE_OR64rr);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -477,13 +466,11 @@ void translate_OR(const t_risc_instr *instr, const register_info *r_info) {
 void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate AND...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     doArithmCommutative(regSrc1, regSrc2, regDest, FE_AND64rr);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -495,16 +482,21 @@ void translate_AND(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLLIW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
-    if (regDest != regSrc1) {
-        err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+    t_risc_imm masked_imm = instr->imm & 0b11111;
+    if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
+        err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
+    } else {
+        if (regDest != regSrc1) {
+            err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
+        }
+
+        err |= fe_enc64(&current, FE_SHL32ri, regDest, masked_imm);
     }
-    err |= fe_enc64(&current, FE_SHL32ri, regDest, instr->imm & 0b11111);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 
-    storeRd(instr, r_info, regDest);
+    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
 /**
@@ -516,16 +508,14 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRLIW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -537,16 +527,14 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRAIW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
     err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -560,14 +548,15 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate ADDW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
-
-    doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD32rr);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
+    if (regSrc1 != regDest && regSrc2 != regDest) {
+        fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(regSrc1, 1, regSrc2, 0));
+    } else {
+        doArithmCommutative(regSrc1, regSrc2, regDest, FE_ADD32rr);
+    }
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -581,9 +570,9 @@ void translate_ADDW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SUBW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc1 = getRs1(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, regSrc1 != regDest ? regDest : SECOND_REG);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regSrc2 = getRs2(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest == regSrc2) {
         if (regDest == regSrc1) {
@@ -597,8 +586,6 @@ void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -612,23 +599,27 @@ void translate_SUBW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SLLW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
+
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHL32rr, regDest, FE_CX);
+    err |= fe_enc64(&current, FE_SHL32rr, regDest, regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -642,23 +633,27 @@ void translate_SLLW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRLW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
+
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHR32rr, regDest, FE_CX);
+    err |= fe_enc64(&current, FE_SHR32rr, regDest, regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }
 
 /**
@@ -672,21 +667,25 @@ void translate_SRLW(const t_risc_instr *instr, const register_info *r_info) {
 void translate_SRAW(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate SRAW...\n");
 
-    FeReg regDest = getRd(instr, r_info, FIRST_REG);
-    FeReg regSrc2 = getRs2(instr, r_info, FE_CX);
-    FeReg regSrc1 = getRs1(instr, r_info, regDest != regSrc2 ? regDest : FIRST_REG);
-
-    if (regSrc2 != FE_CX) {
-        //rs2 needs to be in CX for us to be able to encode the shift
-        err |= fe_enc64(&current, FE_MOV32rr, FE_CX, regSrc2);
-    }
+    FeReg regSrc2 = getRs2Into(instr, r_info, FE_CX);
+    FeReg regSrc1 = getRs1(instr, r_info);
+    FeReg regDest = getRd(instr, r_info);
 
     if (regDest != regSrc1) {
+        ///If rd and rs2 are the same, we need to load rd into another register (not rs1), to not override shift amount
+        if (regDest == regSrc2) {
+            if (regSrc1 == FE_AX) {
+                invalidateReplacement(r_info, FE_DX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_DX, true);
+            } else {
+                invalidateReplacement(r_info, FE_AX, true);
+                regDest = loadIntoSpecific(r_info, instr->reg_dest, FE_AX, true);
+            }
+        }
+
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SAR32rr, regDest, FE_CX);
+    err |= fe_enc64(&current, FE_SAR32rr, regDest, regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
-
-    storeRd(instr, r_info, regDest);
 }

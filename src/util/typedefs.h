@@ -22,6 +22,8 @@ char *reg_to_string(int reg);
 
 char *reg_to_alias(int reg);
 
+char *reg_x86_to_string(FeReg reg);
+
 typedef enum {
     INVALID_MNEM,
 
@@ -113,6 +115,8 @@ typedef enum {
     pc
 } t_risc_reg;
 
+#define INVALID_REG 33
+
 typedef enum {
     zero,
     ra, sp, gp, tp, t0, t1, t2, s0, fp = s0, s1,
@@ -120,7 +124,9 @@ typedef enum {
     s4, s5, s6, s7, s8, s9, s10, s11, t3, t4,
     t5, t6
 } t_risc_reg_mnem;
+
 #define N_REG 34
+#define N_REPLACE 3
 
 //CSR registers
 #define N_CSR 4096
@@ -164,12 +170,21 @@ typedef struct {
 
 /**
  * Register information for the translator functions.
+ * @param map the RISC-V -> x86 register mapping
+ * @param mapped which of the RISC-V registers are mapped
+ * @param base the base address of the general-purpose register file in memory
+ * @param csr_base the base address of the CSR register file in memory
+ * @param replacement_content the current RISC-V registers that are loaded into the replacement registers (UNKNOWN is empty)
+ * @param replacement_recency specifies the recently used RISC-V registers (lower is older, 0 is clean)
  */
 typedef struct {
     FeReg *map;
     bool *mapped;
     uint64_t base;
     uint64_t csr_base;
+    t_risc_reg *replacement_content;
+    uint64_t *replacement_recency;
+    uint64_t *current_recency;
 } register_info;
 
 #ifdef __cplusplus

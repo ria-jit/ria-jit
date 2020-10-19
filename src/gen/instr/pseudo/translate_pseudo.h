@@ -7,7 +7,7 @@
 
 #include <util/typedefs.h>
 
-void translate_PC_NEXT_INST(t_risc_addr addr, uint64_t reg_base);
+void translate_PC_NEXT_INST(t_risc_addr addr, const register_info *r_info);
 
 void translate_SILENT_NOP(const t_risc_instr *instr, const register_info *r_info);
 

@@ -19,11 +19,12 @@ t_risc_reg_val gp_file[N_REG];
 t_risc_reg_val csr_file[N_CSR];
 
 /**
- * Swap space for the 6 callee-saved registers we are using for loading the context.
+ * Swap space for the 6 callee-saved registers and a scratch register
+ * we are using for loading the context.
  * Keeping the values here avoids stack consistency issues.
  * See context.c for reference.
  */
-uint64_t swap_file[6];
+uint64_t swap_file[7];
 
 /**
  * Usage array for profiler.

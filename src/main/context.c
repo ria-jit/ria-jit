@@ -3,6 +3,7 @@
 //
 
 #include "context.h"
+#include <env/flags.h>
 
 #include <runtime/register.h>
 #include <gen/translate.h>
@@ -17,6 +18,7 @@
 
 context_info *init_map_context(void) {
     //register mapping as pulled from translate.c
+    log_context("Initializing context...\n");
 
     //create register allocation mapping
     FeReg *register_map = mmap(NULL,
@@ -28,7 +30,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(register_map)) {
         dprintf(2, "Failed to allocate register_map for context. Error %li", -(intptr_t) register_map);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     bool *mapped = mmap(NULL,
@@ -40,13 +42,69 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(mapped)) {
         dprintf(2, "Failed to allocate mapped for context. Error %li", -(intptr_t) mapped);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     //fill boolean array with 0
     for (int i = 0; i < N_REG; ++i) {
         mapped[i] = false;
     }
+
+    /**
+     * Allocate memory for the dynamic translate-time replacement mapping.
+     * These struct contents are used to lazily load values into replacement registers at translate time.
+     */
+    t_risc_reg *replacement_content = mmap(NULL,
+                                           N_REPLACE * sizeof(t_risc_reg),
+                                           PROT_READ | PROT_WRITE,
+                                           MAP_ANONYMOUS | MAP_PRIVATE,
+                                           -1,
+                                           0);
+
+    if (BAD_ADDR(replacement_content)) {
+        dprintf(2, "Failed to allocate replacement_content for context. Error %li", -(intptr_t) replacement_content);
+        panic(FAIL_HEAP_ALLOC);
+    }
+
+    //fill with INVALID_REG to indicate unused
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        replacement_content[i] = INVALID_REG;
+    }
+
+    uint64_t *replacement_recency = mmap(NULL,
+                                         N_REPLACE * sizeof(uint64_t),
+                                         PROT_READ | PROT_WRITE,
+                                         MAP_ANONYMOUS | MAP_PRIVATE,
+                                         -1,
+                                         0);
+
+    if (BAD_ADDR(replacement_recency)) {
+        dprintf(2, "Failed to allocate replacement_recency for context. Error %li", -(intptr_t) replacement_recency);
+        panic(FAIL_HEAP_ALLOC);
+    }
+
+    //fill with 0 to indicate clean (maybe not necessary?)
+    for (size_t i = 0; i < N_REPLACE; i++) {
+        replacement_recency[i] = 0;
+    }
+
+
+    //Allocating here to keep r_info const in all translator functions.
+    //I am, however, aware this is not pretty. Maybe refactor in the future?
+    uint64_t *current_recency = mmap(NULL,
+                                     sizeof(uint64_t),
+                                     PROT_READ | PROT_WRITE,
+                                     MAP_ANONYMOUS | MAP_PRIVATE,
+                                     -1,
+                                     0);
+
+    if (BAD_ADDR(current_recency)) {
+        dprintf(2, "Failed to allocate current_recency for context. Error %li", -(intptr_t) current_recency);
+        panic(FAIL_HEAP_ALLOC);
+    }
+
+    //start count (across blocks?) at 1
+    *current_recency = 1;
 
 
     /**
@@ -90,6 +148,19 @@ context_info *init_map_context(void) {
 
 #undef map_reg
 
+    //log context setup
+    if (flag_log_context) {
+        log_context("Static mapping contents:\n");
+        for (t_risc_reg reg = x0; reg <= pc; reg++) {
+            if (mapped[reg]) {
+                log_context("%s/%s --> %s\n",
+                            reg_to_string(reg),
+                            reg_to_alias(reg),
+                            reg_x86_to_string(register_map[reg]));
+            }
+        }
+    }
+
     ///create info struct
     register_info *r_info =
             mmap(NULL,
@@ -101,13 +172,16 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(r_info)) {
         dprintf(2, "Failed to allocate r_info for context. Error %li", -(intptr_t) r_info);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     r_info->map = register_map;
     r_info->mapped = mapped;
     r_info->base = (uint64_t) get_gp_reg_file();
     r_info->csr_base = (uint64_t) get_csr_reg_file();
+    r_info->replacement_content = replacement_content;
+    r_info->replacement_recency = replacement_recency;
+    r_info->current_recency = current_recency;
 
     //generate switching functions
     t_cache_loc load_execute_save_context;
@@ -116,7 +190,7 @@ context_info *init_map_context(void) {
     //generate these dynamically in case we need to modify them
     {
         //context storing
-        init_block();
+        init_block(r_info);
         log_general("Generating context storing block...\n");
 
         //save by register mapping
@@ -134,12 +208,12 @@ context_info *init_map_context(void) {
         err |= fe_enc64(&current, FE_MOV64rm, FE_R14, SWAP_R14);
         err |= fe_enc64(&current, FE_MOV64rm, FE_R15, SWAP_R15);
 
-        save_context = finalize_block(DONT_LINK);
+        save_context = finalize_block(DONT_LINK, r_info);
     }
 
     {
         //context loading
-        init_block();
+        init_block(r_info);
         log_general("Generating context executing block...\n");
 
         //store callee-saved host registers BX, BP, R12, R13, R14, R15
@@ -172,7 +246,7 @@ context_info *init_map_context(void) {
 
         err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
 
-        load_execute_save_context = finalize_block(DONT_LINK);
+        load_execute_save_context = finalize_block(DONT_LINK, r_info);
     }
 
     //create context info struct
@@ -185,7 +259,7 @@ context_info *init_map_context(void) {
 
     if (BAD_ADDR(c_info)) {
         dprintf(2, "Failed to allocate c_info for context. Error %li", -(intptr_t) c_info);
-        _exit(FAIL_HEAP_ALLOC);
+        panic(FAIL_HEAP_ALLOC);
     }
 
     c_info->r_info = r_info;

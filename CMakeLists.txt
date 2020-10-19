@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.15)
 project(DynamicBinaryTranslatorRISCV64->x86-64)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 
 #Create CMake Constant TRANSLATOR_BASE
 set(TRANSLATOR_BASE 0x780000000000)
@@ -47,9 +47,19 @@ ExternalProject_Add(fadec
         TEST_COMMAND meson test -v
         BUILD_BYPRODUCTS ${FADEC_BYPRODUCTS})
 
+#Will always be regenerated
+add_custom_target(
+        version
+        ${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/src/util/version.h.in
+        -D DST=${CMAKE_BINARY_DIR}/src/util/version.h
+        -P ${CMAKE_SOURCE_DIR}/version.cmake
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
+)
+
 include_directories(src)
 include_directories(lib)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/${FADEC_PATH_PREFIX})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 
 set(TRANSLATOR_SOURCES
         src/main/main.c src/main/main.h
@@ -86,7 +96,10 @@ set(TRANSLATOR_SOURCES
         lib/ryu/ryu.h
         src/gen/instr/pseudo/translate_pseudo.c src/gen/instr/pseudo/translate_pseudo.h
         src/gen/optimize.c src/gen/optimize.h
-        src/gen/instr/patterns.h src/gen/instr/patterns.c)
+        src/gen/instr/patterns.h src/gen/instr/patterns.c
+        ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
+        src/env/flags.c src/env/flags.h
+        src/env/exit.c src/env/exit.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
@@ -118,8 +131,8 @@ set_target_properties(fadecLib PROPERTIES
 add_dependencies(fadecLib fadec)
 
 #Make sure fadecLib is built before translator or test
-add_dependencies(translator fadecLib)
-add_dependencies(test fadecLib)
+add_dependencies(translator fadecLib version)
+add_dependencies(test fadecLib version)
 
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)

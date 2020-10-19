@@ -65,8 +65,6 @@ int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
 int32_t parse_instruction(t_risc_instr *p_instr_struct) {
-    //TODO verify all commands, clean up textual output, add float and multiprocessor memory opcodes?
-
     // print out the line to parse in grouped binary as in the spec
     int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);
@@ -74,7 +72,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
     //fill basic struct
     p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
     p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
-    p_instr_struct->reg_src_2 = pc + 1; //Set to not used value for analyzer to work correctly
+    p_instr_struct->reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
     //p_instr_struct->reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
 
     //extract opcode bits[6:2]
@@ -83,19 +81,19 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         case OP_LUI:
             p_instr_struct->optype = UPPER_IMMEDIATE;
             p_instr_struct->mnem = LUI;
-            p_instr_struct->reg_src_1 = pc + 1; //Set to not used value for analyzer to work correctly
+            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
             p_instr_struct->imm = extract_imm_U(raw_instr);
             break;
         case OP_AUIPC:
             p_instr_struct->optype = IMMEDIATE;
             p_instr_struct->mnem = AUIPC;
-            p_instr_struct->reg_src_1 = pc + 1; //Set to not used value for analyzer to work correctly
+            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
             p_instr_struct->imm = extract_imm_U(raw_instr);
             break;
         case OP_JAL:
             p_instr_struct->optype = JUMP;
             p_instr_struct->mnem = JAL;
-            p_instr_struct->reg_src_1 = pc + 1; //Set to not used value for analyzer to work correctly
+            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
             p_instr_struct->imm = extract_imm_J(raw_instr);
             break;
         case OP_JALR:
@@ -121,7 +119,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             // BEQ, BNE...
             p_instr_struct->optype = BRANCH;
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            p_instr_struct->reg_dest = pc + 1; //Set to not used value for analyzer to work correctly
+            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
             p_instr_struct->imm = extract_imm_B(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:
@@ -187,7 +185,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
         case OP_STORE:
             p_instr_struct->optype = STORE;
             p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_dest = pc + 1; //Set to not used value for analyzer to work correctly
+            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
             p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
             switch (extract_funct3(raw_instr)) {
                 case 0:

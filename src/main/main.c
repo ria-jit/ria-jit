@@ -15,6 +15,7 @@
 #include <util/tools/perf.h>
 #include <main/context.h>
 #include <cache/return_stack.h>
+#include <env/flags.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -34,7 +35,7 @@ int main(int argc, char *argv[]) {
     //command line parsing failed, cannot execute anything
     if (options.status != 0) return options.status;
 
-    if (flag_do_analyze) {
+    if (flag_do_analyze_reg || flag_do_analyze_mnem || flag_do_analyze_pattern) {
         analyze(options.file_path);
         return 0;
     }

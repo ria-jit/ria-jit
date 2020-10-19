@@ -25,6 +25,7 @@ void translate_ECALL(const t_risc_instr *instr, const register_info *r_info, con
     //see https://stackoverflow.com/questions/59800430/risc-v-ecall-syscall-calling-convention-on-pk-linux
     log_asm_out("Translate ECALL...\n");
 
+    invalidateAllReplacements(r_info);
     //emit c_info->save_context();
     err |= fe_enc64(&current, FE_CALL, (intptr_t) c_info->save_context);
     //emit emulate_ecall(instr->addr, r_info->base);
