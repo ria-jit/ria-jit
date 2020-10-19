@@ -97,7 +97,8 @@ register_info *FusedArithmFloatTest::r_info = nullptr;
 
 TEST_P(FusedArithmFloatTest, AllDifferent) {
     blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, .reg_src_3 = rs3};
+            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0].reg_src_3 = rs3;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -115,7 +116,8 @@ TEST_P(FusedArithmFloatTest, AllDifferent) {
 
 TEST_P(FusedArithmFloatTest, Rs1RdSame) {
     blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, .reg_src_3 = rs3};
+            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
+    blockCache[0].reg_src_3 = rs3;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
@@ -132,7 +134,8 @@ TEST_P(FusedArithmFloatTest, Rs1RdSame) {
 
 TEST_P(FusedArithmFloatTest, Rs2RdSame) {
     blockCache[0] =
-            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, .reg_src_3 = rs3};
+            t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
+    blockCache[0].reg_src_3 = rs3;
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
