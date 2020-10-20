@@ -106,7 +106,7 @@ INSTANTIATE_TEST_SUITE_P(FMVXW,
                                  testing::Values(-1.f, 20.123f, 300.4f, -1232.123f),
                                  testing::Values([](float rs1) {
                                      int32_t float_bits = *(int32_t *) ((float *) &rs1);
-                                     int64_t sign_extended_bits = (int64_t) float_bits;
+                                     auto sign_extended_bits = (int64_t) float_bits;
                                      return (uint64_t) sign_extended_bits;
                                  }),
                                  testing::Values(false),

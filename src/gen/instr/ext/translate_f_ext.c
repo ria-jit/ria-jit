@@ -648,13 +648,23 @@ void translate_FMAXS(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTWS");
     log_asm_out("Translate FCVTWS...\n");
+    uint64_t CVTmnem = FE_SSE_CVTSS2SI32rr;
+    switch (instr->rounding_mode) {
+        case DYN:
+            break;
+        case RTZ:
+            CVTmnem = FE_SSE_CVTTSS2SI32rr;
+            break;
+        default:
+            critical_not_yet_implemented("Unsupported rounding mode FCVTWS");
+            break;
+    }
 
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_SSE_CVTSS2SI32rr, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);//sign extend
 }
 
@@ -666,13 +676,23 @@ void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTWUS(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTWUS");
     log_asm_out("Translate FCVTWUS...\n");
+    uint64_t CVTmnem = FE_SSE_CVTSS2SI64rr;
+    switch (instr->rounding_mode) {
+        case DYN:
+            break;
+        case RTZ:
+            CVTmnem = FE_SSE_CVTTSS2SI64rr;
+            break;
+        default:
+            critical_not_yet_implemented("Unsupported rounding mode FCVTWUS");
+            break;
+    }
 
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
     err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);//TODO necessary? does cvtss2si clear them already
 }
 
@@ -925,13 +945,23 @@ void translate_FMVWX(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLS(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTLS");
     log_asm_out("Translate FCVTLS...\n");
+    uint64_t CVTmnem = FE_SSE_CVTSS2SI64rr;
+    switch (instr->rounding_mode) {
+        case DYN:
+            break;
+        case RTZ:
+            CVTmnem = FE_SSE_CVTTSS2SI64rr;
+            break;
+        default:
+            critical_not_yet_implemented("Unsupported rounding mode FCVTLS");
+            break;
+    }
 
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
 }
 
 /**
@@ -941,8 +971,19 @@ void translate_FCVTLS(const t_risc_instr *instr, const register_info *r_info) {
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
 void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
-    if (instr->rounding_mode != RTZ) critical_not_yet_implemented("Rounding mode needs to be round to zero for FCVTLUS");
     log_asm_out("Translate FCVTLUS...\n");
+
+    uint64_t CVTmnem = FE_SSE_CVTSS2SI64rr;
+    switch (instr->rounding_mode) {
+        case DYN:
+            break;
+        case RTZ:
+            CVTmnem = FE_SSE_CVTTSS2SI64rr;
+            break;
+        default:
+            critical_not_yet_implemented("Unsupported rounding mode FCVTLUS");
+            break;
+    }
 
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, FIRST_FP_REG);
 
@@ -961,7 +1002,7 @@ void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
 
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
 
     uint8_t *jmpBufEnd = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
@@ -969,7 +1010,7 @@ void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
 
     err |= fe_enc64(&jmpBufCOM, FE_JNC, (intptr_t) current);
     err |= fe_enc64(&current, FE_SSE_SUBSSrr, regSrc2, SECOND_FP_REG);
-    err |= fe_enc64(&current, FE_SSE_CVTSS2SI64rr, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
     err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
 }

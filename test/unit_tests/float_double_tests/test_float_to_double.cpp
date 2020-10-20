@@ -101,10 +101,10 @@ TEST_P(FloatToDoubleTest, AllDifferent) {
     EXPECT_EQ(expectedRd, get_fpvalue(rd).d);
 }
 
-INSTANTIATE_TEST_SUITE_P(FCVTSD,
+INSTANTIATE_TEST_SUITE_P(FCVTDS,
                          FloatToDoubleTest,
                          testing::Combine(
-                                 testing::Values(FCVTSD),
+                                 testing::Values(FCVTDS),
                                  testing::Values(1, -200, 12312.12),
                                  testing::Values([](float rs1) {
                                      return (double) rs1;
