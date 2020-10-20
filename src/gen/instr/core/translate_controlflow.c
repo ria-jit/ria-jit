@@ -141,14 +141,14 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
                 rs_emit_push(instr, r_info);
             }
         } else {
-            if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
+            if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 ///pop
                 rs_emit_pop_RAX(true, r_info);
             } else {
                 ///none
             }
         }
-     }
+    }
 
 
     if (instr->reg_src_2 == 1 && flag_translate_opt_chain) {
@@ -163,7 +163,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
         t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.imm + instr->imm;
 
         t_cache_loc cache_loc = 0;
-        if((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
+        if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
             ///4: write chainEnd to be chained by chainer
             log_asm_out("CHAIN JALR\n");
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
@@ -289,9 +289,12 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
 
     ///compare registers:
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
-
-    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
+    if (instr->reg_src_2 == x0) {
+        err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
+    } else {
+        FeReg regSrc2 = getRs2(instr, r_info);
+        err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
+    }
 
     invalidateAllReplacements(r_info);
 }
