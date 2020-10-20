@@ -52,6 +52,8 @@ void insertionSort(t_node **head);
 void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count);
 
 void analyze(const char *file_path) {
+    log_analyze("Started file analysis...\n");
+
     if (file_path == NULL) {
         dprintf(2, "Bad. Invalid file path.\n");
         panic(FAIL_INVALID_PATH);
@@ -82,6 +84,8 @@ void analyze(const char *file_path) {
     for (t_risc_addr addr = startAddr; addr < endAddr; addr += 4) {
         add_instruction(addr, mnem, reg);
     }
+
+    log_analyze("Done reading file.\n");
 
     if (flag_do_analyze_mnem) {
         ///rank mnem by usage
