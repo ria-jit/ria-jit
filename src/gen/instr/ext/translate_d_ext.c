@@ -612,7 +612,7 @@ void translate_FEQD(const t_risc_instr *instr, const register_info *r_info) {
     }
     invalidateReplacement(r_info, scratch, true);
 
-    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, regSrc2);
     err |= fe_enc64(&current, FE_MOV64ri, scratch, 0);
     err |= fe_enc64(&current, FE_SETNP8r, regDest);
@@ -633,7 +633,7 @@ void translate_FLTD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc2, regSrc1);
     err |= fe_enc64(&current, FE_SETA8r, regDest);
 }
@@ -651,7 +651,7 @@ void translate_FLED(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc2, regSrc1);
     err |= fe_enc64(&current, FE_SETNC8r, regDest);
 }
