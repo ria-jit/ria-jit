@@ -853,7 +853,7 @@ void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
     invalidateReplacement(r_info, scratch, true);
 
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
-    //zero upper bits by moving into regSrc1
+    //zero upper bits by moving regSrc1 into scratch
     err |= fe_enc64(&current, FE_MOV32rr, scratch, regSrc1);
 
     err |= fe_enc64(&current, FE_SSE_XORPDrr, regDest, regDest); //needs to be done because of cvtsi2ss design
