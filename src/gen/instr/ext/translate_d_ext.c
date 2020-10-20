@@ -606,11 +606,7 @@ void translate_FEQD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regSrc2 = getFpReg(instr->reg_src_2, r_info, SECOND_FP_REG);
     FeReg regDest = getRd(instr, r_info);
-    FeReg scratch = SECOND_REG;
-    if (scratch == regDest) {
-        scratch = FIRST_REG;
-    }
-    invalidateReplacement(r_info, scratch, true);
+    FeReg scratch = invalidateOldest(r_info);
 
     err |= fe_enc64(&current, FE_XOR32rr, regDest, regDest);
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, regSrc2);
@@ -846,13 +842,9 @@ void translate_FCVTDWU(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTDWU...\n");
 
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg scratch = SECOND_REG;
-    if (scratch == regSrc1) {
-        scratch = FIRST_REG;
-    }
-    invalidateReplacement(r_info, scratch, true);
-
+    FeReg scratch = invalidateOldest(r_info);
     FeReg regDest = getFpRegNoLoad(instr->reg_dest, r_info, FIRST_FP_REG);
+
     //zero upper bits by moving regSrc1 into scratch
     err |= fe_enc64(&current, FE_MOV32rr, scratch, regSrc1);
 
@@ -910,8 +902,8 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     FeReg regSrc1 = getFpReg(instr->reg_src_1, r_info, FIRST_FP_REG);
-    FeReg scratch = FIRST_REG;
-    invalidateReplacement(r_info, scratch, true);
+    FeReg regDest = getRd(instr, r_info);
+    FeReg scratch = invalidateOldest(r_info);
 
     //constant saved here
     const unsigned long C0 = 0x43E0000000000000lu;
@@ -922,8 +914,6 @@ void translate_FCVTLUD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_SSE_COMISDrr, regSrc1, SECOND_FP_REG);
     uint8_t *jmpBufCOM = current;
     err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy
-
-    FeReg regDest = getRd(instr, r_info);
 
     err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
 
