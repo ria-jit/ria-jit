@@ -309,6 +309,8 @@ typedef enum {
     NX = 0 //Inexact
 } t_risc_f_exp;
 
+#define FCSR 0x003
+
 /**
  * Register value type.
  * XLEN = 64 for the integer registers.

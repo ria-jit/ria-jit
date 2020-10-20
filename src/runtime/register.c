@@ -33,6 +33,14 @@ t_risc_fp_reg_val fp_file[N_FP];
 uint64_t swap_file[7];
 
 /**
+ * Space for saving the MXCSR control register for SSE
+ * used to save and restore the previous rounding mode [0] and for setting a new one [1]
+ * See context.c for reference.
+ */
+uint32_t fctrl_file[2];
+
+
+/**
  * Usage array for profiler.
  * Used to count register accesses during program execution.
  */
@@ -52,6 +60,14 @@ t_risc_reg_val *get_fp_reg_file(void) {
 
 uint64_t *get_swap_file(void) {
     return swap_file;
+}
+
+uint32_t *get_fctrl_file(void) {
+    return fctrl_file;
+}
+
+uint64_t *get_usage_file(void) {
+    return usage;
 }
 
 /**

@@ -579,6 +579,55 @@ static inline void loadScratchReg(FeReg scratch) {
     err |= fe_enc64(&current, FE_MOV64rm, scratch, SWAP_SCRATCH);
 }
 
+#define SSE_ROUND_MASK  (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
+#define SSE_ROUND_SHIFT 3
+#define MXCSR_SCRATCH FE_MEM_ADDR((intptr_t) get_fctrl_file() + 8 * 1)
+#define MXCSR_SAVE FE_MEM_ADDR((intptr_t) get_fctrl_file())
+#define FE_TONEAREST    0
+#define FE_DOWNWARD    0x400
+#define FE_UPWARD    0x800
+#define FE_TOWARDZERO    0xc00
+
+static inline void saveAndSetRound(register_info *r_info, int round) {
+    //convert to SSE_ROUND mode
+    switch (round) {
+        case RNE:
+            round = FE_TONEAREST;
+            break;
+        case RDN:
+            round = FE_DOWNWARD;
+            break;
+        case RUP:
+            round = FE_UPWARD;
+            break;
+        case RTZ:
+            round = FE_TOWARDZERO;
+            break;
+        case DYN:
+            //restore last dyn
+        default:
+            critical_not_yet_implemented("setFpRound: unsupported rounding mode");
+    }
+    FeReg temp = invalidateOldest(r_info);
+    err |= fe_enc64(&current, FE_STMXCSRm, MXCSR_SAVE); //load control register
+    err |= fe_enc64(&current, FE_MOV32rm, temp, MXCSR_SAVE);
+    err |= fe_enc64(&current, FE_AND16mi, MXCSR_SAVE, (int16_t) ~0x9fff); //clear all but round bits
+    err |= fe_enc64(&current, FE_AND16ri, temp, (int16_t) 0x9fff); //clear round bits
+    err |= fe_enc64(&current, FE_OR16ri, temp, (round << SSE_ROUND_SHIFT)); //set new round mode
+    err |= fe_enc64(&current, FE_MOV32mr, MXCSR_SCRATCH, temp);
+    err |= fe_enc64(&current, FE_LDMXCSRm, MXCSR_SCRATCH);//store control register
+}
+
+static inline void restoreFpRound(register_info *r_info) {
+    FeReg temp = invalidateOldest(r_info);
+    err |= fe_enc64(&current, FE_STMXCSRm, MXCSR_SCRATCH); //load control register
+    err |= fe_enc64(&current, FE_MOV32rm, temp, MXCSR_SCRATCH);
+    err |= fe_enc64(&current, FE_AND16ri, temp, (int16_t) 0x9fff); //clear round bits
+    err |= fe_enc64(&current, FE_OR16mr, MXCSR_SAVE, temp);
+    err |= fe_enc64(&current, FE_LDMXCSRm, MXCSR_SAVE);//store control register
+}
+
+
 #ifdef __cplusplus
 }
 #endif
