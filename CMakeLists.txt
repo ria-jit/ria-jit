@@ -99,7 +99,7 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/patterns.h src/gen/instr/patterns.c
         ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
         src/env/flags.c src/env/flags.h
-        src/env/exit.c src/env/exit.h)
+        src/env/exit.c src/env/exit.h src/runtime/manualCSRR.c src/runtime/manualCSRR.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
@@ -124,7 +124,7 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/float_tests/test_float_fp_to_gp.cpp
         test/unit_tests/float_double_tests/test_float_to_double.cpp
         test/unit_tests/float_double_tests/test_double_to_float.cpp
-        test/unit_tests/test_parser_param.cpp)
+        test/unit_tests/test_parser_param.cpp src/runtime/manualCSRR.c src/runtime/manualCSRR.h)
 
 #include the googletest testing framework
 add_subdirectory(lib/googletest-master)

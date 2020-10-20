@@ -579,35 +579,57 @@ static inline void loadScratchReg(FeReg scratch) {
     err |= fe_enc64(&current, FE_MOV64rm, scratch, SWAP_SCRATCH);
 }
 
-#define SSE_ROUND_MASK  (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
-#define SSE_ROUND_SHIFT 3
-#define MXCSR_SCRATCH FE_MEM_ADDR((intptr_t) get_fctrl_file() + 8 * 1)
-#define MXCSR_SAVE FE_MEM_ADDR((intptr_t) get_fctrl_file())
 #define FE_TONEAREST    0
 #define FE_DOWNWARD    0x400
 #define FE_UPWARD    0x800
 #define FE_TOWARDZERO    0xc00
 
-static inline void saveAndSetRound(register_info *r_info, int round) {
-    //convert to SSE_ROUND mode
+#define SSE_ROUND_MASK  (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
+#define RISCV_ROUND_MASK 0xe0 //should evaluate to 0b1110 0000
+#define SSE_ROUND_SHIFT 3
+#define SSE_FLAGS_MASK 0x3d
+
+#define MXCSR_SCRATCH FE_MEM_ADDR((intptr_t) get_fctrl_file() + 8 * 1)
+#define MXCSR_SAVE FE_MEM_ADDR((intptr_t) get_fctrl_file())
+
+
+static inline uint32_t to_SSE_RoundMode(uint32_t round){
     switch (round) {
         case RNE:
-            round = FE_TONEAREST;
-            break;
+            return FE_TONEAREST;
         case RDN:
-            round = FE_DOWNWARD;
-            break;
+            return FE_DOWNWARD;
         case RUP:
-            round = FE_UPWARD;
-            break;
+            return FE_UPWARD;
         case RTZ:
-            round = FE_TOWARDZERO;
-            break;
+            return FE_TOWARDZERO;
         case DYN:
-            //restore last dyn
+            critical_not_yet_implemented("to_SSE_RoundMode: should never be called with DYN ");
         default:
-            critical_not_yet_implemented("setFpRound: unsupported rounding mode");
+            critical_not_yet_implemented("to_SSE_RoundMode: unsupported rounding mode");
     }
+    return -1;
+}
+
+static inline uint32_t to_RISCV_RoundMode(uint32_t round){
+    switch (round) {
+        case FE_TONEAREST:
+            return RNE;
+        case FE_DOWNWARD:
+            return RDN;
+        case FE_UPWARD:
+            return RUP;
+        case FE_TOWARDZERO:
+            return RTZ;
+        default:
+            critical_not_yet_implemented("to_RISCV_RoundMode: unsupported rounding mode");
+            return -1;
+    }
+}
+
+static inline void saveAndSetRound(const register_info *r_info, int round) {
+    //convert to SSE_ROUND mode
+    round = to_SSE_RoundMode(round);
     FeReg temp = invalidateOldest(r_info);
     err |= fe_enc64(&current, FE_STMXCSRm, MXCSR_SAVE); //load control register
     err |= fe_enc64(&current, FE_MOV32rm, temp, MXCSR_SAVE);
@@ -618,7 +640,7 @@ static inline void saveAndSetRound(register_info *r_info, int round) {
     err |= fe_enc64(&current, FE_LDMXCSRm, MXCSR_SCRATCH);//store control register
 }
 
-static inline void restoreFpRound(register_info *r_info) {
+static inline void restoreFpRound(const register_info *r_info) {
     FeReg temp = invalidateOldest(r_info);
     err |= fe_enc64(&current, FE_STMXCSRm, MXCSR_SCRATCH); //load control register
     err |= fe_enc64(&current, FE_MOV32rm, temp, MXCSR_SCRATCH);

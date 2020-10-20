@@ -85,6 +85,7 @@ typedef enum {
     CSRRWI,
     CSRRSI,
     CSRRCI,
+    MANUAL_CSRR,
 
     //---RV64I---
     //load & store
@@ -301,14 +302,28 @@ typedef enum {
     DYN = 7  //In instruction's rm field, selects dynamic rounding mode; In Rounding Mode register, Invalid.
 } t_risc_rm;
 
+#define FE_COUNT_RISCV 5
+
 typedef enum {
-    NV = 4, //Invalid Operation
-    DZ = 3, //Divide by Zero
-    OF = 2, //Overflow
-    UF = 1, //Underflow
-    NX = 0 //Inexact
+    rv_NV = 0x10, //Invalid Operation
+    rv_DZ = 0x8, //Divide by Zero
+    rv_OF = 0x4, //Overflow
+    rv_UF = 0x2, //Underflow
+    rv_NX = 0x1 //Inexact
 } t_risc_f_exp;
 
+typedef enum {
+    SSE_NX = 0x20, // Precision Flag
+    SSE_UF = 0x10, // Underflow Flag
+    SSE_OF = 0x8, // Overflow Flag
+    SSE_DZ = 0x4, // Divide by Zero Flag
+    SSE_DEN = 0x2, // Denormal Flag
+    SSE_NV = 0x1, // Invalid Operation Flag
+
+} t_SSEfflags;
+
+#define FFLAGS 0x001
+#define FRM 0x002
 #define FCSR 0x003
 
 /**

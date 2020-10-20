@@ -41,6 +41,10 @@ char *mnem_to_string(int mnem) {
     switch (mnem) {
         case PATTERN_EMIT:
             return "PATTERN";
+        case PC_NEXT_INST:
+            return "PC_NEXT_INST";
+        case MANUAL_CSRR:
+            return "MANUAL_CSRR";
         case LUI:
             return "LUI";
         case AUIPC:

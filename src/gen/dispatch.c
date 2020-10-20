@@ -234,6 +234,9 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
         case ECALL:
             translate_ECALL(instr, r_info, c_info);
             break;
+        case MANUAL_CSRR:
+            translate_MANUAL_CSRR(instr, r_info, c_info);
+            break;
         case EBREAK:
             translate_EBREAK(instr, r_info);
             break;
