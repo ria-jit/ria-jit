@@ -86,8 +86,8 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, wh
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
 % ================================
-\pgfplotstableread[col sep=comma]{native.csv}\nativetable
-\pgfplotstableread[col sep=comma]{dbt.csv}\dbttable
+\pgfplotstableread[col sep=comma]{benchmarks/spec/native.csv}\nativetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec/dbt.csv}\dbttable
 \pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
 
@@ -135,14 +135,14 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, wh
 		}
 		]
 			% Native results
-			\pgfplotstableread[col sep=comma]{native.csv}\nativelocaltable
+			\pgfplotstableread[col sep=comma]{benchmarks/spec/native.csv}\nativelocaltable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
 			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\nativelocalsortedtable{\nativelocaltable}
 			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocalsortedtable;
 
 			% QEMU results
-			\pgfplotstableread[col sep=comma]{qemu.csv}\qemutable
+			\pgfplotstableread[col sep=comma]{benchmarks/spec/qemu.csv}\qemutable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
 			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\qemusortedtable{\qemutable}
