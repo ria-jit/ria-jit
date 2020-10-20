@@ -118,6 +118,7 @@ static inline FeReg invalidateOldest(const register_info *r_info) {
 
     //if the oldest replacement contains a RISC-V register, invalidate that before returning
     FeReg oldest = getRegForIndex(min);
+    log_context("Selected %s as oldest or free replacement register...\n", reg_x86_to_string(oldest));
     if (r_info->replacement_recency[min] != 0 && r_info->replacement_content[min] != INVALID_REG) {
         invalidateReplacement(r_info, oldest, true);
     }
