@@ -16,6 +16,7 @@ extern "C" {
 typedef void *t_cache_loc;
 
 extern volatile uint8_t *chain_end;
+extern volatile uint32_t chain_type;
 
 //cache entries for translated code segments
 typedef struct {

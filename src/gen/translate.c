@@ -82,6 +82,7 @@ t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info) {
     ///write chainEnd to be chained by chainer
     if (flag_translate_opt_chain && chainLinkOp == LINK_NULL) {
         err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
+        //no need to set chain_type here
     }
 
     //emit the ret instruction as the final instruction in the block
@@ -516,7 +517,7 @@ void chain(t_cache_loc target) {
     int chain_err = 0;
     if (chain_end != NULL) {
         log_general("chaining: ...\n");
-        chain_err |= fe_enc64((uint8_t **) &chain_end, FE_JMP, (intptr_t) target);
+        chain_err |= fe_enc64((uint8_t **) &chain_end, chain_type|FE_JMPL, (intptr_t) target);
         ///Reset chain_end
         chain_end = NULL;
     }

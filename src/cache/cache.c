@@ -32,6 +32,7 @@
 
 ///position where direct jump to next block can be inserted
 volatile uint8_t *chain_end = NULL;
+volatile uint32_t chain_type = 0;
 
 //cache table
 t_cache_entry *cache_table = NULL;
