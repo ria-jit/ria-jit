@@ -43,9 +43,9 @@ protected:
     bool rs2Mapped{};
     bool rdMapped{};
 
-    t_risc_reg rs1 = x0;
-    t_risc_reg rs2 = x0;
-    t_risc_reg rd = x0;
+    t_risc_reg rs1 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rs2 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rd = static_cast<t_risc_reg>(fInvalid);
 
     t_risc_instr blockCache[1]{};
     static context_info *c_info;
@@ -72,17 +72,16 @@ public:
 protected:
 
     void SetUp() override {
-        for (int i = 1; i < N_REG; ++i) {
+        for (int i = 0; i < N_FP_REG; ++i) {
             bool curMap = r_info->fp_mapped[i];
-            if (rs1 == x0 && curMap == rs1Mapped) {
+            if (rs1 == fInvalid && curMap == rs1Mapped) {
                 rs1 = static_cast<t_risc_reg>(i);
-            } else if (rs2 == x0 && curMap == rs2Mapped) {
+            } else if (rs2 == fInvalid && curMap == rs2Mapped) {
                 rs2 = static_cast<t_risc_reg>(i);
-            } else if (rd == x0 && curMap == rdMapped) {
+            } else if (rd == fInvalid && curMap == rdMapped) {
                 rd = static_cast<t_risc_reg>(i);
             }
         }
-
     }
 };
 
@@ -178,9 +177,9 @@ INSTANTIATE_TEST_SUITE_P(FADDS,
                                  testing::Values([](float rs1, float rs2) {
                                      return rs1 + rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FSUBS,
                          ArithmFloatTest,
@@ -191,9 +190,9 @@ INSTANTIATE_TEST_SUITE_P(FSUBS,
                                  testing::Values([](float rs1, float rs2) {
                                      return rs1 - rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FMULS,
                          ArithmFloatTest,
@@ -204,9 +203,9 @@ INSTANTIATE_TEST_SUITE_P(FMULS,
                                  testing::Values([](float rs1, float rs2) {
                                      return rs1 * rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FDIVS,
                          ArithmFloatTest,
@@ -217,9 +216,9 @@ INSTANTIATE_TEST_SUITE_P(FDIVS,
                                  testing::Values([](float rs1, float rs2) {
                                      return rs1 / rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FSQRTS,
                          ArithmFloatTest,
@@ -230,9 +229,9 @@ INSTANTIATE_TEST_SUITE_P(FSQRTS,
                                  testing::Values([](float rs1, float rs2 attr_unused) {
                                      return sqrt(rs1);
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 
 INSTANTIATE_TEST_SUITE_P(FSGNJS,
@@ -248,9 +247,9 @@ INSTANTIATE_TEST_SUITE_P(FSGNJS,
                                      }
                                      return rs1;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 
 INSTANTIATE_TEST_SUITE_P(FSGNJNS,
@@ -266,9 +265,9 @@ INSTANTIATE_TEST_SUITE_P(FSGNJNS,
                                      }
                                      return rs1;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FSGNJXS,
                          ArithmFloatTest,
@@ -283,9 +282,9 @@ INSTANTIATE_TEST_SUITE_P(FSGNJXS,
                                      }
                                      return rs1;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FMINS,
                          ArithmFloatTest,
@@ -297,9 +296,9 @@ INSTANTIATE_TEST_SUITE_P(FMINS,
                                      //return smaller
                                      return rs1 < rs2 ? rs1 : rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FMAXS,
                          ArithmFloatTest,
@@ -311,9 +310,9 @@ INSTANTIATE_TEST_SUITE_P(FMAXS,
                                      //return bigger
                                      return rs1 > rs2 ? rs1 : rs2;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 
 #pragma ide diagonstics pop

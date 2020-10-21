@@ -37,8 +37,9 @@ protected:
     bool rs1Mapped{};
     bool rdMapped{};
 
-    t_risc_reg rs1 = x0;
-    t_risc_reg rd = x0;
+
+    t_risc_reg rs1 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rd = static_cast<t_risc_reg>(fInvalid);
 
     t_risc_instr blockCache[1]{};
     static context_info *c_info;
@@ -64,16 +65,16 @@ public:
 
 protected:
 
+
     void SetUp() override {
-        for (int i = 1; i < N_REG; ++i) {
+        for (int i = 0; i < N_FP_REG; ++i) {
             bool curMap = r_info->fp_mapped[i];
-            if (rs1 == x0 && curMap == rs1Mapped) {
+            if (rs1 == fInvalid && curMap == rs1Mapped) {
                 rs1 = static_cast<t_risc_reg>(i);
-            } else if (rd == x0 && curMap == rdMapped) {
+            } else if (rd == fInvalid && curMap == rdMapped) {
                 rd = static_cast<t_risc_reg>(i);
             }
         }
-
     }
 };
 
@@ -101,6 +102,19 @@ TEST_P(DoubleToFloatTest, AllDifferent) {
     EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
 }
 
+TEST_P(DoubleToFloatTest, BothSame) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
+    blockCache[0].rounding_mode = RNE;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rs1).f);
+}
+
 INSTANTIATE_TEST_SUITE_P(FCVTSD,
                          DoubleToFloatTest,
                          testing::Combine(
@@ -109,8 +123,8 @@ INSTANTIATE_TEST_SUITE_P(FCVTSD,
                                  testing::Values([](double rs1) {
                                      return (float) rs1;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 #pragma ide diagonstics pop
 #pragma GCC diagnostic pop
