@@ -28,6 +28,13 @@ TEST_P(ParserTest, AllMnemonics) {
     parse_instruction(&parsed_instr);
 
     EXPECT_EQ(expect_mnem, parsed_instr.mnem);
+
+    //check for float optype for all instructions starting with F excluding FENCE and FENCE_I
+    //beware of new instructions starting with 'F'
+    char *name = mnem_to_string(parsed_instr.mnem);
+    if (*name == 'F' && !(strcmp(name, "FENCE") == 0 || strcmp(name, "FENCE_I") == 0)) {
+        EXPECT_TRUE(parsed_instr.optype == FLOAT);
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(LUI, ParserTest,
