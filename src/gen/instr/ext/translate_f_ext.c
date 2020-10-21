@@ -220,7 +220,7 @@ void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc3 = getFpReg(instr->reg_src_3, r_info, FIRST_FP_REG);
 
     //if src3 is not already in dest move it
-    if (regDest == regSrc3) {
+    if (regDest != regSrc3) {
         err |= fe_enc64(&current, FE_SSE_MOVSSrr, regDest, regSrc3);
         regSrc3 = FIRST_FP_REG;
     }

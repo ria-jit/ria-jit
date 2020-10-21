@@ -41,10 +41,10 @@ protected:
     bool rs3Mapped{};
     bool rdMapped{};
 
-    t_risc_reg rs1 = x0;
-    t_risc_reg rs2 = x0;
-    t_risc_reg rs3 = x0;
-    t_risc_reg rd = x0;
+    t_risc_reg rs1 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rs2 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rs3 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rd = static_cast<t_risc_reg>(fInvalid);
 
     t_risc_instr blockCache[1]{};
     static context_info *c_info;
@@ -71,19 +71,18 @@ public:
 protected:
 
     void SetUp() override {
-        for (int i = 1; i < N_REG; ++i) {
+        for (int i = 0; i < N_FP_REG; ++i) {
             bool curMap = r_info->fp_mapped[i];
-            if (rs1 == x0 && curMap == rs1Mapped) {
+            if (rs1 == fInvalid && curMap == rs1Mapped) {
                 rs1 = static_cast<t_risc_reg>(i);
-            } else if (rs2 == x0 && curMap == rs2Mapped) {
+            } else if (rs2 == fInvalid && curMap == rs2Mapped) {
                 rs2 = static_cast<t_risc_reg>(i);
-            } else if (rs3 == x0 && curMap == rs3Mapped) {
+            } else if (rs3 == fInvalid && curMap == rs3Mapped) {
                 rs3 = static_cast<t_risc_reg>(i);
-            } else if (rd == x0 && curMap == rdMapped) {
+            } else if (rd == fInvalid && curMap == rdMapped) {
                 rd = static_cast<t_risc_reg>(i);
             }
         }
-
     }
 };
 
@@ -114,6 +113,42 @@ TEST_P(FusedArithmDoubleTest, AllDifferent) {
     EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).d);
     EXPECT_EQ(rs3StartValue, get_fpvalue(rs3).d);
     EXPECT_EQ(expectedRd, get_fpvalue(rd).d);
+}
+
+TEST_P(FusedArithmDoubleTest, Rs1Rs2Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+    set_fpvalue(rs3, get_dVal(rs3StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs3StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).d);
+    EXPECT_EQ(rs3StartValue, get_fpvalue(rs3).d);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).d);
+}
+
+TEST_P(FusedArithmDoubleTest, Rs1Rs2Rs3Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].reg_src_3 = rs1;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs1StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).d);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).d);
 }
 
 TEST_P(FusedArithmDoubleTest, Rs1RdSame) {
@@ -152,6 +187,40 @@ TEST_P(FusedArithmDoubleTest, Rs2RdSame) {
     EXPECT_EQ(expectedRd, get_fpvalue(rs2).d);
 }
 
+TEST_P(FusedArithmDoubleTest, Rs3RdSame) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs3, 0};
+    blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+    set_fpvalue(rs2, get_dVal(rs2StartValue));
+    set_fpvalue(rs3, get_dVal(rs3StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).d);
+    EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).d);
+    EXPECT_EQ(expectedRd, get_fpvalue(rs3).d);
+}
+
+TEST_P(FusedArithmDoubleTest, AllSame) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
+    blockCache[0].reg_src_3 = rs1;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_dVal(rs1StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs1StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rs1).d);
+}
+
 INSTANTIATE_TEST_SUITE_P(FMADDD,
                          FusedArithmDoubleTest,
                          testing::Combine(
@@ -162,10 +231,10 @@ INSTANTIATE_TEST_SUITE_P(FMADDD,
                                  testing::Values([](double rs1, double rs2, double rs3) {
                                      return rs1 * rs2 + rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FNMADDD,
                          FusedArithmDoubleTest,
@@ -177,10 +246,10 @@ INSTANTIATE_TEST_SUITE_P(FNMADDD,
                                  testing::Values([](double rs1, double rs2, double rs3) {
                                      return -rs1 * rs2 - rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FMSUBD,
                          FusedArithmDoubleTest,
@@ -192,10 +261,10 @@ INSTANTIATE_TEST_SUITE_P(FMSUBD,
                                  testing::Values([](double rs1, double rs2, double rs3) {
                                      return rs1 * rs2 - rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FNMSUBD,
                          FusedArithmDoubleTest,
@@ -207,10 +276,10 @@ INSTANTIATE_TEST_SUITE_P(FNMSUBD,
                                  testing::Values([](double rs1, double rs2, double rs3) {
                                      return -rs1 * rs2 + rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 #pragma ide diagonstics pop
 #pragma GCC diagnostic pop

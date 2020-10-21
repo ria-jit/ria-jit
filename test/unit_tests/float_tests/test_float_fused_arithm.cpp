@@ -39,10 +39,10 @@ protected:
     bool rs3Mapped{};
     bool rdMapped{};
 
-    t_risc_reg rs1 = x0;
-    t_risc_reg rs2 = x0;
-    t_risc_reg rs3 = x0;
-    t_risc_reg rd = x0;
+    t_risc_reg rs1 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rs2 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rs3 = static_cast<t_risc_reg>(fInvalid);
+    t_risc_reg rd = static_cast<t_risc_reg>(fInvalid);
 
     t_risc_instr blockCache[1]{};
     static context_info *c_info;
@@ -69,19 +69,18 @@ public:
 protected:
 
     void SetUp() override {
-        for (int i = 1; i < N_REG; ++i) {
+        for (int i = 0; i < N_FP_REG; ++i) {
             bool curMap = r_info->fp_mapped[i];
-            if (rs1 == x0 && curMap == rs1Mapped) {
+            if (rs1 == fInvalid && curMap == rs1Mapped) {
                 rs1 = static_cast<t_risc_reg>(i);
-            } else if (rs2 == x0 && curMap == rs2Mapped) {
+            } else if (rs2 == fInvalid && curMap == rs2Mapped) {
                 rs2 = static_cast<t_risc_reg>(i);
-            } else if (rs3 == x0 && curMap == rs3Mapped) {
+            } else if (rs3 == fInvalid && curMap == rs3Mapped) {
                 rs3 = static_cast<t_risc_reg>(i);
-            } else if (rd == x0 && curMap == rdMapped) {
+            } else if (rd == fInvalid && curMap == rdMapped) {
                 rd = static_cast<t_risc_reg>(i);
             }
         }
-
     }
 };
 
@@ -160,10 +159,10 @@ INSTANTIATE_TEST_SUITE_P(FMADDS,
                                  testing::Values([](float rs1, float rs2, float rs3) {
                                      return rs1 * rs2 + rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FNMADDS,
                          FusedArithmFloatTest,
@@ -175,10 +174,10 @@ INSTANTIATE_TEST_SUITE_P(FNMADDS,
                                  testing::Values([](float rs1, float rs2, float rs3) {
                                      return -rs1 * rs2 - rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FMSUBS,
                          FusedArithmFloatTest,
@@ -190,10 +189,10 @@ INSTANTIATE_TEST_SUITE_P(FMSUBS,
                                  testing::Values([](float rs1, float rs2, float rs3) {
                                      return rs1 * rs2 - rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 INSTANTIATE_TEST_SUITE_P(FNMSUBS,
                          FusedArithmFloatTest,
@@ -205,10 +204,10 @@ INSTANTIATE_TEST_SUITE_P(FNMSUBS,
                                  testing::Values([](float rs1, float rs2, float rs3) {
                                      return -rs1 * rs2 + rs3;
                                  }),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false),
-                                 testing::Values(false)));
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool(),
+                                 testing::Bool()));
 
 #pragma ide diagonstics pop
 #pragma GCC diagnostic pop
