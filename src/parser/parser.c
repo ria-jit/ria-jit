@@ -475,8 +475,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
             p_instr_struct->rounding_mode = extract_funct3(raw_instr);
             if(p_instr_struct->rounding_mode == RMM) {
-                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx",
+                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
                                              p_instr_struct->addr);
+                p_instr_struct->rounding_mode = RNE;
             }
             switch (extract_funct2(raw_instr)) {
                 case 0:
@@ -495,8 +496,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
             p_instr_struct->rounding_mode = extract_funct3(raw_instr);
             if(p_instr_struct->rounding_mode == RMM) {
-                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx",
+                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
                                              p_instr_struct->addr);
+                p_instr_struct->rounding_mode = RNE;
             }
             switch (extract_funct2(raw_instr)) {
                 case 0:
@@ -515,8 +517,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
             p_instr_struct->rounding_mode = extract_funct3(raw_instr);
             if(p_instr_struct->rounding_mode == RMM) {
-                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx",
+                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
                                              p_instr_struct->addr);
+                p_instr_struct->rounding_mode = RNE;
             }
             switch (extract_funct2(raw_instr)) {
                 case 0:
@@ -535,8 +538,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
             p_instr_struct->rounding_mode = extract_funct3(raw_instr);
             if(p_instr_struct->rounding_mode == RMM) {
-                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx",
+                critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
                                              p_instr_struct->addr);
+                p_instr_struct->rounding_mode = RNE;
             }
             switch (extract_funct2(raw_instr)) {
                 case 0:
@@ -564,8 +568,9 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             if ((funct7 & 0x0010000) == 0) {
                 p_instr_struct->rounding_mode = funct3;
                 if(p_instr_struct->rounding_mode == RMM) {
-                    critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx",
+                    critical_not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
                                                  p_instr_struct->addr);
+                    p_instr_struct->rounding_mode = RNE;
                 }
             }
 
