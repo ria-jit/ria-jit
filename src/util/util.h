@@ -606,10 +606,11 @@ static inline uint32_t to_SSE_RoundMode(uint32_t round){
             return FE_TOWARDZERO;
         case DYN:
             critical_not_yet_implemented("to_SSE_RoundMode: should never be called with DYN ");
+            break;
         default:
             critical_not_yet_implemented("to_SSE_RoundMode: unsupported rounding mode");
     }
-    return -1;
+    return RNE; //default to standard RNE
 }
 
 static inline uint32_t to_RISCV_RoundMode(uint32_t round){

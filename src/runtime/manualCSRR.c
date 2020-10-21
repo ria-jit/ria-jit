@@ -29,7 +29,7 @@ static inline uint32_t to_SSE_flags(uint32_t flags) {
 
 __attribute__((force_align_arg_pointer))
 void manualCSRR(t_risc_reg_val *registerValues, t_risc_imm imm, t_risc_reg src_1, t_risc_mnem mnem, t_risc_reg dest) {
-    uint32_t csr;
+    uint32_t csr = 0;
     uint32_t mxcsr = _mm_getcsr();
     //load csr
     switch (imm) {

@@ -111,3 +111,6 @@ INSTANTIATE_TEST_SUITE_P(FCVTSD,
                                  }),
                                  testing::Values(false),
                                  testing::Values(false)));
+
+#pragma ide diagonstics pop
+#pragma GCC diagnostic pop

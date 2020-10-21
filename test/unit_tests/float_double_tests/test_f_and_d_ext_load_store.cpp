@@ -58,11 +58,11 @@ TEST(DoubleExtension, LoadStore) {
     t_risc_instr blockCache[test_size*2]{};
     for(int i = 0;i<test_size;i++) {
         blockCache[i] =
-                t_risc_instr{0, FLD, static_cast<t_risc_optype>(0), src_base, src_base, static_cast<t_risc_reg>(rd + i), static_cast<t_risc_imm>(i*sizeof(double))};
+                t_risc_instr{0, FLD, static_cast<t_risc_optype>(0), src_base, src_base, static_cast<t_risc_reg>(rd + i), {{static_cast<t_risc_imm>(i*sizeof(double))}}};
     }
     for(int i = 0;i<test_size;i++) {
         blockCache[30+i] =
-                t_risc_instr{0, FSD, static_cast<t_risc_optype>(0), dest_base,static_cast<t_risc_reg>(i + 1), rd, static_cast<t_risc_imm>(i*sizeof(double))};
+                t_risc_instr{0, FSD, static_cast<t_risc_optype>(0), dest_base,static_cast<t_risc_reg>(i + 1), rd, {{static_cast<t_risc_imm>(i*sizeof(double))}}};
     }
 
     static const context_info *c_info = init_map_context();
@@ -83,7 +83,7 @@ TEST(DoubleExtension, LoadStore) {
 
     EXPECT_EQ(src_base_address, get_value(src_base));
     EXPECT_EQ(dest_base_address, get_value(dest_base));
-    for(int i = 0;i<30;i++){
+    for(int i = 0;i<30;i++) {
         EXPECT_EQ(test_source[i], test_destination[i]);
     }
 }
