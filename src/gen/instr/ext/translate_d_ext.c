@@ -614,9 +614,7 @@ void translate_FMAXD(const t_risc_instr *instr, const register_info *r_info) {
  */
 void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate FCVTDS...\n");
-    if (instr->rounding_mode != DYN) {
-        saveAndSetRound(r_info, instr->rounding_mode);
-    }
+    //convert DS will never round
 
     FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getFpRegNoLoad((t_risc_fp_reg) instr->reg_dest, r_info, FIRST_FP_REG);
@@ -624,9 +622,6 @@ void translate_FCVTDS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_SSE_CVTSS2SDrr, regDest, regSrc1);
 
     setFpReg((t_risc_fp_reg) instr->reg_dest, r_info, regDest);
-    if (instr->rounding_mode != DYN) {
-        restoreFpRound(r_info);
-    }
 }
 
 /**
