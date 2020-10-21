@@ -227,6 +227,8 @@ context_info *init_map_context(void) {
 
     r_info->gp_map = gp_map;
     r_info->gp_mapped = gp_mapped;
+    r_info->fp_map = fp_map;
+    r_info->fp_mapped = fp_mapped;
     r_info->base = (uint64_t) get_gp_reg_file();
     r_info->csr_base = (uint64_t) get_csr_reg_file();
     r_info->replacement_content = replacement_content;
