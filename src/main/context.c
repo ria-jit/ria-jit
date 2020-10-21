@@ -24,11 +24,11 @@ context_info *init_map_context(void) {
      * Allocation for general purpose register mapping.
      */
     FeReg *gp_map = mmap(NULL,
-                               N_REG * sizeof(FeReg),
-                               PROT_READ | PROT_WRITE,
-                               MAP_ANONYMOUS | MAP_PRIVATE,
-                               -1,
-                               0);
+                         N_REG * sizeof(FeReg),
+                         PROT_READ | PROT_WRITE,
+                         MAP_ANONYMOUS | MAP_PRIVATE,
+                         -1,
+                         0);
 
     if (BAD_ADDR(gp_map)) {
         dprintf(2, "Failed to allocate gp_map for context. Error %li", -(intptr_t) gp_map);
@@ -36,11 +36,11 @@ context_info *init_map_context(void) {
     }
 
     bool *gp_mapped = mmap(NULL,
-                        N_REG * sizeof(bool),
-                        PROT_READ | PROT_WRITE,
-                        MAP_ANONYMOUS | MAP_PRIVATE,
-                        -1,
-                        0);
+                           N_REG * sizeof(bool),
+                           PROT_READ | PROT_WRITE,
+                           MAP_ANONYMOUS | MAP_PRIVATE,
+                           -1,
+                           0);
 
     if (BAD_ADDR(gp_mapped)) {
         dprintf(2, "Failed to allocate gp_mapped for context. Error %li", -(intptr_t) gp_mapped);
@@ -157,10 +157,10 @@ context_info *init_map_context(void) {
      * Of which are callee-saved: BX, BP, R12, R13, R14, R15
      */
 #define map_gp_reg(reg_risc, reg_x86)          \
-    {                                       \
-        gp_map[reg_risc] = reg_x86;   \
+    {                                          \
+        gp_map[reg_risc] = reg_x86;            \
         gp_mapped[reg_risc] = true;            \
-    }                                       \
+    }
 
     /**
      * We capture approximately 85 % of the register hits when we map the following registers:
@@ -194,7 +194,30 @@ context_info *init_map_context(void) {
     {                                       \
         fp_map[reg_risc] = reg_x86;   \
         fp_mapped[reg_risc] = true;            \
-    }                                       \
+    }                                          \
+
+    /**
+     * We capture approximately 85 % of the register hits when we map the following registers:
+     * (by order of access frequency)
+     * f15, f14, f9, f13, f12, f10, f11, f1, f0, f3,  f2, f31, f20, f24
+     *                             into
+     * XMM2 - XMM15
+     */
+    //can't map FE_XMM0 and FE_XMM1 as they are used as replacement
+    map_fp_reg(f15, FE_XMM2)
+    map_fp_reg(f14, FE_XMM3)
+    map_fp_reg(f9, FE_XMM4)
+    map_fp_reg(f13, FE_XMM5)
+    map_fp_reg(f12, FE_XMM6)
+    map_fp_reg(f10, FE_XMM7)
+    map_fp_reg(f11, FE_XMM8)
+    map_fp_reg(f1, FE_XMM9)
+    map_fp_reg(f0, FE_XMM10)
+    map_fp_reg(f3, FE_XMM11)
+    map_fp_reg(f2, FE_XMM12)
+    map_fp_reg(f31, FE_XMM13)
+    map_fp_reg(f20, FE_XMM14)
+    map_fp_reg(f24, FE_XMM15)
 
 #undef map_fp_reg
 
@@ -247,7 +270,7 @@ context_info *init_map_context(void) {
         log_general("Generating context storing block...\n");
 
         //check floatRegsLoaded
-        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded),0); //zero if not loaded
+        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
 
         uint8_t *jmpBuf = current;
         fe_enc64(&current, FE_JZ, (intptr_t) current);
@@ -255,7 +278,7 @@ context_info *init_map_context(void) {
         //save by register mapping fp
         for (int i = f0; i <= f31; ++i) {
             if (r_info->fp_mapped[i]) {
-                err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * i),r_info->fp_map[i]);
+                err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * i), r_info->fp_map[i]);
             }
         }
 

@@ -64,7 +64,7 @@ protected:
 
     void SetUp() override {
         for (int i = 1; i < N_REG; ++i) {
-            bool curMap = r_info->gp_mapped[i];
+            bool curMap = r_info->fp_mapped[i];
             if (rs1 == x0 && curMap == rs1Mapped) {
                 rs1 = static_cast<t_risc_reg>(i);
             } else if (rd == x0 && curMap == rdMapped) {

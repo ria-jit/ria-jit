@@ -86,7 +86,7 @@ void init_block(register_info *r_info) {
         }
 
         //set flag
-        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1); //zero if not loaded
+        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1);
 
         //write jump
         fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
