@@ -29,9 +29,4 @@ extern bool flag_do_analyze_reg;
 extern bool flag_do_analyze_pattern;
 extern bool flag_do_profile;
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <util/typedefs.h>
-
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_FLAGS_H

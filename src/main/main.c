@@ -10,12 +10,13 @@
 #include <gen/translate.h>
 #include <runtime/register.h>
 #include <elf/loadElf.h>
-#include <util/tools/analyze.h>
-#include <env/opt.h>
 #include <util/tools/perf.h>
 #include <main/context.h>
 #include <cache/return_stack.h>
 #include <env/flags.h>
+#include <env/opt.h>
+#include <util/tools/analyze.h>
+#include <util/tools/profile.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;
@@ -73,7 +74,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     init_return_stack();
 
     setupInstrMem();
-    context_info *c_info = init_map_context();
+    context_info *c_info = init_map_context(result.floatBinary);
 
     set_value(pc, next_pc);
 

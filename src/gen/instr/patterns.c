@@ -225,13 +225,13 @@ void emit_pattern_4(const t_risc_instr instrs[static 2], const register_info *r_
     //invalidateAllReplacements(r_info);
 
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
-    if (r_info->mapped[instrs[1].reg_dest]) {
+    if (r_info->gp_mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
-            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instrs[1].reg_dest], FE_MEM(0, 0, 0, addr));
+            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->gp_map[instrs[1].reg_dest], FE_MEM(0, 0, 0, addr));
         } else {
             invalidateReplacement(r_info, FE_AX, true);
             err |= fe_enc64(&current, FE_MOV64ri, FE_AX, addr);
-            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
+            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->gp_map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
         }
     } else {
 
@@ -268,13 +268,13 @@ void emit_pattern_5(const t_risc_instr instrs[static 2], const register_info *r_
     //invalidateAllReplacements(r_info);
 
     t_risc_addr addr = instrs[0].addr + instrs[0].imm + instrs[1].imm;
-    if (r_info->mapped[instrs[1].reg_dest]) {
+    if (r_info->gp_mapped[instrs[1].reg_dest]) {
         if ((int64_t) addr == (int32_t) addr) {
-            err |= fe_enc64(&current, FE_MOV64rm, r_info->map[instrs[1].reg_dest], FE_MEM(0, 0, 0, addr));
+            err |= fe_enc64(&current, FE_MOV64rm, r_info->gp_map[instrs[1].reg_dest], FE_MEM(0, 0, 0, addr));
         } else {
             invalidateReplacement(r_info, FE_AX, true);
             err |= fe_enc64(&current, FE_MOV64ri, FE_AX, addr);
-            err |= fe_enc64(&current, FE_MOV64rm, r_info->map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
+            err |= fe_enc64(&current, FE_MOV64rm, r_info->gp_map[instrs[1].reg_dest], FE_MEM(FE_AX, 0, 0, 0));
         }
     } else {
         FeReg regDest = getRd(&instrs[1], r_info);
@@ -308,13 +308,13 @@ void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_
     log_asm_out("emit pattern 6: SLLI +  SRLI at 0x%lx\n", instrs[0].addr);
     //invalidateAllReplacements(r_info);
 
-    if (r_info->mapped[instrs[0].reg_src_1]) {
-        if (r_info->mapped[instrs[1].reg_dest]) {
+    if (r_info->gp_mapped[instrs[0].reg_src_1]) {
+        if (r_info->gp_mapped[instrs[1].reg_dest]) {
             //sets high 32 to zero
-            err |= fe_enc64(&current, FE_MOV32rr, r_info->map[instrs[1].reg_dest], r_info->map[instrs[0].reg_src_1]);
+            err |= fe_enc64(&current, FE_MOV32rr, r_info->gp_map[instrs[1].reg_dest], r_info->gp_map[instrs[0].reg_src_1]);
         } else {
             FeReg reg_dest = getRd(&instrs[1], r_info);
-            err |= fe_enc64(&current, FE_MOV32rr, reg_dest, r_info->map[instrs[0].reg_src_1]);
+            err |= fe_enc64(&current, FE_MOV32rr, reg_dest, r_info->gp_map[instrs[0].reg_src_1]);
 
             /*
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instrs[1].reg_dest), 0);
@@ -323,9 +323,9 @@ void emit_pattern_6(const t_risc_instr instrs[static 2], const register_info *r_
                             r_info->map[instrs[0].reg_src_1]);
             */
         }
-    } else if (r_info->mapped[instrs[1].reg_dest]) {
+    } else if (r_info->gp_mapped[instrs[1].reg_dest]) {
         FeReg reg_src1 = getRs1(&instrs[0], r_info);
-        err |= fe_enc64(&current, FE_MOV32rr, r_info->map[instrs[1].reg_dest], reg_src1);
+        err |= fe_enc64(&current, FE_MOV32rr, r_info->gp_map[instrs[1].reg_dest], reg_src1);
 
         /*
         err |= fe_enc64(&current, FE_MOV32rm, r_info->map[instrs[1].reg_dest],
@@ -367,16 +367,16 @@ void emit_pattern_8_SEXTW(const t_risc_instr *instr, const register_info *r_info
     log_asm_out("emit pattern 8: ADDIW 32b sign extension at 0x%lx\n", instr[0].addr);
     invalidateAllReplacements(r_info);
 
-    if (r_info->mapped[instr->reg_src_1]) {
-        if (r_info->mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOVSXr64r32, r_info->map[instr->reg_dest], r_info->map[instr->reg_src_1]);
+    if (r_info->gp_mapped[instr->reg_src_1]) {
+        if (r_info->gp_mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOVSXr64r32, r_info->gp_map[instr->reg_dest], r_info->gp_map[instr->reg_src_1]);
         } else {
-            err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, r_info->map[instr->reg_src_1]);
+            err |= fe_enc64(&current, FE_MOVSXr64r32, FE_AX, r_info->gp_map[instr->reg_src_1]);
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), FE_AX);
         }
     } else {
-        if (r_info->mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->map[instr->reg_dest],
+        if (r_info->gp_mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOVSXr64m32, r_info->gp_map[instr->reg_dest],
                             FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
         } else {
             err |= fe_enc64(&current, FE_MOVSXr64m32, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));

@@ -17,15 +17,15 @@
 #include <elf/loadElf.h>
 #include <fadec/fadec.h>
 #include <env/exit.h>
+#include "runtime/register.h"
 
 void *currentPos = NULL;
-
-t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
 
 //instruction translation
 void translate_risc_instr(t_risc_instr *instr, const context_info *c_info);
 
-int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
+int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info,
+                bool *isFloatBlock);
 
 /**
  * The pointer to the head of the current basic block.
@@ -51,7 +51,7 @@ int err;
  * (e.g., before translating every basic block).
  * @param r_info the register mapping info for invalidating the replacements
  */
-void init_block(register_info *r_info) {
+void init_block(register_info *r_info, bool isFloatBlock) {
     if (currentPos == NULL) {
         setupInstrMem();
     }
@@ -67,6 +67,26 @@ void init_block(register_info *r_info) {
 
     //make sure all replacement registers are written back as a precaution
     invalidateAllReplacements(r_info);
+
+    /*if (isFloatBlock) {
+        //check floatRegsLoaded
+        err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        uint8_t *jmpBuf = current;
+        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);
+
+        //load by register mapping
+        for (int i = f0; i <= f31; ++i) {
+            if (r_info->fp_mapped[i]) {
+                err |= fe_enc64(&current, FE_SSE_MOVSDrm, r_info->fp_map[i], FE_MEM_ADDR(r_info->fp_base + 8 * i));
+            }
+        }
+
+        //set flag
+        err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1);
+
+        //write jump
+        err |= fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
+    }*/
 }
 
 /**
@@ -143,27 +163,27 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
-            reg_to_string(instr->reg_src_1),
-            reg_to_alias(instr->reg_src_1),
-            reg_to_string(instr->reg_src_2),
-            reg_to_alias(instr->reg_src_2),
-            reg_to_string(instr->reg_dest),
-            reg_to_alias(instr->reg_dest),
+            gp_to_string(instr->reg_src_1),
+            gp_to_alias(instr->reg_src_1),
+            gp_to_string(instr->reg_src_2),
+            gp_to_alias(instr->reg_src_2),
+            gp_to_string(instr->reg_dest),
+            gp_to_alias(instr->reg_dest),
             instr->imm
     );
 
     //log context details
     log_context("Static mapping of %s - (rs1: %s/%s %s) - (rs2: %s/%s %s) - (rd: %s/%s %s)\n",
                 mnem_to_string(instr->mnem),
-                reg_to_string(instr->reg_src_1),
-                reg_to_alias(instr->reg_src_1),
-                bool_str(c_info->r_info->mapped[instr->reg_src_1]),
-                reg_to_string(instr->reg_src_2),
-                reg_to_alias(instr->reg_src_2),
-                bool_str(c_info->r_info->mapped[instr->reg_src_2]),
-                reg_to_string(instr->reg_dest),
-                reg_to_alias(instr->reg_dest),
-                bool_str(c_info->r_info->mapped[instr->reg_dest])
+                gp_to_string(instr->reg_src_1),
+                gp_to_alias(instr->reg_src_1),
+                bool_str(c_info->r_info->gp_mapped[instr->reg_src_1]),
+                gp_to_string(instr->reg_src_2),
+                gp_to_alias(instr->reg_src_2),
+                bool_str(c_info->r_info->gp_mapped[instr->reg_src_2]),
+                gp_to_string(instr->reg_dest),
+                gp_to_alias(instr->reg_dest),
+                bool_str(c_info->r_info->gp_mapped[instr->reg_dest])
     );
 
     //dispatch to translator functions
@@ -194,10 +214,12 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
         panic(FAIL_HEAP_ALLOC);
     }
 
-    int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info);
+    bool isFloatBlock = false;
+
+    int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info, &isFloatBlock);
 
     ///Start of actual translation
-    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info);
+    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info, isFloatBlock);
 
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", (void *) risc_addr, instructions_in_block);
 
@@ -214,9 +236,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  * @return the cached location of the generated block.
  */
 t_cache_loc
-translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info,
+                             bool isFloatBlock) {
     ///initialize new block
-    init_block(c_info->r_info);
+    init_block(c_info->r_info, isFloatBlock);
 
     ///apply macro optimization
     if (flag_translate_opt_fusion) {
@@ -249,7 +272,8 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
  * @param c_info the context info for this block.
  * @return
  */
-int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info) {
+int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info,
+                bool *isFloatBlock) {
 
     int instructions_in_block = 0;
 
@@ -290,6 +314,22 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
 
                         instructions_in_block++;
                         goto PARSE_DONE;
+                    }
+                    case CSRRS:
+                    case CSRRSI:
+                    case CSRRW:
+                    case CSRRWI:
+                    case CSRRC:
+                    case CSRRCI: {
+                        ///next instruction address
+                        if (parse_buf[parse_pos].imm > 0 && parse_buf[parse_pos].imm < 4) {
+                            //accesses the fcsr register handle separatly
+                            parse_buf[parse_pos].reg_src_2 = (t_risc_reg) parse_buf[parse_pos].mnem; //save mnem
+                            parse_buf[parse_pos].mnem = MANUAL_CSRR; //set different mnem for different dispatch
+                        }
+                        risc_addr += 4;
+                        instructions_in_block++;
+                        break;
                     }
                     default:
                         ///should not get here
@@ -389,7 +429,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 x0,
                                 x0,
                                 parse_buf[parse_pos].reg_dest,
-                                4
+                                {{4}}
                         };
 
                         instructions_in_block++;
@@ -488,6 +528,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
             }
                 break;
 
+            case FLOAT: {
+                *isFloatBlock = true;
+            } //FALLTHROUGH
                 ///no jump or branch -> continue fetching
             default: {
                 ///next instruction address

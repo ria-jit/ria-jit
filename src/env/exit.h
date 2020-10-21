@@ -17,6 +17,7 @@ typedef enum {
     FAIL_INVALID_CODE
 } t_exit_code;
 
+__attribute__((noreturn))
 void panic(t_exit_code reason);
 
 char *exit_code_to_str(t_exit_code exit);

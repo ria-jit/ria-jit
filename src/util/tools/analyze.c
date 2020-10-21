@@ -148,8 +148,8 @@ void analyze(const char *file_path) {
         log_analyze("==========\n");
         for (int i = 0; i < N_REG; i++) {
             if (reg[regRanked[i]] == 0) break;
-            log_analyze("Register %s (%s) is used %li times.\n", reg_to_string(regRanked[i]),
-                        reg_to_alias(regRanked[i]),
+            log_analyze("Register %s (%s) is used %li times.\n", gp_to_string(regRanked[i]),
+                        gp_to_alias(regRanked[i]),
                         reg[regRanked[i]]);
         }
         log_analyze("\n");
@@ -315,7 +315,8 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
     reg_count[cur.reg_src_2]++;
     reg_count[cur.reg_dest]++;
 
-    if (prev.reg_dest == cur.reg_src_1 || prev.reg_dest == cur.reg_src_2) {
+    if (prev.reg_dest == cur.reg_src_1 ||
+            prev.reg_dest == cur.reg_src_2) {
         t_secondLevel **lvl2Ptr;
         lvl2Ptr = array[prev.mnem].followingMnem + cur.mnem;
         if (*lvl2Ptr == NULL) {
@@ -334,7 +335,9 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
                 prev.reg_dest == prev.reg_src_2,
                 prev.reg_src_1 == prev.reg_src_2,
                 prev.reg_dest == cur.reg_src_1,
-                cur.reg_dest == (prev.reg_dest == cur.reg_src_1 ? cur.reg_src_1 : cur.reg_src_2),
+                cur.reg_dest ==
+                        (prev.reg_dest == cur.reg_src_1 ? cur.reg_src_1 :
+                                cur.reg_src_2),
                 cur.reg_src_1 == cur.reg_src_2};
 
         t_secondLevel *lvl2 = *lvl2Ptr;
@@ -353,7 +356,8 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
         lvl3->flags = flags.asBitField;
         t_node *curNode = lvl3->immediateList.head;
         t_node *prevNode = NULL;
-        while (curNode != NULL && (curNode->imm1 != (uint32_t) prev.imm || curNode->imm2 != (uint32_t) cur.imm)) {
+        while (curNode != NULL &&
+                (curNode->imm1 != (uint32_t) prev.imm || curNode->imm2 != (uint32_t) cur.imm)) {
             prevNode = curNode;
             curNode = (t_node *) curNode->next;
         }

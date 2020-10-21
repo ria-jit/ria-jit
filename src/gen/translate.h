@@ -25,12 +25,14 @@ extern "C" {
 #define FIRST_REG FE_AX
 #define SECOND_REG FE_DX
 #define THIRD_REG FE_CX
+#define FIRST_FP_REG FE_XMM0
+#define SECOND_FP_REG FE_XMM1
 
 extern uint8_t *current;
 extern int err;
 
 //basic block translation management
-void init_block(register_info *r_info);
+void init_block(register_info *r_info, bool isFloatBlock);
 
 t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info);
 
@@ -38,7 +40,8 @@ t_cache_loc finalize_block(int chainLinkOp, const register_info *r_info);
 t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info);
 
 t_cache_loc
-translate_block_instructions(t_risc_instr block_cache[], int instructions_in_block, const context_info *c_info);
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info,
+                             bool isFloatBlock);
 
 ///chaining
 void chain(t_cache_loc target);

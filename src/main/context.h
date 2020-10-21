@@ -32,7 +32,7 @@ typedef struct {
 
 void execute_in_guest_context(const context_info *c_info, t_cache_loc loc);
 
-context_info *init_map_context(void);
+context_info *init_map_context(bool floatBinary);
 
 #ifdef __cplusplus
 }
