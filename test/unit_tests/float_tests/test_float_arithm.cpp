@@ -100,7 +100,7 @@ TEST_P(ArithmFloatTest, AllDifferent) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, {rs1StartValue});
     set_fpvalue(rs2, {rs2StartValue});
@@ -116,7 +116,7 @@ TEST_P(ArithmFloatTest, Rs1RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, {rs1StartValue});
     set_fpvalue(rs2, {rs2StartValue});
@@ -131,7 +131,7 @@ TEST_P(ArithmFloatTest, Rs2RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, {rs1StartValue});
     set_fpvalue(rs2, {rs2StartValue});
@@ -146,7 +146,7 @@ TEST_P(ArithmFloatTest, Rs1Rs2Same) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, {rs1StartValue});
 
@@ -160,7 +160,7 @@ TEST_P(ArithmFloatTest, AllSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, {rs1StartValue});
 

@@ -24,7 +24,8 @@ void *currentPos = NULL;
 //instruction translation
 void translate_risc_instr(t_risc_instr *instr, const context_info *c_info);
 
-int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info);
+int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info,
+                bool *isFloatBlock);
 
 /**
  * The pointer to the head of the current basic block.
@@ -45,17 +46,12 @@ uint8_t *current;
 int err;
 
 /**
- * float that stores if the block, that is currently worked on is a float block
- */
-bool isFloatBlock;
-
-/**
  * Initializes a new translatable block of code.
  * Call this before translating any instructions that belong together in the same execution run
  * (e.g., before translating every basic block).
  * @param r_info the register mapping info for invalidating the replacements
  */
-void init_block(register_info *r_info) {
+void init_block(register_info *r_info, bool isFloatBlock) {
     if (currentPos == NULL) {
         setupInstrMem();
     }
@@ -218,10 +214,12 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
         panic(FAIL_HEAP_ALLOC);
     }
 
-    int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info);
+    bool isFloatBlock = false;
+
+    int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info, &isFloatBlock);
 
     ///Start of actual translation
-    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info);
+    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info, isFloatBlock);
 
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", (void *) risc_addr, instructions_in_block);
 
@@ -238,9 +236,10 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  * @return the cached location of the generated block.
  */
 t_cache_loc
-translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info,
+                             bool isFloatBlock) {
     ///initialize new block
-    init_block(c_info->r_info);
+    init_block(c_info->r_info, isFloatBlock);
 
     ///apply macro optimization
     if (flag_translate_opt_fusion) {
@@ -273,10 +272,10 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
  * @param c_info the context info for this block.
  * @return
  */
-int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info) {
+int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info,
+                bool *isFloatBlock) {
 
     int instructions_in_block = 0;
-    isFloatBlock = false;
 
     ///parse structs
     for (int parse_pos = 0; parse_pos <= maxCount - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
@@ -530,7 +529,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                 break;
 
             case FLOAT: {
-                isFloatBlock = true;
+                *isFloatBlock = true;
             } //FALLTHROUGH
                 ///no jump or branch -> continue fetching
             default: {

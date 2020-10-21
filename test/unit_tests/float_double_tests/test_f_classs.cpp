@@ -34,7 +34,7 @@ namespace {
                     t_risc_instr{0, FCLASSS, static_cast<t_risc_optype>(0), src, src, rd, 0};
 
             c_info = init_map_context();
-            loc = translate_block_instructions(blockCache, 1, c_info);
+            loc = translate_block_instructions(blockCache, 1, c_info, true);
         }
     };
 

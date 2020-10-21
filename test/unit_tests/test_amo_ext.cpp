@@ -103,7 +103,7 @@ register_info *AmoExtTest::r_info = nullptr;
 TEST_P(AmoExtTest, AllDifferent) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     volatile uint64_t memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -119,7 +119,7 @@ TEST_P(AmoExtTest, AllDifferent) {
     ///rd = x0 means result (=old value) ignored, but memory should still update accordingly.
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, x0, 0};
 
-    loc = translate_block_instructions(blockCache, 1, c_info);
+    loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -134,7 +134,7 @@ TEST_P(AmoExtTest, AllDifferent) {
     ///rs2 = x0
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, x0, rd, 0};
 
-    loc = translate_block_instructions(blockCache, 1, c_info);
+    loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -149,7 +149,7 @@ TEST_P(AmoExtTest, AllDifferent) {
 TEST_P(AmoExtTest, Rs2RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     volatile uint64_t memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -164,7 +164,7 @@ TEST_P(AmoExtTest, Rs2RdSame) {
     ///rs2 = rd = x0 means result (=old value) ignored, but memory should still update accordingly.
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, x0, x0, 0};
 
-    loc = translate_block_instructions(blockCache, 1, c_info);
+    loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -178,7 +178,7 @@ TEST_P(AmoExtTest, Rs2RdSame) {
 TEST_P(AmoExtTest, Rs1RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     volatile uint64_t memoryLocation = rs1StartValue;
 
@@ -193,7 +193,7 @@ TEST_P(AmoExtTest, Rs1RdSame) {
     ///rs2 = x0
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, x0, rs1, 0};
 
-    loc = translate_block_instructions(blockCache, 1, c_info);
+    loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     memoryLocation = rs1StartValue;
 
@@ -207,7 +207,7 @@ TEST_P(AmoExtTest, Rs1RdSame) {
 TEST_P(AmoExtTest, Rs1Rs2Same) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     volatile uint64_t memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -226,7 +226,7 @@ TEST_P(AmoExtTest, Rs1Rs2Same) {
     ///rd = x0 means result (=old value) ignored, but memory should still update accordingly.
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, x0, 0};
 
-    loc = translate_block_instructions(blockCache, 1, c_info);
+    loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);
@@ -244,7 +244,7 @@ TEST_P(AmoExtTest, Rs1Rs2Same) {
 TEST_P(AmoExtTest, AllSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     volatile uint64_t memoryLocation = rs1StartValue;
     set_value(rs1, (t_risc_reg_val) &memoryLocation);

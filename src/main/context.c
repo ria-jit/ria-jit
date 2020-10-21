@@ -266,7 +266,7 @@ context_info *init_map_context(void) {
     //generate these dynamically in case we need to modify them
     {
         //context storing
-        init_block(r_info);
+        init_block(r_info, 0);
         log_general("Generating context storing block...\n");
 
         //check floatRegsLoaded
@@ -308,7 +308,7 @@ context_info *init_map_context(void) {
 
     {
         //context loading
-        init_block(r_info);
+        init_block(r_info, 0);
         log_general("Generating context executing block...\n");
 
         //store callee-saved host registers BX, BP, R12, R13, R14, R15

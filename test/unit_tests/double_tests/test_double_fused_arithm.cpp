@@ -102,7 +102,7 @@ TEST_P(FusedArithmDoubleTest, AllDifferent) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -121,7 +121,7 @@ TEST_P(FusedArithmDoubleTest, Rs1RdSame) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -139,7 +139,7 @@ TEST_P(FusedArithmDoubleTest, Rs2RdSame) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
