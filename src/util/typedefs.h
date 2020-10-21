@@ -18,9 +18,13 @@ char *errorcode_to_string(int mnem);
 //the RISC-V mnemonic of the instruction
 char *mnem_to_string(int mnem);
 
-char *reg_to_string(int reg);
+char *gp_to_string(int reg);
 
-char *reg_to_alias(int reg);
+char *gp_to_alias(int reg);
+
+char *fp_to_string(int reg);
+
+char *fp_to_alias(int reg);
 
 char *reg_x86_to_string(FeReg reg);
 
@@ -32,56 +36,196 @@ typedef enum {
     AUIPC, //register = Imm
 
     //control flow
-    JAL, JALR, BEQ, BNE, BLT, BGE, BLTU, BGEU,
+    JAL,
+    JALR,
+    BEQ,
+    BNE,
+    BLT,
+    BGE,
+    BLTU,
+    BGEU,
 
     //load & store
-    LB, LH, LW, LBU, LHU, SB, SH, SW,
+    LB,
+    LH,
+    LW,
+    LBU,
+    LHU,
+    SB,
+    SH,
+    SW,
 
     //Arithmetic
-    ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI, ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND,
+    ADDI,
+    SLTI,
+    SLTIU,
+    XORI,
+    ORI,
+    ANDI,
+    SLLI,
+    SRLI,
+    SRAI,
+    ADD,
+    SUB,
+    SLL,
+    SLT,
+    SLTU,
+    XOR,
+    SRL,
+    SRA,
+    OR,
+    AND,
 
     //??????
-    FENCE, ECALL, EBREAK, FENCE_I,
+    FENCE,
+    ECALL,
+    EBREAK,
+    FENCE_I,
 
     //CSRR
-    CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI,
+    CSRRW,
+    CSRRS,
+    CSRRC,
+    CSRRWI,
+    CSRRSI,
+    CSRRCI,
+    MANUAL_CSRR,
 
     //---RV64I---
     //load & store
-    LWU, LD, SD,
+    LWU,
+    LD,
+    SD,
 
     //Arithmetic
     //SLLI,
     //SRLI,
     //SRAI,
-    ADDIW, SLLIW, SRLIW, SRAIW, ADDW, SUBW, SLLW, SRLW, SRAW,
+    ADDIW,
+    SLLIW,
+    SRLIW,
+    SRAIW,
+    ADDW,
+    SUBW,
+    SLLW,
+    SRLW,
+    SRAW,
 
     //---RV32M---
-    MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU,
+    MUL,
+    MULH,
+    MULHSU,
+    MULHU,
+    DIV,
+    DIVU,
+    REM,
+    REMU,
 
     //---RV64M---
-    MULW, DIVW, DIVUW, REMW, REMUW,
+    MULW,
+    DIVW,
+    DIVUW,
+    REMW,
+    REMUW,
 
     //---RV32A---
-    LRW, SCW, AMOSWAPW, AMOADDW, AMOXORW, AMOANDW, AMOORW, AMOMINW, AMOMAXW, AMOMINUW, AMOMAXUW,
+    LRW,
+    SCW,
+    AMOSWAPW,
+    AMOADDW,
+    AMOXORW,
+    AMOANDW,
+    AMOORW,
+    AMOMINW,
+    AMOMAXW,
+    AMOMINUW,
+    AMOMAXUW,
 
     //---RV64A---
-    LRD, SCD, AMOSWAPD, AMOADDD, AMOXORD, AMOANDD, AMOORD, AMOMIND, AMOMAXD, AMOMINUD, AMOMAXUD,
+    LRD,
+    SCD,
+    AMOSWAPD,
+    AMOADDD,
+    AMOXORD,
+    AMOANDD,
+    AMOORD,
+    AMOMIND,
+    AMOMAXD,
+    AMOMINUD,
+    AMOMAXUD,
 
     //---RV32F---
-    FLW, FSW, FMADDS, FMSUBS, FNMSUBS, FNMADDS, FADDS, FSUBS, FMULS, FDIVS, FSQRTS, FSGNJS, FSGNJNS, FSGNJXS, FMINS, FMAXS, FCVTWS, FCVTWUS, FMVXW, FEQS, FLTS, FLES, FCLASSS, FCVTSW, FCVTSWU, FMVWX,
+    FLW,
+    FSW,
+    FMADDS,
+    FMSUBS,
+    FNMSUBS,
+    FNMADDS,
+    FADDS,
+    FSUBS,
+    FMULS,
+    FDIVS,
+    FSQRTS,
+    FSGNJS,
+    FSGNJNS,
+    FSGNJXS,
+    FMINS,
+    FMAXS,
+    FCVTWS,
+    FCVTWUS,
+    FMVXW,
+    FEQS,
+    FLTS,
+    FLES,
+    FCLASSS,
+    FCVTSW,
+    FCVTSWU,
+    FMVWX,
 
     //---RV64F---
-    FCVTLS, FCVTLUS, FCVTSL, FCVTSLU,
+    FCVTLS,
+    FCVTLUS,
+    FCVTSL,
+    FCVTSLU,
 
-    //---RV32D---
-    FLD, FSD, FMADDD, FMSUBD, FNMSUBD, FNMADDD, FADDD, FSUBD, FMULD, FDIVD, FSQRTD, FSGNJD, FSGNJND, FSGNJXD, FMIND, FMAXD, FCVTSD, FCVTDS, FEQD, FLTD, FLED, FCLASSD, FCVTWD, FCVTWUD, FCVTDW, FCVTDWU,
-
-    //---RV64D---
-    FCVTLD, FCVTLUD, FMVXD, FCVTDL, FCVTDLU, FMVDX,
+    //---RV32D--- + //---RV64D--- //reordering for easier parser design
+    FLD,
+    FSD,
+    FMADDD,
+    FMSUBD,
+    FNMSUBD,
+    FNMADDD,
+    FADDD,
+    FSUBD,
+    FMULD,
+    FDIVD,
+    FSQRTD,
+    FSGNJD,
+    FSGNJND,
+    FSGNJXD,
+    FMIND,
+    FMAXD,
+    FCVTWD,
+    FCVTWUD,
+    FMVXD,
+    FEQD,
+    FLTD,
+    FLED,
+    FCLASSD,
+    FCVTDW,
+    FCVTDWU,
+    FMVDX,
+    FCVTLD,
+    FCVTLUD,
+    FCVTDL,
+    FCVTDLU,
+    FCVTSD,
+    FCVTDS,
 
     //---PSEUDO---
-    PC_NEXT_INST, SILENT_NOP, PATTERN_EMIT,
+    PC_NEXT_INST,
+    SILENT_NOP,
+    PATTERN_EMIT,
 
     //To always have a count, don't insert below here
     LAST_MNEM
@@ -144,12 +288,112 @@ typedef enum {
     csr_instreth = 0xC82//upper 32 bits of instret (for RV32I)
 } t_risc_csr_reg;
 
-//register value type
+//floating point registers
+#define N_FP_REG 32
+typedef enum {
+    f0, f1, f2, f3, f4, f5, f6, f7, f8, f9,
+    f10, f11, f12, f13, f14, f15, f16, f17, f18, f19,
+    f20, f21, f22, f23, f24, f25, f26, f27, f28, f29,
+    f30, f31, fInvalid
+} t_risc_fp_reg;
+
+typedef enum {
+    RNE = 0, //Round to Nearest, ties to Even
+    RTZ = 1, //Round towards Zero
+    RDN = 2, //Round Down (towards negative infinity)
+    RUP = 3, //Round Up (towards positive infinity)
+    RMM = 4, //Round to Nearest, ties to Max Magnitude
+    DYN = 7  //In instruction's rm field, selects dynamic rounding mode; In Rounding Mode register, Invalid.
+} t_risc_rm;
+
+#define FE_COUNT_RISCV 5
+
+typedef enum {
+    rv_NV = 0x10, //Invalid Operation
+    rv_DZ = 0x8, //Divide by Zero
+    rv_OF = 0x4, //Overflow
+    rv_UF = 0x2, //Underflow
+    rv_NX = 0x1 //Inexact
+} t_risc_f_exp;
+
+typedef enum {
+    SSE_NX = 0x20, // Precision Flag
+    SSE_UF = 0x10, // Underflow Flag
+    SSE_OF = 0x8, // Overflow Flag
+    SSE_DZ = 0x4, // Divide by Zero Flag
+    SSE_DEN = 0x2, // Denormal Flag
+    SSE_NV = 0x1, // Invalid Operation Flag
+
+} t_SSEfflags;
+
+/* Definiton bit is set if:
+ * 0: rs is negative infinity
+ * 1: rs is a negative normal number
+ * 2: rs is a negative subnormal number
+ * 3: rs is minus zero
+ * 4: rs is positive zero
+ * 5: rs is a positive subnormal number
+ * 6: rs is a positive normal number
+ * 7: rs is positive infinity
+ * 8: rs is a signaling NaN
+ * 9: rs is a quiet NaN
+ * Assembler code for the following instructions
+ */
+
+typedef enum {
+    NEG_INFINITY = 0x1,
+    NEG_NORMAL = 0x2,
+    NEG_SUBNORMAL = 0x4,
+    NEG_ZERO = 0x8,
+    POS_ZERO = 0x10,
+    POS_SUBNORMAL = 0x20,
+    POS_NORMAL = 0x40,
+    POS_INFINITY = 0x80,
+    SIG_NAN = 0x100,
+    QUIET_NAN = 0x200
+} t_fclass_bits;
+
+#define FFLAGS 0x001
+#define FRM 0x002
+#define FCSR 0x003
+
+/**
+ * Register value type.
+ * XLEN = 64 for the integer registers.
+ */
 typedef uint64_t t_risc_reg_val;
+
+/**
+ * Float Register value type.
+ * For floating point, F-extension requires FLEN = 32-bit, D-extension requires 64-bit.
+ */
+typedef union {
+    float f;
+    double d;
+    uint64_t i;
+} t_risc_fp_reg_val;
+
+static inline t_risc_fp_reg_val get_fVal(float f) {
+    t_risc_fp_reg_val ret;
+    ret.f = f;
+    return ret;
+}
+
+static inline t_risc_fp_reg_val get_dVal(double d) {
+    t_risc_fp_reg_val ret;
+    ret.d = d;
+    return ret;
+}
+
+static inline t_risc_fp_reg_val get_iVal(uint64_t i) {
+    t_risc_fp_reg_val ret;
+    ret.i = i;
+    return ret;
+}
 
 //RISC-V operation types (for later optimization)
 typedef enum {
-    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
+    REG_REG, IMMEDIATE, UPPER_IMMEDIATE, STORE, BRANCH, JUMP, SYSTEM, FLOAT, INVALID_INSTRUCTION, INVALID_BLOCK, PSEUDO
 } t_risc_optype;
 
 //carry immediate values in the instruction struct
@@ -165,7 +409,15 @@ typedef struct {
     t_risc_reg reg_src_1;
     t_risc_reg reg_src_2;
     t_risc_reg reg_dest;
-    t_risc_imm imm;
+    union {
+        struct {
+            t_risc_imm imm;
+        };
+        struct {
+            uint32_t reg_src_3;
+            uint32_t rounding_mode;
+        };
+    };
 } t_risc_instr;
 
 /**
@@ -178,13 +430,16 @@ typedef struct {
  * @param replacement_recency specifies the recently used RISC-V registers (lower is older, 0 is clean)
  */
 typedef struct {
-    FeReg *map;
-    bool *mapped;
+    FeReg *gp_map;
+    bool *gp_mapped;
+    FeReg *fp_map;
+    bool *fp_mapped;
     uint64_t base;
     uint64_t csr_base;
     t_risc_reg *replacement_content;
     uint64_t *replacement_recency;
     uint64_t *current_recency;
+    uint64_t fp_base;
 } register_info;
 
 #ifdef __cplusplus

@@ -21,4 +21,6 @@ void translate_CSRRSI(const t_risc_instr *instr, const register_info *r_info);
 
 void translate_CSRRCI(const t_risc_instr *instr, const register_info *r_info);
 
+void translate_MANUAL_CSRR(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info);
+
 #endif //DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_CSR_H

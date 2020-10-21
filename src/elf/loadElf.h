@@ -33,6 +33,7 @@ typedef struct {
     t_risc_addr dataEnd;
     t_risc_addr execStart;
     t_risc_addr execEnd;
+    bool floatBinary;
 } t_risc_elf_map_result;
 
 /**

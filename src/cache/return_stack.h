@@ -14,7 +14,7 @@ typedef struct {
 
 void init_return_stack(void);
 
-void rs_emit_push(const t_risc_instr *instr, const register_info *r_info);
+void rs_emit_push(const t_risc_instr *instr, const register_info *r_info, bool save_rax);
 
 void rs_emit_pop_RAX(bool jump_or_push, const register_info *r_info);
 

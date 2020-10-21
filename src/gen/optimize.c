@@ -202,7 +202,7 @@ void optimize_patterns(t_risc_instr block_cache[], int len) {
             //invalidate matched sequence ??
 
             ///skip to end of pattern
-            j = j + patterns[i].len;
+            j = j + patterns[i].len - 1;
 
             MISMATCH:;
         }

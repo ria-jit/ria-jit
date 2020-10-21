@@ -22,6 +22,7 @@ void translate_PC_NEXT_INST(const t_risc_addr addr, const register_info *r_info)
     if (flag_translate_opt_chain) {
         err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+        err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
     }
 
     ///set pc

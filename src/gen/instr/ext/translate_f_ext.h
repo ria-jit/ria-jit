@@ -6,6 +6,7 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_TRANSLATE_F_EXT_H
 
 #include "util/log.h"
+#include "util/util.h"
 #include "gen/translate.h"
 #include <util/typedefs.h>
 

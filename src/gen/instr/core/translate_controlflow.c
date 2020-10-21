@@ -8,7 +8,6 @@
 #include <util/log.h>
 #include <fadec/fadec-enc.h>
 #include <cache/return_stack.h>
-#include <common.h>
 #include <util/util.h>
 
 #include <parser/parser.h>
@@ -22,17 +21,17 @@ static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *jmpLoc, uint64_t mnem);
 
 
-void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
+void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info __attribute__((unused))) {
     log_asm_out("Translate JAL\n");
 
     //add rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     ///push to return stack
     if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
-        rs_emit_push(instr, r_info);
+        rs_emit_push(instr, r_info, false);
     }
 
     ///set rd
@@ -43,7 +42,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
             x0,
             x0,
             instr->reg_dest,
-            4
+            {{4}}
     };
 
     translate_AUIPC(&aupicInstr, r_info);
@@ -64,11 +63,12 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
         if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
         }
 
         ///set pc
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc],
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc],
                             instr->addr + instr->imm);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
@@ -80,7 +80,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     }
 }
 
-void translate_JALR(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
+void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     /**
      * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1,
      * then setting the least-significant bit of the result to zero.
@@ -91,16 +91,16 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
     //add rs1, rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     ///1: compute target address
 
     ///mov rs1 to temp register
     invalidateAllReplacements(r_info);
-    if (r_info->mapped[instr->reg_src_1]) {
-        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
+    if (r_info->gp_mapped[instr->reg_src_1]) {
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->gp_map[instr->reg_src_1]);
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
     }
@@ -114,8 +114,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
     ///2: write addr of next instruction in rd
     if (instr->reg_dest != x0) {
-        if (r_info->mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], instr->addr + 4);
+        if (r_info->gp_mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[instr->reg_dest], instr->addr + 4);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
         }
@@ -128,17 +128,17 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
             if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 if (instr->reg_dest == instr->reg_src_1) {
                     ///push
-                    rs_emit_push(instr, r_info);
+                    rs_emit_push(instr, r_info, true);
                 } else {
                     //not tested
                     ///pop and push
                     rs_emit_pop_RAX(false, r_info);
-                    rs_emit_push(instr, r_info);
+                    rs_emit_push(instr, r_info, true);
                     rs_jump_stack(r_info);
                 }
             } else {
                 ///push
-                rs_emit_push(instr, r_info);
+                rs_emit_push(instr, r_info, true);
             }
         } else {
             if(instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
@@ -148,29 +148,31 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
                 ///none
             }
         }
-     }
+    }
 
 
     if (instr->reg_src_2 == 1 && flag_translate_opt_chain) {
 
         //TODO: more efficient way of obtaining target (without parsing)
 
-        t_risc_instr tmp_p_instr = {};
+        t_risc_instr tmp_p_instr;
         tmp_p_instr.addr = instr->addr - 4;
 
         parse_instruction(&tmp_p_instr);
 
         t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.imm + instr->imm;
 
-        t_cache_loc cache_loc = 0;
-        if((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
+        t_cache_loc cache_loc;
+
+        if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
             ///4: write chainEnd to be chained by chainer
             log_asm_out("CHAIN JALR\n");
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
         } else {
             log_asm_out("DIRECT JUMP JALR\n");
-            err |= fe_enc64(&current, FE_MOV64ri, FE_CX, cache_loc);
+            err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (FeOp) cache_loc);
             err |= fe_enc64(&current, FE_JMPr, FE_CX);
         }
 
@@ -179,12 +181,13 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
         log_asm_out("DON'T CHAIN JALR\n");
         if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR((uint64_t) &chain_end), 0);
+            //no need to set chain type here
         }
     }
 
     ///5: write target addr to pc
-    if (r_info->mapped[pc]) {
-        err |= fe_enc64(&current, FE_MOV64rr, r_info->map[pc], FE_AX);
+    if (r_info->gp_mapped[pc]) {
+        err |= fe_enc64(&current, FE_MOV64rr, r_info->gp_map[pc], FE_AX);
     } else {
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * pc), FE_AX);
     }
@@ -200,7 +203,7 @@ void translate_BEQ(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_b = current;
-    err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JNZ|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_b, FE_JNZ);
@@ -215,7 +218,7 @@ void translate_BNE(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_b = current;
-    err |= fe_enc64(&current, FE_JZ, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JZ|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_b, FE_JZ);
@@ -229,7 +232,7 @@ void translate_BLT(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_b = current;
-    err |= fe_enc64(&current, FE_JGE, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JGE|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_b, FE_JGE);
@@ -243,7 +246,7 @@ void translate_BLTU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_b = current;
-    err |= fe_enc64(&current, FE_JNC, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JNC|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_b, FE_JNC);
@@ -257,7 +260,7 @@ void translate_BGE(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_l = current;
-    err |= fe_enc64(&current, FE_JL, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JL|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_l, FE_JL);
@@ -271,7 +274,7 @@ void translate_BGEU(const t_risc_instr *instr, const register_info *r_info) {
 
     ///dummy jump
     uint8_t *jump_b = current;
-    err |= fe_enc64(&current, FE_JC, (intptr_t) current);
+    err |= fe_enc64(&current, FE_JC|FE_JMPL, (intptr_t) current);
 
     ///set pc
     translate_controlflow_set_pc2(instr, r_info, jump_b, FE_JC);
@@ -283,15 +286,18 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
 
     //add rs1, rs2 access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
-        RECORD_PROFILER(instr->reg_src_2);
+        RECORD_GP_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_src_2);
     }
 
     ///compare registers:
     FeReg regSrc1 = getRs1(instr, r_info);
-    FeReg regSrc2 = getRs2(instr, r_info);
-
-    err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
+    if (instr->reg_src_2 == x0) {
+        err |= fe_enc64(&current, FE_TEST64rr, regSrc1, regSrc1);
+    } else {
+        FeReg regSrc2 = getRs2(instr, r_info);
+        err |= fe_enc64(&current, FE_CMP64rr, regSrc1, regSrc2);
+    }
 
     invalidateAllReplacements(r_info);
 }
@@ -311,36 +317,41 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
         if (flag_translate_opt_chain) {
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
         }
 
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], (instr->addr + ((int64_t) (instr->imm))));
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], (instr->addr + ((int64_t) (instr->imm))));
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
                             instr->addr + (int64_t) instr->imm);
         }
     }
 
+    ///continue to ret after setting pc
     uint8_t *endJmpLoc = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy jump
 
-    err |= fe_enc64(&noJmpLoc, jmpMnem, (intptr_t) current); //replace dummy
 
     ///set pc: NO BRANCH
     target = instr->addr + 4;
+
     if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
             cache_loc != (t_cache_loc) 1) {
         log_asm_out("DIRECT JUMP BRANCH 2\n");
-        err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
+        err |= fe_enc64(&noJmpLoc, jmpMnem|FE_JMPL, (intptr_t) cache_loc); //replace conditional dummy
     } else {
+        err |= fe_enc64(&noJmpLoc, jmpMnem|FE_JMPL, (intptr_t) current); //replace conditional dummy
+
         ///write chainEnd to be chained by chainer
         if (flag_translate_opt_chain) {
-            err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
+            err |= fe_enc64(&current, FE_MOV64ri, FE_AX, (uint64_t) (noJmpLoc - 6));
             err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR((uint64_t) &chain_end), FE_AX);
+            err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), jmpMnem);
         }
 
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], instr->addr + 4);
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], instr->addr + 4);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc), instr->addr + 4);
         }

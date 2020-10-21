@@ -16,6 +16,7 @@ extern "C" {
 typedef void *t_cache_loc;
 
 extern volatile uint8_t *chain_end;
+extern volatile uint32_t chain_type;
 
 //cache entries for translated code segments
 typedef struct {
@@ -40,7 +41,7 @@ void set_tlb(t_risc_addr risc_addr, t_cache_loc cacheLoc);
 
 void print_values(void);
 
-void dump_cache_stats(void);
+size_t get_cache_entry_count(void);
 
 #ifdef __cplusplus
 }

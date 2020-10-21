@@ -31,7 +31,7 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_JAL(instr, r_info, c_info);
             break;
         case JALR:
-            translate_JALR(instr, r_info, c_info);
+            translate_JALR(instr, r_info);
             break;
         case BEQ:
             translate_BEQ(instr, r_info);
@@ -233,6 +233,9 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             break;
         case ECALL:
             translate_ECALL(instr, r_info, c_info);
+            break;
+        case MANUAL_CSRR:
+            translate_MANUAL_CSRR(instr, r_info, c_info);
             break;
         case EBREAK:
             translate_EBREAK(instr, r_info);

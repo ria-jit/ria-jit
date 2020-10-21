@@ -26,6 +26,7 @@
 #define envp __environ
 #endif
 
+
 size_t stackSize = 8 * 1024 * 1024; //Default stack size
 //Add guard page at bottom just in case.
 const size_t guard = 4096;
@@ -71,23 +72,15 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     Elf64_Half sh_count = header.e_shnum;
 
     bool incompatible = false;
+    bool floatBinary = false;
 
     //Check for not supported ABI Flags
     if (flags & EF_RISCV_RVC) {
         critical_not_yet_implemented("C ABI is not yet supported");
         incompatible = true;
     }
-    if (flags & EF_RISCV_FLOAT_ABI_SINGLE) {
-        critical_not_yet_implemented("F ABI is not yet supported");
-        incompatible = true;
-    }
-    if (flags & EF_RISCV_FLOAT_ABI_DOUBLE) {
-        critical_not_yet_implemented("D ABI is not yet supported");
-        incompatible = true;
-    }
-    if (flags & EF_RISCV_FLOAT_ABI_QUAD) {
-        critical_not_yet_implemented("Q ABI is not yet supported");
-        incompatible = true;
+    if (flags & EF_RISCV_FLOAT_ABI_QUAD || flags & EF_RISCV_FLOAT_ABI_DOUBLE || flags & EF_RISCV_FLOAT_ABI_SINGLE) {
+        floatBinary = true;
     }
     if (flags & EF_RISCV_RVE) {
         critical_not_yet_implemented("E ABI is not yet supported");
@@ -248,7 +241,8 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     close(fd);
     close(fd2);
 
-    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize, endAddr, minAddrExec, maxAddrExec};
+    return (t_risc_elf_map_result) {true, entry, phdr, ph_count, phentsize, endAddr, minAddrExec, maxAddrExec,
+            floatBinary};
 }
 
 t_risc_addr allocateStack() {

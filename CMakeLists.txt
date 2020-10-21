@@ -99,7 +99,7 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/patterns.h src/gen/instr/patterns.c
         ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
         src/env/flags.c src/env/flags.h
-        src/env/exit.c src/env/exit.h)
+        src/env/exit.c src/env/exit.h src/runtime/manualCSRR.c src/runtime/manualCSRR.h src/util/tools/profile.c src/util/tools/profile.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp
@@ -109,7 +109,22 @@ set(UNIT_TESTS_SOURCES
         test/unit_tests/test_faenc_experiments.cpp
         test/unit_tests/test_amo_ext.cpp
         test/unit_tests/test_arithm.cpp
-        test/unit_tests/test_parser_param.cpp)
+        test/unit_tests/float_tests/test_float_arithm.cpp
+        test/unit_tests/float_tests/test_float_fused_arithm.cpp
+        test/unit_tests/float_tests/test_float_con.cpp
+        test/unit_tests/float_double_tests/test_f_and_d_ext_load_store.cpp
+        test/unit_tests/float_double_tests/test_f_classs.cpp
+        test/unit_tests/float_double_tests/test_f_classd.cpp
+        test/unit_tests/double_tests/test_double_arithm.cpp
+        test/unit_tests/double_tests/test_double_fused_arithm.cpp
+        test/unit_tests/double_tests/test_double_con.cpp
+        test/unit_tests/double_tests/test_double_gp_to_fp.cpp
+        test/unit_tests/double_tests/test_double_fp_to_gp.cpp
+        test/unit_tests/float_tests/test_float_gp_to_fp.cpp
+        test/unit_tests/float_tests/test_float_fp_to_gp.cpp
+        test/unit_tests/float_double_tests/test_float_to_double.cpp
+        test/unit_tests/float_double_tests/test_double_to_float.cpp
+        test/unit_tests/test_parser_param.cpp src/runtime/manualCSRR.c src/runtime/manualCSRR.h)
 
 #include the googletest testing framework
 add_subdirectory(lib/googletest-master)

@@ -6,27 +6,45 @@
 #include "typedefs.h"
 #include <env/flags.h>
 #include <common.h>
-#include <stdbool.h>
 #include <util/version.h>
 #include <env/exit.h>
+
+void not_yet_implemented_internal(const char *info, va_list args);
 
 /**
  * Version number of our translator. Keep up to date - see GitLab releases.
  */
 const char *const translator_version = VERSION;
 
-void not_yet_implemented(const char *info) {
-    log_general("%s - not yet implemented\n", info);
+void not_yet_implemented_internal(const char *info, va_list args) {
+    dprintf(1, "Warning: ");
+    vdprintf(1, info, args);
+    dprintf(1, " - not yet implemented\n");
 }
 
-void critical_not_yet_implemented(const char *info) {
+void not_yet_implemented(const char *info, ...) {
+    va_list args;
+    va_start(args, info);
+    not_yet_implemented_internal(info, args);
+    va_end(args);
+}
+
+void critical_not_yet_implemented(const char *info, ...) {
+    va_list args;
+    va_start(args, info);
+
     if (flag_fail_silently) {
-        not_yet_implemented(info);
+        not_yet_implemented_internal(info, args);
     } else {
         //fail fast, so write to stderr, then quit
-        dprintf(2, "Critical: %s - not yet implemented\n", info);
+        dprintf(2, "Critical: ");
+        vdprintf(2, info, args);
+        dprintf(2, " - not yet implemented\n");
         panic(FAIL_NOT_IMPL);
+        //exited
     }
+
+    va_end(args);
 }
 
 /**

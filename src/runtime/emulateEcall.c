@@ -144,6 +144,12 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
             registerValues[a0] = syscall3(__NR_unlinkat, registerValues[a0], registerValues[a1], registerValues[a2]);
         }
             break;
+        case 46: //ftruncate
+        {
+            log_syscall("Emulate syscall ftruncate (46)...\n");
+            registerValues[a0] = syscall2(__NR_ftruncate, registerValues[a0], registerValues[a1]);
+        }
+            break;
         case 48: //faccessat
         {
             log_syscall("Emulate syscall faccessat (48)...\n");

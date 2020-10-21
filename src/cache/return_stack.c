@@ -25,7 +25,7 @@ void init_return_stack(void) {
     rs_front = 0;
 }
 
-void rs_emit_push(const t_risc_instr *instr, const register_info *r_info) {
+void rs_emit_push(const t_risc_instr *instr, const register_info *r_info, bool save_rax) {
     invalidateAllReplacements(r_info);
 
     ///push to return stack
@@ -33,8 +33,8 @@ void rs_emit_push(const t_risc_instr *instr, const register_info *r_info) {
 
     t_cache_loc cache_loc;
 
-    if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE) {  // 1 ???
-        log_asm_out("rs_emit_push: flag_translate_op is enabled, but return target is not in cache! riscv: %p\n",
+    if ((cache_loc = lookup_cache_entry(ret_target)) == UNSEEN_CODE || cache_loc == (void*) 1) {
+        log_asm_out("rs_emit_push: flag_translate_op is enabled, but return target is not in cache or in translation riscv: %p\n",
                (void *) instr->addr);
         goto NOT_CACHED;
     }
@@ -61,7 +61,9 @@ void rs_emit_push(const t_risc_instr *instr, const register_info *r_info) {
     //*/
 
     //*  //new
-    err |= fe_enc64(&current, FE_PUSHr, FE_AX);
+    if(save_rax) {
+        err |= fe_enc64(&current, FE_PUSHr, FE_AX);
+    }
 
     err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));    //get front
     err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR((intptr_t) &r_stack));     //get base
@@ -74,7 +76,9 @@ void rs_emit_push(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_AX, 0, 0, 0), FE_CX);               //save risc ret addr
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(FE_AX, 0, 0, 8), FE_DX);               //save x86 addr
 
-    err |= fe_enc64(&current, FE_POPr, FE_AX);
+    if(save_rax) {
+        err |= fe_enc64(&current, FE_POPr, FE_AX);
+    }
 
     //*/
 
