@@ -96,7 +96,7 @@ TEST_P(ConditionalDoubleTest, AllDifferent) {
     blockCache[0] =
             t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -111,7 +111,7 @@ TEST_P(ConditionalDoubleTest, AllDifferent) {
 TEST_P(ConditionalDoubleTest, Rs1Rs2Same) {
         blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
 
         set_fpvalue(rs1, get_dVal(rs1StartValue));
 

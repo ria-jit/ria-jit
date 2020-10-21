@@ -90,7 +90,7 @@ TEST_P(FloatToDoubleTest, AllDifferent) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
     blockCache[0].rounding_mode = RNE;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
 
     set_fpvalue(rs1, get_fVal(rs1StartValue));
 
@@ -104,7 +104,7 @@ TEST_P(FloatToDoubleTest, BothSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
     blockCache[0].rounding_mode = RNE;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
 
     set_fpvalue(rs1, get_fVal(rs1StartValue));
 
