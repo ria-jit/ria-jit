@@ -16,6 +16,9 @@ extern "C" {
 
 extern const char *const translator_version;
 
+void not_yet_implemented(const char *info, ...)
+__attribute__((__format__(printf, 1, 2)));
+
 void critical_not_yet_implemented(const char *info, ...)
 __attribute__((__format__(printf, 1, 2)));
 
