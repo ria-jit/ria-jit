@@ -155,13 +155,13 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
                 mnem_to_string(instr->mnem),
                 reg_to_string(instr->reg_src_1),
                 reg_to_alias(instr->reg_src_1),
-                bool_str(c_info->r_info->mapped[instr->reg_src_1]),
+                bool_str(c_info->r_info->gp_mapped[instr->reg_src_1]),
                 reg_to_string(instr->reg_src_2),
                 reg_to_alias(instr->reg_src_2),
-                bool_str(c_info->r_info->mapped[instr->reg_src_2]),
+                bool_str(c_info->r_info->gp_mapped[instr->reg_src_2]),
                 reg_to_string(instr->reg_dest),
                 reg_to_alias(instr->reg_dest),
-                bool_str(c_info->r_info->mapped[instr->reg_dest])
+                bool_str(c_info->r_info->gp_mapped[instr->reg_dest])
     );
 
     //dispatch to translator functions

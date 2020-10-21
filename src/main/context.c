@@ -20,34 +20,68 @@ context_info *init_map_context(void) {
     //register mapping as pulled from translate.c
     log_context("Initializing context...\n");
 
-    //create register allocation mapping
-    FeReg *register_map = mmap(NULL,
+    /**
+     * Allocation for general purpose register mapping.
+     */
+    FeReg *gp_map = mmap(NULL,
                                N_REG * sizeof(FeReg),
                                PROT_READ | PROT_WRITE,
                                MAP_ANONYMOUS | MAP_PRIVATE,
                                -1,
                                0);
 
-    if (BAD_ADDR(register_map)) {
-        dprintf(2, "Failed to allocate register_map for context. Error %li", -(intptr_t) register_map);
+    if (BAD_ADDR(gp_map)) {
+        dprintf(2, "Failed to allocate gp_map for context. Error %li", -(intptr_t) gp_map);
         panic(FAIL_HEAP_ALLOC);
     }
 
-    bool *mapped = mmap(NULL,
+    bool *gp_mapped = mmap(NULL,
                         N_REG * sizeof(bool),
                         PROT_READ | PROT_WRITE,
                         MAP_ANONYMOUS | MAP_PRIVATE,
                         -1,
                         0);
 
-    if (BAD_ADDR(mapped)) {
-        dprintf(2, "Failed to allocate mapped for context. Error %li", -(intptr_t) mapped);
+    if (BAD_ADDR(gp_mapped)) {
+        dprintf(2, "Failed to allocate gp_mapped for context. Error %li", -(intptr_t) gp_mapped);
         panic(FAIL_HEAP_ALLOC);
     }
 
     //fill boolean array with 0
     for (int i = 0; i < N_REG; ++i) {
-        mapped[i] = false;
+        gp_mapped[i] = false;
+    }
+
+    /**
+     * Allocation for floating point register mapping.
+     */
+    FeReg *fp_map = mmap(NULL,
+                         N_REG * sizeof(FeReg),
+                         PROT_READ | PROT_WRITE,
+                         MAP_ANONYMOUS | MAP_PRIVATE,
+                         -1,
+                         0);
+
+    if (BAD_ADDR(fp_map)) {
+        dprintf(2, "Failed to allocate fp_map for context. Error %li", -(intptr_t) fp_map);
+        panic(FAIL_HEAP_ALLOC);
+    }
+
+    bool *fp_mapped = mmap(NULL,
+                           N_REG * sizeof(bool),
+                           PROT_READ | PROT_WRITE,
+                           MAP_ANONYMOUS | MAP_PRIVATE,
+                           -1,
+                           0);
+
+    if (BAD_ADDR(fp_mapped)) {
+        dprintf(2, "Failed to allocate fp_mapped for context. Error %li", -(intptr_t) fp_mapped);
+        panic(FAIL_HEAP_ALLOC);
+    }
+
+    //fill boolean array with 0
+    for (int i = 0; i < N_REG; ++i) {
+        fp_mapped[i] = false;
     }
 
     /**
@@ -90,7 +124,7 @@ context_info *init_map_context(void) {
 
 
     //Allocating here to keep r_info const in all translator functions.
-    //I am, however, aware this is not pretty. Maybe refactor in the future?
+    //I am, however, aware this is not pretty. Maybe refactor in the future? todo?
     uint64_t *current_recency = mmap(NULL,
                                      sizeof(uint64_t),
                                      PROT_READ | PROT_WRITE,
@@ -108,10 +142,13 @@ context_info *init_map_context(void) {
 
 
     /**
+     * General-purpose register mapping
+     * ================================
      * Any register mapping needs to take the translator functions into account.
      * They temporarily replace into AX, DX and CX for arithmetics (e.g. imul, shifts),
      * as well as CX as a scratch register for the atomics.
      * FIRST_REG and SECOND_REG are #defined as AX and DX.
+     * Instructions may also replace into the SP, assuming they take care and save the register accordingly.
      * As soon as this is implemented, all other x86-GPRs must be considered callee-saved
      * when used inside instruction translations, as the mapping requires them to keep their value.
      * So, for the registers available to the mapping, see the following:
@@ -119,10 +156,10 @@ context_info *init_map_context(void) {
      * May be used: BX, BP, SI, DI, R8, R9, R10, R11, R12, R13, R14, R15
      * Of which are callee-saved: BX, BP, R12, R13, R14, R15
      */
-#define map_reg(reg_risc, reg_x86)          \
+#define map_gp_reg(reg_risc, reg_x86)          \
     {                                       \
-        register_map[reg_risc] = reg_x86;   \
-        mapped[reg_risc] = true;            \
+        gp_map[reg_risc] = reg_x86;   \
+        gp_mapped[reg_risc] = true;            \
     }                                       \
 
     /**
@@ -133,30 +170,43 @@ context_info *init_map_context(void) {
      *                             into
      * BX,  BP,  SI,  DI,  R8, R9, R10, R11, R12, R13, R14, R15
      */
-    map_reg(a5, FE_BX)
-    map_reg(a4, FE_BP)
-    map_reg(a3, FE_SI)
-    map_reg(a0, FE_DI)
-    map_reg(fp, FE_R8)
-    map_reg(sp, FE_R9)
-    map_reg(a2, FE_R10)
-    map_reg(a1, FE_R11)
-    map_reg(s1, FE_R12)
-    map_reg(ra, FE_R13)
-    map_reg(a7, FE_R14)
-    map_reg(s2, FE_R15)
+    map_gp_reg(a5, FE_BX)
+    map_gp_reg(a4, FE_BP)
+    map_gp_reg(a3, FE_SI)
+    map_gp_reg(a0, FE_DI)
+    map_gp_reg(fp, FE_R8)
+    map_gp_reg(sp, FE_R9)
+    map_gp_reg(a2, FE_R10)
+    map_gp_reg(a1, FE_R11)
+    map_gp_reg(s1, FE_R12)
+    map_gp_reg(ra, FE_R13)
+    map_gp_reg(a7, FE_R14)
+    map_gp_reg(s2, FE_R15)
 
-#undef map_reg
+#undef map_gp_reg
+
+
+    /**
+     * Floating point register mapping
+     * ===============================
+     */
+#define map_fp_reg(reg_risc, reg_x86)          \
+    {                                       \
+        fp_map[reg_risc] = reg_x86;   \
+        fp_mapped[reg_risc] = true;            \
+    }                                       \
+
+#undef map_fp_reg
 
     //log context setup
     if (flag_log_context) {
         log_context("Static mapping contents:\n");
         for (t_risc_reg reg = x0; reg <= pc; reg++) {
-            if (mapped[reg]) {
+            if (gp_mapped[reg]) {
                 log_context("%s/%s --> %s\n",
                             reg_to_string(reg),
                             reg_to_alias(reg),
-                            reg_x86_to_string(register_map[reg]));
+                            reg_x86_to_string(gp_map[reg]));
             }
         }
     }
@@ -175,8 +225,8 @@ context_info *init_map_context(void) {
         panic(FAIL_HEAP_ALLOC);
     }
 
-    r_info->map = register_map;
-    r_info->mapped = mapped;
+    r_info->gp_map = gp_map;
+    r_info->gp_mapped = gp_mapped;
     r_info->base = (uint64_t) get_gp_reg_file();
     r_info->csr_base = (uint64_t) get_csr_reg_file();
     r_info->replacement_content = replacement_content;
@@ -196,8 +246,8 @@ context_info *init_map_context(void) {
 
         //save by register mapping
         for (int i = x0; i <= pc; ++i) {
-            if (r_info->mapped[i]) {
-                err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * i), r_info->map[i]);
+            if (r_info->gp_mapped[i]) {
+                err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * i), r_info->gp_map[i]);
             }
         }
 
@@ -231,8 +281,8 @@ context_info *init_map_context(void) {
 
         //load by register mapping
         for (int i = x0; i <= pc; ++i) {
-            if (r_info->mapped[i]) {
-                err |= fe_enc64(&current, FE_MOV64rm, r_info->map[i], FE_MEM_ADDR(r_info->base + 8 * i));
+            if (r_info->gp_mapped[i]) {
+                err |= fe_enc64(&current, FE_MOV64rm, r_info->gp_map[i], FE_MEM_ADDR(r_info->base + 8 * i));
             }
         }
         err |= fe_enc64(&current, FE_TEST32rr, SECOND_REG, SECOND_REG);

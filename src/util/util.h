@@ -380,10 +380,10 @@ static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_inf
     }
 
     //either return the mapped register, or load into a replacement
-    if (!r_info->mapped[instr->reg_src_1]) {
+    if (!r_info->gp_mapped[instr->reg_src_1]) {
         return loadIntoReplacement(r_info, instr->reg_src_1, true);
     } else {
-        return r_info->map[instr->reg_src_1];
+        return r_info->gp_map[instr->reg_src_1];
     }
 }
 
@@ -401,10 +401,10 @@ static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_inf
     }
 
     //either return the mapped register, or load into a replacement
-    if (!r_info->mapped[instr->reg_src_2]) {
+    if (!r_info->gp_mapped[instr->reg_src_2]) {
         return loadIntoReplacement(r_info, instr->reg_src_2, true);
     } else {
-        return r_info->map[instr->reg_src_2];
+        return r_info->gp_map[instr->reg_src_2];
     }
 }
 
@@ -421,12 +421,12 @@ static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info
         RECORD_PROFILER(instr->reg_dest);
     }
 
-    if (!r_info->mapped[instr->reg_dest]) {
+    if (!r_info->gp_mapped[instr->reg_dest]) {
         //"load" the destination register without reading the previous value from the register file, as it will be
         //  overwritten by the instruction that follows this load
         return loadIntoReplacement(r_info, instr->reg_dest, false);
     } else {
-        return r_info->map[instr->reg_dest];
+        return r_info->gp_map[instr->reg_dest];
     }
 }
 
@@ -448,17 +448,17 @@ static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r
     }
 
     //either return the mapped register, or load into the replacement
-    if (!r_info->mapped[instr->reg_src_1]) {
+    if (!r_info->gp_mapped[instr->reg_src_1]) {
         return loadIntoSpecific(r_info, instr->reg_src_1, into, true);
-    } else if (r_info->map[instr->reg_src_1] == into) {
+    } else if (r_info->gp_map[instr->reg_src_1] == into) {
         //it is already statically mapped into the correct register, so we're done
-        return r_info->map[instr->reg_src_1];
+        return r_info->gp_map[instr->reg_src_1];
     } else {
         //it is statically mapped, but into the wrong register
         invalidateReplacement(r_info, into, true);
 
         //move over to the correct replacement and note
-        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_1]);
+        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->gp_map[instr->reg_src_1]);
         *r_info->current_recency += 1;
         r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
         r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_1;
@@ -484,17 +484,17 @@ static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r
     }
 
     //either return the mapped register, or load into the replacement
-    if (!r_info->mapped[instr->reg_src_2]) {
+    if (!r_info->gp_mapped[instr->reg_src_2]) {
         return loadIntoSpecific(r_info, instr->reg_src_2, into, true);
-    } else if (r_info->map[instr->reg_src_2] == into) {
+    } else if (r_info->gp_map[instr->reg_src_2] == into) {
         //it is already statically mapped into the correct register, so we're done
-        return r_info->map[instr->reg_src_2];
+        return r_info->gp_map[instr->reg_src_2];
     } else {
         //it is statically mapped, but into the wrong register
         invalidateReplacement(r_info, into, true);
 
         //move over to the correct replacement and note
-        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->map[instr->reg_src_2]);
+        err |= fe_enc64(&current, FE_MOV64rr, into, r_info->gp_map[instr->reg_src_2]);
         *r_info->current_recency += 1;
         r_info->replacement_recency[getIndexForReg(into)] = *r_info->current_recency;
         r_info->replacement_content[getIndexForReg(into)] = instr->reg_src_2;
@@ -519,12 +519,12 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
     }
 
     //return the mapped register, or load into replacement
-    if (!r_info->mapped[instr->reg_dest]) {
+    if (!r_info->gp_mapped[instr->reg_dest]) {
         //value is not required, as we're loading a destination register
         return loadIntoSpecific(r_info, instr->reg_dest, hint, false);
     } else {
         //it is statically mapped, so we don't touch it and return that
-        return r_info->map[instr->reg_dest];
+        return r_info->gp_map[instr->reg_dest];
     }
 }
 

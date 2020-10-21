@@ -67,8 +67,8 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
         }
 
         ///set pc
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc],
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc],
                             instr->addr + instr->imm);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
@@ -99,8 +99,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
 
     ///mov rs1 to temp register
     invalidateAllReplacements(r_info);
-    if (r_info->mapped[instr->reg_src_1]) {
-        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->map[instr->reg_src_1]);
+    if (r_info->gp_mapped[instr->reg_src_1]) {
+        err |= fe_enc64(&current, FE_MOV64rr, FE_AX, r_info->gp_map[instr->reg_src_1]);
     } else {
         err |= fe_enc64(&current, FE_MOV64rm, FE_AX, FE_MEM_ADDR(r_info->base + 8 * instr->reg_src_1));
     }
@@ -114,8 +114,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
 
     ///2: write addr of next instruction in rd
     if (instr->reg_dest != x0) {
-        if (r_info->mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[instr->reg_dest], instr->addr + 4);
+        if (r_info->gp_mapped[instr->reg_dest]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[instr->reg_dest], instr->addr + 4);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
         }
@@ -186,8 +186,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     }
 
     ///5: write target addr to pc
-    if (r_info->mapped[pc]) {
-        err |= fe_enc64(&current, FE_MOV64rr, r_info->map[pc], FE_AX);
+    if (r_info->gp_mapped[pc]) {
+        err |= fe_enc64(&current, FE_MOV64rr, r_info->gp_map[pc], FE_AX);
     } else {
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * pc), FE_AX);
     }
@@ -320,8 +320,8 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
             err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
         }
 
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], (instr->addr + ((int64_t) (instr->imm))));
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], (instr->addr + ((int64_t) (instr->imm))));
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc),
                             instr->addr + (int64_t) instr->imm);
@@ -350,8 +350,8 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
             err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), jmpMnem);
         }
 
-        if (r_info->mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->map[pc], instr->addr + 4);
+        if (r_info->gp_mapped[pc]) {
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], instr->addr + 4);
         } else {
             err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc), instr->addr + 4);
         }

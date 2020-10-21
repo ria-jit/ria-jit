@@ -426,8 +426,10 @@ typedef struct {
  * @param replacement_recency specifies the recently used RISC-V registers (lower is older, 0 is clean)
  */
 typedef struct {
-    FeReg *map;
-    bool *mapped;
+    FeReg *gp_map;
+    bool *gp_mapped;
+    FeReg *fp_map;
+    bool *fp_mapped;
     uint64_t base;
     uint64_t csr_base;
     t_risc_reg *replacement_content;
