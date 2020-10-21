@@ -246,7 +246,26 @@ context_info *init_map_context(void) {
         init_block(r_info);
         log_general("Generating context storing block...\n");
 
-        //save by register mapping
+        //check floatRegsLoaded
+        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded),0); //zero if not loaded
+
+        uint8_t *jmpBuf = current;
+        fe_enc64(&current, FE_JZ, (intptr_t) current);
+
+        //save by register mapping fp
+        for (int i = f0; i <= f31; ++i) {
+            if (r_info->fp_mapped[i]) {
+                err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * i),r_info->fp_map[i]);
+            }
+        }
+
+        //clear flag
+        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+
+        //write jump
+        fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
+
+        //save by register mapping gp
         for (int i = x0; i <= pc; ++i) {
             if (r_info->gp_mapped[i]) {
                 err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * i), r_info->gp_map[i]);

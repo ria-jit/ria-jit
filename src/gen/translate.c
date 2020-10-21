@@ -17,6 +17,7 @@
 #include <elf/loadElf.h>
 #include <fadec/fadec.h>
 #include <env/exit.h>
+#include "runtime/register.h"
 
 void *currentPos = NULL;
 
@@ -44,6 +45,11 @@ uint8_t *current;
 int err;
 
 /**
+ * float that stores if the block, that is currently worked on is a float block
+ */
+bool isFloatBlock;
+
+/**
  * Initializes a new translatable block of code.
  * Call this before translating any instructions that belong together in the same execution run
  * (e.g., before translating every basic block).
@@ -65,6 +71,26 @@ void init_block(register_info *r_info) {
 
     //make sure all replacement registers are written back as a precaution
     invalidateAllReplacements(r_info);
+
+    if (isFloatBlock) {
+        //check floatRegsLoaded
+        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        uint8_t *jmpBuf = current;
+        fe_enc64(&current, FE_JNZ, (intptr_t) current);
+
+        //load by register mapping
+        for (int i = f0; i <= f31; ++i) {
+            if (r_info->fp_mapped[i]) {
+                err |= fe_enc64(&current, FE_SSE_MOVSDrm, r_info->fp_map[i], FE_MEM_ADDR(r_info->fp_base + 8 * i));
+            }
+        }
+
+        //set flag
+        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1); //zero if not loaded
+
+        //write jump
+        fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
+    }
 }
 
 /**
@@ -250,6 +276,7 @@ translate_block_instructions(t_risc_instr *block_cache, int instructions_in_bloc
 int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, const context_info *c_info) {
 
     int instructions_in_block = 0;
+    isFloatBlock = false;
 
     ///parse structs
     for (int parse_pos = 0; parse_pos <= maxCount - 2; parse_pos++) { //-2 rather than -1 bc of final AUIPC
@@ -502,6 +529,9 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
             }
                 break;
 
+            case FLOAT: {
+                isFloatBlock = true;
+            } //FALLTHROUGH
                 ///no jump or branch -> continue fetching
             default: {
                 ///next instruction address
