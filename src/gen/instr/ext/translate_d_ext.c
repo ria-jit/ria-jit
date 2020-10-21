@@ -17,7 +17,7 @@ void translate_FLD(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getFpRegNoLoad((t_risc_fp_reg) instr->reg_dest, r_info, FIRST_FP_REG);
     err |= fe_enc64(&current, FE_SSE_MOVSDrm, regDest, FE_MEM(regSrc1, 0, 0, instr->imm));
-    setFpReg((t_risc_fp_reg) instr->reg_dest, r_info, FIRST_FP_REG);
+    setFpReg((t_risc_fp_reg) instr->reg_dest, r_info, regDest);
 }
 
 /**
