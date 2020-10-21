@@ -223,13 +223,23 @@ context_info *init_map_context(void) {
 
     //log context setup
     if (flag_log_context) {
-        log_context("Static mapping contents:\n");
+        log_context("Static general-purpose mapping contents:\n");
         for (t_risc_reg reg = x0; reg <= pc; reg++) {
             if (gp_mapped[reg]) {
                 log_context("%s/%s --> %s\n",
                             gp_to_string(reg),
                             gp_to_alias(reg),
                             reg_x86_to_string(gp_map[reg]));
+            }
+        }
+
+        log_context("Static floating point mapping contents:\n");
+        for (t_risc_fp_reg reg = f0; reg <= f31; reg++) {
+            if (fp_mapped[reg]) {
+                log_context("%s/%s --> %s\n",
+                            fp_to_string(reg),
+                            fp_to_alias(reg),
+                            reg_x86_to_string(fp_map[reg]));
             }
         }
     }
