@@ -202,8 +202,6 @@ void translate_FNMSUBS(const t_risc_instr *instr, const register_info *r_info) {
     } else {
         err |= fe_enc64(&current, FE_VFNMSUB213SSrrr, regDest, regSrc2, regSrc3);
     }
-
-    setFpReg(instr->reg_dest, r_info, regDest);
 #else
     FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, SECOND_FP_REG);
     FeReg regSrc2 = getFpReg((t_risc_fp_reg) instr->reg_src_2, r_info, FIRST_FP_REG);
@@ -692,7 +690,7 @@ void translate_FMAXS(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
  * Translate the FCVTWS instruction.
- * Description: convert floating-point number in floating-point register rs2 to signed 32-bit int into int register rd
+ * Description: convert floating-point number in floating-point register rs1 to signed 32-bit int into int register rd
  * if the value is not representable it is clipped an the invalid flag is set
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
@@ -714,10 +712,10 @@ void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
             break;
     }
 
-    FeReg regSrc2 = getFpReg((t_risc_fp_reg) instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);//sign extend
 
     if (restoreRoundMode) {
@@ -727,7 +725,7 @@ void translate_FCVTWS(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
  * Translate the FCVTWUS instruction.
- * Description: convert floating-point number in floating-point register rs2 to unsigned 32-bit int in int register rd
+ * Description: convert floating-point number in floating-point register rs1 to unsigned 32-bit int in int register rd
  * WARNING this implementation will still clamp the value but won't set the exceptions every time
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
@@ -748,11 +746,18 @@ void translate_FCVTWUS(const t_risc_instr *instr, const register_info *r_info) {
             break;
     }
 
-    FeReg regSrc2 = getFpReg((t_risc_fp_reg) instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
-    err |= fe_enc64(&current, FE_MOV32rr, regDest, regDest);//TODO necessary? does cvtss2si clear them already
+    err |= fe_enc64(&current, FE_SSE_PXORrr, SECOND_FP_REG, SECOND_FP_REG);
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, SECOND_FP_REG, FIRST_FP_REG);
+    //ja
+    uint8_t *jmpBuf = current;
+    err |= fe_enc64(&current, FE_JA, (intptr_t) current);
+    err |= fe_enc64(&current, FE_SSE_PXORrr, SECOND_FP_REG, SECOND_FP_REG);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
+    err |= fe_enc64(&jmpBuf, FE_JA, (intptr_t) current);
 
     if (restoreRoundMode) {
         restoreFpRound(r_info);
@@ -994,7 +999,7 @@ void translate_FMVWX(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
  * Translate the FCVTLS instruction.
- * Description: convert a fp number in fp register rs2 to a signed 64-bit int in rd
+ * Description: convert a fp number in fp register rs1 to a signed 64-bit int in rd
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
@@ -1014,10 +1019,10 @@ void translate_FCVTLS(const t_risc_instr *instr, const register_info *r_info) {
             break;
     }
 
-    FeReg regSrc2 = getFpReg((t_risc_fp_reg) instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
 
-    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
 
     if (restoreRoundMode) {
         restoreFpRound(r_info);
@@ -1026,7 +1031,7 @@ void translate_FCVTLS(const t_risc_instr *instr, const register_info *r_info) {
 
 /**
  * Translate the FCVTLUS instruction.
- * Description: convert a fp number in fp register rs2 to a unsigned 64-bit int in rd
+ * Description: convert a fp number in fp register rs1 to a unsigned 64-bit int in rd
  * @param instr the RISC-V instruction to translate
  * @param r_info the runtime register mapping (RISC-V -> x86)
  */
@@ -1047,9 +1052,16 @@ void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
             break;
     }
 
-    FeReg regSrc2 = getFpReg((t_risc_fp_reg) instr->reg_src_2, r_info, FIRST_FP_REG);
+    FeReg regSrc1 = getFpReg((t_risc_fp_reg) instr->reg_src_1, r_info, FIRST_FP_REG);
     FeReg regDest = getRd(instr, r_info);
     FeReg scratch = invalidateOldest(r_info);
+
+
+    err |= fe_enc64(&current, FE_SSE_PXORrr, SECOND_FP_REG, SECOND_FP_REG);
+    err |= fe_enc64(&current, FE_XOR64rr, regDest, regDest);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, SECOND_FP_REG, FIRST_FP_REG);
+    uint8_t *jmpBufZero = current;
+    err |= fe_enc64(&current, FE_JA, (intptr_t) current); //dummy
 
     //constant saved here
     const unsigned long C0 = 1593835520;
@@ -1057,21 +1069,24 @@ void translate_FCVTLUS(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_MOV32ri, scratch, C0);
     err |= fe_enc64(&current, FE_SSE_MOVDrr, SECOND_FP_REG, scratch);
 
-    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc2, SECOND_FP_REG);
+    err |= fe_enc64(&current, FE_SSE_COMISSrr, regSrc1, SECOND_FP_REG);
     uint8_t *jmpBufCOM = current;
     err |= fe_enc64(&current, FE_JNC, (intptr_t) current); //dummy
 
-    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
 
     uint8_t *jmpBufEnd = current;
     err |= fe_enc64(&current, FE_JMP, (intptr_t) current); //dummy
 
 
     err |= fe_enc64(&jmpBufCOM, FE_JNC, (intptr_t) current);
-    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regSrc2, SECOND_FP_REG);
-    err |= fe_enc64(&current, CVTmnem, regDest, regSrc2);
+    err |= fe_enc64(&current, FE_SSE_SUBSSrr, regSrc1, SECOND_FP_REG);
+    err |= fe_enc64(&current, CVTmnem, regDest, regSrc1);
     err |= fe_enc64(&current, FE_BTC64ri, regDest, 63);
+
+    //set jumps
     err |= fe_enc64(&jmpBufEnd, FE_JMP, (intptr_t) current);
+    err |= fe_enc64(&jmpBufZero, FE_JA, (intptr_t) current);
     if (restoreRoundMode) {
         restoreFpRound(r_info);
     }
@@ -1117,19 +1132,19 @@ void translate_FCVTSLU(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg scratch1 = FIRST_REG;
     FeReg scratch2 = SECOND_REG;
-    if(scratch1 == regSrc1){
-        invalidateReplacement(r_info,scratch2,true);
+    if (scratch1 == regSrc1) {
+        invalidateReplacement(r_info, scratch2, true);
         err |= fe_enc64(&current, FE_MOV64rr, scratch2, regSrc1);
-        invalidateReplacement(r_info,scratch1,true);
+        invalidateReplacement(r_info, scratch1, true);
         err |= fe_enc64(&current, FE_MOV64rr, scratch1, scratch2);
-    } else if(scratch2 == regSrc1){
-        invalidateReplacement(r_info,scratch1,true);
+    } else if (scratch2 == regSrc1) {
+        invalidateReplacement(r_info, scratch1, true);
         err |= fe_enc64(&current, FE_MOV64rr, scratch1, regSrc1);
-        invalidateReplacement(r_info,scratch2,true);
+        invalidateReplacement(r_info, scratch2, true);
         err |= fe_enc64(&current, FE_MOV64rr, scratch2, scratch1);
     } else {
-        invalidateReplacement(r_info,scratch1,true);
-        invalidateReplacement(r_info,scratch2,true);
+        invalidateReplacement(r_info, scratch1, true);
+        invalidateReplacement(r_info, scratch2, true);
         err |= fe_enc64(&current, FE_MOV64rr, scratch1, regSrc1);
         err |= fe_enc64(&current, FE_MOV64rr, scratch2, regSrc1);
     }
