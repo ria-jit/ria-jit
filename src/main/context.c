@@ -276,14 +276,14 @@ context_info *init_map_context(void) {
     //generate these dynamically in case we need to modify them
     {
         //context storing
-        init_block(r_info, false);
+        init_block(r_info, 0);
         log_general("Generating context storing block...\n");
 
         //check floatRegsLoaded
-        /*err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
 
         uint8_t *jmpBuf = current;
-        err |= fe_enc64(&current, FE_JZ, (intptr_t) current);*/
+        err |= fe_enc64(&current, FE_JZ, (intptr_t) current);
 
         //save by register mapping fp
         for (int i = f0; i <= f31; ++i) {
@@ -291,12 +291,12 @@ context_info *init_map_context(void) {
                 err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * i), r_info->fp_map[i]);
             }
         }
-        /*
+
         //clear flag
         err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
 
         //write jump
-        err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);*/
+        err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
 
         //save by register mapping gp
         for (int i = x0; i <= pc; ++i) {
@@ -318,7 +318,7 @@ context_info *init_map_context(void) {
 
     {
         //context loading
-        init_block(r_info, false);
+        init_block(r_info, 0);
         log_general("Generating context executing block...\n");
 
         //store callee-saved host registers BX, BP, R12, R13, R14, R15
@@ -339,14 +339,6 @@ context_info *init_map_context(void) {
                 err |= fe_enc64(&current, FE_MOV64rm, r_info->gp_map[i], FE_MEM_ADDR(r_info->base + 8 * i));
             }
         }
-
-        //load by fp register mapping
-        for (int i = f0; i <= f31; ++i) {
-            if (r_info->fp_mapped[i]) {
-                err |= fe_enc64(&current, FE_SSE_MOVSDrm, r_info->fp_map[i], FE_MEM_ADDR(r_info->fp_base + 8 * i));
-            }
-        }
-
         err |= fe_enc64(&current, FE_TEST32rr, SECOND_REG, SECOND_REG);
 
         uint8_t *jmpBuf = current;
