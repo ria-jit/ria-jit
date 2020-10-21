@@ -166,8 +166,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                     break;
                 case 'v':
                 VERSION:
-		    //todo: remove fp_ext in dev note when merging into develop
-                    printf("RISC-V -> x86-64 Dynamic Binary Translator (fp_ext in dev) %s\n", translator_version);
+                    printf("RISC-V -> x86-64 Dynamic Binary Translator %s\n", translator_version);
                     parse_result.status = 1;
                     return parse_result;
                 case 'g':
@@ -213,8 +212,7 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 case 'h':
                 default:
                 HELP:
-		    //todo: remove fp_ext in dev note when merging into develop
-                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator (fp_ext in dev) %s\n", translator_version);
+                    dprintf(1, "RISC-V -> x86-64 Dynamic Binary Translator %s\n", translator_version);
                     dprintf(1,
                             "Usage: ./translator [translator option(s)] -f <filename> [guest options]\n"
                             "\n"
