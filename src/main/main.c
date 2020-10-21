@@ -74,7 +74,7 @@ int transcode_loop(const char *file_path, int guestArgc, char **guestArgv) {
     init_return_stack();
 
     setupInstrMem();
-    context_info *c_info = init_map_context();
+    context_info *c_info = init_map_context(result.floatBinary);
 
     set_value(pc, next_pc);
 

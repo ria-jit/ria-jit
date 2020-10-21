@@ -68,7 +68,7 @@ void init_block(register_info *r_info, bool isFloatBlock) {
     //make sure all replacement registers are written back as a precaution
     invalidateAllReplacements(r_info);
 
-    if (isFloatBlock) {
+    /*if (isFloatBlock) {
         //check floatRegsLoaded
         err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
         uint8_t *jmpBuf = current;
@@ -86,7 +86,7 @@ void init_block(register_info *r_info, bool isFloatBlock) {
 
         //write jump
         err |= fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
-    }
+    }*/
 }
 
 /**

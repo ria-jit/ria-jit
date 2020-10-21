@@ -68,7 +68,7 @@ public:
 
     static void SetUpTestSuite() {
         if (c_info == nullptr) {
-            c_info = init_map_context();
+            c_info = init_map_context(false);
             r_info = c_info->r_info;
         }
     }
