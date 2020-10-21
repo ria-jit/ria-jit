@@ -233,7 +233,8 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
     //write back that register to the file, if there is a valid value present
     t_risc_reg currentlyPresent = r_info->replacement_content[min];
     FeReg selectedReplacement = getRegForIndex(min);
-    log_context("Selected %s for %s (oldest or free).\n", reg_x86_to_string(selectedReplacement), reg_to_string(requested));
+    log_context("Selected %s for %s (oldest or free).\n", reg_x86_to_string(selectedReplacement),
+                reg_to_string(requested));
     if (currentlyPresent != x0 && currentlyPresent != INVALID_REG) {
         err |= fe_enc64(&current,
                         FE_MOV64mr,
@@ -275,7 +276,8 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
  */
 static inline FeReg
 loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination, bool requireValue) {
-    log_context("Loading %s into specific replacement %s...\n", reg_to_string(candidate), reg_x86_to_string(destination));
+    log_context("Loading %s into specific replacement %s...\n", reg_to_string(candidate),
+                reg_x86_to_string(destination));
 
     //increment access recency and get index
     *r_info->current_recency += 1;
@@ -308,7 +310,8 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
                 err |= fe_enc64(&current, FE_XCHG64rr, destination, getRegForIndex(presentIndex));
             } else if (r_info->replacement_recency[index] != 0 && !requireValue) {
                 //we need to keep this value, but the other value does not matter, so just move
-                log_context("Requested %s occupied. Overwriting redundant value of %s...\n", reg_x86_to_string(destination),
+                log_context("Requested %s occupied. Overwriting redundant value of %s...\n",
+                            reg_x86_to_string(destination),
                             reg_x86_to_string(getRegForIndex(presentIndex)));
                 err |= fe_enc64(&current, FE_MOV64rr, getRegForIndex(presentIndex), destination);
             } else if (requireValue) {
@@ -529,17 +532,26 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
 }
 
 static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
-    //for now always load from memory
-    err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg)); //TODO maybe use movq instead?
-    return replacement;
+    if (!r_info->fp_mapped[fp_reg]) {
+        err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->base + 8 * fp_reg));
+        return replacement;
+    } else {
+        return r_info->fp_map[fp_reg];
+    }
 }
 
 static inline FeReg getFpRegNoLoad(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
-    return replacement;
+    if (!r_info->fp_mapped[fp_reg]) {
+        return replacement;
+    } else {
+        return r_info->fp_map[fp_reg];
+    }
 }
 
 static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg regUsed) {
-    err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), regUsed);
+    if (!r_info->fp_mapped[fp_reg]) {
+        err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->base + 8 * fp_reg), regUsed);
+    }
 }
 
 static inline void doArithmCommutative(FeReg regSrc1, FeReg regSrc2, FeReg regDest, uint64_t arithmMnem) {
@@ -594,7 +606,7 @@ static inline void loadScratchReg(FeReg scratch) {
 #define MXCSR_SAVE FE_MEM_ADDR((intptr_t) get_fctrl_file())
 
 
-static inline uint32_t to_SSE_RoundMode(uint32_t round){
+static inline uint32_t to_SSE_RoundMode(uint32_t round) {
     switch (round) {
         case RNE:
             return FE_TONEAREST;
@@ -613,7 +625,7 @@ static inline uint32_t to_SSE_RoundMode(uint32_t round){
     return RNE; //default to standard RNE
 }
 
-static inline uint32_t to_RISCV_RoundMode(uint32_t round){
+static inline uint32_t to_RISCV_RoundMode(uint32_t round) {
     switch (round) {
         case FE_TONEAREST:
             return RNE;
