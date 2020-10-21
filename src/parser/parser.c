@@ -79,7 +79,6 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
     p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
     p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
     p_instr_struct->reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
-    //p_instr_struct->reg_src_2 = extract_rs2(raw_instr); NOT REALLY NEEDED MOST OF TIME
 
     //extract opcode bits[6:2]
     t_opcodes opcode = (t_opcodes) (raw_instr >> 2 & 0x1f);

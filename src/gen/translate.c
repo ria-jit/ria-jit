@@ -302,9 +302,6 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             //accesses the fcsr register handle separatly
                             parse_buf[parse_pos].reg_src_2 = (t_risc_reg) parse_buf[parse_pos].mnem; //save mnem
                             parse_buf[parse_pos].mnem = MANUAL_CSRR; //set different mnem for different dispatch
-                            risc_addr += 4;
-                            instructions_in_block++;
-                            goto PARSE_DONE;
                         }
                         risc_addr += 4;
                         instructions_in_block++;
