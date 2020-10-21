@@ -37,6 +37,9 @@ protected:
     t_risc_reg_val rs2StartValue{};
     t_resFunc resFunc{};
     t_risc_reg_val expectedRd;
+    const t_risc_reg_val test_reg_values[31] =
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    30};
     bool rs1Mapped{};
     bool rs2Mapped{};
     bool rdMapped{};
@@ -53,7 +56,6 @@ protected:
     ArithmTest() {
         std::tie(mnem, immediateInstr, rs1StartValue, rs2StartValue, resFunc, rs1Mapped, rs2Mapped, rdMapped) =
                 GetParam();
-
         expectedRd = resFunc(rs1StartValue, rs1StartValue, rs2StartValue);
     }
 
@@ -96,16 +98,29 @@ register_info *ArithmTest::r_info = nullptr;
 TEST_P(ArithmTest, AllDifferent) {
     blockCache[0] =
             t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd,
-                    static_cast<t_risc_imm>(rs2StartValue)};
+                    {{static_cast<t_risc_imm>(rs2StartValue)}}};
 
     t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
+    //set every register
     set_value(rs1, rs1StartValue);
     if (!immediateInstr) {
         set_value(rs2, rs2StartValue);
     }
+    for (int i = 1; i < 31; i++) {
+        if(i != rs1 && (immediateInstr || i != rs2)){
+            set_value(static_cast<t_risc_reg>(i),test_reg_values[i]);
+        }
+    }
 
     execute_in_guest_context(c_info, loc);
+
+    //check for side effects
+    for (int i = 1; i < 31; i++) {
+        if(i != rd && i != rs1 && (immediateInstr || i != rs2)) {
+            EXPECT_EQ(test_reg_values[i], get_value(static_cast<t_risc_reg>(i)));
+        }
+    }
 
     EXPECT_EQ(rs1StartValue, get_value(rs1));
     if (!immediateInstr) {
