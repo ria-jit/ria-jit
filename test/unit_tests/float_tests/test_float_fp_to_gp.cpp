@@ -128,8 +128,9 @@ INSTANTIATE_TEST_SUITE_P(FCVTWUS,
                          FpToGpFloatTest,
                          testing::Combine(
                                  testing::Values(FCVTWUS),
-                                 testing::Values(1, 20.123, 300.4, -1232.123, -0.111),
+                                 testing::Values(1, 20.123, 300.4, -1232.123, -10.111),
                                  testing::Values([](float rs1) {
+                                     if(rs1 < 0) return (uint64_t) 0;
                                      return (uint64_t) (uint32_t) rs1;
                                  }),
                                  testing::Values(false),
@@ -153,6 +154,7 @@ INSTANTIATE_TEST_SUITE_P(FCVTLUS,
                                  testing::Values(1, 20.123, 300.4, -1232.123, -0.111, 10000000000000000000.0,
                                                  -10000000000000000.0),
                                  testing::Values([](float rs1) {
+                                     if(rs1 < 0) return (uint64_t) 0;
                                      return (uint64_t) rs1;
                                  }),
                                  testing::Values(false),

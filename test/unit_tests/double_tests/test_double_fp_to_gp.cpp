@@ -129,6 +129,7 @@ INSTANTIATE_TEST_SUITE_P(FCVTWUD,
                                  testing::Values(FCVTWUD),
                                  testing::Values(1, 20.123, 300.4,-1232.123,-0.111),
                                  testing::Values([](double rs1) {
+                                     if(rs1 < 0) return (uint64_t) 0;
                                      return (uint64_t )(uint32_t)rs1;
                                  }),
                                  testing::Values(false),
@@ -150,6 +151,7 @@ INSTANTIATE_TEST_SUITE_P(FCVTLUD,
                                  testing::Values(FCVTLUD),
                                  testing::Values(1, 20.123, 300.4,-1232.123,-0.111, 10000000000000000000.0,-10000000000000000.0),
                                  testing::Values([](double rs1) {
+                                     if(rs1 < 0) return (uint64_t) 0;
                                      return (uint64_t)rs1;
                                  }),
                                  testing::Values(false),
