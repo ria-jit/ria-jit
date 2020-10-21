@@ -32,7 +32,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     ///push to return stack
     if (flag_translate_opt_ras && (instr->reg_dest == x1 || instr->reg_dest == x5)) {
-        rs_emit_push(instr, r_info);
+        rs_emit_push(instr, r_info, false);
     }
 
     ///set rd
@@ -129,17 +129,17 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
             if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
                 if (instr->reg_dest == instr->reg_src_1) {
                     ///push
-                    rs_emit_push(instr, r_info);
+                    rs_emit_push(instr, r_info, true);
                 } else {
                     //not tested
                     ///pop and push
                     rs_emit_pop_RAX(false, r_info);
-                    rs_emit_push(instr, r_info);
+                    rs_emit_push(instr, r_info, true);
                     rs_jump_stack(r_info);
                 }
             } else {
                 ///push
-                rs_emit_push(instr, r_info);
+                rs_emit_push(instr, r_info, true);
             }
         } else {
             if (instr->reg_src_1 == x1 || instr->reg_src_1 == x5) {
