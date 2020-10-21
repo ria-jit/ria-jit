@@ -364,7 +364,7 @@ char *mnem_to_string(int mnem) {
     }
 }
 
-char *reg_to_string(int reg) {
+char *gp_to_string(int reg) {
     switch (reg) {
         case x0:
             return "x0";
@@ -435,7 +435,7 @@ char *reg_to_string(int reg) {
     }
 }
 
-char *reg_to_alias(int reg) {
+char *gp_to_alias(int reg) {
     switch (reg) {
         case zero:
             return "zero";
@@ -626,6 +626,148 @@ char *reg_x86_to_string(FeReg reg) {
             return "XMM14";
         case FE_XMM15:
             return "XMM15";
+        default:
+            return "INVALID";
+    }
+}
+
+char *fp_to_string(int reg) {
+    switch (reg) {
+        case f0:
+            return "f0";
+        case f1:
+            return "f1";
+        case f2:
+            return "f2";
+        case f3:
+            return "f3";
+        case f4:
+            return "f4";
+        case f5:
+            return "f5";
+        case f6:
+            return "f6";
+        case f7:
+            return "f7";
+        case f8:
+            return "f8";
+        case f9:
+            return "f9";
+        case f10:
+            return "f10";
+        case f11:
+            return "f11";
+        case f12:
+            return "f12";
+        case f13:
+            return "f13";
+        case f14:
+            return "f14";
+        case f15:
+            return "f15";
+        case f16:
+            return "f16";
+        case f17:
+            return "f17";
+        case f18:
+            return "f18";
+        case f19:
+            return "f19";
+        case f20:
+            return "f20";
+        case f21:
+            return "f21";
+        case f22:
+            return "f22";
+        case f23:
+            return "f23";
+        case f24:
+            return "f24";
+        case f25:
+            return "f25";
+        case f26:
+            return "f26";
+        case f27:
+            return "f27";
+        case f28:
+            return "f28";
+        case f29:
+            return "f29";
+        case f30:
+            return "f30";
+        case f31:
+            return "f31";
+        default:
+            return "INVALID";
+    }
+}
+
+char *fp_to_alias(int reg) {
+    switch (reg) {
+        case f0:
+            return "ft0";
+        case f1:
+            return "ft1";
+        case f2:
+            return "ft2";
+        case f3:
+            return "ft3";
+        case f4:
+            return "ft4";
+        case f5:
+            return "ft5";
+        case f6:
+            return "ft6";
+        case f7:
+            return "ft7";
+        case f8:
+            return "fs0";
+        case f9:
+            return "fs1";
+        case f10:
+            return "fa0";
+        case f11:
+            return "fa1";
+        case f12:
+            return "fa2";
+        case f13:
+            return "fa3";
+        case f14:
+            return "fa4";
+        case f15:
+            return "fa5";
+        case f16:
+            return "fa6";
+        case f17:
+            return "fa7";
+        case f18:
+            return "fs2";
+        case f19:
+            return "fs3";
+        case f20:
+            return "fs4";
+        case f21:
+            return "fs5";
+        case f22:
+            return "fs6";
+        case f23:
+            return "fs7";
+        case f24:
+            return "fs8";
+        case f25:
+            return "fs9";
+        case f26:
+            return "fs10";
+        case f27:
+            return "fs11";
+        case f28:
+            return "ft8";
+        case f29:
+            return "ft9";
+        case f30:
+            return "ft10";
+        case f31:
+            return "ft11";
         default:
             return "INVALID";
     }

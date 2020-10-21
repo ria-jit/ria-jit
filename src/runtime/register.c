@@ -22,7 +22,7 @@ t_risc_reg_val csr_file[N_CSR];
  * Contents of the floating point registers stored in memory.
  * For convenience, see enum type t_risc_fp_reg.
  */
-t_risc_fp_reg_val fp_file[N_FP];
+t_risc_fp_reg_val fp_file[N_FP_REG];
 
 /**
  * Swap space for the 6 callee-saved registers and a scratch register
@@ -38,13 +38,6 @@ uint64_t swap_file[7];
  * See context.c for reference.
  */
 uint32_t fctrl_file[2];
-
-
-/**
- * Usage array for profiler.
- * Used to count register accesses during program execution.
- */
-uint64_t usage[N_REG];
 
 t_risc_reg_val *get_gp_reg_file(void) {
     return gp_file;
@@ -66,11 +59,6 @@ uint32_t *get_fctrl_file(void) {
     return fctrl_file;
 }
 
-__attribute__((unused))
-uint64_t *get_usage_file(void) {
-    return usage;
-}
-
 /**
  * Get the value currently in the passed register.
  * @param reg the register to lookup
@@ -83,7 +71,6 @@ t_risc_reg_val get_value(t_risc_reg reg) {
     } else {
         return gp_file[reg];
     }
-
 }
 
 /**
@@ -124,7 +111,7 @@ void dump_gp_registers(void) {
 
     //dump all registers:
     for (t_risc_reg i = x0; i < pc; ++i) {
-        log_reg_dump("%s/%s\t0x%lx\n", reg_to_string(i), reg_to_alias(i), get_value(i));
+        log_reg_dump("%s/%s\t0x%lx\n", gp_to_string(i), gp_to_alias(i), get_value(i));
     }
 
     //nice pc output

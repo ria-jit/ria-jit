@@ -18,9 +18,13 @@ char *errorcode_to_string(int mnem);
 //the RISC-V mnemonic of the instruction
 char *mnem_to_string(int mnem);
 
-char *reg_to_string(int reg);
+char *gp_to_string(int reg);
 
-char *reg_to_alias(int reg);
+char *gp_to_alias(int reg);
+
+char *fp_to_string(int reg);
+
+char *fp_to_alias(int reg);
 
 char *reg_x86_to_string(FeReg reg);
 
@@ -285,7 +289,7 @@ typedef enum {
 } t_risc_csr_reg;
 
 //floating point registers
-#define N_FP 32
+#define N_FP_REG 32
 typedef enum {
     f0, f1, f2, f3, f4, f5, f6, f7, f8, f9,
     f10, f11, f12, f13, f14, f15, f16, f17, f18, f19,

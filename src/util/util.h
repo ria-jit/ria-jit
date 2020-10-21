@@ -8,6 +8,7 @@
 #include <fadec/fadec-enc.h>
 #include <gen/translate.h>
 #include <runtime/register.h>
+#include <util/tools/profile.h>
 #include <common.h>
 #include <env/flags.h>
 #include <env/exit.h>
@@ -23,8 +24,11 @@ extern "C" {
 
 #define bool_str(b) (b ? "yes" : "no")
 
-//add an access to reg to the profiler's data
-#define RECORD_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_usage_file() + 8 * (reg)))
+//add an access to gp reg to the profiler's data
+#define RECORD_GP_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_gp_usage_file() + 8 * (reg)))
+
+//add an access to the fp reg to the profiler's data
+#define RECORD_FP_PROFILER(reg) err |= fe_enc64(&current, FE_INC64m, FE_MEM_ADDR((uint64_t) get_fp_usage_file() + 8 * (reg)))
 
 /*
  * Helper functions to extract FeRegs without handling every mapping case.
@@ -83,12 +87,12 @@ static inline void invalidateReplacement(const register_info *r_info, FeReg repl
     t_risc_reg currentContent = r_info->replacement_content[index];
     log_context("Invalidating replacement %s with content %s...\n",
                 reg_x86_to_string(replacement),
-                reg_to_string(currentContent));
+                gp_to_string(currentContent));
 
     //write back to register file
     if (writeback && currentContent != x0 && currentContent != INVALID_REG) {
         log_context("Writing back %s from %s...\n",
-                    reg_to_string(currentContent),
+                    gp_to_string(currentContent),
                     reg_x86_to_string(replacement));
         err |= fe_enc64(&current, FE_MOV64mr, FE_MEM_ADDR(r_info->base + 8 * currentContent), replacement);
     }
@@ -153,7 +157,7 @@ static inline void loadReplacements(const register_info *r_info) {
         } else if (content == INVALID_REG) {
             continue;
         } else {
-            log_context("Loading %s into %s...\n", reg_to_string(content), reg_x86_to_string(replacement));
+            log_context("Loading %s into %s...\n", gp_to_string(content), reg_x86_to_string(replacement));
             err |= fe_enc64(&current,
                             FE_MOV64rm,
                             replacement,
@@ -176,7 +180,7 @@ static inline void storeReplacements(const register_info *r_info) {
         if (content == x0 || content == INVALID_REG) {
             continue;
         } else {
-            log_context("Writing back %s from %s...\n", reg_to_string(content), reg_x86_to_string(replacement));
+            log_context("Writing back %s from %s...\n", gp_to_string(content), reg_x86_to_string(replacement));
             err |= fe_enc64(&current,
                             FE_MOV64mr,
                             FE_MEM_ADDR(r_info->base + 8 * content),
@@ -196,7 +200,7 @@ static inline void storeReplacements(const register_info *r_info) {
  * @return the x86 register that contains the requested replacement
  */
 static inline FeReg loadIntoReplacement(const register_info *r_info, const t_risc_reg requested, bool requireValue) {
-    log_context("Loading %s into replacement (requireValue %s)...\n", reg_to_string(requested), bool_str(requireValue));
+    log_context("Loading %s into replacement (requireValue %s)...\n", gp_to_string(requested), bool_str(requireValue));
 
     //increment access recency
     *r_info->current_recency += 1;
@@ -234,13 +238,13 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
     t_risc_reg currentlyPresent = r_info->replacement_content[min];
     FeReg selectedReplacement = getRegForIndex(min);
     log_context("Selected %s for %s (oldest or free).\n", reg_x86_to_string(selectedReplacement),
-                reg_to_string(requested));
+                gp_to_string(requested));
     if (currentlyPresent != x0 && currentlyPresent != INVALID_REG) {
         err |= fe_enc64(&current,
                         FE_MOV64mr,
                         FE_MEM_ADDR(r_info->base + 8 * currentlyPresent),
                         selectedReplacement);
-        log_context("Writing back %s from %s...\n", reg_to_string(currentlyPresent),
+        log_context("Writing back %s from %s...\n", gp_to_string(currentlyPresent),
                     reg_x86_to_string(selectedReplacement));
     }
 
@@ -250,7 +254,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
 
     //load the requested register into the selected replacement
     if (requireValue) {
-        log_context("Loading %s into %s...\n", reg_to_string(requested), reg_x86_to_string(selectedReplacement));
+        log_context("Loading %s into %s...\n", gp_to_string(requested), reg_x86_to_string(selectedReplacement));
         if (requested != x0) {
             err |= fe_enc64(&current, FE_MOV64rm, selectedReplacement, FE_MEM_ADDR(r_info->base + 8 * requested));
         } else {
@@ -276,8 +280,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
  */
 static inline FeReg
 loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destination, bool requireValue) {
-    log_context("Loading %s into specific replacement %s...\n", reg_to_string(candidate),
-                reg_x86_to_string(destination));
+    log_context("Loading %s into specific replacement %s...\n", gp_to_string(candidate), reg_x86_to_string(destination));
 
     //increment access recency and get index
     *r_info->current_recency += 1;
@@ -298,7 +301,7 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
     if (alreadyMapped) {
         //if we already mapped it and it's in the correct spot, we're done
         if (index == presentIndex) {
-            log_context("Register %s was already in %s.\n", reg_to_string(candidate), reg_x86_to_string(destination));
+            log_context("Register %s was already in %s.\n", gp_to_string(candidate), reg_x86_to_string(destination));
             return destination;
         } else {
             //we have to shuffle the registers around (switch info as well as values), so
@@ -342,7 +345,7 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
                 (r_info->replacement_content[index] != x0 || r_info->replacement_content[index] != INVALID_REG)) {
             //write back if we don't have x0 or invalid in there
             log_context("Writing back %s from %s to free specific replacement...\n",
-                        reg_to_string(r_info->replacement_content[index]),
+                        gp_to_string(r_info->replacement_content[index]),
                         reg_x86_to_string(destination));
             err |= fe_enc64(&current,
                             FE_MOV64mr,
@@ -353,7 +356,7 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
         //load the register into the correct spot
         if (requireValue) {
             log_context("Loading %s into %s...\n",
-                        reg_to_string(candidate),
+                        gp_to_string(candidate),
                         reg_x86_to_string(destination));
             err |= fe_enc64(&current,
                             FE_MOV64rm,
@@ -379,7 +382,7 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
 static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_src_1);
     }
 
     //either return the mapped register, or load into a replacement
@@ -400,7 +403,7 @@ static inline FeReg getRs1(const t_risc_instr *instr, const register_info *r_inf
 static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_2);
+        RECORD_GP_PROFILER(instr->reg_src_2);
     }
 
     //either return the mapped register, or load into a replacement
@@ -421,7 +424,7 @@ static inline FeReg getRs2(const t_risc_instr *instr, const register_info *r_inf
 static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info) {
     //log register access to profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     if (!r_info->gp_mapped[instr->reg_dest]) {
@@ -447,7 +450,7 @@ static inline FeReg getRd(const t_risc_instr *instr, const register_info *r_info
 static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r_info, FeReg into) {
     //log register access to profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_src_1);
     }
 
     //either return the mapped register, or load into the replacement
@@ -483,7 +486,7 @@ static inline FeReg getRs1Into(const t_risc_instr *instr, const register_info *r
 static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r_info, FeReg into) {
     //log register access to profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_2);
+        RECORD_GP_PROFILER(instr->reg_src_2);
     }
 
     //either return the mapped register, or load into the replacement
@@ -518,7 +521,7 @@ static inline FeReg getRs2Into(const t_risc_instr *instr, const register_info *r
 static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *r_info, FeReg hint) {
     //log register access to the profile if requested
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     //return the mapped register, or load into replacement
@@ -532,6 +535,10 @@ static inline FeReg getRdHinted(const t_risc_instr *instr, const register_info *
 }
 
 static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
+    if (flag_do_profile) {
+        RECORD_FP_PROFILER(fp_reg);
+    }
+
     if (!r_info->fp_mapped[fp_reg]) {
         err |= fe_enc64(&current, FE_SSE_MOVSDrm, replacement, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg));
         return replacement;
@@ -541,6 +548,10 @@ static inline FeReg getFpReg(const t_risc_fp_reg fp_reg, const register_info *r_
 }
 
 static inline FeReg getFpRegNoLoad(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg replacement) {
+    if (flag_do_profile) {
+        RECORD_FP_PROFILER(fp_reg);
+    }
+
     if (!r_info->fp_mapped[fp_reg]) {
         return replacement;
     } else {
@@ -549,6 +560,10 @@ static inline FeReg getFpRegNoLoad(const t_risc_fp_reg fp_reg, const register_in
 }
 
 static inline void setFpReg(const t_risc_fp_reg fp_reg, const register_info *r_info, const FeReg regUsed) {
+    if (flag_do_profile) {
+        RECORD_FP_PROFILER(fp_reg);
+    }
+
     if (!r_info->fp_mapped[fp_reg]) {
         err |= fe_enc64(&current, FE_SSE_MOVSDmr, FE_MEM_ADDR(r_info->fp_base + 8 * fp_reg), regUsed);
     }

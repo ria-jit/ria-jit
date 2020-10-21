@@ -16,6 +16,7 @@
 #include <env/flags.h>
 #include <env/opt.h>
 #include <util/tools/analyze.h>
+#include <util/tools/profile.h>
 
 //just temporary - we need some way to control transcoding globally?
 bool finalize = false;

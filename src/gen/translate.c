@@ -141,26 +141,26 @@ void translate_risc_instr(t_risc_instr *instr, const context_info *c_info) {
             mnem_to_string(instr->mnem),
             instr->addr,
             instr->optype,
-            reg_to_string(instr->reg_src_1),
-            reg_to_alias(instr->reg_src_1),
-            reg_to_string(instr->reg_src_2),
-            reg_to_alias(instr->reg_src_2),
-            reg_to_string(instr->reg_dest),
-            reg_to_alias(instr->reg_dest),
+            gp_to_string(instr->reg_src_1),
+            gp_to_alias(instr->reg_src_1),
+            gp_to_string(instr->reg_src_2),
+            gp_to_alias(instr->reg_src_2),
+            gp_to_string(instr->reg_dest),
+            gp_to_alias(instr->reg_dest),
             instr->imm
     );
 
     //log context details
     log_context("Static mapping of %s - (rs1: %s/%s %s) - (rs2: %s/%s %s) - (rd: %s/%s %s)\n",
                 mnem_to_string(instr->mnem),
-                reg_to_string(instr->reg_src_1),
-                reg_to_alias(instr->reg_src_1),
+                gp_to_string(instr->reg_src_1),
+                gp_to_alias(instr->reg_src_1),
                 bool_str(c_info->r_info->gp_mapped[instr->reg_src_1]),
-                reg_to_string(instr->reg_src_2),
-                reg_to_alias(instr->reg_src_2),
+                gp_to_string(instr->reg_src_2),
+                gp_to_alias(instr->reg_src_2),
                 bool_str(c_info->r_info->gp_mapped[instr->reg_src_2]),
-                reg_to_string(instr->reg_dest),
-                reg_to_alias(instr->reg_dest),
+                gp_to_string(instr->reg_dest),
+                gp_to_alias(instr->reg_dest),
                 bool_str(c_info->r_info->gp_mapped[instr->reg_dest])
     );
 

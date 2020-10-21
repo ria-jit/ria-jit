@@ -204,8 +204,8 @@ context_info *init_map_context(void) {
         for (t_risc_reg reg = x0; reg <= pc; reg++) {
             if (gp_mapped[reg]) {
                 log_context("%s/%s --> %s\n",
-                            reg_to_string(reg),
-                            reg_to_alias(reg),
+                            gp_to_string(reg),
+                            gp_to_alias(reg),
                             reg_x86_to_string(gp_map[reg]));
             }
         }

@@ -148,8 +148,8 @@ void analyze(const char *file_path) {
         log_analyze("==========\n");
         for (int i = 0; i < N_REG; i++) {
             if (reg[regRanked[i]] == 0) break;
-            log_analyze("Register %s (%s) is used %li times.\n", reg_to_string(regRanked[i]),
-                        reg_to_alias(regRanked[i]),
+            log_analyze("Register %s (%s) is used %li times.\n", gp_to_string(regRanked[i]),
+                        gp_to_alias(regRanked[i]),
                         reg[regRanked[i]]);
         }
         log_analyze("\n");

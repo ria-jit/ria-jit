@@ -99,7 +99,7 @@ set(TRANSLATOR_SOURCES
         src/gen/instr/patterns.h src/gen/instr/patterns.c
         ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
         src/env/flags.c src/env/flags.h
-        src/env/exit.c src/env/exit.h src/runtime/manualCSRR.c src/runtime/manualCSRR.h)
+        src/env/exit.c src/env/exit.h src/runtime/manualCSRR.c src/runtime/manualCSRR.h src/util/tools/profile.c src/util/tools/profile.h)
 
 set(UNIT_TESTS_SOURCES
         test/unit_tests/test_main.cpp

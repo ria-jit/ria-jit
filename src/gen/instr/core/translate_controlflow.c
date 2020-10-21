@@ -26,7 +26,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
 
     //add rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     ///push to return stack
@@ -91,8 +91,8 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
 
     //add rs1, rd access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
-        RECORD_PROFILER(instr->reg_dest);
+        RECORD_GP_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_dest);
     }
 
     ///1: compute target address
@@ -286,8 +286,8 @@ translate_controlflow_cmp_rs1_rs2(const t_risc_instr *instr, const register_info
 
     //add rs1, rs2 access to profiler
     if (flag_do_profile) {
-        RECORD_PROFILER(instr->reg_src_1);
-        RECORD_PROFILER(instr->reg_src_2);
+        RECORD_GP_PROFILER(instr->reg_src_1);
+        RECORD_GP_PROFILER(instr->reg_src_2);
     }
 
     ///compare registers:
