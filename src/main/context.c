@@ -197,7 +197,7 @@ context_info *init_map_context(void) {
     }                                          \
 
     /**
-     * We capture approximately 85 % of the register hits when we map the following registers:
+     * We capture approximately 81,4 % of the register hits when we map the following registers:
      * (by order of access frequency)
      * f15, f14, f9, f13, f12, f10, f11, f1, f0, f3,  f2, f31, f20, f24
      *                             into
@@ -280,10 +280,10 @@ context_info *init_map_context(void) {
         log_general("Generating context storing block...\n");
 
         //check floatRegsLoaded
-        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
 
         uint8_t *jmpBuf = current;
-        fe_enc64(&current, FE_JZ, (intptr_t) current);
+        err |= fe_enc64(&current, FE_JZ, (intptr_t) current);
 
         //save by register mapping fp
         for (int i = f0; i <= f31; ++i) {
@@ -293,10 +293,10 @@ context_info *init_map_context(void) {
         }
 
         //clear flag
-        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
 
         //write jump
-        fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
+        err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);
 
         //save by register mapping gp
         for (int i = x0; i <= pc; ++i) {

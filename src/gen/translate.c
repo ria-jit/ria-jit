@@ -70,9 +70,9 @@ void init_block(register_info *r_info, bool isFloatBlock) {
 
     if (isFloatBlock) {
         //check floatRegsLoaded
-        fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
+        err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
         uint8_t *jmpBuf = current;
-        fe_enc64(&current, FE_JNZ, (intptr_t) current);
+        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);
 
         //load by register mapping
         for (int i = f0; i <= f31; ++i) {
@@ -82,10 +82,10 @@ void init_block(register_info *r_info, bool isFloatBlock) {
         }
 
         //set flag
-        fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1);
+        err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1);
 
         //write jump
-        fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
+        err |= fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
     }
 }
 
