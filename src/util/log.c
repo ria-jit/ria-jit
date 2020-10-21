@@ -15,18 +15,24 @@
  */
 const char *const translator_version = VERSION;
 
-void not_yet_implemented(const char *info) {
-    log_general("%s - not yet implemented\n", info);
-}
+void critical_not_yet_implemented(const char *info, ...) {
+    va_list args;
+    va_start(args, info);
 
-void critical_not_yet_implemented(const char *info) {
     if (flag_fail_silently) {
-        not_yet_implemented(info);
+        dprintf(1, "Warning: ");
+        vdprintf(1, info, args);
+        dprintf(1, " - not yet implemented\n");
     } else {
         //fail fast, so write to stderr, then quit
-        dprintf(2, "Critical: %s - not yet implemented\n", info);
+        dprintf(2, "Critical: ");
+        vdprintf(2, info, args);
+        dprintf(2, " - not yet implemented\n");
         panic(FAIL_NOT_IMPL);
+        //exited
     }
+
+    va_end(args);
 }
 
 /**
