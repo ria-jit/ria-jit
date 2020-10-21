@@ -2,12 +2,7 @@
 // Created by Flo Schmidt on 18.10.20.
 //
 
-#include <util/version.h>
 #include <stdbool.h>
-#include <common.h>
-#include <util/typedefs.h>
-#include <util/log.h>
-#include "flags.h"
 
 bool flag_log_general = false;
 bool flag_log_syscall = false;

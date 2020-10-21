@@ -8,7 +8,6 @@
 #include <util/log.h>
 #include <fadec/fadec-enc.h>
 #include <cache/return_stack.h>
-#include <common.h>
 #include <util/util.h>
 
 #include <parser/parser.h>
@@ -22,7 +21,7 @@ static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *jmpLoc, uint64_t mnem);
 
 
-void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
+void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info __attribute__((unused))) {
     log_asm_out("Translate JAL\n");
 
     //add rd access to profiler
@@ -43,7 +42,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
             x0,
             x0,
             instr->reg_dest,
-            4
+            {{4}}
     };
 
     translate_AUIPC(&aupicInstr, r_info);
@@ -81,7 +80,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     }
 }
 
-void translate_JALR(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info) {
+void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     /**
      * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1,
      * then setting the least-significant bit of the result to zero.
@@ -156,14 +155,15 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
 
         //TODO: more efficient way of obtaining target (without parsing)
 
-        t_risc_instr tmp_p_instr = {0};
+        t_risc_instr tmp_p_instr;
         tmp_p_instr.addr = instr->addr - 4;
 
         parse_instruction(&tmp_p_instr);
 
         t_risc_addr target = tmp_p_instr.addr + tmp_p_instr.imm + instr->imm;
 
-        t_cache_loc cache_loc = 0;
+        t_cache_loc cache_loc;
+
         if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
             ///4: write chainEnd to be chained by chainer
             log_asm_out("CHAIN JALR\n");
@@ -172,7 +172,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info, cons
             err |= fe_enc64(&current, FE_MOV32mi, FE_MEM_ADDR((uint64_t) &chain_type), FE_JMP);
         } else {
             log_asm_out("DIRECT JUMP JALR\n");
-            err |= fe_enc64(&current, FE_MOV64ri, FE_CX, cache_loc);
+            err |= fe_enc64(&current, FE_MOV64ri, FE_CX, (FeOp) cache_loc);
             err |= fe_enc64(&current, FE_JMPr, FE_CX);
         }
 

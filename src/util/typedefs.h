@@ -322,6 +322,33 @@ typedef enum {
 
 } t_SSEfflags;
 
+/* Definiton bit is set if:
+ * 0: rs is negative infinity
+ * 1: rs is a negative normal number
+ * 2: rs is a negative subnormal number
+ * 3: rs is minus zero
+ * 4: rs is positive zero
+ * 5: rs is a positive subnormal number
+ * 6: rs is a positive normal number
+ * 7: rs is positive infinity
+ * 8: rs is a signaling NaN
+ * 9: rs is a quiet NaN
+ * Assembler code for the following instructions
+ */
+
+typedef enum {
+    NEG_INFINITY = 0x1,
+    NEG_NORMAL = 0x2,
+    NEG_SUBNORMAL = 0x4,
+    NEG_ZERO = 0x8,
+    POS_ZERO = 0x10,
+    POS_SUBNORMAL = 0x20,
+    POS_NORMAL = 0x40,
+    POS_INFINITY = 0x80,
+    SIG_NAN = 0x100,
+    QUIET_NAN = 0x200
+} t_fclass_bits;
+
 #define FFLAGS 0x001
 #define FRM 0x002
 #define FCSR 0x003
@@ -353,6 +380,7 @@ static inline t_risc_fp_reg_val get_dVal(double d) {
     ret.d = d;
     return ret;
 }
+
 static inline t_risc_fp_reg_val get_iVal(uint64_t i) {
     t_risc_fp_reg_val ret;
     ret.i = i;

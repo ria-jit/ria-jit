@@ -8,46 +8,45 @@
 #include "parser.h"
 
 // extract rd register number bit[11:7]
-static inline int extract_rd(int32_t instr) {return instr >> 7 & 0b11111;}
+static inline int32_t extract_rd(int32_t instr) {return instr >> 7 & 0x1f;}
 
 // extract rs1 register number bit[19:15]
-static inline int extract_rs1(int32_t instr) {return instr >> 15 & 0b11111;}
+static inline int32_t extract_rs1(int32_t instr) {return instr >> 15 & 0x1f;}
 
 // extract rs2 register number bit[24:20]
-static inline int extract_rs2(int32_t instr) {return instr >> 20 & 0b11111;}
+static inline int32_t extract_rs2(int32_t instr) {return instr >> 20 & 0x1f;}
 
 // extract rs3 register number bit[31:27]
-static inline int extract_rs3(int32_t instr) {return instr >> 27 & 0b11111;}
+static inline int32_t extract_rs3(int32_t instr) {return instr >> 27 & 0x1f;}
 
 // extract func2 bit [26:25]
-static inline int extract_funct2(int32_t instr) {return instr >> 25 & 0b11;}
+static inline int32_t extract_funct2(int32_t instr) {return instr >> 25 & 0x3;}
 
 // extract func3 bit [14:12]
-static inline int extract_funct3(int32_t instr) {return instr >> 12 & 0b111;}
+static inline int32_t extract_funct3(int32_t instr) {return instr >> 12 & 0x7;}
 
 // extract func7 bit [31:25]
-static inline int extract_funct7(int32_t instr) {return instr >> 25 & 0b1111111;}
+static inline int32_t extract_funct7(int32_t instr) {return instr >> 25 & 0x7f;}
 
 // extract big_shamt bit[25:20]
-static inline int extract_big_shamt(int32_t instr) {return instr >> 20 & 0b111111;}
+static inline int32_t extract_big_shamt(int32_t instr) {return instr >> 20 & 0x3f;}
 
 // extract small_shamt bit[24:20] -> basically the same as rs2
-static inline int extract_small_shamt(int32_t instr) {return instr >> 20 & 0b11111;}
+static inline int32_t extract_small_shamt(int32_t instr) {return instr >> 20 & 0x1f;}
 
 // extract U-Type immediate bit[31:12] -> mask lower 12 bit [11:0] with zeros
-static inline int extract_imm_U(int32_t instr) {return instr & ~(0xfff);}
+static inline int32_t extract_imm_U(int32_t instr) {return instr & ~(0xfff);}
 
 // extract I-Type immediate bit[31:20]
-static inline int extract_imm_I(int32_t instr) {return instr >> 20;} //sign extend!
+static inline int32_t extract_imm_I(int32_t instr) {return instr >> 20;} //sign extend!
 
 // extract S-Type immediate bit[31:25] + [11:7] => 7bits + 5 bits
-static inline int extract_imm_S(int32_t instr) {return (instr >> 20 & ~0b11111) | (instr >> 7 & 0b11111);}
+static inline int32_t extract_imm_S(int32_t instr) {return (instr >> 20 & ~0x1f) | (instr >> 7 & 0x1f);}
 
 // extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
 // sign extended because jump address is pc relative
 // [20] => [31], [10:1] => [30:21], [11] => [20], [19:12] => [19:12]
-
-static inline int extract_imm_J(int32_t instr) {
+static inline int32_t extract_imm_J(int32_t instr) {
     return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
             ((signed) instr >> (30 - 10) & 0xffe007fe);
 }
@@ -55,7 +54,7 @@ static inline int extract_imm_J(int32_t instr) {
 // extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
 static inline int32_t extract_imm_B(int32_t instr) {
     return (instr >> (31 - 12) & 0xfffff000) | (instr << (11 - 7) & (1 << 11)) |
-            (instr >> (30 - 10) & 0b11111100000) | (instr >> (11 - 4) & 0b11110);
+            (instr >> (30 - 10) & 0x7e0) | (instr >> (11 - 4) & 0x1e);
 }
 
 int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
@@ -555,7 +554,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
             int funct7 = extract_funct7(raw_instr);
             int funct3 = extract_funct3(raw_instr);
             int rs2 = extract_rs2(raw_instr);
-            int operandSize = funct7 & 0b11; // lower two bits determine operand size
+            int operandSize = funct7 & 0x3; // lower two bits determine operand size
             // it looks like this bit determines if the rs2 field is used as a rounding mode, or as a funct code
             if ((funct7 & 0x0100000) == 0) {
                 p_instr_struct->reg_src_2 = rs2;

@@ -40,7 +40,7 @@ void translate_SLLI(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    t_risc_imm masked_imm = instr->imm & 0b111111;
+    t_risc_imm masked_imm = instr->imm & 0x3f;
     if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
         err |= fe_enc64(&current, FE_LEA64rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
     } else {
@@ -224,7 +224,7 @@ void translate_SRLI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SHR64ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SHR64ri, regDest, instr->imm & 0x3f);
 }
 
 /**
@@ -243,7 +243,7 @@ void translate_SRAI(const t_risc_instr *instr, const register_info *r_info) {
         err |= fe_enc64(&current, FE_MOV64rr, regDest, regSrc1);
     }
 
-    err |= fe_enc64(&current, FE_SAR64ri, regDest, instr->imm & 0b111111);
+    err |= fe_enc64(&current, FE_SAR64ri, regDest, instr->imm & 0x3f);
 }
 
 /**
@@ -484,7 +484,7 @@ void translate_SLLIW(const t_risc_instr *instr, const register_info *r_info) {
     FeReg regSrc1 = getRs1(instr, r_info);
     FeReg regDest = getRd(instr, r_info);
 
-    t_risc_imm masked_imm = instr->imm & 0b11111;
+    t_risc_imm masked_imm = instr->imm & 0x1f;
     if (regDest != regSrc1 && (masked_imm == 1 || masked_imm == 2 || masked_imm == 3)) {
         err |= fe_enc64(&current, FE_LEA32rm, regDest, FE_MEM(0, 1 << masked_imm, regSrc1, 0));
     } else {
@@ -513,7 +513,7 @@ void translate_SRLIW(const t_risc_instr *instr, const register_info *r_info) {
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
-    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0b11111);
+    err |= fe_enc64(&current, FE_SHR32ri, regDest, instr->imm & 0x1f);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 
@@ -532,7 +532,7 @@ void translate_SRAIW(const t_risc_instr *instr, const register_info *r_info) {
     if (regDest != regSrc1) {
         err |= fe_enc64(&current, FE_MOV32rr, regDest, regSrc1);
     }
-    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0b11111);
+    err |= fe_enc64(&current, FE_SAR32ri, regDest, instr->imm & 0x1f);
     err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, regDest);
 }
 

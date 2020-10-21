@@ -120,10 +120,10 @@ context_info *init_map_context(void) {
      * Of which are callee-saved: BX, BP, R12, R13, R14, R15
      */
 #define map_reg(reg_risc, reg_x86)          \
-    ({                                      \
+    {                                       \
         register_map[reg_risc] = reg_x86;   \
         mapped[reg_risc] = true;            \
-    })                                      \
+    }                                       \
 
     /**
      * We capture approximately 85 % of the register hits when we map the following registers:
@@ -133,18 +133,18 @@ context_info *init_map_context(void) {
      *                             into
      * BX,  BP,  SI,  DI,  R8, R9, R10, R11, R12, R13, R14, R15
      */
-    map_reg(a5, FE_BX);
-    map_reg(a4, FE_BP);
-    map_reg(a3, FE_SI);
-    map_reg(a0, FE_DI);
-    map_reg(fp, FE_R8);
-    map_reg(sp, FE_R9);
-    map_reg(a2, FE_R10);
-    map_reg(a1, FE_R11);
-    map_reg(s1, FE_R12);
-    map_reg(ra, FE_R13);
-    map_reg(a7, FE_R14);
-    map_reg(s2, FE_R15);
+    map_reg(a5, FE_BX)
+    map_reg(a4, FE_BP)
+    map_reg(a3, FE_SI)
+    map_reg(a0, FE_DI)
+    map_reg(fp, FE_R8)
+    map_reg(sp, FE_R9)
+    map_reg(a2, FE_R10)
+    map_reg(a1, FE_R11)
+    map_reg(s1, FE_R12)
+    map_reg(ra, FE_R13)
+    map_reg(a7, FE_R14)
+    map_reg(s2, FE_R15)
 
 #undef map_reg
 

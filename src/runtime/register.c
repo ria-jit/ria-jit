@@ -55,7 +55,7 @@ t_risc_reg_val *get_csr_reg_file(void) {
 }
 
 t_risc_reg_val *get_fp_reg_file(void) {
-    return fp_file;
+    return (t_risc_reg_val *) fp_file;
 }
 
 uint64_t *get_swap_file(void) {
@@ -66,6 +66,7 @@ uint32_t *get_fctrl_file(void) {
     return fctrl_file;
 }
 
+__attribute__((unused))
 uint64_t *get_usage_file(void) {
     return usage;
 }

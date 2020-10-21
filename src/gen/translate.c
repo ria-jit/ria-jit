@@ -20,8 +20,6 @@
 
 void *currentPos = NULL;
 
-t_risc_addr lastUsedAddress = TRANSLATOR_BASE;
-
 //instruction translation
 void translate_risc_instr(t_risc_instr *instr, const context_info *c_info);
 
@@ -405,7 +403,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 x0,
                                 x0,
                                 parse_buf[parse_pos].reg_dest,
-                                4
+                                {{4}}
                         };
 
                         instructions_in_block++;

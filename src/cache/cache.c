@@ -21,7 +21,6 @@
 #include "cache.h"
 #include <env/flags.h>
 #include <util/log.h>
-#include <util/util.h>
 #include <common.h>
 #include <linux/mman.h>
 #include <env/opt.h>

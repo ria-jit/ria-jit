@@ -6,7 +6,6 @@
 #include "typedefs.h"
 #include <env/flags.h>
 #include <common.h>
-#include <stdbool.h>
 #include <util/version.h>
 #include <env/exit.h>
 
