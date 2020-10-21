@@ -113,6 +113,80 @@ TEST_P(FusedArithmFloatTest, AllDifferent) {
     EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
 }
 
+TEST_P(FusedArithmFloatTest, Rs1Rs2Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+    set_fpvalue(rs3, get_fVal(rs3StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs3StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(rs3StartValue, get_fpvalue(rs3).f);
+}
+
+TEST_P(FusedArithmFloatTest, Rs1Rs3Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0].reg_src_3 = rs1;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+    set_fpvalue(rs2, get_fVal(rs2StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs2StartValue, rs1StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
+}
+
+TEST_P(FusedArithmFloatTest, Rs2Rs3Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd, 0};
+    blockCache[0].reg_src_3 = rs2;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+    set_fpvalue(rs2, get_fVal(rs2StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs2StartValue, rs2StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
+}
+
+TEST_P(FusedArithmFloatTest, Rs1Rs2Rs3Same) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd, 0};
+    blockCache[0].reg_src_3 = rs1;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs1StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rd).f);
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+}
+
 TEST_P(FusedArithmFloatTest, Rs1RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1, 0};
     blockCache[0].reg_src_3 = rs3;
@@ -131,6 +205,22 @@ TEST_P(FusedArithmFloatTest, Rs1RdSame) {
     EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
 }
 
+TEST_P(FusedArithmFloatTest, AllSame) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1, 0};
+    blockCache[0].reg_src_3 = rs1;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    expectedRd = resFunc(rs1StartValue, rs1StartValue, rs1StartValue);
+
+    EXPECT_EQ(expectedRd, get_fpvalue(rs1).f);
+}
+
 TEST_P(FusedArithmFloatTest, Rs2RdSame) {
     blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2, 0};
     blockCache[0].reg_src_3 = rs3;
@@ -147,6 +237,24 @@ TEST_P(FusedArithmFloatTest, Rs2RdSame) {
     EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
     EXPECT_EQ(rs3StartValue, get_fpvalue(rs3).f);
     EXPECT_EQ(expectedRd, get_fpvalue(rs2).f);
+}
+
+TEST_P(FusedArithmFloatTest, Rs3RdSame) {
+    blockCache[0] = t_risc_instr{0, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs3, 0};
+    blockCache[0].reg_src_3 = rs3;
+    blockCache[0].rounding_mode = DYN;
+
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+
+    set_fpvalue(rs1, get_fVal(rs1StartValue));
+    set_fpvalue(rs2, get_fVal(rs2StartValue));
+    set_fpvalue(rs3, get_fVal(rs3StartValue));
+
+    execute_in_guest_context(c_info, loc);
+
+    EXPECT_EQ(rs1StartValue, get_fpvalue(rs1).f);
+    EXPECT_EQ(rs2StartValue, get_fpvalue(rs2).f);
+    EXPECT_EQ(expectedRd, get_fpvalue(rs3).f);
 }
 
 INSTANTIATE_TEST_SUITE_P(FMADDS,
