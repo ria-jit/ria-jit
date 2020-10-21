@@ -16,7 +16,7 @@ extern "C" {
 /**
  * Global for saving if the static mapped float registers have been loaded
  */
-uint8_t floatRegsLoaded = false;
+extern uint8_t floatRegsLoaded;
 
 t_risc_reg_val *get_gp_reg_file(void);
 

@@ -39,6 +39,11 @@ uint64_t swap_file[7];
  */
 uint32_t fctrl_file[2];
 
+/**
+ * Global for saving if the static mapped float registers have been loaded
+ */
+uint8_t floatRegsLoaded = false;
+
 t_risc_reg_val *get_gp_reg_file(void) {
     return gp_file;
 }
