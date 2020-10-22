@@ -19,19 +19,14 @@ The main possibilities to achieve this are:
     \item \textbf{Static Binary Translation}, where the guest executable is statically reverse-engineered and translated to the guest architecture as a whole.
     After this translation step, it can be executed as if it were a native binary, without the need for any further special treatment.
     In theory you could reach near native speeds for the generated binary using this technique.
-    There some hurdles with this though, one example is register indirect branches, which require some way to convert the guest addresses to native.
-    Any program that produces assembly at runtime would also prove difficult to translate statically.
-    \item \textbf{Dynamic Binary Translation}, which serves as a middle ground between interpreting and statically translating the executable.
+    There some hurdles with this though, one example is register indirect branches, which require some way to convert the guest addresses to native at runtime.
+    Any program that produces or edits assembly at runtime would also prove difficult to translate statically.
+    \item \textbf{Dynamic Binary Translation} (DBT), which serves as a middle ground between interpreting and statically translating the executable.
     It aims to translate the program on the fly, while only focussing on the parts that are actually needed for execution.
+    Therefore it can save some of the overhead of a Static Translator by not worrying about unused code paths and also the other mentioned issues are easily resolved.
+    Unlike an Interpreter every instruction only has to be translated once and can then be run without any unnecessary overhead.
+    Of course, this assumes that the translation routines are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f.]{bintrans}.
 \end{itemize}
-
-By only translating the parts of the binary that are actually executed, the dynamic binary translator (DBT) can save the overhead a static translator would have spent on translating unused code paths.
-Also, as the DBT is actually stepping through and executing the program, the other limitations of static binary translators essentially do not apply.
-
-It can also perform significantly better than an interpreter might, as it has to translate a single piece of code only once, which can then be called many times; unlike the above-mentioned behaviour of an interpreter.
-Furthermore, as it produces blocks of code that are native to the host platform, it can be reasonably expected that a single block's execution will be faster than the respective emulation.
-
-Of course, this assumes that the translation routines of the DBT are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f.]{bintrans}.
 
 We aim to provide such an emulator, allowing the execution of RISC-V code on an x86-64 machine by means of dynamic binary translation.
 
