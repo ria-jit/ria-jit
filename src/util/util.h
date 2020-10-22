@@ -310,6 +310,9 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
                 err |= fe_enc64(&current, FE_XOR32rr, destination, destination);
             }
 
+            //reset recency so the value will not be overwritten
+            r_info->replacement_recency[presentIndex] = *r_info->current_recency;
+
             //we're already done
             return destination;
         } else {
