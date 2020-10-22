@@ -6,8 +6,15 @@
 
 [![pipeline status](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/badges/develop/pipeline.svg)](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/-/commits/develop)
 
+## Version 1.3.1 (latest)
+### Release notes
+- fix a bug where the replacement register recency was not reset correctly when loading a non-mapped register that was already present
+- prevent redundant writes to x0 in the A-extension translation
+- reorder patterns for more efficient translations
+- various minor cleanups
 
-## Version 1.3.0 (latest)
+
+## Version 1.3.0
 ### Release notes
 - implement support for F-/D-extension including a static register mapping
 - expand unit testing coverage to test combinations for floating point instructions
