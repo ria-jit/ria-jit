@@ -258,6 +258,7 @@ static inline FeReg loadIntoReplacement(const register_info *r_info, const t_ris
         if (requested != x0) {
             err |= fe_enc64(&current, FE_MOV64rm, selectedReplacement, FE_MEM_ADDR(r_info->base + 8 * requested));
         } else {
+            log_context("Zeroing %s for requested x0...\n", reg_x86_to_string(selectedReplacement));
             err |= fe_enc64(&current, FE_XOR32rr, selectedReplacement, selectedReplacement);
         }
     }
@@ -302,6 +303,17 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
         //if we already mapped it and it's in the correct spot, we're done
         if (index == presentIndex) {
             log_context("Register %s was already in %s.\n", gp_to_string(candidate), reg_x86_to_string(destination));
+
+            //make sure x0 is actually zero
+            if (candidate == x0) {
+                log_context("Zeroing %s for requested x0...\n", reg_x86_to_string(destination));
+                err |= fe_enc64(&current, FE_XOR32rr, destination, destination);
+            }
+
+            //reset recency so the value will not be overwritten
+            r_info->replacement_recency[presentIndex] = *r_info->current_recency;
+
+            //we're already done
             return destination;
         } else {
             //we have to shuffle the registers around (switch info as well as values), so
@@ -337,6 +349,12 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
 
             //mark as young, so it won't get overwritten in case of misuse
             r_info->replacement_recency[index] = *r_info->current_recency;
+
+            //make sure x0 is actually zero
+            if (candidate == x0) {
+                log_context("Zeroing %s for requested x0...\n", reg_x86_to_string(destination));
+                err |= fe_enc64(&current, FE_XOR32rr, destination, destination);
+            }
         }
     } else {
         //if it's not mapped, we need to load it into this specific register
@@ -354,7 +372,7 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
         }
 
         //load the register into the correct spot
-        if (requireValue) {
+        if (requireValue && candidate != x0) {
             log_context("Loading %s into %s...\n",
                         gp_to_string(candidate),
                         reg_x86_to_string(destination));
@@ -362,6 +380,10 @@ loadIntoSpecific(const register_info *r_info, t_risc_reg candidate, FeReg destin
                             FE_MOV64rm,
                             destination,
                             FE_MEM_ADDR(r_info->base + 8 * candidate));
+        } else if (candidate == x0) {
+            //make sure x0 is actually zero
+            log_context("Zeroing %s for requested x0...\n", reg_x86_to_string(destination));
+            err |= fe_enc64(&current, FE_XOR32rr, destination, destination);
         }
 
         //note the load

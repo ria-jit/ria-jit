@@ -654,8 +654,8 @@ const pattern patterns[] = {
         {p_3_elem,  2, &emit_pattern_3},  //AUIPC + ADDI
         {p_4_elem,  2, &emit_pattern_4},  //AUIPC + LW
         {p_5_elem,  2, &emit_pattern_5},  //AUIPC + LD
-        {p_21_elem, 2, &emit_pattern_21}, //zero-extend, then multiply
         {p_6_elem,  2, &emit_pattern_6},  //SLLI + SRLI
+        {p_21_elem, 2, &emit_pattern_21}, //zero-extend, then multiply
         {p_19_elem, 2, &emit_pattern_19_LI}, //LUI + ADDI
         {p_23_elem, 2, &emit_pattern_23},  //ADDIW + ANDI 0xff
         {p_11_elem, 1, &emit_pattern_11_MV}, //ADDI MV

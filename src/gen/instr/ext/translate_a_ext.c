@@ -75,7 +75,9 @@ void translate_AMOSWAPW(const t_risc_instr *instr, const register_info *r_info) 
 //    err |= fe_enc64(&current, FE_XCHG32mr, FE_MEM(regSrc1, 0, 0, 0), SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -100,7 +102,9 @@ void translate_AMOADDW(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_ADD32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -125,7 +129,9 @@ void translate_AMOXORW(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_XOR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -150,7 +156,9 @@ void translate_AMOANDW(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_AND32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -175,7 +183,9 @@ void translate_AMOORW(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV32rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_OR32mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -207,7 +217,9 @@ void translate_AMOMINW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMOVL32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -239,7 +251,9 @@ void translate_AMOMAXW(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMOVG32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -271,7 +285,9 @@ void translate_AMOMINUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMOVC32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -303,7 +319,9 @@ void translate_AMOMAXUW(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMOVA32rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -366,7 +384,9 @@ void translate_AMOSWAPD(const t_risc_instr *instr, const register_info *r_info) 
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -391,7 +411,9 @@ void translate_AMOADDD(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_ADD64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -416,7 +438,9 @@ void translate_AMOXORD(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_XOR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -441,7 +465,9 @@ void translate_AMOANDD(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_AND64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -466,7 +492,9 @@ void translate_AMOORD(const t_risc_instr *instr, const register_info *r_info) {
     //note: this was likely wrong in the previous implementation. we want to set rd := [rs1], not rd := rs1
     err |= fe_enc64(&current, FE_MOV64rm, SCRATCH_REG, FE_MEM(regSrc1, 0, 0, 0));
     err |= fe_enc64(&current, FE_OR64mr, FE_MEM(regSrc1, 0, 0, 0), regSrc2);
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -498,7 +526,9 @@ void translate_AMOMIND(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMOVL64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -530,7 +560,9 @@ void translate_AMOMAXD(const t_risc_instr *instr, const register_info *r_info) {
     err |= fe_enc64(&current, FE_CMOVG64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -563,7 +595,9 @@ void translate_AMOMINUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMOVC64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }
@@ -595,7 +629,9 @@ void translate_AMOMAXUD(const t_risc_instr *instr, const register_info *r_info) 
     err |= fe_enc64(&current, FE_CMOVA64rr, SECOND_REG, SCRATCH_REG);
     err |= fe_enc64(&current, FE_MOV64mr, FE_MEM(regSrc1, 0, 0, 0), SECOND_REG);
 
-    err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    if (instr->reg_dest != x0) {
+        err |= fe_enc64(&current, FE_MOV64rr, regDest, SCRATCH_REG);
+    }
 
     loadScratchReg(SCRATCH_REG);
 }

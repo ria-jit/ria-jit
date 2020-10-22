@@ -271,8 +271,8 @@ t_opt_parse_result parse_cmd_arguments(int argc, char **argv) {
                 flag_log_cache_contents, flag_log_syscall, flag_verbose_disassembly, flag_log_context);
     log_general("Fail silently: %d\n", flag_fail_silently);
     log_general("Single stepping: %d\n", flag_single_step);
-    log_general("Translate opt: ras %d, chaining %d, recurse jumps %d, singlestep %d\n",
-                flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_single_step);
+    log_general("Translate opt: ras %d, chaining %d, recurse jumps %d, fusion %d,singlestep %d\n",
+                flag_translate_opt_ras, flag_translate_opt_chain, flag_translate_opt_jump, flag_translate_opt_fusion, flag_single_step);
     log_general("Do analyze: mnem %d, reg %d, pattern %d\n", flag_do_analyze_mnem, flag_do_analyze_reg, flag_do_analyze_pattern);
     log_general("Do benchmarking: %d\n", flag_do_benchmark);
     log_general("Do profiling: %d\n", flag_do_profile);

@@ -276,16 +276,10 @@ context_info *init_map_context(bool floatBinary) {
     //generate these dynamically in case we need to modify them
     {
         //context storing
-        init_block(r_info, false);
+        init_block(r_info);
         log_general("Generating context storing block...\n");
 
         if (floatBinary) {
-            //check floatRegsLoaded
-            /*err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
-
-            uint8_t *jmpBuf = current;
-            err |= fe_enc64(&current, FE_JZ, (intptr_t) current);*/
-
             //save by register mapping fp
             for (int i = f0; i <= f31; ++i) {
                 if (r_info->fp_mapped[i]) {
@@ -293,13 +287,6 @@ context_info *init_map_context(bool floatBinary) {
                 }
             }
         }
-
-        /*
-        //clear flag
-        err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
-
-        //write jump
-        err |= fe_enc64(&jmpBuf, FE_JZ, (intptr_t) current);*/
 
         //save by register mapping gp
         for (int i = x0; i <= pc; ++i) {
@@ -321,7 +308,7 @@ context_info *init_map_context(bool floatBinary) {
 
     {
         //context loading
-        init_block(r_info, false);
+        init_block(r_info);
         log_general("Generating context executing block...\n");
 
         //store callee-saved host registers BX, BP, R12, R13, R14, R15

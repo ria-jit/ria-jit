@@ -9,7 +9,7 @@ execute_process(
 
 ##Update this on Release so the fallback is right.
 if (res)
-    set(VERSION "v1.3.0")
+    set(VERSION "v1.3.1")
 endif ()
 
 configure_file(${SRC} ${DST})

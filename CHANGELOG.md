@@ -6,8 +6,45 @@
 
 [![pipeline status](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/badges/develop/pipeline.svg)](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/-/commits/develop)
 
+## Version 1.3.1 (latest)
+### Release notes
+- fix a bug where the replacement register recency was not reset correctly when loading a non-mapped register that was already present
+- prevent redundant writes to x0 in the A-extension translation
+- reorder patterns for more efficient translations
+- various minor cleanups
 
-## Version 1.2.2 (latest)
+
+## Version 1.3.0
+### Release notes
+- implement support for F-/D-extension including a static register mapping
+- expand unit testing coverage to test combinations for floating point instructions
+- optimise chaining for conditional branches
+- cleanup and fix various small issues in the code base
+
+
+## Version 1.2.4
+### Release notes
+- implement a lazy runtime register replacement strategy, keeping the not-statically-mapped values in the replacement registers as long as possible to prevent redundant memory operations inside blocks
+- add logging for static and dynamic register mapping
+- implement patterns for MV and LI, ADDI with rs1 == x0 and several shifting combinations as well as zero-extensions via ANDI and 0xff
+- use the x86 LEA instruction for faster translations of various input instructions
+- rewrite and optimise the return address stack
+- fix the `-m` short option to include `--optimize=no-fusion`
+- use the output of `git describe` for the version string to include the commit hash in the build
+- add inline logging for generated assembly with `--log=asm-out`
+- split up the analyser command line flags to specify what to analyse
+- bump C standard to C11
+
+
+## Version 1.2.3
+### Release notes
+- do not page-align the generated code
+- implement pattern matching to apply macro operation fusion of multiple RISC-V instructions
+- optimise various instructions and clean up legacy code
+- gain performance to approx. 1.4x-1.7x faster than QEMU
+
+
+## Version 1.2.2
 ### Release notes
 
 * expand the static register mapping for better performance overall
@@ -23,7 +60,6 @@
 
 
 ## Version 1.2.1
-
 ### Release notes
 
 * add implementations for `AMOMIN` and `AMOMAX` instructions
@@ -50,7 +86,6 @@
 
 
 ## Version 1.1.0
-
 ### Release notes
 
 *  cleanup and refactor project files
@@ -61,7 +96,6 @@
 
 
 ## Version 1.0.1
-
 ### Release notes
 
 *  Fix an issue with the `read` system call that could cause blocking problems with gzip.
@@ -69,7 +103,6 @@
 
 
 ## Version 1.0
-
 ### Release notes
 
 The initial release of the translator capable of executing gzip.

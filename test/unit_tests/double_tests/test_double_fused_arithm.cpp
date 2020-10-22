@@ -101,7 +101,7 @@ TEST_P(FusedArithmDoubleTest, AllDifferent) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -120,7 +120,7 @@ TEST_P(FusedArithmDoubleTest, Rs1Rs2Same) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs3, get_dVal(rs3StartValue));
@@ -139,7 +139,7 @@ TEST_P(FusedArithmDoubleTest, Rs1Rs2Rs3Same) {
     blockCache[0].reg_src_3 = rs1;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
 
@@ -156,7 +156,7 @@ TEST_P(FusedArithmDoubleTest, Rs1RdSame) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -174,7 +174,7 @@ TEST_P(FusedArithmDoubleTest, Rs2RdSame) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -192,7 +192,7 @@ TEST_P(FusedArithmDoubleTest, Rs3RdSame) {
     blockCache[0].reg_src_3 = rs3;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
     set_fpvalue(rs2, get_dVal(rs2StartValue));
@@ -210,7 +210,7 @@ TEST_P(FusedArithmDoubleTest, AllSame) {
     blockCache[0].reg_src_3 = rs1;
     blockCache[0].rounding_mode = DYN;
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, true);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_fpvalue(rs1, get_dVal(rs1StartValue));
 
