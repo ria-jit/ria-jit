@@ -9,14 +9,17 @@ as the repository contains submodules that are required for compilation.
 Then, the translator can be built by exeucting
 \begin{lstlisting}
 	sudo apt-get -y install gcc g++ cmake make autoconf meson
-	mkdir build && cd build && cmake .. && make
+	mkdir build && cd build
+	cmake -DCMAKE_BUILD_TYPE=Release \
+			-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=true ..
+	make
 \end{lstlisting}
 in the root directory of the repository.
-Note that the build requires CMake version 3.16 or above.
+Note that the build requires CMake version 3.15 or above.
 This will build two artifacts:
 \begin{description}
-	\item[translator] The actual dynamic binary translator.
-	For details on the usage, see section \vref{sec:translator-usage}, or execute \texttt{./translator -h}.
+	\item[translator] The dynamic binary translator.
+	For details on the usage, see section \ref{sec:translator-usage}, or execute \texttt{./translator -h}.
 	
 	\item[test] The unit test binary.
 	It can be executed via \texttt{./test} and performs extensive unit testing of the RISC-V instruction implementations, the cache, register file, as well as the parser.
@@ -26,14 +29,12 @@ This will build two artifacts:
 We can execute binaries compiled via the tools provided in the RISC-V GNU toolchain\footnote{For further information as well as download and usage instructions, see \url{https://github.com/riscv/riscv-gnu-toolchain} (last accessed on 25.09.2020).}.
 The executables need to be linked statically (pass the flag \texttt{-static} to gcc when compiling), as the translator does not support dynamically linked files.
 
-% todo update if floating point comes into play
-We currently support binaries compiled for the architecture specifier \texttt{rv64ima}, meaning the compiler is free to utilise the base integer instruction set (\texttt{i}), as well as the instructions provided by the multiplication (\texttt{m}) and atomic standard extensions (\texttt{a}).
-This can be achieved by passing \texttt{-march=rv64ima} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, the aforementioned option implies \texttt{-mabi=lp64}.}.
+We currently support binaries compiled for the architecture specifier \texttt{rv64imafd} (also called \texttt{rv64g}), meaning the compiler is free to utilise the base integer instruction set (\texttt{i}), as well as the instructions provided by the multiplication (\texttt{m}), atomic (\texttt{a}) and floating point standard extensions (\texttt{f}, \texttt{d}).
+This can be achieved by passing \texttt{-march=rv64g} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, excluding the floating point instructions in the architecture string implies \texttt{-mabi=lp64}.}.
 
 
 \subsection{Using the translator}
 \label{sec:translator-usage}
-% this assumes the state of opt_rewrite, todo update as necessary
 \begin{lstlisting}
 	./translator [translator option(s)] -f <filename> [guest options]
 \end{lstlisting}
@@ -43,22 +44,58 @@ All possible translator options are described in the help text, as seen by execu
 Every option after the filename specified via the \texttt{-f} flag is passed along to the guest in its \texttt{argv}, so all options intended for the translator must be passed before \texttt{-f}.
 
 The command line options also include the ability to analyse (\texttt{-a}) the binary to produce a detailed breakdown of which instruction mnemonics and registers the guest will use when executed.
-Furthermore, it includes the ability to time the execution of only the guest program by passing the flag \texttt{-b}.
+Furthermore, it includes the ability to time the execution of only the guest program (\texttt{-b}) and profile the register and cache usage (\texttt{-p}).
 
 Logging can be controlled by passing the requested category to the \texttt{----log} flag as detailed in the help, and can provide insights into the state of the translator during execution or debugging.
-Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining or recursive jump target translation via \texttt{----optimize}.
-
-
-\subsection{Using the bundled tools}
-\label{sec:appendix-tools}
-% todo section about usage of -a, -p, -b and --perf
-There seems to be nothing here yet\ldots
+Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining, recursive jump target translation or macro operation fusion via \texttt{----optimize}.
 
 
 \subsection{Version history}
 The following mirrors the version control change log of the translator over the course of its development.
 
-\paragraph{Version 1.2.2 (latest)}
+\paragraph{Version 1.3.1 (latest)}
+\begin{itemize*}
+ 	\item fix a bug where the replacement register recency was not reset correctly when loading a non-mapped-register that was already present
+ 	\item prevent redundant writes to x0 in the A-extension translation
+ 	\item reorder patterns for more efficient translations
+ 	\item various minor cleanups
+\end{itemize*}
+
+
+\paragraph{Version 1.3.0}
+\begin{itemize*}
+ 	\item implement support for F-/D-extension including a static register mapping
+ 	\item expand unit testing coverage to test combinations for floating point instructions
+ 	\item optimise chaining for conditional branches
+ 	\item cleanup and fix various small issues in the code base
+\end{itemize*}
+
+
+\paragraph{Version 1.2.4}
+\begin{itemize*}
+ 	\item implement a lazy runtime register replacement strategy, keeping the not-statically-mapped values in the replacement registers as long as possible to prevent redundant memory operations inside blocks
+ 	\item add logging for static and dynamic register mapping
+ 	\item implement patterns for MV and LI, ADDI with rs1 == x0 and several shifting combinations as well as zero-extensions via ANDI and 0xff
+ 	\item use the x86 LEA instruction for faster translations of various input instructions
+ 	\item rewrite and optimise the return address stack
+ 	\item fix the \texttt{-m} short option to include \texttt{----optimize=no-fusion}
+ 	\item use the output of \texttt{git describe} for the version string to include the commit hash in the build
+ 	\item add inline logging for generated assembly with \texttt{----log=asm-out}
+ 	\item split up the analyser command line flags to specify what to analyse
+ 	\item bump C standard to C11
+\end{itemize*}
+
+
+\paragraph{Version 1.2.3}
+\begin{itemize*}
+ 	\item do not page-align the generated code
+ 	\item implement pattern matching to apply macro operation fusion of multiple RISC-V instructions
+ 	\item optimise various instructions and clean up legacy code
+ 	\item gain performance to approx. 1.4x--1.7x faster than QEMU
+\end{itemize*}
+
+
+\paragraph{Version 1.2.2}
 \begin{itemize*}
  	\item expand the static register mapping for better performance overall
  	\item reallocate the code cache index and rehash all values when it is 50 \% full for better lookup performance on capacity overflow
