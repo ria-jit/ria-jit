@@ -346,7 +346,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
                                                 (void *) risc_addr, (void *) target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -362,7 +362,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JAL from (riscv)%p to ret_target(+4) (riscv)%p\n",
                                                 (void *) risc_addr, (void *) ret_target);
-                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(ret_target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
@@ -382,7 +382,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JAL from (riscv)%p to target (riscv)%p\n",
                                                 (void *) risc_addr, (void *) target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }
@@ -433,7 +433,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
                                                 (void *) risc_addr, (void *) ret_target);
-                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(ret_target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
@@ -463,7 +463,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JALR from (riscv)%p to ret_target(+4) (riscv)%p\n",
                                                 (void *) risc_addr, (void *) ret_target);
-                                    set_cache_entry(ret_target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(ret_target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(ret_target, c_info);
                                     set_cache_entry(ret_target, cache_loc);
                                 }
@@ -479,7 +479,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 if (cache_loc == UNSEEN_CODE) {
                                     log_asm_out("Recursion in JALR from (riscv)%p to target (riscv)%p\n",
                                                 (void *) risc_addr, (void *) target);
-                                    set_cache_entry(target, (t_cache_loc) 1); //break cycles
+                                    set_cache_entry(target, TRANSLATION_STARTED); //break cycles
                                     cache_loc = translate_block(target, c_info);
                                     set_cache_entry(target, cache_loc);
                                 }

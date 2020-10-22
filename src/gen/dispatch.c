@@ -28,7 +28,7 @@ void dispatch_instr(t_risc_instr *instr, const context_info *c_info) {
             translate_LUI(instr, r_info);
             break;
         case JAL:
-            translate_JAL(instr, r_info, c_info);
+            translate_JAL(instr, r_info);
             break;
         case JALR:
             translate_JALR(instr, r_info);

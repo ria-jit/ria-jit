@@ -6,6 +6,7 @@
 #define DYNAMICBINARYTRANSLATORRISCV64_X86_64_CACHE_H
 
 #define UNSEEN_CODE (void*) 0
+#define TRANSLATION_STARTED (void*) 1
 
 #include <util/log.h>
 

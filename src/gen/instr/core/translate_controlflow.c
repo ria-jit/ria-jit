@@ -21,7 +21,7 @@ static inline void
 translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_info, uint8_t *jmpLoc, uint64_t mnem);
 
 
-void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const context_info *c_info __attribute__((unused))) {
+void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
     log_asm_out("Translate JAL\n");
 
     //add rd access to profiler
@@ -56,7 +56,7 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info, const
     invalidateAllReplacements(r_info);
 
     if (!flag_translate_opt_chain || (cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE ||
-            cache_loc == (t_cache_loc) 1) {
+            cache_loc == TRANSLATION_STARTED) {
         //afaik the "multiples of two" thing is resolved in parser.c
 
         ///write chainEnd to be chained by chainer
@@ -164,7 +164,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
 
         t_cache_loc cache_loc;
 
-        if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == (t_cache_loc) 1) {
+        if ((cache_loc = lookup_cache_entry(target)) == UNSEEN_CODE || cache_loc == TRANSLATION_STARTED) {
             ///4: write chainEnd to be chained by chainer
             log_asm_out("CHAIN JALR\n");
             err |= fe_enc64(&current, FE_LEA64rm, FE_AX, FE_MEM(FE_IP, 0, 0, 0));
@@ -309,7 +309,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     t_risc_addr target = instr->addr + instr->imm;
     t_cache_loc cache_loc;
     if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
-            cache_loc != (t_cache_loc) 1) {
+            cache_loc != TRANSLATION_STARTED) {
         log_asm_out("DIRECT JUMP BRANCH 1\n");
         err |= fe_enc64(&current, FE_JMP, (intptr_t) cache_loc);
     } else {
@@ -337,7 +337,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
     target = instr->addr + 4;
 
     if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
-            cache_loc != (t_cache_loc) 1) {
+            cache_loc != TRANSLATION_STARTED) {
         log_asm_out("DIRECT JUMP BRANCH 2\n");
         err |= fe_enc64(&noJmpLoc, jmpMnem|FE_JMPL, (intptr_t) cache_loc); //replace conditional dummy
     } else {
