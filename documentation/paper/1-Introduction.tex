@@ -28,7 +28,11 @@ The main possibilities to achieve this are:
     Of course, this assumes that the translation routines are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f.]{bintrans}.
 \end{itemize}
 
-We aim to provide such an emulator, allowing the execution of RISC-V code on an x86-64 machine by means of dynamic binary translation.
+\subsubsection{Motivation}
+One of the most popular emulators is QEMU\@.
+While QEMU is a portable DBT that supports a wide variety of guest and host architectures and ISAs, this also makes it hard to optimize it for a specific guest/host combination and therefore the program execution will be slower than necessary.
+
+Our aim is to provide a faster emulator, allowing the execution of RISC-V code on an x86-64 machine by means of dynamic binary translation.
 
 By its very nature, executing code compiled for one architecture on a different one is not an easy task.
 
