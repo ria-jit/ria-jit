@@ -77,7 +77,7 @@ The \texttt{intspeed} suite also presents a variety of different workloads to th
 Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT.
 
 All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
-The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release}, which implies \texttt{-O3}.
+The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
 \subsection{SPEC CPU 2017 Results}
 % todo benchmark results
