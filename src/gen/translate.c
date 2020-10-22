@@ -51,7 +51,7 @@ int err;
  * (e.g., before translating every basic block).
  * @param r_info the register mapping info for invalidating the replacements
  */
-void init_block(register_info *r_info, bool isFloatBlock) {
+void init_block(register_info *r_info) {
     if (currentPos == NULL) {
         setupInstrMem();
     }
@@ -67,26 +67,6 @@ void init_block(register_info *r_info, bool isFloatBlock) {
 
     //make sure all replacement registers are written back as a precaution
     invalidateAllReplacements(r_info);
-
-    /*if (isFloatBlock) {
-        //check floatRegsLoaded
-        err |= fe_enc64(&current, FE_CMP8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 0); //zero if not loaded
-        uint8_t *jmpBuf = current;
-        err |= fe_enc64(&current, FE_JNZ, (intptr_t) current);
-
-        //load by register mapping
-        for (int i = f0; i <= f31; ++i) {
-            if (r_info->fp_mapped[i]) {
-                err |= fe_enc64(&current, FE_SSE_MOVSDrm, r_info->fp_map[i], FE_MEM_ADDR(r_info->fp_base + 8 * i));
-            }
-        }
-
-        //set flag
-        err |= fe_enc64(&current, FE_MOV8mi, FE_MEM_ADDR((intptr_t) &floatRegsLoaded), 1);
-
-        //write jump
-        err |= fe_enc64(&jmpBuf, FE_JNZ, (intptr_t) current);
-    }*/
 }
 
 /**
@@ -219,7 +199,7 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
     int instructions_in_block = parse_block(risc_addr, block_cache, maxCount, c_info, &isFloatBlock);
 
     ///Start of actual translation
-    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info, isFloatBlock);
+    t_cache_loc block = translate_block_instructions(block_cache, instructions_in_block, c_info);
 
     log_asm_out("Translated block at (riscv)%p: %d instructions\n", (void *) risc_addr, instructions_in_block);
 
@@ -236,10 +216,9 @@ t_cache_loc translate_block(t_risc_addr risc_addr, const context_info *c_info) {
  * @return the cached location of the generated block.
  */
 t_cache_loc
-translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info,
-                             bool isFloatBlock) {
+translate_block_instructions(t_risc_instr *block_cache, int instructions_in_block, const context_info *c_info) {
     ///initialize new block
-    init_block(c_info->r_info, isFloatBlock);
+    init_block(c_info->r_info);
 
     ///apply macro optimization
     if (flag_translate_opt_fusion) {

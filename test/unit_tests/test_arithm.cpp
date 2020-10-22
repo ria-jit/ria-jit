@@ -100,7 +100,7 @@ TEST_P(ArithmTest, AllDifferent) {
             t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rd,
                     {{static_cast<t_risc_imm>(rs2StartValue)}}};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     //set every register
     set_value(rs1, rs1StartValue);
@@ -133,7 +133,7 @@ TEST_P(ArithmTest, AllDifferent) {
             t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), x0, rs2, rd,
                     static_cast<t_risc_imm>(rs2StartValue)};
 
-    loc = translate_block_instructions(blockCache, 1, c_info, false);
+    loc = translate_block_instructions(blockCache, 1, c_info);
 
     if (!immediateInstr) {
         set_value(rs2, rs2StartValue);
@@ -150,7 +150,7 @@ TEST_P(ArithmTest, AllDifferent) {
         blockCache[0] = t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, x0, rd,
                 static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
@@ -165,7 +165,7 @@ TEST_P(ArithmTest, AllDifferent) {
             t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs2, x0,
                     static_cast<t_risc_imm>(rs2StartValue)};
 
-    loc = translate_block_instructions(blockCache, 1, c_info, false);
+    loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_value(rs1, rs1StartValue);
     if (!immediateInstr) {
@@ -185,7 +185,7 @@ TEST_P(ArithmTest, Rs1RdSame) {
             t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs1,
                     static_cast<t_risc_imm>(rs2StartValue)};
 
-    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+    t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
     set_value(rs1, rs1StartValue);
     if (!immediateInstr) {
@@ -204,7 +204,7 @@ TEST_P(ArithmTest, Rs1RdSame) {
         blockCache[0] = t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, x0, rs1,
                 static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
@@ -217,7 +217,7 @@ TEST_P(ArithmTest, Rs1RdSame) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), x0, rs2, x0,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         if (!immediateInstr) {
             set_value(rs2, rs2StartValue);
@@ -237,7 +237,7 @@ TEST_P(ArithmTest, Rs2RdSame) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs2, rs2,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
         set_value(rs2, rs2StartValue);
@@ -252,7 +252,7 @@ TEST_P(ArithmTest, Rs2RdSame) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), x0, rs2, rs2,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs2, rs2StartValue);
 
@@ -265,7 +265,7 @@ TEST_P(ArithmTest, Rs2RdSame) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, x0, x0,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
@@ -280,7 +280,7 @@ TEST_P(ArithmTest, Rs1Rs2Same) {
         blockCache[0] = t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rd,
                 static_cast<t_risc_imm>(rs2StartValue)};
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
@@ -294,7 +294,7 @@ TEST_P(ArithmTest, Rs1Rs2Same) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), x0, x0, rd,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         execute_in_guest_context(c_info, loc);
 
@@ -305,7 +305,7 @@ TEST_P(ArithmTest, Rs1Rs2Same) {
                 t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs1, x0,
                         static_cast<t_risc_imm>(rs2StartValue)};
 
-        loc = translate_block_instructions(blockCache, 1, c_info, false);
+        loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
@@ -320,7 +320,7 @@ TEST_P(ArithmTest, AllSame) {
         blockCache[0] = t_risc_instr{rs1StartValue, mnem, static_cast<t_risc_optype>(0), rs1, rs1, rs1,
                 static_cast<t_risc_imm>(rs2StartValue)};
 
-        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info, false);
+        t_cache_loc loc = translate_block_instructions(blockCache, 1, c_info);
 
         set_value(rs1, rs1StartValue);
 
