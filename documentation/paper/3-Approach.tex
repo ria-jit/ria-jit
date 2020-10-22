@@ -2,16 +2,6 @@ In the following, the term \textit{host} will refer to the system of the native 
 
 
 
-\subsection{Environment setup and memory layout}
-\label{sec:memory-layout}
-As the DBT is responsible for managing the execution environment of the guest binary in the shared address space, it must also handle the setup of said environment.
-
-The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
-The DBT must take care to map the file into memory correctly, while not compromising its own memory region.
-
-Furthermore, the guest registers (see section \vref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
-
-% todo details about the memory layout and setup of the environment
 
 \subsection{Partitioning the input code}
 Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
