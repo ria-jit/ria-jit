@@ -4,8 +4,17 @@
 \subsection{Comparison of the RISC-V and x86-64 ISAs}
 \label{sec:isa-cmp}
 %todo (mention pseudoinstructions for later)
+It is obvious that there are major differences in the two architectures, implied by RISC-V beeing a reduced instruction set computer (RISC) architecture and x86-64 a complex instruction set computer (CISC) architecture.
 
-Continued here (compare ISAs and note challenges)\ldots
+The most relevant distinction between RISC-V and x86-64 for the development of this DBT is the different address format and mismatch of general purpose and floating point registers in number.
+
+RISC-V's load-store architecture with a three-operand instruction format allowes for a better reuse of data but more instructions due to the explicit load/store operations.
+
+x86-64 however has a register-memory architecture with a two-operand instruction format leading to more implicit/fused memory accesses beeing used in optimized code.
+
+Also the very nature of translating a RISC archtiecture into a CISC architecture might seem like it would lead to less instructions. In praxis the efficient fusion of multiple RISC-V instructions into single x86-64 instructions is difficult considering the fact that we are only presented with the assembly. Even more a naive implementation leads to an instruction overhead due to the mismatch in supported operands per instruction.
+
+Those challenges will be further elaborated on in section \ref{sec:Approach}.
 
 \subsection{Environment setup and memory layout}
 \label{sec:memory-layout}
