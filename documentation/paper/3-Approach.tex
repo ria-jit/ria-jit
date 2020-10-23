@@ -35,6 +35,7 @@ It would thus only be possible to either remove all blocks with jump references 
 
 \subsection{Register handling and context switching}
 \label{sec:context-switch-reg-handle}
+\subsubsection{Handling of guest registers}
 As outlined in section~\ref{sec:isa-cmp}, the RISC-V and x86-64 architectures have differing amounts of general purpose registers.
 In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86-64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
 
@@ -44,15 +45,24 @@ Keeping a guest register file exclusively in memory, and loading them into nativ
 However, this necessitates a large number of memory accesses for both memory operands in the instructions as well as local register allocation within the translated blocks.
 Due to the very large performance gain connected to using register operands instead of memory operands, this is also not feasible at scale~\cite[S. 8f.]{bintrans}.
 
-Accordingly, the solution would be an approach that employs parts of both of these extremes~\cite[S. 9]{bintrans}.
-We aim to employ the tools we design to discover the most-used registers in the guest programs, and statically map these to general purpose x86-64 registers.
-The remaining operands can either be used from memory directly, or dynamically allocated into free host registers inside a single block's translation.
-Thus, we save much overhead otherwise spent on memory access to the register file, but do not unnecessarily occupy native register space with seldomly accessed guest registers.
+Accordingly, the solution for this problem would be an approach that employs parts of both of these extremes~\cite[S. 9]{bintrans}.
+We utilise the tools we designed to discover the most-used registers in the guest programs, and statically map these to general purpose x86-64 registers.
+The remaining operands are then dynamically allocated into reserved host registers inside a single block's translation.
+The loaded values are then lazily kept in the temporary registers for as long as possible in order to avoid unnecessary memory accesses.
+In case the translator requires a value not currently present in a replacement register, the oldest value is written back to the register file in memory and the now free space is utilised for the requested value.
+The final write-backs then need to be performed on the block boundaries.
 
-% todo context switching
+The most-used registers are relatively invariant in between RISC--V executables and their basic blocks, however it might be the case that a single block in such an executable requires a few unique registers fairly often.
+By dynamically allocating these into temporaries and statically mapping the most-used registers in general, we save much overhead otherwise spent on memory access to the register file, but do not unnecessarily occupy native register space with seldomly accessed guest registers.
 
+\subsubsection{Context switching during execution}
+When the code translated by the DBT is executed, it will behave as if it were an independent x86--64 executable.
+With the static register mapping in place, these values will thus need to be loaded before any of the translated blocks are called, and stored back before the execution is returned to the DBT.
 
+This is called a \textit{context switch}, as we are switching from the host's program state made up of the current register values to that of the guest.
+Evidently, preserving both the host and guest's state during execution is critical for the correct program behaviour.
 
+% todo more details?
 
 \subsection{System call handling}
 \label{sec:syscall-handling}
