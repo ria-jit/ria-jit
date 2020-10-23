@@ -1,0 +1,501 @@
+% File: tumpage.sty Copyright (C) 2019 The LaTeX4EI Team
+% Provides the TUM Corporate Design page margins, header, footer.
+%
+% It may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License (LPPL), either version 1.3c of this
+% license or (at your option) any later version. The latest version
+% of this license is in the file
+%
+%    https://www.latex-project.org/lppl.txt
+%
+% This file is part of the "tum-templates bundle" (The Work in LPPL)
+% and all files in that bundle must be distributed together.
+%
+%
+% ----------------------------------------------------------------------------
+%
+% The development version of the bundle can be found at
+%
+%    https://gitlab.lrz.de/latex4ei/tum-templates
+%
+% for those people who are interested.
+%
+% ----------------------------------------------------------------------------
+%
+% Version history:
+% v1.0 2020/10/01 Initial version.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumpage}[2020/10/01 v1.0]
+
+
+% .:: Required packages
+% ----------------------------------------------------------------------------
+
+\RequirePackage{geometry}
+\RequirePackage{scrlayer-scrpage}
+\RequirePackage{lastpage}
+\RequirePackage{pgfkeys}
+\RequirePackage{pgfopts}
+
+
+% .:: Package options for paper size and orientation
+% ----------------------------------------------------------------------------
+
+% length to store tum logo height
+\newlength{\@tum@logoheight@}
+
+% keys to choose paper size (supportet A5 to A0)
+\pgfqkeys{/TUM/page}{
+  paper/.is choice,
+  paper/a5paper/.code = {
+      \geometry{paper=a5paper}
+      \setlength{\@tum@logoheight@}{7mm}
+      \setlength{\columnsep}{5mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=9pt, H1=17pt, H2=13pt, H3=11pt}
+    },
+  paper/a4paper/.code = {
+      \geometry{paper=a4paper}
+      \setlength{\@tum@logoheight@}{10mm}
+      \setlength{\columnsep}{5mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=11pt, H1=24pt, H2=18pt, H3=14pt}
+    },
+  paper/a3paper/.code = {
+      \geometry{paper=a3paper}
+      \setlength{\@tum@logoheight@}{18mm}
+      \setlength{\columnsep}{7mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=16pt, H1=34pt, H2=25pt, H3=20pt}
+    },
+  paper/a2paper/.code = {
+      \geometry{paper=a2paper}
+      \setlength{\@tum@logoheight@}{27mm}
+      \setlength{\columnsep}{10mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=18pt, H1=48pt, H2=35pt, H3=28pt}
+    },
+  paper/a1paper/.code = {
+      \geometry{paper=a1paper}
+      \setlength{\@tum@logoheight@}{35mm}
+      \setlength{\columnsep}{14mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=22pt, H1=67pt, H2=49pt, H3=39pt}
+    },
+  paper/a0paper/.code = {
+      \geometry{paper=a0paper}
+      \setlength{\@tum@logoheight@}{46mm}
+      \setlength{\columnsep}{18mm}
+      \pgfqkeys{/TUM/page/fontsize}{base=25pt, H1=94pt, H2=67pt, H3=44pt}
+    },
+  % compatibility with geometry and KOMAscript
+  papername/.forward to = /TUM/page/paper,
+  a5paper/.forward to = /TUM/page/paper/a5paper,
+  a4paper/.forward to = /TUM/page/paper/a4paper,
+  a3paper/.forward to = /TUM/page/paper/a3paper,
+  a2paper/.forward to = /TUM/page/paper/a2paper,
+  a1paper/.forward to = /TUM/page/paper/a1paper,
+  a0paper/.forward to = /TUM/page/paper/a0paper,
+  % compatibility with old naming
+  format/.is choice,
+  format/a5/.forward to = /TUM/page/paper/a5paper,
+  format/a4/.forward to = /TUM/page/paper/a4paper,
+  format/a3/.forward to = /TUM/page/paper/a3paper,
+  format/a2/.forward to = /TUM/page/paper/a2paper,
+  format/a1/.forward to = /TUM/page/paper/a1paper,
+  format/a0/.forward to = /TUM/page/paper/a0paper,
+}
+
+% keys to choose paper orientation (lansdcape, portrait)
+\pgfqkeys{/TUM/page}{
+  orientation/.is choice,
+  orientation/landscape/.code = {\geometry{landscape}},
+  orientation/portrait/.code = {\geometry{portrait}},
+  % compatibility with geometry
+  landscape/.forward to = /TUM/page/orientation/landscape,
+  portrait/.forward to = /TUM/page/orientation/portrait,
+}
+
+% keys to store fontsizes (according to TUM CD)
+\newlength{\@tum@fontsize@one@}
+\newlength{\@tum@fontsize@two@}
+\newlength{\@tum@fontsize@three@}
+\newlength{\@tum@fontsize@base@}
+
+\pgfqkeys{/TUM/page/fontsize}{
+  H1/.code = \setlength{\@tum@fontsize@one@}{#1},
+  H2/.code = \setlength{\@tum@fontsize@two@}{#1},
+  H3/.code = \setlength{\@tum@fontsize@three@}{#1},
+  base/.code = \setlength{\@tum@fontsize@base@}{#1},
+}
+
+% KOMA script fonts to access TUM CD fontsizes
+\newkomafont{TUM.H1}{\sffamily%
+  \fontsize{\@tum@fontsize@one@}{1.3\@tum@fontsize@one@}\selectfont}
+\newkomafont{TUM.H2}{\sffamily%
+  \fontsize{\@tum@fontsize@two@}{1.3\@tum@fontsize@two@}\selectfont}
+\newkomafont{TUM.H3}{\sffamily%
+  \fontsize{\@tum@fontsize@three@}{1.2\@tum@fontsize@three@}\selectfont}
+\newkomafont{TUM.base}{\rmfamily%
+  \fontsize{\@tum@fontsize@base@}{1.2\@tum@fontsize@base@}\selectfont}
+
+
+% .:: Package options for page layout
+% ----------------------------------------------------------------------------
+
+% keys and macros to store layout settings
+\pgfqkeys{/TUM/page}{
+  top/.store in          = \@tum@top@,
+  bottom/.store in       = \@tum@bottom@,
+  inner/.store in        = \@tum@inner@,
+  outer/.store in        = \@tum@outer@,
+  head/.store in         = \@tum@head@,
+  headsep/.store in      = \@tum@headsep@,
+  foot/.store in         = \@tum@foot@,
+  marginpar/.store in    = \@tum@marginpar@,
+  marginparsep/.store in = \@tum@marginparsep@,
+}
+
+% keys to choose TUM Corporate design layouts
+\pgfqkeys{/TUM/page/layout}{
+  .is choice,
+  titlepage/.style = {/TUM/page/.cd,
+      top = 3\@tum@logoheight@, bottom = \@tum@logoheight@,
+      inner = \@tum@logoheight@, outer = \@tum@logoheight@,
+      head = \@tum@logoheight@, headsep = \@tum@logoheight@,
+      foot = 0pt, marginpar = 0pt, marginparsep = 0pt,
+    },
+  insidepage/.style = {/TUM/page/.cd,
+      top = 3\@tum@logoheight@, bottom = 2\@tum@logoheight@,
+      inner = 2\@tum@logoheight@, outer = 2\@tum@logoheight@,
+      head = \@tum@logoheight@, headsep = \@tum@logoheight@,
+      foot = \@tum@logoheight@,
+      marginpar = 0pt, marginparsep = 0pt,
+    },
+  margincolumn/.style = {/TUM/page/.cd,
+      top = 3\@tum@logoheight@, bottom = 2\@tum@logoheight@,
+      inner = 2\@tum@logoheight@, outer = 7.8\@tum@logoheight@,
+      head = \@tum@logoheight@, headsep = \@tum@logoheight@,
+      foot = \@tum@logoheight@,
+      marginpar = 5\@tum@logoheight@,
+      marginparsep = 0.8\@tum@logoheight@,
+    },
+  formpage/.style = {/TUM/page/.cd,
+      top = 3\@tum@logoheight@, bottom = \@tum@logoheight@,
+      inner = 2\@tum@logoheight@, outer = \@tum@logoheight@,
+      head = \@tum@logoheight@, headsep = \@tum@logoheight@,
+      foot = 0pt, marginpar = 0pt, marginparsep = 0pt,
+    },
+  letterpage/.style = {/TUM/page/.cd,
+      top = 3.45\@tum@logoheight@, bottom = 2.9\@tum@logoheight@,
+      inner = 2.5\@tum@logoheight@, outer = 2\@tum@logoheight@,
+      head = \@tum@logoheight@, headsep = .45\@tum@logoheight@,
+      foot = 1.9\@tum@logoheight@,
+      marginpar = 0pt, marginparsep = 0pt,
+    },
+}
+
+% helper macro to activate layout using the geometry package
+\newcommand{\@tum@activate@layout@}{
+  \newgeometry{
+    top = \@tum@top@, bottom = \@tum@bottom@,
+    inner = \@tum@inner@, outer = \@tum@outer@,
+    head = \@tum@head@, headsep = \@tum@headsep@,
+    foot = \@tum@foot@, marginpar = \@tum@marginpar@,
+    marginparsep = \@tum@marginparsep@
+  }
+}
+
+
+% .:: Definition of helper macros for headlines and footlines
+% ----------------------------------------------------------------------------
+
+% helper macro to typeset TUM headline
+\newcommand{\@tum@headline@}[2][]{%
+  \resizebox{!}{\@tum@logoheight@}{\parbox[b]{\textwidth}{%
+      \usekomafont{pagehead}%
+      % use phantoms here to ensure every line has the same height and depth
+      \leavevmode\rlap{#1}{\phantom{University}}\newline%
+      \rlap{#2}{\phantom{University}}\newline%
+      \theUniversityName\phantom{University}%
+    }}
+}
+
+% helper macro to typeset TUM headline with department logo
+\newcommand{\@tum@logothreeliner@}{%
+  \ifdef{\theDepartmentLogo}{%
+    \theDepartmentLogo[height=\@tum@logoheight@]%
+    \hspace{.5\@tum@logoheight@}%
+  }{%
+    \ClassWarning{tumpage}{Department logo is not defined!}%
+  }%
+  \@tum@headline@[\theChairName]{\theDepartmentName}%
+}
+
+% helper macro to raise and smash header elements to baseline
+\newcommand{\@raiseandsmash}[1]{%
+  \raisebox{-0.3\baselineskip}{\smash{#1}}%
+}
+
+% KOMA script fonts for headline and footline
+\setkomafont{pagehead}{\fontfamily{phv}\selectfont\upshape\color{TUMBlue}}
+\setkomafont{pagenumber}{\fontfamily{phv}\selectfont\upshape\small\mdseries}
+
+
+% .:: KOMA script layers for TUM Corporate design headers
+% ----------------------------------------------------------------------------
+
+\DeclareNewLayer[everypage, oneside, background, head,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+]{TUM.head.base.oneside}
+\DeclareNewLayer[oddpage, twoside, background, head,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+]{TUM.head.base.odd}
+\DeclareNewLayer[evenpage, twoside, background, head,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+  addhoffset = -\@tum@marginpar@ - \@tum@marginparsep@,
+]{TUM.head.base.even}
+
+% layers for TUM Logo
+\DeclareNewLayer[clone = TUM.head.base.oneside,
+  contents = {\hfill\@raiseandsmash{\theTUMLogo[height=\@tum@logoheight@]}}
+]{TUM.head.tumlogo.oneside}
+\DeclareNewLayer[clone = TUM.head.base.odd,
+  contents = {\GetLayerContents{TUM.head.tumlogo.oneside}}
+]{TUM.head.tumlogo.odd}
+\DeclareNewLayer[clone = TUM.head.base.even,
+  contents = {\GetLayerContents{TUM.head.tumlogo.oneside}}
+]{TUM.head.tumlogo.even}
+
+% layers for TUM oneliner
+\DeclareNewLayer[clone = TUM.head.base.oneside,
+  contents = {\@raiseandsmash{\@tum@headline@{}}}
+]{TUM.head.oneliner.oneside}
+\DeclareNewLayer[clone = TUM.head.base.odd,
+  contents = {\GetLayerContents{TUM.head.oneliner.oneside}}
+]{TUM.head.oneliner.odd}
+\DeclareNewLayer[clone = TUM.head.base.even,
+  contents = {\GetLayerContents{TUM.head.oneliner.oneside}}
+]{TUM.head.oneliner.even}
+
+% layers for TUM twoliner
+\DeclareNewLayer[clone = TUM.head.base.oneside,
+  contents = {\@raiseandsmash{\@tum@headline@{\theDepartmentName}}}
+]{TUM.head.twoliner.oneside}
+\DeclareNewLayer[clone = TUM.head.base.odd,
+  contents = {\GetLayerContents{TUM.head.twoliner.oneside}}
+]{TUM.head.twoliner.odd}
+\DeclareNewLayer[clone = TUM.head.base.even,
+  contents = {\GetLayerContents{TUM.head.twoliner.oneside}}
+]{TUM.head.twoliner.even}
+
+% layers for TUM threeliner
+\DeclareNewLayer[clone = TUM.head.base.oneside,
+  contents = {\@raiseandsmash{%
+        \@tum@headline@[\theChairName]{\theDepartmentName}}}
+]{TUM.head.threeliner.oneside}
+\DeclareNewLayer[clone = TUM.head.base.odd,
+  contents = {\GetLayerContents{TUM.head.threeliner.oneside}}
+]{TUM.head.threeliner.odd}
+\DeclareNewLayer[clone = TUM.head.base.even,
+  contents = {\GetLayerContents{TUM.head.threeliner.oneside}}
+]{TUM.head.threeliner.even}
+
+% layers for TUM logothreeliner
+\DeclareNewLayer[clone = TUM.head.base.oneside,
+  contents = {\@raiseandsmash{\@tum@logothreeliner@}}
+]{TUM.head.logothreeliner.oneside}
+\DeclareNewLayer[clone = TUM.head.base.odd,
+  contents = {\GetLayerContents{TUM.head.logothreeliner.oneside}}
+]{TUM.head.logothreeliner.odd}
+\DeclareNewLayer[clone = TUM.head.base.even,
+  contents = {\GetLayerContents{TUM.head.logothreeliner.oneside}}
+]{TUM.head.logothreeliner.even}
+
+
+% .:: KOMA script layers for TUM Corporate design footers
+% ----------------------------------------------------------------------------
+
+\DeclareNewLayer[everypage, oneside, background, foot,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+]{TUM.foot.base.oneside}
+\DeclareNewLayer[oddpage, twoside, background, foot,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+]{TUM.foot.base.odd}
+\DeclareNewLayer[evenpage, twoside, background, foot,
+  addwidth = \@tum@marginpar@ + \@tum@marginparsep@,
+  addhoffset = -\@tum@marginpar@ - \@tum@marginparsep@,
+]{TUM.foot.base.even}
+
+% layers for TUM pagenumber
+\DeclareNewLayer[clone = TUM.foot.base.oneside,
+  contents = {\hfill\usekomafont{pagenumber}\pagemark}
+]{TUM.foot.pagenumber.oneside}
+\DeclareNewLayer[clone = TUM.foot.base.odd,
+  contents = {\hfill\usekomafont{pagenumber}\pagemark}
+]{TUM.foot.pagenumber.odd}
+\DeclareNewLayer[clone = TUM.foot.base.even,
+  contents = {\usekomafont{pagenumber}\pagemark}
+]{TUM.foot.pagenumber.even}
+
+% layer for TUM pagenumber on letter pages
+\DeclareNewLayer[everypage, oneside, background, foot,
+  addwidth = \@tum@logoheight@,
+  contents = {\hfill\usekomafont{pagenumber}\thepage/\pageref{LastPage}}
+]{TUM.foot.letterpagenumber}
+
+
+% .:: Definition of pagestyles using KOMA script layers
+% ----------------------------------------------------------------------------
+
+% title page styles (only header, no page numbers)
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=titlepage}\@tum@activate@layout@}
+]{TUM.titlepage.tumlogo}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+}
+
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=titlepage}\@tum@activate@layout@}
+]{TUM.titlepage.oneliner}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+  TUM.head.oneliner.oneside,%
+  TUM.head.oneliner.odd,%
+  TUM.head.oneliner.even,%
+}
+
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=titlepage}\@tum@activate@layout@}
+]{TUM.titlepage.twoliner}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+  TUM.head.twoliner.oneside,%
+  TUM.head.twoliner.odd,%
+  TUM.head.twoliner.even,%
+}
+
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=titlepage}\@tum@activate@layout@}
+]{TUM.titlepage.threeliner}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+  TUM.head.threeliner.oneside,%
+  TUM.head.threeliner.odd,%
+  TUM.head.threeliner.even,%
+}
+
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=titlepage}\@tum@activate@layout@}
+]{TUM.titlepage.logothreeliner}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+  TUM.head.logothreeliner.oneside,%
+  TUM.head.logothreeliner.odd,%
+  TUM.head.logothreeliner.even,%
+}
+
+% inner page style (no header only page numbers)
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=insidepage}\@tum@activate@layout@}
+]{TUM.insidepage}{%
+  TUM.foot.pagenumber.oneside,%
+  TUM.foot.pagenumber.odd,%
+  TUM.foot.pagenumber.even,%
+}
+
+% margincolumn page style (1.5 column layout)
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=margincolumn}\@tum@activate@layout@}
+]{TUM.margincolumn}{%
+  TUM.foot.pagenumber.oneside,%
+  TUM.foot.pagenumber.odd,%
+  TUM.foot.pagenumber.even,%
+}
+
+% letter page style (only logo in header and letter page numbers)
+\DeclareNewPageStyleByLayers[
+  onselect = {\pgfkeys{/TUM/page/layout=letterpage}\@tum@activate@layout@}
+]{TUM.letterpage}{%
+  TUM.head.tumlogo.oneside,%
+  TUM.head.tumlogo.odd,%
+  TUM.head.tumlogo.even,%
+  TUM.foot.letterpagenumber,%
+}
+
+% keys to choose headline of titlepage layout
+\pgfqkeys{/TUM/page/headline}{
+  .is choice,
+  tumlogo/.code = {
+      \DeclarePageStyleAlias{TUM.titlepage}{TUM.titlepage.tumlogo}
+    },
+  oneliner/.code = {
+      \DeclarePageStyleAlias{TUM.titlepage}{TUM.titlepage.oneliner}
+    },
+  twoliner/.code = {
+      \DeclarePageStyleAlias{TUM.titlepage}{TUM.titlepage.twoliner}
+    },
+  threeliner/.code = {
+      \DeclarePageStyleAlias{TUM.titlepage}{TUM.titlepage.threeliner}
+    },
+  logothreeliner/.code = {
+      \DeclarePageStyleAlias{TUM.titlepage}{TUM.titlepage.logothreeliner}
+    },
+}
+
+
+% .:: process package options
+% ----------------------------------------------------------------------------
+\pgfqkeys{/TUM/page}{paper=a4paper, layout=titlepage, headline=threeliner}
+\ProcessPgfOptions{/TUM/page}
+
+
+% .:: Compatibility
+% ----------------------------------------------------------------------------
+
+\newcommand{\layoutInsidePage}{
+  \pagestyle{TUM.insidepage}
+}
+
+\newcommand{\layoutTitlePage}{
+  \pagestyle{TUM.titlepage}
+}
+
+\newcommand{\layoutFormPage}{
+  \pgfkeys{/TUM/page/layout=formpage}
+  \@tum@activate@layout@
+}
+
+\newcommand{\layoutLetterPage}{
+  \pagestyle{TUM.letterpage}
+}
+
+\newcommand{\theTUMLogoHeight}{\@tum@logoheight@}
+
+\newcommand{\headfootThreeliner}{%
+  \lohead{%
+    \@raiseandsmash{\@tum@headline@[\theChairName]{\theDepartmentName}}%
+  }%
+}
+
+\newcommand{\headfootLogo}{%
+  \rohead{%
+    \@raiseandsmash{\theTUMLogo[height=\@tum@logoheight@]{}}%
+  }%
+}
+
+\RequirePackage{ifthen}
+\newcommand{\headfootPageNumbers}{%
+  \renewcommand{\pagemark}{%
+    \ifthenelse{\pageref{LastPage}>1}{%
+      \usekomafont{pagenumber}\thepage%
+    }{}%
+  }%
+  \ofoot{\pagemark}%
+}
+
+\newcommand{\headfootClear}{%
+  \clearpairofpagestyles%
+}

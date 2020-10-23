@@ -1,0 +1,138 @@
+% File: tumfonts.sty Copyright (C) 2019 The LaTeX4EI Team
+% Provides the fonts defined by the TUM Corporate Design.
+%
+% It may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License (LPPL), either version 1.3c of this
+% license or (at your option) any later version. The latest version
+% of this license is in the file
+%
+%    https://www.latex-project.org/lppl.txt
+%
+% This file is part of the "tum-templates bundle" (The Work in LPPL)
+% and all files in that bundle must be distributed together.
+%
+%
+% ----------------------------------------------------------------------------
+%
+% The development version of the bundle can be found at
+%
+%    https://gitlab.lrz.de/latex4ei/tum-templates
+%
+% for those people who are interested.
+%
+% ----------------------------------------------------------------------------
+%
+% Version history:
+% v1.0 2020/10/01 Initial version.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumfonts}[2020/10/01 v1.0]
+
+
+% .:: Required packages for all options
+% ----------------------------------------------------------------------------
+% For option specific package requirements, see below
+
+\RequirePackage{pgfkeys}
+\RequirePackage{pgfopts}
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+\RequirePackage{upgreek}
+
+
+% .:: Package options
+% ----------------------------------------------------------------------------
+% text font: helvet (default), times, palatino, libertine
+% math font: newtxpx (default for all but helvet), ams (default for helvet)
+
+\newcounter{@tum@font@number@}
+\newcounter{@tum@math@number@}
+
+\pgfqkeys{/TUM/fonts}{
+  font/.is choice,
+  font/helvet/.code = {\setcounter{@tum@font@number@}{0}},
+  font/times/.code = {\setcounter{@tum@font@number@}{1}},
+  font/palatino/.code = {\setcounter{@tum@font@number@}{2}},
+  font/libertine/.code = {\setcounter{@tum@font@number@}{3}},
+  math/.is choice,
+  math/newtxpx/.code = {\setcounter{@tum@math@number@}{2}},
+  math/ams/.code = {\setcounter{@tum@math@number@}{1}},
+}
+
+\ProcessPgfOptions{/TUM/fonts}
+
+% handle font option
+\ifcase\the@tum@font@number@
+  % Helvetica
+  \RequirePackage{helvet}
+  %
+  % math font
+  \ifnum\the@tum@math@number@=2
+    % user chose non-default newpxmath
+    \RequirePackage[bigdelims]{newpxmath}
+  \fi
+  %
+  % typewriter font
+  \RequirePackage[scale=1.10]{newtxtt}
+  %
+  % make sans serif font the default font
+  \renewcommand{\familydefault}{\sfdefault}
+  %
+\or
+  % Times New Roman
+  \RequirePackage[largesc]{newtxtext}
+  %
+  % math font
+  \ifnum\the@tum@math@number@=1
+    % user chose non-default amsmath (so nothing to do)
+  \else
+    % user made no choice or chose newtxmath
+    \RequirePackage[bigdelims]{newtxmath}
+  \fi
+  %
+  % typewriter font
+  \RequirePackage[scale=1.06]{newtxtt}
+  %
+  % make serif font the default font
+  \renewcommand{\familydefault}{\rmdefault}
+  %
+\or
+  % Palatino
+  \RequirePackage[largesc]{newpxtext}
+  %
+  % math font
+  \ifnum\the@tum@math@number@=1
+    % user chose non-default amsmath (so nothing to do)
+  \else
+    % user made no choice or chose newpxmath
+    \RequirePackage[bigdelims]{newpxmath}
+  \fi
+  %
+  % typewriter font
+  \RequirePackage[scale=1.06]{newtxtt}
+  %
+  % make serif font the default font
+  \renewcommand{\familydefault}{\rmdefault}
+  %
+\or
+  % Libertine
+  \RequirePackage{libertine}
+  %
+  % math font
+  \ifnum\the@tum@math@number@=1
+    % user chose non-default amsmath (so nothing to do)
+  \else
+    % user made no choice or chose newtxmath
+    \RequirePackage[libertine]{newtxmath}
+  \fi
+  %
+  % typewriter font
+  \RequirePackage[scale=1.0]{newtxtt}
+  %
+  % make serif font the default font
+  \renewcommand{\familydefault}{\rmdefault}
+  %
+\else
+  % invalid choice
+\fi

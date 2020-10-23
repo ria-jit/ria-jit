@@ -1,0 +1,121 @@
+% File: tumcolors.sty Copyright (C) 2019 The LaTeX4EI Team
+% Provides the TUM Corporate Design colors.
+%
+% It may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License (LPPL), either version 1.3c of this
+% license or (at your option) any later version. The latest version
+% of this license is in the file
+%
+%    https://www.latex-project.org/lppl.txt
+%
+% This file is part of the "tum-templates bundle" (The Work in LPPL)
+% and all files in that bundle must be distributed together.
+%
+%
+% ----------------------------------------------------------------------------
+%
+% The development version of the bundle can be found at
+%
+%    https://gitlab.lrz.de/latex4ei/tum-templates
+%
+% for those people who are interested.
+%
+% ----------------------------------------------------------------------------
+%
+% Version history:
+% v1.0 2020/10/01 Initial version.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumcolors}[2020/10/01 v1.0]
+
+
+% .:: Required packages
+% ----------------------------------------------------------------------------
+
+\RequirePackage[table]{xcolor}
+\RequirePackage{pgfkeys}
+\RequirePackage{pgfopts}
+
+
+% .:: Package options
+% ----------------------------------------------------------------------------
+
+\newif\if@tum@colormodel@cmyk@
+
+\pgfqkeys{/TUM/colors}{
+  colormodel/.is choice,
+  colormodel/cmyk/.code = {\@tum@colormodel@cmyk@true},
+  colormodel/rgb/.code = {\@tum@colormodel@cmyk@false},
+  print/.is if = @tum@colormodel@cmyk@,
+}
+
+% set default option (colormodel=rgb)
+\pgfkeys{/TUM/colors/colormodel=rgb}
+
+% process package options
+\ProcessPgfOptions{/TUM/colors}
+
+% select color model based on option
+\if@tum@colormodel@cmyk@
+  \selectcolormodel{cmyk}
+\else
+  \selectcolormodel{rgb}
+\fi
+
+
+% .:: Color definitions
+% ----------------------------------------------------------------------------
+
+% primary colors
+\definecolor{TUMBlue}        {RGB/cmyk}{  0,101,189 / 1.  ,0.43,0.  ,0.  }
+\definecolor{TUMWhite}       {RGB/cmyk}{255,255,255 / 0.  ,0.  ,0.  ,0.  }
+\definecolor{TUMBlack}       {RGB/cmyk}{  0,  0,  0 / 0.  ,0.  ,0.  ,1.  }
+
+% secondary colors
+\definecolor{TUMBlueDark}    {RGB/cmyk}{  0, 82,147 / 1.  ,0.54,0.04,0.19}
+\definecolor{TUMBlueDarker}  {RGB/cmyk}{  0, 51, 89 / 1.  ,0.57,0.12,0.7 }
+\definecolor{TUMGrayDark}    {RGB/cmyk}{ 88, 88, 90 / 0.  ,0.  ,0.  ,0.8 }
+\definecolor{TUMGray}        {RGB/cmyk}{156,157,159 / 0.  ,0.  ,0.  ,0.5 }
+\definecolor{TUMGrayLight}   {RGB/cmyk}{217,218,219 / 0.  ,0.  ,0.  ,0.2 }
+
+% accent colors
+\definecolor{TUMGreen}       {RGB/cmyk}{162,173,  0 / 0.35,0.  ,1.  ,0.2 }
+\definecolor{TUMOrange}      {RGB/cmyk}{227,114, 34 / 0.  ,0.65,0.95,0.  }
+\definecolor{TUMIvory}       {RGB/cmyk}{218,215,203 / 0.03,0.04,0.14,0.08}
+\definecolor{TUMBlueLight}   {RGB/cmyk}{100,160,200 / 0.65,0.19,0.01,0.04}
+\definecolor{TUMBlueLighter} {RGB/cmyk}{152,198,234 / 0.42,0.09,0.  ,0.  }
+
+% extended colors
+\definecolor{TUMExtViolet}   {RGB/cmyk}{105,  8, 90 / 0.5 ,1.  ,0.  ,0.4 }
+\definecolor{TUMExtNavy}     {RGB/cmyk}{ 15, 27, 95 / 1.  ,1.  ,0.  ,0.4 }
+\definecolor{TUMExtTeal}     {RGB/cmyk}{  0,119,138 / 1.  ,0.03,0.3 ,0.3 }
+\definecolor{TUMExtForest}   {RGB/cmyk}{  0,124, 48 / 1.  ,0.  ,1.  ,0.2 }
+\definecolor{TUMExtLime}     {RGB/cmyk}{103,154, 29 / 0.6 ,0.  ,1.  ,0.2 }
+\definecolor{TUMExtYellow}   {RGB/cmyk}{255,220,  0 / 0.  ,0.1 ,1.  ,0.  }
+\definecolor{TUMExtGoldenrod}{RGB/cmyk}{249,186,  0 / 0.  ,0.3 ,1.  ,0.  }
+\definecolor{TUMExtPumpkin}  {RGB/cmyk}{214, 76, 19 / 0.  ,0.8 ,1.  ,0.1 }
+\definecolor{TUMExtRed}      {RGB/cmyk}{196,  7, 27 / 0.1 ,1.  ,1.  ,0.1 }
+\definecolor{TUMExtMaroon}   {RGB/cmyk}{156, 13, 22 / 0.  ,1.  ,1.  ,0.4 }
+
+
+% .:: Redefinition of standard colors
+% ----------------------------------------------------------------------------
+
+\colorlet{black}      {TUMBlack}
+\colorlet{blue}       {TUMBlue}
+\colorlet{darkgray}   {TUMGrayDark}
+\colorlet{gray}       {TUMGray}
+\colorlet{green}      {TUMGreen}
+\colorlet{lightgray}  {TUMGrayLight}
+\colorlet{lime}       {TUMExtLime}
+\colorlet{orange}     {TUMOrange}
+\colorlet{red}        {TUMExtRed}
+\colorlet{teal}       {TUMExtTeal}
+\colorlet{violet}     {TUMExtViolet}
+\colorlet{white}      {TUMWhite}
+\colorlet{yellow}     {TUMExtYellow}
+\colorlet{ForestGreen}{TUMExtForest}
+\colorlet{Goldenrod}  {TUMExtGoldenrod}
+\colorlet{Maroon}     {TUMExtMaroon}
+\colorlet{NavyBlue}   {TUMExtNavy}
+\colorlet{RedOrange}  {TUMExtPumpkin}

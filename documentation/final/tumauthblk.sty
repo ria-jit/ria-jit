@@ -1,0 +1,164 @@
+% File: tumauthblk.sty Copyright (C) 2019 The LaTeX4EI Team
+% Provides macros for author blocks (authors, affiliations, ORCIDs,
+% e-mail addresses) to be used in the document classes.
+%
+% It may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License (LPPL), either version 1.3c of this
+% license or (at your option) any later version. The latest version
+% of this license is in the file
+%
+%    https://www.latex-project.org/lppl.txt
+%
+% This file is part of the "tum-templates bundle" (The Work in LPPL)
+% and all files in that bundle must be distributed together.
+%
+%
+% ----------------------------------------------------------------------------
+%
+% The development version of the bundle can be found at
+%
+%    https://gitlab.lrz.de/latex4ei/tum-templates
+%
+% for those people who are interested.
+%
+% ----------------------------------------------------------------------------
+%
+% Version history:
+% v1.0 2020/10/01 Initial version.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumauthblk}[2020/10/01 v1.0]
+
+
+% .:: Required packages
+% ----------------------------------------------------------------------------
+
+\RequirePackage{etoolbox}
+\RequirePackage{graphicx}
+\RequirePackage[hidelinks,breaklinks]{hyperref}
+\RequirePackage[misc]{ifsym}
+\RequirePackage{pgffor}
+\RequirePackage{pgfkeys}
+
+
+% .:: E-Mail symbol support
+% ----------------------------------------------------------------------------
+
+% e-mail symbol
+\newcommand{\theEmailSymbol}{\textcolor{TUMBlue}{\mdseries{\Letter}}}
+
+
+% .:: ORCID symbol support
+% ----------------------------------------------------------------------------
+
+% ORCID symbol with web-link
+\newrobustcmd{\theORCIDSymbol}[1]{%
+  \href{http://orcid.org/#1}{%
+    \includegraphics[height=\fontcharht\font`\O]{resources/orcid.pdf}%
+  }%
+}
+
+
+% .:: Handling affiliations
+% ----------------------------------------------------------------------------
+
+\newcounter{AffilCount}
+
+\newcommand{\affil}[2][]{
+  \stepcounter{AffilCount}
+
+  % get current automatic affilation number
+  \edef\@tmp@mark@{\theAffilCount}
+
+  % store affiliation information
+  \pgfqkeys{/TUM/affiliations/\theAffilCount}{
+    name/.initial = {#2},
+    mark/.initial,
+    mark/.expand once=\@tmp@mark@,
+    #1
+  }
+}
+
+% print affiliation mark (only when there is more than one affiliation)
+\newcommand{\@affilmark}[1]{%
+  \ifnumgreater{\theAffilCount}{1}{\textsuperscript{\mdseries{#1}}}{}%
+}
+
+% print affiliation block
+\newcommand{\theAffil}{%
+  \foreach \x in {1,...,\theAffilCount}{%
+    \@affilmark{\pgfkeysvalueof{/TUM/affiliations/\x/mark}}%
+    \pgfkeysvalueof{/TUM/affiliations/\x/name}\par%
+  }%
+}
+
+
+% .:: Handling authors
+% ----------------------------------------------------------------------------
+
+\newcounter{AuthorCount}
+
+\renewcommand{\author}[2][]{
+  \stepcounter{AuthorCount}
+
+  % get current automatic affilation number
+  \edef\@tmp@affil@{\number\numexpr\theAffilCount+1\relax}
+
+  % store author information
+  \pgfqkeys{/TUM/authors/\theAuthorCount}{
+    name/.initial = {#2},
+    email/.initial,
+    orcid/.initial,
+    affil/.initial,
+    affil/.expand once=\@tmp@affil@,
+    #1
+  }
+}
+
+% author separator (typically `,`)
+\newcommand{\@auth@sep@}{,}
+
+% author final separator (typically, `and`)
+\provideName{\@auth@fsep@}{and}{und}
+
+% print author list
+\renewcommand{\@author}{%
+  \foreach \x in {1,...,\theAuthorCount}{%
+    \pgfkeysvalueof{/TUM/authors/\x/name}%
+    \edef\@tmp@orcid@{\pgfkeysvalueof{/TUM/authors/\x/orcid}}%
+    \ifdefempty{\@tmp@orcid@}{}{\theORCIDSymbol{\@tmp@orcid@}}%
+    \@affilmark{\pgfkeysvalueof{/TUM/authors/\x/affil}}%
+    \edef\@tmp@email@{\pgfkeysvalueof{/TUM/authors/\x/email}}%
+    \ifdefempty{\@tmp@email@}{}{\textsuperscript{~\theEmailSymbol}}%
+    \ifnumless{\x}{\theAuthorCount}{%
+      \ifnumequal{\x}{\theAuthorCount-1}{%
+        \ifnumgreater{\theAuthorCount}{2}{%
+          \@auth@sep@{}}{} \@auth@fsep@{} %
+      }{\@auth@sep@{} }%
+    }{}%
+  }%
+}
+
+
+% .:: Handling e-mail addresses
+% ----------------------------------------------------------------------------
+
+% set e-mail address for current author
+\newcommand{\email}[1]{\pgfkeys{/TUM/authors/\theAuthorCount/email=#1}}
+
+% print e-mail addresses
+\newcommand{\theEmail}{%
+  \foreach \x in {1,...,\theAuthorCount}{%
+    \edef\@tmp@email@{\pgfkeysvalueof{/TUM/authors/\x/email}}%
+    \ifdefempty{\@tmp@email@}{}{%
+      \theEmailSymbol{}~\@tmp@email@\par%
+    }%
+  }%
+}
+
+
+% .:: Handling ORCIDs
+% ----------------------------------------------------------------------------
+
+% set ORCID for current author
+\newcommand{\orcid}[1]{\pgfkeys{/TUM/authors/\theAuthorCount/orcid=#1}}

@@ -1,7 +1,9 @@
-\documentclass[german]{tum-presentation}
+\documentclass[aspectratio=169,sectionpage=false, german]{tumbeamer}
+\usepackage{tumuser}
 
+
+\usepackage{biblatex}
 \usepackage[utf8]{inputenc}
-\usepackage[ngerman]{babel}
 \usepackage[autostyle]{csquotes}
 \usepackage[T1]{fontenc}
 \usepackage{xstring}
@@ -18,6 +20,18 @@
 \usepackage[german]{varioref}
 \usepackage{listings}
 \usepackage{color}
+
+
+\TUMbeamersetup{
+title page = TUM tower,
+part page = TUM toc,
+section page = TUM blue,
+content page = TUM more space,
+headline = TUM threeliner,
+footline = TUM default,
+headline on = {title page, section page},
+footline on = {section page, content page, part page=false},
+}
 
 % setup commands
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
@@ -65,17 +79,14 @@
 \setbeamertemplate{subsection in toc}[subsections numbered]
 
 \begin{document}
-
-\begin{frame}[noframenumbering]
- 	\titlepage
-\end{frame}
-
+\maketitle
 \begin{frame}
 	\frametitle{Gliederung}
 	\tableofcontents
 \end{frame}
 
 % selbstverständlich sample-Gliederung
+%\part*{Gliederung}
 \section{Einführung} % Noah
 \subsection{Grobüberblick über die RISC-V ISA}
 \begin{frame}
