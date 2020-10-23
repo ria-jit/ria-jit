@@ -149,7 +149,7 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 			% DBT results
 			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \sorteddbttable;
 
-			\legend{Native, QEMU, DBT}
+			\legend{native, QEMU, DBT}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[SPEC CPU 2017 Results]%
@@ -182,19 +182,20 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 	\label{tab:opt-options}
 \end{table}
 
-In order to evaluate the optimisations built into the translator, we ran the \textit{SPEC CPU 2017} suite with various combinations of the available optimisation options.
+In order to evaluate the optimisations built into the translator, we ran the \textit{SPEC CPU 2017} suite with various combinations of the available optimisation options in the same translator version (\texttt{v1.3.1}, the final release in the project's main development cycle).
 
-An overview of the specific behaviour of the mentioned switches can be seen in table~\ref{tab:opt-options}.
+The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an overview of the switches specified in the figure's legend can be found in table~\ref{tab:opt-options}.
 
 
 % ======= Optimisation comparison results =======
-% Results of the intspeed SPEC CPU 2017 runs.
-% ================================
+% Results of the optimisation option comparisons.
+% Show all SPEC run results and analyse below.
+% ===============================================
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-fusion.csv}\nofusiontable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-jump-no-ras.csv}\nojumpnorastable
-\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-jump-none.csv}\nonetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/none.csv}\nonetable
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\basetable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\basetable
@@ -235,18 +236,18 @@ An overview of the specific behaviour of the mentioned switches can be seen in t
 				anchor = north east,
 				rotate = 60
 			},
-			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
 			scaled y ticks = false,
 			flexible xticklabels from table={\basetable}{Benchmark},
-			ymin = 0, ymax = 6.5,
+			ytick = {0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0},
+			ymin = 0, ymax = 3.0,
 			ymajorgrids = true,
-			bar width = 5pt,
+			bar width = 3pt,
 			height = 7.0cm,
 			width = 0.9\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
-				legend columns = 3,
+				legend columns = 2,
 				column sep = 0.2cm
 			}
 		]
@@ -260,12 +261,12 @@ An overview of the specific behaviour of the mentioned switches can be seen in t
 			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \norastable;
 			
 			% no-jump-no-ras results
-			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
+			\addplot+[fill=era-dbt-2, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
 			
 			% none results
-			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nonetable;
+			\addplot+[fill=era-dbt-3, draw=black] table [x expr=\coordindex, y=ratio] \nonetable;
 
-			\legend{Base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump, no-ras}, \texttt{none}}
+			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,} \texttt{no-ras}, \texttt{none}}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[Translator optimisation evaluation results]%
@@ -276,7 +277,7 @@ An overview of the specific behaviour of the mentioned switches can be seen in t
 
 
 
-% todo analysis of SPEC comparisons
+% todo analysis of optimisation comparisons
 
 
 \subsection{Data compression via gzip}
