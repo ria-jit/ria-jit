@@ -5,19 +5,21 @@ The following section aims to provide an in-depth overview of the system's archi
 
 \subsection{Instruction translation process}
 % todo add reference to faenc
-The decoding of the RISC-V assembly is quite straight forward as we have a fixed instruction length of 32bit. Thus, the assembly is parsed in 4byte blocks with the information beeing extracted in an intermediate instruction format, holding the instruction mnemonic, operands and immediates in uncompressed form. This intermediate format can then be used by special per mnemonic translation functions which in the end generate the x86-64 byte code using faenc
+The decoding of the RISC-V assembly is quite straight forward as we have a fixed instruction length of 32bit.
+Thus, the assembly is parsed in 4byte blocks with the information beeing extracted in an intermediate instruction format, holding the instruction mnemonic, operands and immediates in uncompressed form.
+This intermediate format can then be used by special per mnemonic translation functions which in the end generate the x86-64 byte code using faenc.
 
 \subsection{Code cache and TLB for block lookup}
 % todo
 
 \subsection{Static hybrid register mapping}
 \subsubsection{Register priority analysis}
-In order to achieve the best performance with the hybrid approach to the register mapping described in section \vref{sec:context-switch-reg-handle}, we must decide which registers of the RISC-V guest to map into the host's limited number of available GPRs.
+In order to achieve the best performance with the hybrid approach to the register mapping described in section~\vref{sec:context-switch-reg-handle}, we must decide which registers of the RISC-V guest to map into the host's limited number of available GPRs.
 There are two main ways of determining the priority of registers when considering them as candidates for a mapping.
 
 It is, on the one hand, possible to assess the priority statically, by performing an analysis of the binary in question.
 Essentially, the hereby produced metric counts the number of times the register is used in the assembly instructions listed in the guest program and thus delivers an idea of how important each register is to this specific executable.
-We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag (see appendix \ref{sec:appendix-tools}).
+We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag (see appendix~\ref{sec:appendix-tools}).
 
 However, this approach does not take into account that a single instruction may be executed many times while the program is running.
 Accordingly, the other approach is to assess the register priority dynamically by analysing and profiling the execution of the testing program, thereby gaining an insight into how often each register is actually used during the execution.
@@ -33,7 +35,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 	\label{tab:register-analysis-results}
 \end{table}
 
-For the results of such an analysis performed on a range of programs, including \textit{gzip}~\cite{gzip} and several benchmarks of the \texttt{intspeed}-Suite of \textit{SPEC CPU 2017}~\cite{spec-cpu-2017}, see table \vref{tab:register-analysis-results}.
+For the results of such an analysis performed on a range of programs, including \textit{gzip}~\cite{gzip} and several benchmarks of the \texttt{intspeed}-Suite of \textit{SPEC CPU 2017}~\cite{spec-cpu-2017}, see table~\vref{tab:register-analysis-results}.
 Primarily, we gain interesting insights into the differences between the static and dynamic results yielded by the analysis.
 While the static ranked hit list does not differ greatly between the different executables and the top $12$ entries are identical for every one of the tested programs, the dynamic results are far more variable.
 This makes creating a register mapping that fits well to every executable very difficult.
@@ -41,7 +43,7 @@ This makes creating a register mapping that fits well to every executable very d
 The benchmarks \texttt{605.mcf\_s} (route planning workload) and \texttt{620.omnetpp\_s} (discrete event simulation for computer networking)~\cite{spec-cpu-doc} of the \textit{SPEC CPU} suite can serve as examples here.
 For programs like \texttt{605.mcf\_s} that only lightly use the stack, holding the stack pointer \texttt{sp/x2} in a native register when only $1,20\,\%$ of accesses actually utilise it would not be necessary.
 However, other programs like \texttt{620.omnetpp\_s} may rely heavily on the stack, and thus log very frequent accesses to \texttt{sp/x2};
-when statistically every ninth access is to the stack pointer, it is absolutely essential to map the register to a native GPR.
+when statistically every ninth access is to the stack pointer, it is absolutely essential to map the register to a native GPR\@.
 
 If a static analysis yielded results of similar quality to the dynamic counterpart, the DBT could analyse the binary prior to execution and run every program with a best-fit static register mapping.
 However, evidently, this is impossible with dynamic profiling.
@@ -53,7 +55,7 @@ When we structure our mapping by the average case of the insights gained, we sta
 From the 16 general-purpose registers x86-64 has to offer, we may use the 12 registers \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}.
 The remaining registers have either implicit or exclusive functions in some instructions (\texttt{rax} and \texttt{rdx} for multiplication/division, \texttt{cl} for shifting), or, like \texttt{rsp}, are impractical to use in combination with block chaining and function calls.
 
-Taking the 12 registers that are most accessed on average, the mapping structure is as seen in table \vref{tab:static-register-mapping}.
+Taking the 12 registers that are most accessed on average, the mapping structure is as seen in table~\vref{tab:static-register-mapping}.
 
 \begin{table}
 	\centering
@@ -86,14 +88,14 @@ Continued here\ldots
 \subsection{Detailed system call overview}
 % todo special description for emulated calls
 
-As described in section \vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
+As described in section~\vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
 We achieve this by translating the \texttt{ECALL} instruction as a context switch and jump to the \texttt{emulate\_ecall} routine in the DBT, which can then take the appropriate action.
 
 As we stored the guest's registers before jumping to the handler, the requested system call index is now available to the DBT in the register file as entry \texttt{a7}, as per the RISC-V standard calling convention.
 We may now handle the system calls based on that index and the arguments passed in the registers \texttt{a0} through \texttt{a6}, and write the return value to entry \texttt{a0} of the register file prior to switching the context back to the guest.
 
-As previously mentioned, some system calls require special handling when encountered by the DBT (see table \vref{tab:syscall-special} for details).
-The following will describe the specifics of these issues with system calls that are either not present on the x86-64 host architecture, or may influence or break the state of the DBT.
+As previously mentioned, some system calls require special handling when encountered by the DBT (see table~\vref{tab:syscall-special} for details).
+The following will describe the specifics of these issues with system calls that are either not present on the x86-64 host architecture, or may influence or break the state of the DBT\@.
 \begin{description}
 	\item[Adapting structure data format.]
 	There are system calls like \texttt{fstat} and \texttt{fstatat} that exist both on RISC-V as well as x86-64, but use different data structure layouts in their return values.
@@ -115,17 +117,18 @@ The following will describe the specifics of these issues with system calls that
 	
 	\item[Guarded pass-through to host.]
 	Essentially, any system call that has the possibility to influence the state or memory of the translator needs to have respective safe-guards in place.
-	A good example of this behaviour is the \texttt{mmap} system call, the handling of which also reflects the memory layout scheme discussed in section \vref{sec:memory-layout}.
+	A good example of this behaviour is the \texttt{mmap} system call, the handling of which also reflects the memory layout scheme discussed in section~\vref{sec:memory-layout}.
 	
 	In any case, we must prevent a memory mapping into the translator's memory region.
 	Mappings that do not interfere with the DBT's memory can be passed along to the host directly.
 	In case a hinted mapping would conflict with the translator's memory, we may just re-hint the mapping to the top of the guest's address space.
-	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping; thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
+	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping;
+	thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
 	
 	Similarly, we fail the guest's \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the deallocation.
 \end{description}
 
-The other supported system calls may be directly passed through to the host after performing the necessary index mapping (see table \vref{tab:syscall-pass-through}).
+The other supported system calls may be directly passed through to the host after performing the necessary index mapping (see table~\vref{tab:syscall-pass-through}).
 
 \begin{table}
 	\centering

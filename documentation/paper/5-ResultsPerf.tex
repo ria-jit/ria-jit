@@ -74,7 +74,7 @@ This not only generates reproducible and widely accepted results in the industry
 
 % todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
 The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
-Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT.
+Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
 
 All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
@@ -225,11 +225,11 @@ The RISC-V ABI was setup as \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 \end{figure}
 % ===================================
 
-Figure \vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
+Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
 % todo add analysis as soon as results are finalized
 
 \subsection{Other performance metrics}
-By implementing optimisations to the DBT like a return address stack, recursive jump target translation and block chaining as discussed in section \vref{sec:optimise}, we are able to meaningfully increase the performance of the translator in certain workloads, to the point where we outperform \textit{QEMU} significantly.
+By implementing optimisations to the DBT like a return address stack, recursive jump target translation and block chaining as discussed in section~\vref{sec:optimise}, we are able to meaningfully increase the performance of the translator in certain workloads, to the point where we outperform \textit{QEMU} significantly.
 
 % ======= merge_sort execution time =======
 % Execution time of the merge_sort test.
@@ -294,7 +294,7 @@ By implementing optimisations to the DBT like a return address stack, recursive 
 \end{figure}
 % =========================================
 
-Figure \vref{fig:dbt-optimisations} shows a manifestation of these performance gains, as seen by executing a benchmark based on a recursive implementation of the merge sort algorithm.
+Figure~\vref{fig:dbt-optimisations} shows a manifestation of these performance gains, as seen by executing a benchmark based on a recursive implementation of the merge sort algorithm.
 
 
 
