@@ -29,6 +29,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 
 \pgfplotstableread[col sep=comma,header=false]{benchmarks/register-frequency/freq.csv}\regfreqtable
 \pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
+% Todo Figure out better caption and titel/y label @flo
 \begin{figure}[h]
 %\pgfplotstabletypeset\sortedregfreqtable
 	\centering
@@ -44,18 +45,20 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 				anchor = north east,
 				rotate = 60
 			},
-			ytick = {0.1,0.2,0.3,0.4},
+			ytick = {0.1, 0.2, 0.3, 0.4},
 			scaled y ticks = false,
-			x=0.4cm,
-			point meta={y*100},
-            nodes near coords={\pgfmathprintnumber\pgfplotspointmeta\%},
-			every node near coord/.append style={font=\tiny, rotate=90, anchor= west, /pgf/number format/fixed,/pgf/number format/precision=2},
-			enlarge x limits ={abs=0.5cm},
-			flexible xticklabels from table={\sortedregfreqtable}{[index]0},
+			x = 0.4cm,
+			point meta = {y*100},
+            nodes near coords = {\pgfmathprintnumber\pgfplotspointmeta\%},
+			every node near coord/.append style = {font = \tiny, rotate = 90, anchor = west, /pgf/number format/fixed, /pgf/number format/precision = 2},
+			enlarge x limits = {abs = 0.5cm},
+			xtick={0,...,31},
+			xticklabels from table = {\sortedregfreqtable}{0},
 			xtick pos=bottom,
 			ymin = 0, ymax = 0.45,
 			ymajorgrids = true,
 			bar width = 5pt,
+			bar shift = 0,
 			height = 7.0cm,
 			width = \linewidth,
 			legend style = {
@@ -65,10 +68,14 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 				column sep = 0.2cm
 			}
 		]
-		\addplot+[fill=era-dbt-1, draw=black]table [x expr= \coordindex, y=1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=0:12]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=13:31]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
 
+			\legend{statically mapped, not mapped}
 		\end{axis}
-	\end{tikzpicture}\label{fig:figure}
+	\end{tikzpicture}
+	\caption[Register Usage]{Register Usage}
+	\label{fig:reg-usage}
 \end{figure}
 
 
