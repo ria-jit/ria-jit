@@ -52,3 +52,21 @@ The memory is laid out as follows:
 	\label{tab:}
 \end{table}
 
+
+\subsection{Partitioning the input code}
+Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
+The natural choice here is for the translator to partition the code into basic blocks.
+
+Basic blocks, by definition, have only a single point of entry and exit;
+all other instructions in a single block are executed sequentially and in the order that they appear in the code.
+(Of course, this does not take into account mechanisms such as out-of-order execution or system calls as well as interrupt- and exception handling).
+
+So, for our purposes, a basic block will be terminated by any control-flow altering instruction like a jump, call or return statement, or a system call\footnote{These may or may not have control-flow altering effects; they in any case need to be handled this way due to the reasons laid out in section~\ref{sec:syscall-handling}.}.
+
+
+
+
+
+
+
+

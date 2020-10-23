@@ -1,27 +1,17 @@
-\subsection{Partitioning the input code}
-Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
-The natural choice here is for the translator to partition the code into basic blocks.
-
-Basic blocks, by definition, have only a single point of entry and exit;
-all other instructions in a single block are executed sequentially and in the order that they appear in the code.
-(Of course, this does not take into account mechanisms such as out-of-order execution or system calls as well as interrupt- and exception handling).
-
-So, for our purposes, a basic block will be terminated by any control-flow altering instruction like a jump, call or return statement, or a system call\footnote{These may or may not have control-flow altering effects; they in any case need to be handled this way due to the reasons laid out in section~\vref{sec:syscall-handling}.}.
-
-% todo continued about basic blocks, jump/call instructions, etc.
-
-
 \subsection{Translating the partitioned code}
 The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
 
-The quality of the code that can be easily generated here strongly depends on the properties of the host and guest architectures in question.
+The quality of the code that can be generated here strongly depends on the properties of the host and guest architectures in question.
 Difficulties can arise due to differences in the instruction operand formats and the type of instruction set architecture the DBT is dealing with.
 
-In our case, as outlined in section~\vref{sec:isa-cmp}, challenges stem from the fact that we are translating code from a load-store architecture using a three-operand instruction format into a register-memory architecture in which (generally) one of the source operands is also the implicit destination operand.
+In our case, as outlined in section~\ref{sec:isa-cmp}, challenges stem from the fact that we are translating code from a load-store architecture using a three-operand instruction format into a register-memory architecture in which (generally) one of the source operands is also the implicit destination operand.
 This, for example, means that a single arithmetic \texttt{add rd, rs1, rs2} in RISC-V assembly language generally can not be translated via a single instruction, but rather requires two instructions: moving \texttt{rs1} to \texttt{rd}, then adding the value of \texttt{rs2} to \texttt{rd}.
 
 Opportunities for optimisation lie wherever there is a way to shorten the translation's amount of CPU clock cycles, possibly by employing semantically equivalent native instructions that run in a shorter timespan.
-The RISC-V pseudoinstructions (as mentioned in section~\ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, as it is clear that an instruction like \texttt{xori x10, x10, -1} can be directly translated as a \texttt{not x10}, without needing to resort to \texttt{mov} and \texttt{xor}.
+The RISC-V pseudoinstructions (as mentioned in section~\ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, along with discoverable patterns in the input assembly.
+It is clear, for example, that an instruction like \texttt{xori x10, x10, -1} can be directly translated as a \texttt{not x10}, without needing to resort to \texttt{mov} and \texttt{xor}.
+The same principle applies to combinations of multiple instructions.
+An \texttt{auipc rd, imm1} followed by \texttt{addi rd, rd, imm2} may for example be translated as directly loading the result of the computation \texttt{imm1 + imm2} into \texttt{rd}.
 
 
 \subsection{Code cache and block handling}
@@ -46,7 +36,7 @@ It would thus only be possible to either remove all blocks with jump references 
 \subsection{Register handling and context switching}
 \label{sec:context-switch-reg-handle}
 As outlined in section~\ref{sec:isa-cmp}, the RISC-V and x86-64 architectures have differing amounts of general purpose registers.
-In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
+In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86-64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
 
 As x86-64 only provides for 16 general-purpose registers (\texttt{rax--rdx, rsi, rdi, rsp, rbp and r8--r15}), it is impossible to directly and statically map all guest registers to native host registers.
 Adding to the above, due to the fact that some x86-64 registers have special or implicit purposes in some instructions (\texttt{rax} and \texttt{rdx} in \texttt{(i)mul}, \texttt{cl} in shifting, etc.), care must be taken in choosing the registers that can be used for such a mapping.
