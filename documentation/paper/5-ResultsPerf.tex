@@ -86,8 +86,8 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
 % ================================
-\pgfplotstableread[col sep=comma]{benchmarks/spec/native.csv}\nativetable
-\pgfplotstableread[col sep=comma]{benchmarks/spec/dbt.csv}\dbttable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-base/dbt.csv}\dbttable
 \pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
 
@@ -135,14 +135,14 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 		}
 		]
 			% Native results
-			\pgfplotstableread[col sep=comma]{benchmarks/spec/native.csv}\nativelocaltable
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativelocaltable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
 			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\nativelocalsortedtable{\nativelocaltable}
 			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocalsortedtable;
 
 			% QEMU results
-			\pgfplotstableread[col sep=comma]{benchmarks/spec/qemu.csv}\qemutable
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/qemu.csv}\qemutable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
 			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\qemusortedtable{\qemutable}
@@ -163,10 +163,8 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 % gzip results
 Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to measure the performance of the translator in real-world workloads by running data compression via \textit{gzip}.
 
-The native \textit{gzip} binary for the reference runs was obtained from the default package repositories.
-As there is no such executable available for the RISC-V architecture, the sources had to be manually compiled.
-The compiler optimisation level \texttt{-O3} was used alongside the linker flag \texttt{-static}.
-The RISC-V ABI was setup as \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
+For better comparability, both the native and RISC-V \textit{gzip} binaries were compiled manually with the compiler optimisation level \texttt{-O3} alongside the linker flag \texttt{-static}.
+The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 % todo Use -O3 and -static for native.
 
 % ======= gzip execution time =======
@@ -177,7 +175,7 @@ The RISC-V ABI was setup as \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}[%
-			title = {Random Data Compression (\textit{gzip}, 500 MB, 10 runs)},
+			title = {Random Data Compression (\textit{gzip}, 500 MB, 5 runs)},
 			xbar,
 			area legend,
 			xlabel = {Execution time [s] (lower is better)},
@@ -227,74 +225,6 @@ The RISC-V ABI was setup as \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 
 Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
 % todo add analysis as soon as results are finalized
-
-\subsection{Other performance metrics}
-By implementing optimisations to the DBT like a return address stack, recursive jump target translation and block chaining as discussed in section~\vref{sec:optimise}, we are able to meaningfully increase the performance of the translator in certain workloads, to the point where we outperform \textit{QEMU} significantly.
-
-% ======= merge_sort execution time =======
-% Execution time of the merge_sort test.
-% todo keep up-to-date with performance improvements
-% =========================================
-\begin{figure}[h]
-	\centering
-	\begin{tikzpicture}
-		\begin{axis}[%
-			title = {Recursive Merge Sort (5000 runs)},
-			xbar,
-			area legend,
-			xlabel = {Execution time [ns] (lower is better)},
-			symbolic y coords = {Native,QEMU,DBT unoptimised,DBT optimised},
-			xmin = 0,
-			bar shift = 0.0cm,
-			y dir = reverse,
-			xmajorgrids = true,
-			height = 4.5cm,
-			width = 0.87\linewidth,
-			legend style = {
-				at = {(0.5, -0.45)},
-				anchor = north,
-				legend columns = 2,
-				column sep = 0.2cm
-			}
-		]	
-			\addplot+ [
-				fill=era-native,
-				draw=black
-			] coordinates {
-				(23385.65,Native)
-			};
-
-			\addplot+ [
-				fill=era-qemu,
-				draw=black
-			] coordinates {
-				(67312.47,QEMU)
-			};
-			
-			\addplot+ [
-				fill=era-dbt-2,
-				draw=black
-			] coordinates {
-				(302521.38,DBT unoptimised)
-			};
-			
-			\addplot+ [
-				fill=era-dbt-1,
-				draw=black
-			] coordinates {
-				(37565.99,DBT optimised)
-			};
-			
-			\legend{Native, QEMU, DBT (\texttt{----optimize=none}), DBT (optimized)}
-		\end{axis}
-	\end{tikzpicture}
-	\caption[Execution time of merge sort (5000 runs)]%
-	{Execution time of merge sort (5000 runs) in nanoseconds (lower is better). Testing performed with v1.2.2-61.}
-	\label{fig:dbt-optimisations}
-\end{figure}
-% =========================================
-
-Figure~\vref{fig:dbt-optimisations} shows a manifestation of these performance gains, as seen by executing a benchmark based on a recursive implementation of the merge sort algorithm.
 
 
 
