@@ -19,7 +19,7 @@ There are two main ways of determining the priority of registers when considerin
 
 It is, on the one hand, possible to assess the priority statically, by performing an analysis of the binary in question.
 Essentially, the hereby produced metric counts the number of times the register is used in the assembly instructions listed in the guest program and thus delivers an idea of how important each register is to this specific executable.
-We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag (see appendix~\ref{sec:appendix-tools}).
+We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag.
 
 However, this approach does not take into account that a single instruction may be executed many times while the program is running.
 Accordingly, the other approach is to assess the register priority dynamically by analysing and profiling the execution of the testing program, thereby gaining an insight into how often each register is actually used during the execution.
