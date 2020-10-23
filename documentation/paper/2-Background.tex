@@ -28,4 +28,27 @@ The DBT must take care to map the file into memory correctly, while not compromi
 
 Furthermore, the guest registers (see section~\vref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
 
-% todo details about the memory layout and setup of the environment
+The stack is set up exactly like the linux kernel would.
+As such the stack pointer needs to point at the argument count and then towards higher addresses in order there are the zero terminated argument, environment and auxiliary vector.
+Finally some alignment bytes need to be added, so the stack pointer is ABI-conformant 16 Byte aligned.
+All of the information is basically just copied from the host in our case.
+
+The memory is laid out as follows:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		\textbf{Address range} & \textbf{Usage}\\
+		\midrule
+		0x780000000000+ & Translator address region\\
+		0x77ff81000000+ & JIT generated code\\
+		0x77ff807fe000+ & guest stack\\
+		(last mapped address + 1)+ & guest heap\\
+		defined by ELF file & mapped guest binary\\
+		\bottomrule
+	\end{tabular}
+	\caption[Memory layout]%
+	{The layout of the memory space.}
+	\label{tab:}
+\end{table}
+
