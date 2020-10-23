@@ -1,13 +1,12 @@
 RISC-V is an open ISA first conceptualised in 2010 with the initial goals of research and education in mind.
-Follows the RISC (Reduced Instruction Set Computer) Scheme (like ARM) in contrast to x86-64\ldots
+In contrast to Intels x86~\cite{intel2017man} it employs the RISC (Reduced Instruction Set Computer) scheme providing fewer less powerful Instructions, addressing modes etc in favor of easier to implement micro architectures.
 Its development took the lessons learned in terms of backwards compatibility and future-proofing from other widespread ISAs like Intel x86 into account, and aimed to provide an open interface for the architecture, rather than strict implementation details.
 This grants a large freedom to the implementors and greatly increases the flexibility and ease of working with the architecture~\cite[S. 1f]{riscvspec}.
 As such it looks to be open to future extensions by already defining a basis for future 128-bit integer instructions and instruction length encodings of up to 176 bits (22 Bytes) already defined and the possibility to expand further.
 
 
 \subsection{Problem description}
-% todo update citation here
-There is already some hardware available for RISC-V (see/maybe cite SIFive), but it is not yet widespread and a lot of developers won't have access to real hardware, so they must rely on emulation to test their code.
+There is already some hardware available for RISC-V \footnote{the biggest name here is probably SIFive~\cite{sifive}, which already produce multi-core CPU with super scalar out-of-order pipelines reaching multi GHz clock speeds}, but it is not yet widespread and a lot of developers won't have access to real hardware, so they must rely on emulation to test their code.
 
 \subsubsection{Modes of binary translation}
 When attempting to execute guest programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
@@ -29,7 +28,7 @@ The main possibilities to achieve this are:
 \end{itemize}
 
 \subsubsection{Motivation}
-One of the most popular emulators is QEMU\@.
+One of the most popular emulators is QEMU~\cite{bellard2005qemu}\@.
 While QEMU is a portable DBT that supports a wide variety of guest and host architectures and ISAs, this also makes it hard to optimize it for a specific guest/host combination and therefore the program execution will be slower than necessary.
 
 Our aim is to provide a faster emulator, allowing the execution of RISC-V code on an x86-64 machine by means of dynamic binary translation.
