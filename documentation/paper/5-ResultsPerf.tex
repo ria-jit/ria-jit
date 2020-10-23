@@ -106,33 +106,31 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}[%
-		title = {SPEC CPU 2017 \texttt{intspeed} Results},
-		ybar,
-		area legend,
-		ylabel = {Execution time [ratio to native]},
-		xtick = data,
-		xtick style = {draw = none},
-		xticklabel style = {
-		inner sep = 0pt,
-		anchor = north east,
-		rotate = 60
-		},
-		ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
-		scaled y ticks = false,
-		flexible xticklabels from table={\sorteddbttable}{Benchmark},
-%			symbolic x coords={600.perlbench, 602.gcc, 605.mcf, 620.omnetpp, 623.xalancbmk, 625.x264, 631.deepsjeng, 641.leela, 648.exchange2, 657.xz},
-%			xticklabels from table,
-		ymin = 0, ymax = 6.5,
-		ymajorgrids = true,
-		bar width = 5pt,
-		height = 7.0cm,
-		width = 0.9\linewidth,
-		legend style = {
-		at = {(1.0, 1.0)},
-		anchor = north east,
-		legend columns = 3,
-		column sep = 0.2cm
-		}
+			title = {SPEC CPU 2017 \texttt{intspeed} Results},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to native]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
+			scaled y ticks = false,
+			flexible xticklabels from table={\sorteddbttable}{Benchmark},
+			ymin = 0, ymax = 6.5,
+			ymajorgrids = true,
+			bar width = 5pt,
+			height = 7.0cm,
+			width = 0.9\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
 		]
 			% Native results
 			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativelocaltable
@@ -155,7 +153,7 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 		\end{axis}
 	\end{tikzpicture}
 	\caption[SPEC CPU 2017 Results]%
-	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised).}\label{fig:figure}
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised, lower is better).}\label{fig:figure}
 \end{figure}
 % ================================
 
@@ -165,11 +163,9 @@ Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to 
 
 For better comparability, both the native and RISC-V \textit{gzip} binaries were compiled manually with the compiler optimisation level \texttt{-O3} alongside the linker flag \texttt{-static}.
 The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
-% todo Use -O3 and -static for native.
 
 % ======= gzip execution time =======
-% Execution time of compression (500 MB, 10 runs).
-% todo keep up-to-date with performance improvements
+% Execution time of compression (500 MB, 5 runs).
 % ===================================
 \begin{figure}[h]
 	\centering
@@ -178,18 +174,19 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 			title = {Random Data Compression (\textit{gzip}, 500 MB, 5 runs)},
 			xbar,
 			area legend,
-			xlabel = {Execution time [s] (lower is better)},
-			symbolic y coords = {Native,QEMU,v1.2.2-61},
-			xmin = 0, xmax = 145,
+			xlabel = {Execution time [ratio to native] (lower is better)},
+			symbolic y coords = {Native,QEMU,DBT,\ldots unoptimised},
+			xmin = 0,
 			bar shift = 0.0cm,
 			y dir = reverse,
+			enlarge y limits = {value=0.2, auto},
 			xmajorgrids = true,
-			height = 4.5cm,
-			width = \linewidth,
+			height = 5.5cm,
+			width = 13.0cm,
 			legend style = {
 				at = {(0.5, -0.45)},
 				anchor = north,
-				legend columns = 3,
+				legend columns = 4,
 				column sep = 0.2cm
 			}
 		]	
@@ -197,34 +194,44 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 				fill=era-native,
 				draw=black
 			] coordinates {
-				(44.14,Native)
+				(1.0,Native) % 44.15
 			};
 
 			\addplot+ [
 				fill=era-qemu,
 				draw=black
 			] coordinates {
-				(121.83,QEMU)
+				(2.767157418,QEMU) % 122.17
 			};
 			
 			\addplot+ [
 				fill=era-dbt-1,
 				draw=black
 			] coordinates {
-				(136.77,v1.2.2-61)
+				(1.911438279,DBT) % 84.39
 			};
 			
-			\legend{Native, QEMU, DBT}
+			\addplot+ [
+				fill=era-dbt-2,
+				draw=black
+			] coordinates {
+				(9.527180068,\ldots unoptimised) % 420.625
+			};
+			
+			\legend{Native, QEMU, DBT, DBT unoptimised}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[Execution time of gzip compression (500 MB, 10 runs)]%
-	{Execution time of gzip file compression (500 MB of random data, 10 runs) in seconds (lower is better).}
+	{Execution time of gzip file compression (500 MB of random data, 5 runs) in seconds (normalised, lower is better). Unoptimised run executed with \texttt{----optimize=none}.}
 	\label{fig:gzip-execution-time}
 \end{figure}
 % ===================================
 
 Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
-% todo add analysis as soon as results are finalized
+
+Through our very efficient return address stack, recursive jump target translation, macro operation fusion and, most importantly, block chaining we are able to significantly outperform QEMU in random data compression by nearly 45\,\%.
+% todo correct way to calculate scale?
+% eval optimisations...
 
 
 
