@@ -69,6 +69,19 @@ Taking the 12 registers that are most accessed on average, the mapping structure
 
 \subsubsection{Dynamically allocated replacement registers}
 % todo details about the lazy_replace mapping
+In order to implement the desired temporary register replacement behaviour detailed in section~\ref{sec:context-switch-reg-handle}, we need to keep track of the age of the values currently situated in the replacement registers.
+To do this, we track a metric of \textit{replacement recency} (essentially serving as an inverse value age) for each block during translate-time.
+This recency gets incremented for every access not captured by the static register mapping.
+
+An access to a register that is not statically mapped then first checks the contents of all temporary registers -- if the value is already present, the DBT may use that value's register.
+If it is not already present, the DBT selects any free replacement register if able, and otherwise selects the register with the oldest value (or minimal recency) for write-back.
+The value is then loaded into the selected register from the register file in memory and marked as being the youngest in order to prevent it from being discarded in following mapping calls.
+
+The dynamic mapping must also be able to receive requests for specific target registers for a load in order to support shifting and multiplication/division instructions that require arguments in implicitly defined registers.
+In order to support this efficiently, the DBT is able to shuffle the values in the replacement registers around accordingly.
+
+With this behaviour, we manage to greatly save on memory accesses to the register file compared to simply loading and storing the values on an instruction-by-instruction basis.
+This style of register mapping can also not perform worse than accessing memory for each instruction, as in the worst case the DBT will perform the same memory accesses as with the other strategy, just possibly at a different time.
 
 
 \subsection{Context switching details}
