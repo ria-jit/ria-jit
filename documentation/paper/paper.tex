@@ -54,10 +54,13 @@
 \setcounter{tocdepth}{2}
 
 % itemize without parskip and itemsep for compact listings
+% New commands to fix editor highlighting
+\newcommand{\lesslengthsep}{\setlength{\itemsep}{0ex}}
+\newcommand{\lesslengthskip}{\setlength{\parskip}{0ex}}
 \newenvironment{itemize*}%
   {\begin{itemize}%
-    \setlength{\itemsep}{0ex}%
-    \setlength{\parskip}{0ex}}%
+    \lesslengthsep%
+    \lesslengthskip}%
   {\end{itemize}}
 
 % environment setup for pgfplots and tikz
