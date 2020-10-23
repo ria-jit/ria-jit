@@ -118,15 +118,6 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 
 \pgfplotstablesort[sort key = ratio, sort cmp=float >]\sorteddbttable{\dbttable}
 
-%Extract xticklabels from file
-\makeatletter
-\pgfplotsset{
-/pgfplots/flexible xticklabels from table/.code n args={2}{%
-\pgfplotstablegetcolumn{#2}\of{#1}\to\pgfplots@xticklabels
-\renewcommand{\pgfplots@xticklabel}\pgfplots@user@ticklabel@list@x
-}
-}
-\makeatother
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}
@@ -239,15 +230,6 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nonetable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nonetable
 
-%Extract xticklabels from file
-\makeatletter
-\pgfplotsset{
-/pgfplots/flexible xticklabels from table/.code n args={2}{%
-\pgfplotstablegetcolumn{#2}\of{#1}\to\pgfplots@xticklabels
-\renewcommand{\pgfplots@xticklabel}\pgfplots@user@ticklabel@list@x
-}
-}
-\makeatother
 \begin{figure}[h]
 	\centering
 	\begin{tikzpicture}

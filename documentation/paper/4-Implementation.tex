@@ -27,7 +27,49 @@ The translator is also capable of performing such an analysis, commanded by the 
 A dynamic analysis, of course, delivers a largely more accurate idea of the priority of the registers in question, but has the decided and obvious disadvantage that it cannot be performed without actually executing the binary.
 
 
-% todo plot goes here
+\pgfplotstableread[col sep=comma,header=false]{benchmarks/register-frequency/freq.csv}\regfreqtable
+\pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
+\begin{figure}[h]
+%\pgfplotstabletypeset\sortedregfreqtable
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Register frequency},
+			ybar,
+			area legend,
+			ylabel = {Register usage precentage},
+			xtick = data,
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			ytick = {0.1,0.2,0.3,0.4},
+			scaled y ticks = false,
+			x=0.4cm,
+			point meta={y*100},
+            nodes near coords={\pgfmathprintnumber\pgfplotspointmeta\%},
+			every node near coord/.append style={font=\tiny, rotate=90, anchor= west, /pgf/number format/fixed,/pgf/number format/precision=2},
+			enlarge x limits ={abs=0.5cm},
+			flexible xticklabels from table={\sortedregfreqtable}{[index]0},
+			xtick pos=bottom,
+			ymin = 0, ymax = 0.45,
+			ymajorgrids = true,
+			bar width = 5pt,
+			height = 7.0cm,
+			width = \linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+		\addplot+[fill=era-dbt-1, draw=black]table [x expr= \coordindex, y=1]\sortedregfreqtable;
+
+		\end{axis}
+	\end{tikzpicture}\label{fig:figure}
+\end{figure}
 
 
 % todo add ref
