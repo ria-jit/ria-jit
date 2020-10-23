@@ -69,11 +69,36 @@
 \end{comment}
 
 
+\begin{table}
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		\textbf{SPECspeed Benchmark} & \textbf{Workload}\\ 
+		\midrule
+		\texttt{600.perlbench\_s} & Perl interpreter\\
+		\texttt{602.gcc\_s} & GNU C compiler\\
+		\texttt{605.mcf\_s} & Route planning\\
+		\texttt{620.omnetpp\_s} & Discrete Event simulation -- computer network\\
+		\texttt{623.xalancbmk\_s} & XML to HTML conversion via XSLT\\
+		\texttt{625.x264\_s} & Video compression\\
+		\texttt{631.deepsjeng\_s} & Artificial Intelligence: alpha-beta tree search (Chess)\\
+		\texttt{641.leela\_s} & Artificial Intelligence: Monte Carlo tree search (Go)\\
+		\texttt{648.exchange2\_s} & Artificial Intelligence: recursive solution generator (Sudoku)\\
+		\texttt{657.xz\_s} & General data compression\\
+		\bottomrule
+	\end{tabular}
+	\caption[SPEC CPU 2017 workload description]%
+	{A description of the workloads covered by \textit{SPEC CPU 2017}'s \texttt{intspeed} suite~\cite{spec-cpu-doc}.}
+	\label{tab:spec-description}
+\end{table}
+
+
 Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017}'s \texttt{intspeed} suite of benchmarks.
 This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the benchmark's translation.
 
 % todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
 The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
+An overview of the workloads covered by the aforementioned suite can be found in table~\ref{tab:spec-description}.
 Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
 
 All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
