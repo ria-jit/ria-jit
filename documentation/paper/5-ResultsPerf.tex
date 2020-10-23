@@ -158,6 +158,127 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 \end{figure}
 % ================================
 
+% todo analysis of SPEC runs
+
+
+
+\subsection{Evaluation of translator optimisations}
+\begin{table}
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		\textbf{Option} & \textbf{Description}\\
+		\midrule
+		\texttt{no-ras} & Disable the return address stack\\
+		\texttt{no-chain} & Disable block chaining\\
+		\texttt{no-jump} & Disable recursive jump target translation\\
+		\texttt{no-fusion} & Disable macro operation fusion\\
+		\texttt{none} & All of the above\\
+		\bottomrule
+	\end{tabular}
+	% state: 5afb8706e482917866a3507a54d1512befe56a21
+	\caption[Translator optimisation options]%
+	{The options for translator optimisations, as seen in \texttt{----optimize=help}.}
+	\label{tab:opt-options}
+\end{table}
+
+In order to evaluate the optimisations built into the translator, we ran the \textit{SPEC CPU 2017} suite with various combinations of the available optimisation options.
+
+An overview of the specific behaviour of the mentioned switches can be seen in table~\ref{tab:opt-options}.
+
+
+% ======= Optimisation comparison results =======
+% Results of the intspeed SPEC CPU 2017 runs.
+% ================================
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-fusion.csv}\nofusiontable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-jump-no-ras.csv}\nojumpnorastable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-jump-none.csv}\nonetable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\basetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\basetable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\norastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\norastable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nofusiontable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nofusiontable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nojumpnorastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nojumpnorastable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nonetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nonetable
+
+%Extract xticklabels from file
+\makeatletter
+\pgfplotsset{
+/pgfplots/flexible xticklabels from table/.code n args={2}{%
+\pgfplotstablegetcolumn{#2}\of{#1}\to\pgfplots@xticklabels
+\renewcommand{\pgfplots@xticklabel}\pgfplots@user@ticklabel@list@x
+}
+}
+\makeatother
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Optimisation option evaluation},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to base]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
+			scaled y ticks = false,
+			flexible xticklabels from table={\basetable}{Benchmark},
+			ymin = 0, ymax = 6.5,
+			ymajorgrids = true,
+			bar width = 5pt,
+			height = 7.0cm,
+			width = 0.9\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+			% base results
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \basetable;
+			
+			% no-fusion results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nofusiontable;
+
+			% no-ras results
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \norastable;
+			
+			% no-jump-no-ras results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
+			
+			% none results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nonetable;
+
+			\legend{Base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump, no-ras}, \texttt{none}}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[Translator optimisation evaluation results]%
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} with various optimisation option combinations (normalised, lower is better).}
+	\label{fig:opt-compare}
+\end{figure}
+% ================================
+
+
+
+% todo analysis of SPEC comparisons
+
+
 \subsection{Data compression via gzip}
 % gzip results
 Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to measure the performance of the translator in real-world workloads by running data compression via \textit{gzip}.
