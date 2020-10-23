@@ -153,7 +153,8 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 		\end{axis}
 	\end{tikzpicture}
 	\caption[SPEC CPU 2017 Results]%
-	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised, lower is better).}\label{fig:figure}
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}'s \texttt{intspeed} (normalised, lower is better).}
+	\label{fig:spec-results}
 \end{figure}
 % ================================
 
@@ -221,8 +222,8 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 			\legend{Native, QEMU, DBT, DBT unoptimised}
 		\end{axis}
 	\end{tikzpicture}
-	\caption[Execution time of gzip compression (500 MB, 10 runs)]%
-	{Execution time of gzip file compression (500 MB of random data, 5 runs) in seconds (normalised, lower is better). Unoptimised run executed with \texttt{----optimize=none}.}
+	\caption[Execution time of gzip compression]%
+	{Execution time of gzip file compression (500 MB of random data, 5 runs) in seconds (normalised, lower is better).\\Unoptimised run executed with \texttt{----optimize=none}.}
 	\label{fig:gzip-execution-time}
 \end{figure}
 % ===================================
@@ -230,8 +231,10 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
 
 Through our very efficient return address stack, recursive jump target translation, macro operation fusion and, most importantly, block chaining we are able to significantly outperform QEMU in random data compression by nearly 45\,\%.
-% todo correct way to calculate scale?
-% eval optimisations...
+The achieved performance of approximately two times the execution time of a native run is in line with the \textit{SPEC CPU 2017} results shown in figure \ref{fig:spec-results}.
+
+As mentioned in the caption, the unoptimised run was performed with the command line option \texttt{----optimize=none}, which disables all of the optimisation features mentioned above.
+The translator will then have to translate every block one-by-one, jump back into the main loop on every block end and fetch the next position based on the current program counter.
 
 
 

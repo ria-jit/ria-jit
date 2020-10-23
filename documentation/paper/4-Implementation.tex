@@ -31,7 +31,8 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 	\makebox[\textwidth][c]{%
 		\includegraphics[height=1.17\textwidth,angle=90]{media/register-usage}%
 	}
-	\caption{The results of a static and dynamic register usage analysis of several \textit{SPEC CPU 2017} benchmarks, \textit{gzip} as well as a merge sort utility program.}
+	\caption[Register usage analysis results]%
+	{The results of a static and dynamic register usage analysis of several \textit{SPEC CPU 2017} benchmarks, \textit{gzip} as well as a merge sort utility program.}
 	\label{tab:register-analysis-results}
 \end{table}
 
@@ -65,7 +66,8 @@ Taking the 12 registers that are most accessed on average, the mapping structure
 		\textbf{x86-64 mapping} & \texttt{rbx} & \texttt{rbp} & \texttt{rsi} & \texttt{rdi} & \texttt{r8} & \texttt{r9} & \texttt{r10} & \texttt{r11} & \texttt{r12} & \texttt{r13} & \texttt{r14} & \texttt{r15}\\
 		\bottomrule
 	\end{tabular}
-	\caption{The static register mapping in use by the translator.}
+	\caption[Active static register mapping]%
+	{The static register mapping in use by the translator.}
 	\label{tab:static-register-mapping}
 \end{table}
 
@@ -148,7 +150,8 @@ The other supported system calls may be directly passed through to the host afte
 	\end{tabular}
 	% todo keep up-to-date
 	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
-	\caption{An overview of the system calls we support that require special handling by the binary translator.}
+	\caption[Specially handled system calls overview]%
+	{An overview of the system calls we support that require special handling by the binary translator.}
 	\label{tab:syscall-special}
 \end{table}
 
@@ -162,6 +165,7 @@ The other supported system calls may be directly passed through to the host afte
 		\texttt{fcntl} & 25 & \refer 72\\
 		\texttt{ioctl} & 29 & \refer 16\\
 		\texttt{unlinkat} & 35 & \refer 263\\
+		\texttt{ftruncate} & 46 & \refer 77\\
 		\texttt{faccessat} & 48 & \refer 269\\
 		\texttt{chdir} & 49 & \refer 80\\
 		\texttt{fchmod} & 52 & \refer 91\\
@@ -198,9 +202,9 @@ The other supported system calls may be directly passed through to the host afte
 		\texttt{getrandom} & 278 & \refer 318\\
 		\bottomrule
 	\end{tabular}
-	% todo keep up-to-date
-	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
-	\caption{An overview of the system calls handled via pass-through to the host.}
+	% state: 5afb8706e482917866a3507a54d1512befe56a21
+	\caption[General system call overview]%
+	{An overview of the system calls handled via pass-through to the host.}
 	\label{tab:syscall-pass-through}
 \end{table}
 
