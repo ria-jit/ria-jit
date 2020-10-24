@@ -11,7 +11,7 @@ Opportunities for optimisation lie wherever there is a way to shorten the transl
 The RISC-V pseudoinstructions (as mentioned in section~\ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, along with discoverable patterns in the input assembly.
 It is clear, for example, that an instruction like \texttt{xori x10, x10, -1} can be directly translated as a \texttt{not x10}, without needing to resort to \texttt{mov} and \texttt{xor}.
 The same principle applies to combinations of multiple instructions.
-An \texttt{auipc rd, imm1} followed by \texttt{addi rd, rd, imm2} may for example be translated as directly loading the result of the computation \texttt{imm1 + imm2} into \texttt{rd}.
+An \texttt{lui rd, imm1} followed by \texttt{addi rd, rd, imm2} may for example be translated as directly loading the result of the computation \texttt{imm1 + imm2} into \texttt{rd}.
 
 
 \subsection{Code cache and block handling}
