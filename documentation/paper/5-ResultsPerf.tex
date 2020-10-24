@@ -32,7 +32,7 @@
 				legend columns = 3,
 				column sep = 0.2cm
 			}
-		]	
+		]
 			\addplot+ [
 				fill=era-dbt-1,
 				draw=black
@@ -73,7 +73,7 @@
 	\centering
 	\begin{tabular}{rl}
 		\toprule
-		\textbf{SPECspeed Benchmark} & \textbf{Workload}\\ 
+		\textbf{SPECspeed Benchmark} & \textbf{Workload}\\
 		\midrule
 		\texttt{600.perlbench\_s} & Perl interpreter\\
 		\texttt{602.gcc\_s} & GNU C compiler\\
@@ -175,6 +175,23 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 % ================================
 
 % todo analysis of SPEC runs
+\subsubsection{Analysis}
+Figure~\ref{fig:spec-results} shows normalized performance results of the SPEC CPU 2017 intspeed benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
+Some of the overhead must of course be attributed to the architectural differences between x86 and RISC-V resulting in needing more instructions in RISC-V assembly than x86.
+This means these results do not directly measure the overhead versus native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
+What you can compare though is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
+This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
+
+Through the various performance optimisations mentioned in Section~\vref{sec:optimise} we were able to reach our goal of consistently outperforming QEMU\@.
+In some cases the advantage is only slight, but in some workloads like the GCC compiler benchmark the advantage grows to a comfortable $80\%$.
+
+Most benchmarks show runtimes of about $1.9$x native with x264 and perlbench being the outliers.
+
+x264 on x86 heavily takes advantage of vectorization, which RISC-V does not yet support, which means that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
+Retrospective vectorization on the translator side is not easy since this would involve detecting the vectorizable loop patterns on assembler level, a task that even the compiler often has isn't good at even though it has the knowledge of the whole program.
+There are also instances where it relies heavily on 32 bit integer arithmetic which in RISC-V always causes the results to be sign extended, in comparison to x86 which zero extends in this case.
+Thus many consecutive 32bit instructions on the same values cause a lot of redundant sign extensions.
+A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
 
 
@@ -321,7 +338,7 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 				legend columns = 4,
 				column sep = 0.2cm
 			}
-		]	
+		]
 			\addplot+ [
 				fill=era-native,
 				draw=black
