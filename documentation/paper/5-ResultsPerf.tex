@@ -193,6 +193,11 @@ There are also instances where it relies heavily on 32 bit integer arithmetic wh
 Thus many consecutive 32bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
+The perlbench on the other hand has a lot of conditional branches and jumps in the hot blocks.
+This causes a lot of context switches since recursive translation currently is only employed for unconditional branches/calls.
+Recursively translating the path that is considered hot by the compiler could improve performance by a bit.
+It also potentially causes redundant work for the translator since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
+
 
 
 \subsection{Evaluation of translator optimisations}
