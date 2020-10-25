@@ -224,12 +224,13 @@ In order to evaluate the optimisations built into the translator, we ran the \te
 
 The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an overview of the switches specified in the figure's legend can be found in table~\ref{tab:opt-options}.
 
-% todo: in some way include that lazy_replace leads to 46 % performance increase in 657.xz_s
+% todo: in some way include that lazy_replace leads to 46 % performance increase in 657.xz_s?
 
 
 % ======= Optimisation comparison results =======
 % Results of the optimisation option comparisons.
 % Show all SPEC run results and analyse below.
+% todo maybe include QEMU?
 % ===============================================
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
@@ -269,11 +270,11 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			},
 			scaled y ticks = false,
 			xticklabels from table={\basetable}{Benchmark},
-			ytick = {0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0},
-			ymin = 0, ymax = 3.0,
+			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			ymin = 0, ymax = 11,
 			ymajorgrids = true,
 			bar width = 3pt,
-			height = 7.0cm,
+			height = 9.0cm,
 			width = 0.9\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
