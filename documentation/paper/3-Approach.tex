@@ -132,10 +132,11 @@ Further cache lookups and context switching are thus avoided for this branch.
 Dynamic jumps can not be statically chained, because their target address may vary.
 Still, there is potential for optimization, as the majority of dynamic jumps found in a typical program are function returns.
 By keeping track of function calls, it is possible to predict the return target addresses.
-We use a return address stack which holds pairs consisting of the guest and host code's addresses, implemented as a ring buffer to prevent over- and underflow.
+To do so, we use a stack holding entries for the calls' respective return addresses, that consist of pairs containing both the guest return address and it's corresponding host code address.
+The stack is implemented as a ring buffer to prevent over- and underflows.
 Calls are first detected at parse time and have their return targets recursively translated.
-The call's emitted host code will push its return address pair onto the stack at every execution, without having to leave guest context.
-Dynamic jumps will then compare their target address with the first element's on the stack, and if it matches, pop the address pair and jump to the target block directly.
+The call's then emitted host code will push its return address pair onto this stack at every execution, without having to leave guest context.
+Following dynamic jumps will compare their target address with the first element's on the stack, and if it matches, pop the address pair and jump to the target block directly, thus avoiding having to return to the transcode loop.
 In case of a mismatch the stack will not be changed and control is handed back to the translator.
 
 
