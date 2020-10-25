@@ -1,74 +1,3 @@
-% todo expand this section with further details
-
-\begin{comment}
-% ======= EXAMPLE PLOT =======
-% Update, copy and modify as needed. Shows tikz usage.
-% todo remove before submission (obviously).
-% ============================
-% The [h] requests TeX put the float <h>ere.
-% There are other options for <p>age, <t>op, <b>ottom;
-% If it shouldn't float, \usepackage{float} and use [H]
-% or a minipage with associated caption.
-\begin{figure}[h]
-	\centering
-	\begin{tikzpicture}
-		\begin{axis}[%
-			title = {Example bar graph},
-			ybar,
-			area legend,
-			ylabel = {Value in some unit},
-			xtick = data,
-			xtick style = {draw = none},
-			ytick = {0, 2500, 5000, 7500, 10000, 12500},
-			scaled y ticks = false,
-			symbolic x coords={First category, Second category, Third category},
-			ymin = 0, ymax = 12500,
-			ymajorgrids = true,
-			height = 6.0cm,
-			width = \linewidth,
-			legend style = {
-				at = {(0.5, -0.25)},
-				anchor = north,
-				legend columns = 3,
-				column sep = 0.2cm
-			}
-		]
-			\addplot+ [
-				fill=era-dbt-1,
-				draw=black
-			] coordinates {
-				(First category, 3061)
-				(Second category, 10930)
-				(Third category, 10971)
-			};
-			
-			\addplot+ [
-				fill=era-qemu,
-				draw=black
-			] coordinates {
-				(First category, 3061)
-				(Second category, 9092)
-				(Third category, 5042)
-			};
-			
-			\addplot+ [
-				fill=era-native,
-				draw=black
-			] coordinates {
-				(First category, 4043)
-				(Second category, 6092)
-				(Third category, 7971)
-			};
-
-			
-			\legend{First series, Second series, Third series}
-		\end{axis}
-	\end{tikzpicture}
-	\caption{I am an example figure. If you're reading the submitted document, someone forgot to remove me.}
-\end{figure}
-\end{comment}
-
-
 \begin{table}
 	\centering
 	\begin{tabular}{rl}
@@ -96,7 +25,6 @@
 Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017}'s \texttt{intspeed} suite of benchmarks.
 This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the benchmark's translation.
 
-% todo include benchmark description table (and list of tables) for the spec programs with the benchmark workload description
 The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the DBT's performance in a non-controlled environment.
 An overview of the workloads covered by the aforementioned suite can be found in table~\ref{tab:spec-description}.
 Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
@@ -105,8 +33,6 @@ All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} s
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
 \subsection{SPEC CPU 2017 Results}
-% todo benchmark results
-
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
@@ -174,7 +100,6 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 \end{figure}
 % ================================
 
-% todo analysis of SPEC runs
 \subsubsection{Analysis}
 Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC-V resulting in needing more instructions in RISC-V assembly than x86.
@@ -227,7 +152,6 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 % ======= Optimisation comparison results =======
 % Results of the optimisation option comparisons.
 % Show all SPEC run results and analyse below.
-% todo maybe include QEMU?
 % ===============================================
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable

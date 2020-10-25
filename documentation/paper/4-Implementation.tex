@@ -9,9 +9,6 @@ The decoding of the RISC-V assembly is relatively straight-forward, as we have a
 Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
 This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86-64 byte code using faenc.
 
-\subsection{Code cache and TLB for block lookup}
-% todo missing?
-
 \subsection{Static hybrid register mapping}
 \subsubsection{Register priority analysis}
 In order to achieve the best performance with the hybrid approach to the register mapping described in section~\vref{sec:context-switch-reg-handle}, we must decide which registers of the RISC-V guest to map into the host's limited number of available GPRs.
@@ -29,7 +26,6 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 
 \pgfplotstableread[col sep=comma,header=false]{benchmarks/register-frequency/freq.csv}\regfreqtable
 \pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
-% Todo Figure out better caption and titel/y label @flo
 \begin{figure}[h]
 %\pgfplotstabletypeset\sortedregfreqtable
 	\centering
@@ -44,6 +40,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 				inner sep = 0pt,
 				anchor = north east,
 				rotate = 60
+				% todo font size
 			},
 			ytick = {0.1, 0.2, 0.3, 0.4},
 			scaled y ticks = false,
@@ -52,6 +49,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
             nodes near coords = {\pgfmathprintnumber\pgfplotspointmeta\%},
 			yticklabel = {\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
 			every node near coord/.append style = {font = \tiny, rotate = 90, anchor = west, /pgf/number format/fixed, /pgf/number format/precision = 2},
+			% todo font color
 			enlarge x limits = {abs = 0.5cm},
 			xtick={0,...,31},
 			xticklabels from table = {\sortedregfreqtable}{0},
@@ -208,20 +206,8 @@ ret
 \end{figure}
 
 
-\subsection{Context switching details}
-% todo context switching
-
-%\subsection{Optimisation of the generated code}
-%\label{sec:optimise}
-%\subsubsection{Block chaining}
-%\subsubsection{Recursive jump translation}
-%\subsubsection{Return address stack}
-%\subsubsection{Macro operation fusion by pattern matching}
-%% todo optimisation details, maybe split up? more sections?
 
 \subsection{Detailed system call overview}
-% todo special description for emulated calls
-
 As described in section~\vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
 We achieve this by translating the \texttt{ECALL} instruction as a context switch and jump to the \texttt{emulate\_ecall} routine in the DBT, which can then take the appropriate action.
 
@@ -324,7 +310,6 @@ With this strategy, we are able to support the following system calls:
 		\texttt{mmap} (222) & guarded pass-through & \texttt{mmap} (9)\\
 		\bottomrule
 	\end{tabular}
-	% todo keep up-to-date
 	% state: aa55cef4816eb790df21f4742b7cf1f29685da49
 	\caption[Specially handled system calls overview]%
 	{An overview of the system calls we support that require special handling by the binary translator.}
