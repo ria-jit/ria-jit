@@ -32,6 +32,12 @@ Further context is provided by performance testing using the data compression ut
 All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
+% todo compiler options
+% native -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static
+% native version gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
+% RISC -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch
+% RISC version riscv64-unknown-linux-gnu-gcc (GCC) 10.1.0
+
 \subsection{SPEC CPU 2017 Results}
 
 % ======= SPEC CPU Results =======
@@ -114,7 +120,7 @@ Most benchmarks show runtimes of about $1.9$x native with \texttt{x264} and \tex
 
 \texttt{x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
 Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
-There are also instances where it relies heavily on 32 bit integer arithmetic which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
+There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
 Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
@@ -253,7 +259,7 @@ Something that also needs to be noted that the lazy replacement register handlin
 Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to measure the performance of the translator in real-world workloads by running data compression via \textit{gzip}.
 
 For better comparability, both the native and RISC-V \textit{gzip} binaries were compiled manually with the compiler optimisation level \texttt{-O3} alongside the linker flag \texttt{-static}.
-The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
+The RISC-V ABI was setup with \texttt{--march=rv64ima} and \texttt{--mabi=lp64}.
 
 % ======= gzip execution time =======
 % Execution time of compression (500 MB, 5 runs).

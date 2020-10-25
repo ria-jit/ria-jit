@@ -21,6 +21,7 @@ Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
 \subsection{Environment setup and memory layout}
 \label{sec:memory-layout}
+% todo man page citation @Simon
 As the DBT is responsible for managing the execution environment of the guest binary in the shared address space, it must also handle the setup of said environment.
 
 The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
@@ -51,13 +52,14 @@ The memory is laid out as follows:
 	{The layout of the memory space.}
 	\label{tab:}
 \end{table}
+% todo oddly specific addresses
 
 
 \subsection{Partitioning the input code}
 Logically, upon facing the task of translation, the DBT must somehow divide the code into chunks it can then process for translation and execution.
 The natural choice here is for the translator to partition the code into basic blocks.
 
-Basic blocks, by definition, have only a single point of entry and exit;
+\textit{Basic blocks}, by definition, have only a single point of entry and exit;
 all other instructions in a single block are executed sequentially and in the order that they appear in the code.
 (Of course, this does not take into account mechanisms such as out-of-order execution or system calls as well as interrupt- and exception handling).
 
