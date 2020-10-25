@@ -2,15 +2,17 @@ In the following, the term \textit{host} will refer to the system of the native 
 
 \subsection{Comparison of the RISC-V and x86-64 ISAs}
 \label{sec:isa-cmp}
-%todo mention pseudoinstructions, referenced later
 By its very nature, executing code compiled for one architecture on a different one is not an easy task.
 It is obvious that there are major differences in the two architectures, brought forth by RISC-V being a reduced instruction set computer (RISC) architecture and x86-64 a complex instruction set computer (CISC) architecture.
 
-The most relevant distinction between RISC-V and x86-64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
-% todo unclear
-RISC-V's load-store architecture with a three-operand instruction format allows for a better reuse of data but more instructions due to the explicit load/store operations.
-% todo unclear, not necessarily?
-x86-64 however is a register-memory architecture with a two-operand instruction format leading to more implicit/fused memory accesses being used in optimised code.
+The most relevant distinction between RISC-V and x86--64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
+RISC-V's load-store architecture with a three-operand instruction format allows for a more flexible register usage but more instructions due to the explicit load/store operations.
+x86--64 however is a register-memory architecture with a two-operand instruction format.
+Thus, memory accesses are reduced by implicit loads in instructions using a memory operand.
+
+RISC assembler code includes pseudoinstructions that are translated into multiple instructions by the assembler, due to the nature of a reduced instruction set.
+One example would be the absence of a \texttt{mov} instruction in the RISC--V ISA\@.
+Thus the assembler translates the pseudoinstruction \texttt{mov} into an \texttt{addi destination, source, 0} instruction.
 
 In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
 However, in practice, this is nearly impossible.
