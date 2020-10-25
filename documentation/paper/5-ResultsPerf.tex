@@ -4,16 +4,16 @@
 		\toprule
 		\textbf{SPECspeed Benchmark} & \textbf{Workload}\\
 		\midrule
-		\texttt{600.perlbench\_s} & Perl interpreter\\
-		\texttt{602.gcc\_s} & GNU C compiler\\
-		\texttt{605.mcf\_s} & Route planning\\
-		\texttt{620.omnetpp\_s} & Discrete Event simulation -- computer network\\
-		\texttt{623.xalancbmk\_s} & XML to HTML conversion via XSLT\\
-		\texttt{625.x264\_s} & Video compression\\
-		\texttt{631.deepsjeng\_s} & Artificial Intelligence: alpha-beta tree search (Chess)\\
-		\texttt{641.leela\_s} & Artificial Intelligence: Monte Carlo tree search (Go)\\
-		\texttt{648.exchange2\_s} & Artificial Intelligence: recursive solution generator (Sudoku)\\
-		\texttt{657.xz\_s} & General data compression\\
+		\texttt{600.perlbench} & Perl interpreter\\
+		\texttt{602.gcc} & GNU C compiler\\
+		\texttt{605.mcf} & Route planning\\
+		\texttt{620.omnetpp} & Discrete Event simulation -- computer network\\
+		\texttt{623.xalancbmk} & XML to HTML conversion via XSLT\\
+		\texttt{625.x264} & Video compression\\
+		\texttt{631.deepsjeng} & Artificial Intelligence: alpha-beta tree search (Chess)\\
+		\texttt{641.leela} & Artificial Intelligence: Monte Carlo tree search (Go)\\
+		\texttt{648.exchange2} & Artificial Intelligence: recursive solution generator (Sudoku)\\
+		\texttt{657.xz} & General data compression\\
 		\bottomrule
 	\end{tabular}
 	\caption[SPEC CPU 2017 workload description]%
@@ -32,11 +32,11 @@ Further context is provided by performance testing using the data compression ut
 All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
-% todo compiler options
-% native -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static
-% native version gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
-% RISC -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch
-% RISC version riscv64-unknown-linux-gnu-gcc (GCC) 10.1.0
+The benchmarks were compiled using compiler optimisation level \texttt{-O3} and linked statically.
+For the native run \texttt{-march=x86-64} was used on GCC version 7.5.0 from the Ubuntu standard repo.
+The RISC--V binaries for our translator and QEMU were compiled using \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
+A self compiled GCC with the sources taken from the official toolchain repo at version 10.1.0 was used.
+This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
 
 \subsection{SPEC CPU 2017 Results}
 
@@ -108,23 +108,23 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 
 \subsubsection{Analysis}
 Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
-Some of the overhead must of course be attributed to the architectural differences between x86 and RISC-V resulting in needing more instructions in RISC-V assembly than x86.
+Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
 This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
 What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
 Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
-In some cases the advantage is only slight, but in other workloads like the GCC compiler benchmark the advantage grows to a comfortable $80\,\%$.
+In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
-Most benchmarks show runtimes of about $1.9$x native with \texttt{x264} and \texttt{perlbench} being the outliers.
+Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
 
-\texttt{x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
+\texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
 Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
 There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
 Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
-The \texttt{perlbench} on the other hand has a lot of conditional branches and jumps in the hot blocks.
+The \texttt{600.perlbench} on the other hand has a lot of conditional branches and jumps in the hot blocks.
 This causes a lot of context switches since recursive translation currently is only employed for unconditional branches/calls.
 Recursively translating the path that is considered hot by the compiler could improve performance by a bit.
 It also potentially causes redundant work for the translator, since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
@@ -240,8 +240,8 @@ This means the implemented pattern matching did not give the desired effect of a
 Further tweaking of the checked patterns might make this optimisation more worth it.
 
 The return address stack gave a significant advantage in some benchmarks.
-Especially the function call heavy 620, 623, 631, 641 benchmarks showed good performance gains of over $50\,\%$.
-The 600, 648, 657 benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
+Especially the function call heavy \texttt{620.omnetp}, \texttt{623.xalancbmk}, \texttt{631.deepsjeng}, \texttt{641.leela} benchmarks showed good performance gains of over $50\,\%$.
+The \texttt{600.perlbench}, \texttt{648.exchange2}, \texttt{657.xz} benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
 
 Recursive jump translation without also utilizing the return address stack only provided a performance increase over disabling both in some benchmarks.
 The main reason for this might be that this also makes context switches necessary on unconditional jumps that aren't function calls or returns.
@@ -252,7 +252,7 @@ This makes a context switch back to the translator necessary for every executed 
 The benchmarks that had lower performance losses are the ones were less basic blocks were executed relative to their runtime.
 This can be justified by seeing that the most executed parts of the these benchmarks are blocks that are very long.
 
-Something that also needs to be noted that the lazy replacement register handling described in section~\vref{sec:reg-handle} had a high impact in some benchmarks, most notably 657, providing a roughly $45\,\%$ performance increase there more than any other optimisation apart from chaining.
+Something that also needs to be noted that the lazy replacement register handling described in section~\vref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, providing a roughly $45\,\%$ performance increase there more than any other optimisation apart from chaining.
 
 \subsection{Data compression via gzip}
 % gzip results

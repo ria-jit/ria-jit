@@ -1,12 +1,12 @@
-In the following, the term \textit{host} will refer to the system of the native architecture the binary translator is built for (in our case, x86-64), and the term \textit{guest} will designate the foreign system we are attempting to emulate (RISC--V).
+In the following, the term \textit{host} will refer to the system of the native architecture the binary translator is built for (in our case, x86--64), and the term \textit{guest} will designate the foreign system we are attempting to emulate (RISC--V).
 
-\subsection{Comparison of the RISC-V and x86-64 ISAs}
+\subsection{Comparison of the RISC--V and x86--64 ISAs}
 \label{sec:isa-cmp}
 By its very nature, executing code compiled for one architecture on a different one is not an easy task.
-It is obvious that there are major differences in the two architectures, brought forth by RISC-V being a reduced instruction set computer (RISC) architecture and x86-64 a complex instruction set computer (CISC) architecture.
+It is obvious that there are major differences in the two architectures, brought forth by RISC--V being a reduced instruction set computer (RISC) architecture and x86--64 a complex instruction set computer (CISC) architecture.
 
-The most relevant distinction between RISC-V and x86--64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
-RISC-V's load-store architecture with a three-operand instruction format allows for a more flexible register usage but requires more instructions due to the explicit load/store operations.
+The most relevant distinction between RISC--V and x86--64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
+RISC--V's load-store architecture with a three-operand instruction format allows for a more flexible register usage but requires more instructions due to the explicit load/store operations.
 x86--64 however is a register-memory architecture with a two-operand instruction format.
 Thus, memory accesses are reduced by implicit loads in instructions using a memory operand.
 
@@ -14,11 +14,11 @@ RISC assembler code includes pseudo-instructions that are translated into multip
 One example is the absence of a \texttt{mov} instruction in the RISC--V ISA\@; the assembler translates the pseudo-instruction \texttt{mv} into an \texttt{addi rd, rs1, 0} instruction.
 
 Similarly, the hardware offers no instruction to load a 64 bit immediate into a register, as the fixed-width 32 bit instruction encoding does not allow for it.
-Contrary to x86, where this problem would be solved by a single \texttt{mov} instruction, the RISC-V assembler has to build up the immediate in the register by using a specific combination of addition and shifting operations as well as program-counter-relative arithmetic.
+Contrary to x86, where this problem would be solved by a single \texttt{mov} instruction, the RISC--V assembler has to build up the immediate in the register by using a specific combination of addition and shifting operations as well as program-counter-relative arithmetic.
 
 In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
 However, in practice, this is nearly impossible.
-Efficient fusion of multiple RISC-V instructions into fewer x86-64 instructions (e.g.\ by vectorisation) is difficult even for compilers presented with the entire program context.
+Efficient fusion of multiple RISC--V instructions into fewer x86--64 instructions (e.g.\ by vectorisation) is difficult even for compilers presented with the entire program context.
 When the DBT is only presented with partial block-wise assembly code snippets, some optimisations are impossible to undertake, as there are many unknowable parameters at play.
 Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
@@ -53,9 +53,11 @@ The memory is laid out as follows:
 	\end{tabular}
 	\caption[Memory layout]%
 	{The layout of the memory space.}
-	\label{tab:}
+	\label{tab:memory-layout}
 \end{table}
-% todo oddly specific addresses
+The translator is linked to a high address at \texttt{0x780000000000} so the range that typical programs use at the bottom of the address space is kept free and guest addresses do not need to be converted and can directly be used.
+So the global variables of the translator can be reached with a 32 bit \texttt{RIP}-relative offset from our generated code, the following region is reserved for the translated code.
+The lower limit for the guest stack is obtained by using the kernel stack limit and adding a guard page.
 
 
 \subsection{Partitioning the input code}
