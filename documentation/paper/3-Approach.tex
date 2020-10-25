@@ -107,6 +107,31 @@ The main difficulty (and their resolutions) that arise by using the x86-64 SSE e
 \end{itemize}
 
 
+\subsection{Optimisations}
+\label{sec:optimise}
+
+\subsubsection{Recursive jump translation}
+\label{sec:recursive_translation}
+Returning from translated guest code to the translator's main transcode loop brings with it the performance penalties imposed by the context switch, code cache lookup, and second context switch necessary for starting execution of the next basic block. To avoid these negative performance impacts, we employ the method of recursive translation: When the parser arrives at an unconditional jump, translation of the jump target is started recursively. That way, the jump target will always be translated before the jump itself. Because the jump target's host code address is now already known at translate time, we can emit a direct jump to the target block instead of returning to the transcode loop. The blocks containing jump and target are thereby chained.
+
+\subsubsection{Retroactive block chaining}
+\label{sec:chaining}
+Targets of conditional jumps are not translated recursively, because translation is done lazy, and it is near impossible to know at parse time whether a branch will be taken, and its target should thus be translated, or not. If the translator reaches a branch, its two sides can only be chained if the target block has already been translated and its host code address is known. If that is not the case, the target can instead be chained retroactively after the respective side of the branch is first taken: Following translation of the target block, the branches host code is modified to jump to the targets now known address directly, instead of returning to the transcode loop. Further cache lookups and context switching are thus avoided for this branch.
+
+\subsubsection{Return address stack}
+\label{sec:return_address_stack}
+Dynamic jumps can not be statically chained, because their target address may vary. Still, there is potential for optimization, as the majority of dynamic jumps found in a typical program are function returns. By keeping track of function calls, it is possible to predict the return target addresses. We use a return address stack which holds pairs consisting of the guest and host code's addresses, implemented as a ring buffer to prevent over- and underflows. Calls are first detected at parse time and have their return targets recursively translated. The call's emitted host code will push its return address pair onto the stack at every execution, without having to leave guest context. Dynamic jumps will then compare their target address with the first element's on the stack, and if matches, pop the address pair and jump to the target block directly. In case of a mismatch the stack will not be changed and control is handed back to the translator. 
+
+
+\subsubsection{Macro operation fusion by pattern matching}
+As RISC-V is a risc- and x86-64 a CISC arcitecture, RISC-V programs often need more instructions to achieve the same effect. We employ a technique known as macro operatin fusion to translate specific patterns of RISC-V instructions into shorter, equivalent x86-64 code, therby increasing the generated code's performance. The pattern matcher will detect these patterns after parsing, and replace them with special pseudo-instructions, whose translator functions then emit the corresponding sequence of x86-64 instructions at translate time. Care must be taken when defining the patterns, as code following the pattern might rely on register values written by instructions earlier in the pattern. Thus, either the emitted x86-64 code has to set these registers as well, or the pattern has only to be applicable if no such writes into later used registers occur.
+
+
+% todo optimisation details, maybe split up? more sections?
+
+
+
+
 
 
 
