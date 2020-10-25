@@ -29,6 +29,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 \begin{figure}[h]
 %\pgfplotstabletypeset\sortedregfreqtable
 	\centering
+	\makebox[\textwidth][c]{
 	\begin{tikzpicture}
 		\begin{axis}[%
 			title = {Dynamic Register Usage Frequency},
@@ -72,6 +73,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 			\legend{statically mapped, not mapped}
 		\end{axis}
 	\end{tikzpicture}
+	}
 	\caption[Dynamic Register Usage Analysis]{The average results of a dynamic register usage analysis, ordered by frequency.}
 	\label{fig:reg-usage}
 \end{figure}
@@ -103,12 +105,14 @@ Taking the 12 registers that are most accessed on average, the mapping structure
 
 \begin{table}
 	\centering
+	\makebox[\textwidth][c]{
 	\begin{tabular}{rcccccccccccc}
 		\toprule
 		\textbf{RISC-V register} & \texttt{a5} & \texttt{a4} & \texttt{a3} & \texttt{a0} & \texttt{fp} & \texttt{sp} & \texttt{a2} & \texttt{a1} & \texttt{s1} & \texttt{ra} & \texttt{a7} & \texttt{s2}\\
 		\textbf{x86-64 mapping} & \texttt{rbx} & \texttt{rbp} & \texttt{rsi} & \texttt{rdi} & \texttt{r8} & \texttt{r9} & \texttt{r10} & \texttt{r11} & \texttt{r12} & \texttt{r13} & \texttt{r14} & \texttt{r15}\\
 		\bottomrule
 	\end{tabular}
+	}
 	\caption[Active static register mapping]%
 	{The static register mapping in use by the translator, ordered by the RISC--V register usage frequency (descending).}
 	\label{tab:static-register-mapping}

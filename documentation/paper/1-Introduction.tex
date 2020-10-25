@@ -11,16 +11,16 @@ There is already some hardware available for RISC-V\footnote{The biggest name he
 Developers usually don't have access to real hardware, so they must instead rely on emulation to test their code written for the RISC-V platform.
 
 \paragraph{Modes of binary translation}
-When attempting to execute guest programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
+When attempting to execute programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
 
 The main principles to achieve this are:
 \begin{itemize}
-    \item \textbf{Interpretation}, where, much alike interpreted programming languages (e.g.\ JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the host system in order to simulate the guest ISA\@.
+    \item \textbf{Interpretation}, where, much alike interpreted programming languages (e.g.\ JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the native system in order to simulate the guest ISA\@.
         \subitem While likely being the easiest to actually be implemented, this comes with a significant performance penalty mainly because every single assembly instruction will have to be interpreted for every execution of that program part, potentially causing a lot of redundant work.
-    \item \textbf{Static Binary Translation}, where the guest executable is statically reverse-engineered and translated to the host architecture as a whole.
+    \item \textbf{Static Binary Translation}, where the executable is statically reverse-engineered and translated to the other architecture as a whole.
     After this translation step, it can be executed as if it were a native binary, without the need for any further special treatment.
     In theory you could reach near native speeds for the generated binary using this technique.
-    There some hurdles with this though, one example is register indirect branches, which require some way to convert the guest addresses to native at runtime.
+    There some hurdles with this though, one example is register indirect branches, which require some way to convert the foreign addresses to native at runtime.
     Any program that produces or edits assembly at runtime would also generally prove difficult to translate statically.
     \item \textbf{Dynamic Binary Translation} (DBT), which serves as a middle ground between interpreting and statically translating the executable.
     It aims to translate the program on the fly, while only focussing on the parts that are actually needed for execution.
@@ -32,7 +32,7 @@ The main principles to achieve this are:
 
 \subsection{Motivation}
 One of the most popular software emulators in general is QEMU~\cite{bellard2005qemu}\@.
-While QEMU is a portable DBT that supports a wide variety of guest and host architectures and ISAs, this also makes it hard to optimise it for a specific guest/host combination and therefore the program execution will be slower than necessary.
+While QEMU is a portable DBT that supports a wide variety of architectural combinations and ISAs, this also makes it hard to optimise it for a specific guest/host combination and therefore the program execution will be slower than necessary.
 
 % todo User space emulation
 Our aim is to provide a faster emulator, allowing the execution of RISC-V code on an x86-64 machine by means of dynamic binary translation.

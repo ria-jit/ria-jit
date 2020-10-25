@@ -152,6 +152,7 @@ An exemplary excerpt from the patterns we implemented is shown by table \ref{tab
 	\centering
 	\ttfamily
 	\small
+	\makebox[\textwidth][c]{
 	\begin{tabular}{ll}
 		\toprule
 		LUI r1, imm; LW r2, imm(r1); ADDI r2, r2, imm; SW r2, imm(r1); & ADD m32, imm32\\
@@ -163,6 +164,7 @@ An exemplary excerpt from the patterns we implemented is shown by table \ref{tab
 		ADDIW r1, r1, imm; SLLI r1, r1, 31; SRLI r1, r1 32 & ADD r32, imm32\\
 		\bottomrule
 	\end{tabular}
+	}
 	\caption[Patterns used for macro-op-fusion]%
 	{Some examples of patterns currently fused by the translator, the last five taken from rv8~\cite{clark2017rv8}.}
 	\label{tab:patterns-table}
