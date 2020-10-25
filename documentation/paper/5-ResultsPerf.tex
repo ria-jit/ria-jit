@@ -176,27 +176,27 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 
 % todo analysis of SPEC runs
 \subsubsection{Analysis}
-Figure~\ref{fig:spec-results} shows normalized performance results of the SPEC CPU 2017 intspeed benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
+Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC-V resulting in needing more instructions in RISC-V assembly than x86.
-This means these results do not directly measure the overhead versus native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
-What you can compare though is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
+This means these results do not directly measure the overhead vs. native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
+What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
-Through the various performance optimisations mentioned in Section~\vref{sec:optimise} we were able to reach our goal of consistently outperforming QEMU\@.
-In some cases the advantage is only slight, but in some workloads like the GCC compiler benchmark the advantage grows to a comfortable $80\%$.
+Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
+In some cases the advantage is only slight, but in other workloads like the GCC compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
-Most benchmarks show runtimes of about $1.9$x native with x264 and perlbench being the outliers.
+Most benchmarks show runtimes of about $1.9$x native with \texttt{x264} and \texttt{perlbench} being the outliers.
 
-x264 on x86 heavily takes advantage of vectorization, which RISC-V does not yet support, which means that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
-Retrospective vectorization on the translator side is not easy since this would involve detecting the vectorizable loop patterns on assembler level, a task that even the compiler often has isn't good at even though it has the knowledge of the whole program.
-There are also instances where it relies heavily on 32 bit integer arithmetic which in RISC-V always causes the results to be sign extended, in comparison to x86 which zero extends in this case.
-Thus many consecutive 32bit instructions on the same values cause a lot of redundant sign extensions.
+\texttt{x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
+Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+There are also instances where it relies heavily on 32 bit integer arithmetic which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
+Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
-The perlbench on the other hand has a lot of conditional branches and jumps in the hot blocks.
+The \texttt{perlbench} on the other hand has a lot of conditional branches and jumps in the hot blocks.
 This causes a lot of context switches since recursive translation currently is only employed for unconditional branches/calls.
 Recursively translating the path that is considered hot by the compiler could improve performance by a bit.
-It also potentially causes redundant work for the translator since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
+It also potentially causes redundant work for the translator, since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
 
 
 
@@ -271,15 +271,15 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			scaled y ticks = false,
 			xticklabels from table={\basetable}{Benchmark},
 			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			ymin = 0, ymax = 11,
+			ymin = 0, ymax = 10.5,
 			ymajorgrids = true,
 			bar width = 3pt,
-			height = 9.0cm,
+			height = 8.5cm,
 			width = 0.9\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
-				legend columns = 2,
+				legend columns = 3,
 				column sep = 0.2cm
 			}
 		]
@@ -298,7 +298,7 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			% none results
 			\addplot+[fill=era-dbt-3, draw=black] table [x expr=\coordindex, y=ratio] \nonetable;
 
-			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,} \texttt{no-ras}, \texttt{none}}
+			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,~} \texttt{no-ras}, \texttt{none}}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[Translator optimisation evaluation results]%

@@ -4,18 +4,20 @@ In the following, the term \textit{host} will refer to the system of the native 
 
 \subsection{Comparison of the RISC-V and x86-64 ISAs}
 \label{sec:isa-cmp}
-%todo (mention pseudoinstructions for later)
-It is obvious that there are major differences in the two architectures, implied by RISC-V being a reduced instruction set computer (RISC) architecture and x86-64 a complex instruction set computer (CISC) architecture.
+%todo mention pseudoinstructions, referenced later
+By its very nature, executing code compiled for one architecture on a different one is not an easy task.
+It is obvious that there are major differences in the two architectures, brought forth by RISC-V being a reduced instruction set computer (RISC) architecture and x86-64 a complex instruction set computer (CISC) architecture.
 
-The most relevant distinction between RISC-V and x86-64 for the development of this DBT is the different address format and mismatch of general purpose and floating point registers in number.
-
+The most relevant distinction between RISC-V and x86-64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
+% todo unclear
 RISC-V's load-store architecture with a three-operand instruction format allows for a better reuse of data but more instructions due to the explicit load/store operations.
+% todo unclear, not necessarily?
+x86-64 however is a register-memory architecture with a two-operand instruction format leading to more implicit/fused memory accesses being used in optimised code.
 
-x86-64 however has a register-memory architecture with a two-operand instruction format leading to more implicit/fused memory accesses being used in optimized code.
-
-Also the very nature of translating a RISC architecture into a CISC architecture might seem like it would lead to less instructions.
-In praxis the efficient fusion of multiple RISC-V instructions into single x86-64 instructions is difficult considering the fact that we are only presented with the assembly.
-Even more a naive implementation leads to an instruction overhead due to the mismatch in supported operands per instruction.
+In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
+However, in practice, this is nearly impossible.
+Efficient fusion of multiple RISC-V instructions into fewer x86-64 instructions (e.g.\ by vectorisation) is difficult even for compilers presented with the entire program context.
+When the DBT is only presented with partial block-wise assembly code snippets, some optimisations are impossible to undertake, as there are many unknowable parameters at play.
 
 Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
@@ -26,12 +28,12 @@ As the DBT is responsible for managing the execution environment of the guest bi
 The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
 The DBT must take care to map the file into memory correctly, while not compromising its own memory region.
 
-Furthermore, the guest registers (see section~\vref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
+Furthermore, the guest registers (see section~\ref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.
 
-The stack is set up exactly like the linux kernel would.
-As such the stack pointer needs to point at the argument count and then towards higher addresses in order there are the zero terminated argument, environment and auxiliary vector.
-Finally some alignment bytes need to be added, so the stack pointer is ABI-compliant 16 Byte aligned.
-All of the information is basically just copied from the host in our case.
+The stack is set up exactly like it would have been by the linux kernel.
+As such, the stack pointer needs to point at the argument count, followed by (towards higher addresses) the zero terminated argument, environment and auxiliary vectors.
+Finally some alignment bytes need to be added, so the stack pointer is 16 byte aligned and ABI-compliant.
+All of the information can generally be copied from the host in our case.
 
 The memory is laid out as follows:
 \begin{table}[h]
