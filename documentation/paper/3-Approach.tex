@@ -74,7 +74,7 @@ Evidently, preserving both the host and guest's state during execution is critic
 System calls are also a very important part of enabling the guest program's execution.
 Thus, every ISA must offer some way to switch the execution context in the kernel mode for the system call to be handled.
 
-For RISC-V, the instruction \texttt{ECALL} (for \textit{environment call}, formerly \texttt{SCALL}) handles these requests, with the system call number residing in register \texttt{a7} and the arguments being passed in \texttt{a0--a6}.
+For RISC-V, the instruction \texttt{ECALL} (for \textit{environment call}, formerly \texttt{SCALL}) handles these requests, with the system call number residing in register \texttt{a7} and the arguments being passed in \texttt{a0} -- \texttt{a6}.
 
 However, the DBT generally cannot just reorganise the guest argument values and system call identifier according the host's calling convention and relay the system call directly.
 The RISC-V guest program expects a different operating system kernel than is present natively on the host;
