@@ -211,13 +211,13 @@ ret
 \subsection{Context switching details}
 % todo context switching
 
-\subsection{Optimisation of the generated code}
-\label{sec:optimise}
-\subsubsection{Block chaining}
-\subsubsection{Recursive jump translation}
-\subsubsection{Return address stack}
-\subsubsection{Macro operation fusion by pattern matching}
-% todo optimisation details, maybe split up? more sections?
+%\subsection{Optimisation of the generated code}
+%\label{sec:optimise}
+%\subsubsection{Block chaining}
+%\subsubsection{Recursive jump translation}
+%\subsubsection{Return address stack}
+%\subsubsection{Macro operation fusion by pattern matching}
+%% todo optimisation details, maybe split up? more sections?
 
 \subsection{Detailed system call overview}
 % todo special description for emulated calls
@@ -259,7 +259,7 @@ The following will describe the specifics of these issues with system calls that
 	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping;
 	thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
 	
-	Similarly, we fail the guest's \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the deallocation.
+	Similarly, we fail the guest's \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the de-allocation.
 \end{description}
 
 The other supported system calls may be directly passed through to the host after performing the necessary index mapping.

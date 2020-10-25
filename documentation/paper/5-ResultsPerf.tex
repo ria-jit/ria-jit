@@ -178,7 +178,7 @@ The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and
 \subsubsection{Analysis}
 Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC-V resulting in needing more instructions in RISC-V assembly than x86.
-This means these results do not directly measure the overhead vs. native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
+This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
 What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
@@ -223,9 +223,6 @@ It also potentially causes redundant work for the translator, since jumps to the
 In order to evaluate the optimisations built into the translator, we ran the \textit{SPEC CPU 2017} suite with various combinations of the available optimisation options in the same translator version (\texttt{v1.3.1}, the final release in the project's main development cycle).
 
 The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an overview of the switches specified in the figure's legend can be found in table~\ref{tab:opt-options}.
-
-% todo: in some way include that lazy_replace leads to 46 % performance increase in 657.xz_s?
-
 
 % ======= Optimisation comparison results =======
 % Results of the optimisation option comparisons.
@@ -308,9 +305,24 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 % ================================
 
 
+Macro operation fusion does not seem to provide a lot of a performance benefit, in most benchmarks the numbers do not even suggest any performance increase above natural deviation of benchmark runs.
+This means the implemented pattern matching did not give the desired effect of a good performance increase.
+Further tweaking of the checked patterns might make this optimisation more worth it.
 
-% todo analysis of optimisation comparisons
+The return address stack gave a significant advantage in some benchmarks.
+Especially the function call heavy 620, 623, 631, 641 benchmarks showed good performance gains of over $50\,\%$.
+The 600, 648, 657 benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
 
+Recursive jump translation without also utilizing the return address stack only provided a performance increase over disabling both in some benchmarks.
+The main reason for this might be that this also makes context switches necessary on unconditional jumps that aren't function calls or returns.
+This makes jump heavy benchmarks take a performance hit while jump light benchmarks are almost unaffected.
+
+Expectedly the highest performance penalty was incurred by disabling chaining as well.
+This makes a context switch back to the translator necessary for every executed basic block.
+The benchmarks that had lower performance losses are the ones were less basic blocks were executed relative to their runtime.
+This can be justified by seeing that the most executed parts of the these benchmarks are blocks that are very long.
+
+Something that also needs to be noted that the lazy replacement register handling described in section~\vref{sec:reg-handle} had a high impact in some benchmarks, most notably 657, providing a roughly $45\,\%$ performance increase there more than any other optimisation apart from chaining.
 
 \subsection{Data compression via gzip}
 % gzip results
@@ -385,7 +397,7 @@ The RISC-V ABI was setup with \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
 Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
 
 Through our very efficient return address stack, recursive jump target translation, macro operation fusion and, most importantly, block chaining we are able to significantly outperform QEMU in random data compression by nearly 45\,\%.
-The achieved performance of approximately two times the execution time of a native run is in line with the \textit{SPEC CPU 2017} results shown in figure \ref{fig:spec-results}.
+The achieved performance of approximately two times the execution time of a native run is in line with the \textit{SPEC CPU 2017} results shown in figure~\ref{fig:spec-results}.
 
 As mentioned in the caption, the unoptimised run was performed with the command line option \texttt{----optimize=none}, which disables all of the optimisation features mentioned above.
 The translator will then have to translate every block one-by-one, jump back into the main loop on every block end and fetch the next position based on the current program counter.
