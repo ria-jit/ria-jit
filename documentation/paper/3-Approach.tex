@@ -128,26 +128,45 @@ If that is not the case, the target can instead be chained retroactively after t
 Further cache lookups and context switching are thus avoided for this branch.
 
 \subsubsection{Return address stack}
-\label{sec:return_address_stack}
+\label{sec:return-address-stack}
 Dynamic jumps can not be statically chained, because their target address may vary.
 Still, there is potential for optimization, as the majority of dynamic jumps found in a typical program are function returns.
 By keeping track of function calls, it is possible to predict the return target addresses.
 We use a return address stack which holds pairs consisting of the guest and host code's addresses, implemented as a ring buffer to prevent over- and underflow.
 Calls are first detected at parse time and have their return targets recursively translated.
 The call's emitted host code will push its return address pair onto the stack at every execution, without having to leave guest context.
-Dynamic jumps will then compare their target address with the first element's on the stack, and if matches, pop the address pair and jump to the target block directly.
+Dynamic jumps will then compare their target address with the first element's on the stack, and if it matches, pop the address pair and jump to the target block directly.
 In case of a mismatch the stack will not be changed and control is handed back to the translator.
 
 
 \subsubsection{Macro operation fusion by pattern matching}
-As RISC-V is a risc- and x86-64 a CISC architecture, RISC-V programs often need more instructions to achieve the same effect.
+\label{sec:pattern-matching}
+As RISC-V is a risc- and x86-64 a CISC architecture, RISC-V programs often need more instructions than on x86-64 to achieve the same effect.
 We employ a technique known as macro operation fusion to translate specific patterns of RISC-V instructions into shorter, equivalent x86-64 code, thereby increasing the generated code's performance.
 The pattern matcher will detect these patterns after parsing, and replace them with special pseudo-instructions, whose translator functions then emit the corresponding sequence of x86-64 instructions at translate time.
 Care must be taken when defining the patterns, as code following the pattern might rely on register values written by instructions earlier in the pattern.
 Thus, either the emitted x86-64 code has to set these registers as well, or the pattern has only to be applicable if no such writes into later used registers occur.
+An exemplary excerpt from the patterns we implemented is shown by table \ref{tab:patterns-table}.
 
-
-
+\begin{table*}[t]
+	\centering
+	\ttfamily
+	\small
+	\begin{tabular}{ll}
+		\toprule
+		LUI r1, imm; LW r2, imm(r1); ADDI r2, r2, imm; SW r2, imm(r1); & ADD m32, imm32\\
+		LUI r1, imm; LD r2, imm(r1); ADDI r2, r2, imm; SD r2, imm(r1); & ADD m64, imm32\\
+		AUIPC r1, imm; ADDI r1, r1; & MOV r64, imm64\\
+		AUIPC r1, imm; LW r1, imm(r1); & MOVSX r64, m32\\
+		AUIPC r1, imm; LD r1, imm(r1); & MOV r64, imm64\\
+		SLLI r1, r1, 32; SLRI r1, r1, 32; & MOV r32, r32\\
+		ADDIW r1, r1, imm; SLLI r1, r1, 31; SRLI r1, r1 32 & ADD r32, imm32\\
+		\bottomrule
+	\end{tabular}
+	\caption[Patterns used for macro-op-fusion]%
+	{Some examples of patterns currently fused by the translator, the last five taken from rv8~\cite{clark2017rv8}.}
+	\label{tab:patterns-table}
+\end{table*}
 
 
 
