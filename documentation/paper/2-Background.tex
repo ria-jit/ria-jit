@@ -13,11 +13,13 @@ Thus, memory accesses are reduced by implicit loads in instructions using a memo
 RISC assembler code includes pseudo-instructions that are translated into multiple instructions by the assembler, due to the nature of a reduced instruction set.
 One example is the absence of a \texttt{mov} instruction in the RISC--V ISA\@; the assembler translates the pseudo-instruction \texttt{mv} into an \texttt{addi rd, rs1, 0} instruction.
 
+Similarly, the hardware offers no instruction to load a 64 bit immediate into a register, as the fixed-width 32 bit instruction encoding does not allow for it.
+Contrary to x86, where this problem would be solved by a single \texttt{mov} instruction, the RISC-V assembler has to build up the immediate in the register by using a specific combination of addition and shifting operations as well as program-counter-relative arithmetic.
+
 In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
 However, in practice, this is nearly impossible.
 Efficient fusion of multiple RISC-V instructions into fewer x86-64 instructions (e.g.\ by vectorisation) is difficult even for compilers presented with the entire program context.
 When the DBT is only presented with partial block-wise assembly code snippets, some optimisations are impossible to undertake, as there are many unknowable parameters at play.
-
 Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
 \subsection{Environment setup and memory layout}

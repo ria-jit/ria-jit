@@ -30,7 +30,7 @@ We can execute binaries compiled via the tools provided in the RISC-V GNU toolch
 The executables need to be linked statically (pass the flag \texttt{-static} to gcc when compiling), as the translator does not support dynamically linked files.
 
 We currently support binaries compiled for the architecture specifier \texttt{rv64imafd} (also called \texttt{rv64g}), meaning the compiler is free to utilise the base integer instruction set (\texttt{i}), as well as the instructions provided by the multiplication (\texttt{m}), atomic (\texttt{a}) and floating point standard extensions (\texttt{f}, \texttt{d}).
-This can be achieved by passing \texttt{-march=rv64g} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, excluding the floating point instructions in the architecture string implies \texttt{-mabi=lp64}.}.
+This can be achieved by passing \texttt{--march=rv64g} to gcc\footnote{Note that some architecture strings require recompilation of the toolchain. Also, excluding the floating point instructions in the architecture string implies \texttt{-mabi=lp64}.}.
 
 
 \subsection{Using the translator}

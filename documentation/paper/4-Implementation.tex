@@ -1,4 +1,4 @@
-The following section aims to provide an in-depth overview of the system's architecture as well as the rationale for major design decisions taken during the implementation.
+The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them.
 
 \subsection{System architecture and execution control flow}
 % todo overview, add class diagrams and flow charts
@@ -233,8 +233,9 @@ The following will describe the specifics of these issues with system calls that
 	
 	
 	\item[Ignoring system calls.]
-	% todo expand the rationale here. is this correct?
-	The \texttt{rt\_sigaction} system call is ignored by the DBT, as any signals received by the process will be handled by the translator due to the fact that the guest program's execution is emulated in the DBT's process.
+	The \texttt{rt\_sigaction} system call is ignored by the DBT.
+	Due to the fact that the DBT and guest binary are running within the confines of the same process, any signal handler installed by the guest binary through \texttt{rt\_sigaction} would also capture the respective signal sent to the translator.
+	As it is impossible to distinguish the DBT from the guest program in inter-process communication, we must ignore this call in order to avoid undefined behaviour on signal handling.
 	
 	
 	\item[Guarded pass-through to host.]
