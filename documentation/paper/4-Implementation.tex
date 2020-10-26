@@ -1,11 +1,10 @@
 The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them.
 
 \subsection{System architecture and execution control flow}
-% todo overview, add class diagrams and flow charts
-% todo add reference to faenc
+% todo overview, add class diagrams and flow charts @Johannes
 The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
 Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
-This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc.
+This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
 
 \begin{figure}[h]
 	\begin{center}
