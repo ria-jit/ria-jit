@@ -55,7 +55,7 @@ The memory is laid out as follows:
 	\label{tab:memory-layout}
 \end{table}
 The translator is linked to a high address at \texttt{0x780000000000} so the range that typical programs use at the bottom of the address space is kept free and guest addresses do not need to be converted and can directly be used.
-So the global variables of the translator can be reached with a 32 bit \texttt{RIP}-relative offset from our generated code, the following region is reserved for the translated code.
+The following region (sized slightly below the max size of a 32 bit signed integer) is reserved for the translated code, so the global variables of the translator can be reached with a 32 bit \texttt{RIP}-relative offset from our generated code.
 The lower limit for the guest stack is obtained by using the kernel stack limit and adding a guard page.
 
 
