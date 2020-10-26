@@ -117,7 +117,9 @@ Taking the 12 registers that are most accessed on average, the mapping structure
 \end{table}
 
 \subsubsection{Dynamically allocated replacement registers}
+\label{sec:lazy-replace-details}
 In order to implement the desired temporary register replacement behaviour detailed in section~\ref{sec:context-switch-reg-handle}, we need to keep track of the age of the values currently situated in the replacement registers.
+With that, we can implement a \textit{least recently used} register replacement policy.
 To do this, we track a metric of \textit{replacement recency} (essentially serving as an inverse value age) for each block during translate-time.
 This recency gets incremented for every access not captured by the static register mapping.
 
@@ -318,7 +320,5 @@ With this strategy, we are able to support the following system calls:
 	{An overview of the system calls we support that require special handling by the binary translator.}
 	\label{tab:syscall-special}
 \end{table}
-
-
 
 
