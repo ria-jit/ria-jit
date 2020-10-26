@@ -27,7 +27,7 @@ Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 % todo man page citation @Simon
 As the DBT is responsible for managing the execution environment of the guest binary in the shared address space, it must also handle the setup of said environment.
 
-The header of the ELF-file (\textit{Executable and Linkable Format}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
+The header of the ELF-file (\textit{Executable and Linkable Format}~\cite{elf}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
 The DBT must take care to map the file into memory correctly, while not compromising its own memory region.
 
 Furthermore, the guest registers (see section~\ref{sec:context-switch-reg-handle}) and stack must be initialised in accordance with the architecture specification and calling convention, which necessitates a specific layout of environment and auxiliary parameters as well as command line arguments to be present~\cite[S. 2]{bintrans}.

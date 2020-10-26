@@ -8,7 +8,7 @@ The possibility to expand further when widespread technology developments would 
 
 \subsection{Problem description}
 There is already some hardware available for RISC--V\footnote{The biggest name here is probably SIFive~\cite{sifive}, which already produce multi-core CPUs with super scalar out-of-order pipelines reaching multi-GHz clock speeds.}, but it is not yet widespread.
-Developers usually don't have access to real hardware, so they must instead rely on emulation to test their code written for the RISC--V platform.
+This means developers usually don't have access to real hardware yet, so they must instead rely on emulation to test their code written for the RISC--V platform.
 
 \paragraph{Modes of binary translation}
 When attempting to execute programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
@@ -34,8 +34,9 @@ The main principles to achieve this are:
 One of the most popular software emulators in general is QEMU~\cite{bellard2005qemu}\@.
 While QEMU is a portable DBT that supports a wide variety of architectural combinations and ISAs, this also makes it hard to optimise it for a specific guest/host combination and therefore the program execution will be slower than necessary.
 
-Our aim is to provide a faster emulator, allowing the execution of RISC--V code on an x86--64 machine by means of dynamic binary translation.
-We want to provide a tool to execute binaries compiled for RISC--V Linux on Linux for x86--64, what is conventionally called \textit{user space emulation}, full system emulation is not supported.\\
+Our aim is to provide a faster emulator, allowing the execution of RISC--V 64 bit code on an x86--64 machine by means of dynamic binary translation.
+We want to provide a tool to execute binaries compiled for RISC--V Linux on Linux for x86--64, what is conventionally called \textit{user space emulation}, full system emulation is not supported.
+Currently only single threaded applications are supported, since managing the execution environment and guaranteeing atomicity for the respective instructions would be rather difficult.\\
 
 The rest of this paper is structured as follows:
 Section~\ref{sec:Background} will define concepts and constraints relevant for our undertaking, after which section~\ref{sec:Approach} will show our approach and describe the rationale for major design decisions taken during the implementation.
