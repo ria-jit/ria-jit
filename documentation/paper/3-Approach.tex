@@ -24,7 +24,8 @@ Naturally, the DBT aims to store the translated code in a semi-permanent way, fo
 For that, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
 Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
 
-% todo TLB @noah
+The efficiency of the index lookup is increased by a translation lookaside buffer (short \textit{TLB}).
+This technique, which is also implemented in the cpu for page lookup, reduces lookup time for most recent used code blocks.
 % todo info about chaining and optimisations
 
 It is possible that this code cache might fill up during the execution of a large guest program.
