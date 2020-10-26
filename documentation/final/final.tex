@@ -1,5 +1,6 @@
-\documentclass[aspectratio=169,sectionpage=false, german]{tumbeamer}
+\documentclass[aspectratio=169, sectionpage=false, german]{tumbeamer}
 \usepackage{tumuser}
+\usepackage{tumcolors}
 
 
 \usepackage{biblatex}
@@ -59,7 +60,7 @@ footline on = {section page, content page, part page=false},
 \addbibresource{literature.bib}
 
 % document properties
-\title[Binary Translation: RISC-V \refer x86--64]{Dynamische Binärübersetzung: RISC-V \refer x86--64}
+\title[Binary Translation: RISC--V \refer x86--64]{Dynamische Binärübersetzung:\\RISC--V \refer x86--64}
 \subtitle{Endpräsentation}
 \author[Dormann, Kammermeier, Pfannschmidt, Schmidt]{Noah Dormann\inst{1}, Simon Kammermeier\inst{1},\\Johannes Pfannschmidt\inst{1}, Florian Schmidt\inst{1}}
 
@@ -75,23 +76,51 @@ Technische Universität München (TUM)}
 \footline{Draft after commit \commit on branch \branch.}
 
 % beamer setup todo uncomment footer after removing commit id
-%\footline{\insertshortauthor~|~\insertshorttitle}
+%\footline{\insertshortauthor~|~\insertshorttitle} (--> type TUM infoline)
 \setbeamertemplate{section in toc}[sections numbered]
 \setbeamertemplate{subsection in toc}[subsections numbered]
+\setbeamerfont{subsection in toc}{size = \small}
+\setbeamercolor{section in toc}{fg=TUMBlue}
+\setbeamercolor{subsection in toc}{fg=TUMBlack}
+\addtoTUMcolortheme{TUM default}{
+	\setbeamercolor{subtitle}{fg=TUMBlack}
+	\setbeamercolor{framesubtitle}{fg=TUMBlack}
+}
 
 \begin{document}
 \maketitle
+
 \begin{frame}
 	\frametitle{Gliederung}
 	\tableofcontents
 \end{frame}
 
-% selbstverständlich sample-Gliederung
-%\part*{Gliederung}
 \section{Einführung} % Noah
-\subsection{Grobüberblick über die RISC-V ISA}
-\begin{frame}
-	\frametitle{Einführung}
-	Hier geht's weiter\ldots
+\subsection{Problembeschreibung} % Noah
+\subsection{RISC--V vs. x86--64} % Noah
+\subsection{Dynamische Binärübersetzung} % Noah
+
+\section{Ansatz}
+\subsection{Programmablauf} % Johannes
+\subsection{Partitionierung des Codes} % Flo
+\subsection{Code Cache} % Flo
+\subsection{Registernutzung} % Flo
+\subsection{Optimierungen} % Johannes
+
+\section{Ergebnisse und Performanz}
+\subsection{SPEC CPU 2017} % Simon
+\subsection{Optimierungen} % Simon
+
+
+\section{Demo} % Noah
+\begin{frame}[c]
+	\frametitle{Demo}
+	\framesubtitle{But can it run Crisis?}
+	\centering\Huge\ttfamily
+	./translator
 \end{frame}
+
+
+
+
 \end{document}
