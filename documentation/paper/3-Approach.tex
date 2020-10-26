@@ -2,12 +2,11 @@
 \paragraph{Generating equivalent code}
 The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
 
-The quality of the code that can be generated here strongly depends on the properties of the host and guest architectures in question.
-Difficulties can arise due to differences in the instruction operand formats and the type of instruction set architecture the DBT is dealing with.
+The quality of the code, that can be generated here, strongly depends on the properties of the host and guest architectures in question.
+Difficulties can arise due to differences in the instruction operand formats and the types of instruction set architectures the DBT is dealing with.
 
-% todo use another example
 In our case, as outlined in section~\ref{sec:isa-cmp}, challenges stem from the fact that we are translating code from a load-store architecture using a three-operand instruction format into a register-memory architecture in which (generally) one of the source operands is also the implicit destination operand.
-This, for example, means that a single arithmetic \texttt{sub~rd,~rs1,~rs2} in RISC--V assembly language generally can not be translated via a single instruction, but rather requires two instructions: moving \texttt{rs1} to \texttt{rd}, then subtracting the value of \texttt{rs2} from \texttt{rd}.
+This, for example, means that the single arithmetic instruction \texttt{sub~rd,~rs1,~rs2} in RISC--V assembly language generally can not be translated via a single instruction, but rather requires two instructions: moving \texttt{rs1} to \texttt{rd}, then subtracting the value of \texttt{rs2} from \texttt{rd}.
 
 Opportunities for optimisation lie wherever there is a way to shorten the translation's amount of CPU clock cycles, possibly by employing semantically equivalent native instructions that run in a shorter timespan.
 The RISC--V pseudo-instructions (as mentioned in section~\ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, along with discoverable patterns in the input assembly.
@@ -33,14 +32,14 @@ When translation of the block is complete, a \texttt{ret} instruction is appende
 
 \subsection{Code cache and block handling}
 \label{sec:code-cache}
-Naturally, the DBT aims to store the translated code in a semi-permanent way, for it is the goal to not have to translate a required section more than once.
+Naturally, the DBT aims to store the translated code in a semi-permanent way, as it is the goal to not have to translate a required section more than once.
 
-For that, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
+For this, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
 Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
 
 The efficiency of the index lookup is increased by a translation lookaside buffer (short \textit{TLB}).
-This technique, which is also implemented in the cpu for page lookup, reduces lookup time for most recent used code blocks.
-% todo info about chaining and optimisations
+This technique, which is also implemented in the CPU for page lookup, reduces lookup time for most recent used code blocks.
+% todo info about chaining and optimisations @Johannes
 
 It is possible that this code cache might fill up during the execution of a large guest program.
 If it does, there are two different strategies to handle this issue:
@@ -60,6 +59,7 @@ It would thus only be possible to either remove all blocks with jump references 
 As outlined in section~\ref{sec:isa-cmp}, the RISC--V and x86--64 architectures have differing amounts of general purpose registers.
 In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86--64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
 
+%todo provides for? What is meant here? @flo
 As x86--64 only provides for 16 general-purpose registers (\texttt{rax}--\texttt{rdx}, \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}), it is impossible to directly and statically map all guest registers to native host registers.
 Adding to the above, due to the fact that some x86--64 registers have special or implicit purposes in some instructions like \texttt{(i)mul} or \texttt{(i)/div}, care must be taken in choosing the registers that can be used for such a mapping.
 Keeping a guest register file exclusively in memory, and loading them into native registers when needed within the translations of single instructions is technically possible, especially in light of x86--64's ability to extensively use memory operands in the instructions.
@@ -103,25 +103,24 @@ Some system calls may not exist at all on the native architecture of the host, i
 
 \subsection{Floating point extension}
 \label{subsec:fp_extension}
-% todo capitalize GCC, remove the @Noah
 Floating point support is a vital part of modern processors, enabling fast computation of real world problems like physics simulations.
-While a standard C compiler like the~\textit{GCC}~\cite{gcc-web} is able to emulate floating point arithmetic using integer arithmetic, using the native support of the x86--64 SSE extension is evidently a lot faster.
+While a standard C compiler like \textit{GCC}~\cite{gcc-web} is able to emulate floating point arithmetic using integer arithmetic, using the native support of the x86--64 SSE extensions is evidently a lot faster.
 
-The main difficulties (and their resolutions) that arise by using the x86--64 SSE extension to translate the RISC--V F- and D-extensions are listed below:
+The main difficulties (and their resolutions) that arise by using the x86--64 SSE extensions to translate the RISC--V F- and D-extensions are listed below:
 \begin{itemize}
     \item \textbf{Register handling} is similar to the integer register management laid out in section~\ref{sec:context-switch-reg-handle}.
-            As mentioned before, the RISC--V architecture consists of 32 floating point registers (\texttt{f0}--\texttt{f31}) which can hold a single precision (F-extension) or double precision (D-extension) floating point value, whereas the SSE-extension only provides 16 registers \texttt{XMM0}--\texttt{XMM15}.
+            As mentioned before, the RISC--V architecture consists of 32 floating point registers (\texttt{f0}--\texttt{f31}) which can hold a single precision (F-extension) or double precision (D-extension) floating point value, whereas the SSE-extensions only provide 16 registers \texttt{XMM0}--\texttt{XMM15}.
             We utilise the tools we designed to discover the most-used registers in the guest programs, and statically map these to x86--64 SSE registers \texttt{XMM2}--\texttt{XMM15}.
-            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for simplicity register \texttt{XMM0}, \texttt{XMM1} are just reserved as replacements and missing registers are moved into them from memory temporally.
-    \item \textbf{Missing equivalent SSE instruction} can lead to a huge instruction overhead, as emulation often use bit manipulation operations instead.
-            Therefore constants or masks need to be moved in from either memory or the general purpose registers because the SSE extension does not support immediates.
+            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for simplicity reasons registers \texttt{XMM0} and \texttt{XMM1} are reserved for use as replacements and missing registers are loaded into them from memory temporarily.
+    \item \textbf{Missing equivalent SSE instructions} can lead to a huge instruction overhead, as emulation often needs to use bit manipulation operations instead.
+            For this constants or masks need to be loaded in from either memory or the general purpose registers because the SSE extensions do not support immediate operands.
             The instructions that need to be emulated are unsigned conversion instructions e.g.~\texttt{FCVT.WU.S}, sign-injection instructions e.g.~\texttt{FSGNJ.S}, compare instructions e.g.~\texttt{FEQ.S}, fused multiply-add instructions e.g.~\texttt{FMADD.S} and the \texttt{FCLASS.S} instruction that classifies a floating point value.
             These instructions are not supported by the SSE extension natively.
-			One could use the FMA--extension~\cite[S. 141]{intel2017man} to implement the fused multiply-add instructions natively, but faenc~\cite{faenc} does not support encoding needed for these instructions so far.  %todo fix reference
+			One could use the FMA--extension~\cite[S. 141]{intel2017man} to implement the fused multiply-add instructions natively, but the used encoding engine faenc~\cite{faenc} does not support the encoding needed for these instructions yet.
             As an implementation reference for these instructions, the assembly generated by GCC was used.
     \item \textbf{Rounding modes} are handled differently in the RISC--V architecture, as the rounding mode can be set individually for every instruction.
             The rounding mode of the SSE extension however is controlled by the state of the \texttt{MXCSR} control and status register.
-            Thus in case a instruction with explicit rounding mode is encountered, the rounding mode is temporally changed in the \texttt{MXCSR} register.
+            Thus in case a instruction with explicit rounding mode is encountered, the rounding mode is temporarily changed in the \texttt{MXCSR} register.
     \item \textbf{Exception handling} in RISC--V is realized by reading the \texttt{fcsr} floating-point control and status register, traps are not supported.
             The CSR instructions used to read this register are thus emulated to instead read and translate the \texttt{MXCSR} exception flags.
             x86--64 exceptions are meanwhile disabled by masking them in the \texttt{MXCSR} register.
@@ -133,10 +132,11 @@ The main difficulties (and their resolutions) that arise by using the x86--64 SS
 
 \subsubsection{Recursive jump translation}
 \label{sec:recursive_translation}
-Returning from translated guest code to the translator's main transcode loop comes with performance penalties imposed by the first context switch, code cache lookup, and second context switch necessary for starting execution of the next basic block.
+Returning from translated guest code to the translator's main transcode loop comes with big performance penalties.
+These are imposed by the first context switch, code cache lookup, and second context switch necessary for starting execution of the next basic block.
 To avoid these negative performance impacts, we employ the method of recursive translation: When the parser arrives at an unconditional jump, translation of the jump target is started recursively.
 That way, the jump target will always be translated before the jump itself.
-Because the jump target's host code address is now already known at translate time, we can emit a direct jump to the target block instead of returning to the transcode loop.
+Because this means that the jump target's host code address is now already known at translate time, we can emit a direct jump to the target block instead of needing to return to the transcode loop.
 The blocks containing jump and target are thereby chained.
 
 \subsubsection{Retroactive block chaining}
@@ -150,22 +150,22 @@ If the translator reaches a branch, its two sides can only be chained if the tar
 If that is not the case, the target can instead be chained retroactively after the respective side of the branch is first taken: Following translation of the target block, the branch's host code is modified to jump to the targets now known address directly, instead of returning to the transcode loop.
 Further cache lookups and context switching are thus avoided for this branch.
 
-
 \begin{figure}[h]
 	\begin{center}
 		\begin{subfigure}[b]{\textwidth}
 			\centering
-			\includegraphics[width=0.7\textwidth]{media/chaining-unchained.pdf}
+			\includegraphics[width=0.8\textwidth]{media/chaining-unchained.pdf}
 			\caption{before chaining}
 		\end{subfigure}
 		\begin{subfigure}[b]{\textwidth}
 			\centering
-			\includegraphics[width=0.7\textwidth]{media/chaining-chained.pdf}
+			\includegraphics[width=0.8\textwidth]{media/chaining-chained.pdf}
 			\caption{after chaining}
 		\end{subfigure}
 	\end{center}
 	
-	\caption{block chaining}
+	\caption[Block chaining illustration]%
+	{An illustration of retroactive block chaining.}
 \end{figure}
 
 

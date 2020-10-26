@@ -1,11 +1,10 @@
 The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them.
 
 \subsection{System architecture and execution control flow}
-% todo overview, add class diagrams and flow charts
-% todo add reference to faenc
+% todo overview, add class diagrams and flow charts @Johannes
 The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
 Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
-This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc.
+This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
 
 \begin{figure}[h]
 	\begin{center}
@@ -141,7 +140,6 @@ In order to support this efficiently, the DBT is able to shuffle the values in t
 With this behaviour, we manage to greatly save on memory accesses to the register file compared to simply loading and storing the values on an instruction-by-instruction basis.
 This style of register mapping can also not perform worse than accessing memory for each instruction, as in the worst case the DBT will perform the same memory accesses as with the other strategy, just possibly at a different time.
 
-% todo we likely need to dumb this down a bit (only representative sections so as not to confuse the reader)
 \begin{figure}[h]
 \begin{subfigure}{0.45\textwidth}
 \begin{lstlisting}[label={lst:without-lazy-replace}, showlines=true]
@@ -231,7 +229,7 @@ The following will describe the specifics of these issues with system calls that
 	
 	
 	\item[Ignoring system calls.]
-	The \texttt{rt\_sigaction} system call is ignored by the DBT.
+	The \texttt{rt\_sigaction} system call is ignored by the DBT\@.
 	Due to the fact that the DBT and guest binary are running within the confines of the same process, any signal handler installed by the guest binary through \texttt{rt\_sigaction} would also capture the respective signal sent to the translator.
 	As it is impossible to distinguish the DBT from the guest program in inter-process communication, we must ignore this call in order to avoid undefined behaviour on signal handling.
 	

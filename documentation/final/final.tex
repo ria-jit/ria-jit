@@ -77,15 +77,12 @@ Technische Universität München (TUM)}
 
 % beamer setup todo uncomment footer after removing commit id
 %\footline{\insertshortauthor~|~\insertshorttitle} (--> type TUM infoline)
-\setbeamertemplate{section in toc}[sections numbered]
-\setbeamertemplate{subsection in toc}[subsections numbered]
-\setbeamerfont{subsection in toc}{size = \small}
-\setbeamercolor{section in toc}{fg=TUMBlue}
-\setbeamercolor{subsection in toc}{fg=TUMBlack}
 \addtoTUMcolortheme{TUM default}{
 	\setbeamercolor{subtitle}{fg=TUMBlack}
 	\setbeamercolor{framesubtitle}{fg=TUMBlack}
 }
+
+% todo where are the slide numbers and the git commit hash?
 
 \begin{document}
 \maketitle
@@ -96,26 +93,19 @@ Technische Universität München (TUM)}
 \end{frame}
 
 \section{Einführung} % Noah
-\subsection{Problembeschreibung} % Noah
-\subsection{RISC--V vs. x86--64} % Noah
-\subsection{Dynamische Binärübersetzung} % Noah
+\input{1F-Introduction}
 
-\section{Ansatz}
-\subsection{Programmablauf} % Johannes
-\subsection{Partitionierung des Codes} % Flo
-\subsection{Code Cache} % Flo
-\subsection{Registernutzung} % Flo
-\subsection{Optimierungen} % Johannes
+\section{Ansatz} % Johannes, Flo
+\input{2F-Approach}
 
-\section{Ergebnisse und Performanz}
-\subsection{SPEC CPU 2017} % Simon
-\subsection{Optimierungen} % Simon
+\section{Ergebnisse und Performanz} % Simon
+\input{3F-ResultsPerf}
 
 
 \section{Demo} % Noah
 \begin{frame}[c]
 	\frametitle{Demo}
-	\framesubtitle{But can it run Crisis?}
+	\framesubtitle{But can it run Crysis?}
 	\centering\Huge\ttfamily
 	./translator
 \end{frame}

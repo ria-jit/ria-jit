@@ -24,7 +24,6 @@ Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
 \subsection{Environment setup and memory layout}
 \label{sec:memory-layout}
-% todo man page citation @Simon
 As the DBT is responsible for managing the execution environment of the guest binary in the shared address space, it must also handle the setup of said environment.
 
 The header of the ELF-file (\textit{Executable and Linkable Format}~\cite{elf}) specifies which section(s) of the program need to be loaded, and where in memory they must reside.
@@ -56,7 +55,7 @@ The memory is laid out as follows:
 	\label{tab:memory-layout}
 \end{table}
 The translator is linked to a high address at \texttt{0x780000000000} so the range that typical programs use at the bottom of the address space is kept free and guest addresses do not need to be converted and can directly be used.
-So the global variables of the translator can be reached with a 32 bit \texttt{RIP}-relative offset from our generated code, the following region is reserved for the translated code.
+The following region (sized slightly below the max size of a 32 bit signed integer) is reserved for the translated code, so the global variables of the translator can be reached with a 32 bit \texttt{RIP}-relative offset from our generated code.
 The lower limit for the guest stack is obtained by using the kernel stack limit and adding a guard page.
 
 
