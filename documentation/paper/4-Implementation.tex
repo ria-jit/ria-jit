@@ -1,18 +1,43 @@
 The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them.
 
 \subsection{System architecture and execution control flow}
+\paragraph{Initialization}\mbox{}\\
+%todo: add a few words on what has to be set up and initialized here
+
+\paragraph{Transcode Loop}\mbox{}\\
 % todo overview, add class diagrams and flow charts @Johannes
-The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
-Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
-This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
+To begin guest program translation and execution, the transcode loop is started with the address next to be executed set to the guest program's entry point.
+
+After entering the loop (see figure \ref{fig:control-flow-chart}), it is first checked if the block next to be executed has already been stored in the code cache. 
+
+If this is not the case, translation will start by parsing the blocks instructions, after which the pattern matcher detects and replaces optimizable patterns. The parsed instructions are then translated, and the block is stored in the code cache.
+
+Next it is checked if the last executed block ended in a jump that can be statically chained.
+If yes, the chainer is called to link the new block to the last one.
+
+The last step is to switch into guest context and start executing the block.
+Due to block chaining and the return address stack, multiple blocks might be executed before switching back to host context, setting the address next to be executed, and returning to the transcode loop.
+
+The loop will break if the guest program terminated, after which the translator will terminate as well, returning the guest's exit code.
+
 
 \begin{figure}[h]
 	\begin{center}
 		\includegraphics[width=\textwidth]{media/strategy.pdf}
 		\caption{Control flow overview of the translation and execution process}
+		\label{fig:control-flow-chart}
 	\end{center}
 \end{figure}
 
+\subsection{Translation process}
+\paragraph{Instruction parsing} \mbox{}\\
+The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
+Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
+%todo: continue, eleborate?
+
+\paragraph{Instruction translation} \mbox{}\\
+This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
+%todo: continue, eleborate?
 
 
 \subsection{Static hybrid register mapping}
