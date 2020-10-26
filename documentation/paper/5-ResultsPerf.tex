@@ -1,3 +1,15 @@
+\subsection{Verification}
+The correctness of our translator was checked by extensive unit tests, which were used to check if the translations of a the RISC--V instruction really do perform the operations that are expected.
+Using the parameterized tests provided by the Google~Test~\cite{gtest} framework we were able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
+Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+
+Apart from this correctness is also confirmed by being able to sucessfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
+
+
+\subsection{SPEC CPU 2017 Benchmark Suite}
+\label{subsec:spec-cpu-2017-benchmark-suite}
+
+
 \begin{table}
 	\centering
 	\begin{tabular}{rl}
@@ -38,7 +50,7 @@ The RISC--V binaries for our translator and QEMU were compiled using \texttt{-ma
 A self compiled GCC with the sources taken from the official toolchain repo at version 10.1.0 was used.
 This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
 
-\subsection{SPEC CPU 2017 Results}
+\subsubsection{Results}
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
@@ -188,10 +200,6 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			ybar,
 			area legend,
 			ylabel = {Execution time [ratio to base]},
-			ymode = log,
-%			log ticks with fixed point,
-			log basis y={2},
-			log origin=infty,
 			xtick = data,
 			xtick style = {draw = none},
 			xticklabel style = {
@@ -199,10 +207,9 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 				anchor = north east,
 				rotate = 60
 			},
-%			scaled y ticks = true,
 			xticklabels from table={\basetable}{Benchmark},
-%			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
-			ymin =0.5, ymax = 16,
+			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+			ymin =0, ymax = 11.5,
 			ymajorgrids = true,
 			bar width = 3pt,
 			height = 9.0cm,
