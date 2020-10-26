@@ -15,10 +15,24 @@ It is clear, for example, that an instruction like \texttt{xori~x10,~x10,~-1} ca
 The same principle applies to combinations of multiple instructions.
 An \texttt{lui~rd,~imm1} followed by \texttt{addi~rd,~rd,~imm2} may for example be translated as directly loading the result of the computation \texttt{imm1~+~imm2} into \texttt{rd}.
 
-\paragraph{Translation procedure}
+\paragraph{Translation procedure} \mbox{}\\
 % todo info about translate-parsing-execution time @Johannes
+The translator's central element is the transcode loop, which controls both translation and execution:
+First, it is checked whether the block to be executed next has already been translated (see \ref{sec:code-cache}), and if it hasn't, translation is started.
+The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.
+
+%todo: formatting
+Translation itself is done in two steps: 
+
+1.: Parsing the guest program's code into easy to work with internal instruction representations, until we hit the end of the basic block.
+
+2.: Translation is then done by dispatching the parsed instructions to special single-instruction translator functions, which emit the matching x86-64 code into memory allocated for the block..
+
+When translation of the block is complete, a \texttt{ret} instruction is appended for returning to the translator after execution.
+
 
 \subsection{Code cache and block handling}
+\label{sec:code-cache}
 Naturally, the DBT aims to store the translated code in a semi-permanent way, for it is the goal to not have to translate a required section more than once.
 
 For that, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
