@@ -1,4 +1,32 @@
-% todo
-Summary here\ldots
+Looking at the motivation the goal of outperforming QEMU~\cite{bellard2005qemu} is achieved consistently by "insert Project name here".
+The performance is measured by ~\textit{SPEC CPU 2017}~\cite{spec-cpu-2017} an industry-standardized, CPU intensive package of benchmark suites for measuring and comparing compute-intensive performance.
+In most cases we can achieve a speed of around twice the native speed, but the tests also show areas for further optimization.
+The quite significant performance increases in comparison to QEMU can be rooted to the specialisation in RISC--V to x86--64 translation lead to a straight forward design of the translation process and enabled specific optimizations for this guest-host pairing.
 
-% todo outlook? future dev?
+The benchmarks suits did not only help to ensure the performance of fish but equally important they tested the implementation in various scenarios and helped to discover bugs due to their assertion of the test programs' outputs.
+Furthermore many unit tests were designed to assure the correct translation of (almost) every RISC--V instruction in diverse contexts.
+All in all nearly 30.000 test cases are being executed by our own test suits based on~\textit{Googletest}~\cite{gtest} covering the RISC--V parser as well as the emitted x86--64 assembly.
+
+Fish was focused on supporting and optimizing the core instruction set and integer extensions so far.
+Support for floating point extensions however is already implemented and tested and will be benchmarked by ~\textit{SPEC CPU 2017} as soon as possible.
+Our preliminary tests nonetheless already show a huge performance increase in comparison with QEMU as a consequence of QEMU's emulation and fish's use of the native SSE--extension for floating point arithmetic.
+
+
+Currently fish supports all base instruction sets and extensions needed for executing single threaded programs besides the \textit{"Q" Standard Extension}.
+Future standard extensions such as the \textit{"B" Standard Extension} for bit manipulation can simple be added to fish when they come available by adding their opcode parsing to the parser and writing tailored translator functions.
+Support of multithreading would be a bigger undertaking as it requires a redesign of fishs core to support the necessary memory consistency and atomicity of some memory access (\textit{"A" Standard Extension}).
+Thus, this is not planned to be added in the near future.
+
+Furthermore some operating system related features are not provided yet.
+Specifically only a subset of the existing system calls is implemented and loading of dynamically linked libraries at runtime is not supported.
+
+The next steps for generally improving fish would be implementing techniques used for integer arithmetic (e.g. lazy register replacement) for floating point arithmetic as well and supporting even more system calls.
+Besides one could invest into on of the aforementioned areas specifically, for example applying a more rigid memory consistency model.
+
+Concerning the performance optimization most time has been invested in the emitted code and reduction of context switches.
+Benchmarking and optimization of the parsing and translation time has mostly been left out so far and might be due to optimization.
+
+
+The current version of fish is capable of outperforming QEMU whilst providing almost the same functionality.
+In some aspects e.g.\ floating-point arithmetic we are even ahead of QEMU by using the SSE-extension instead of emulating.
+Also there is still potential for improvement the~\textit{SPEC CPU 2017} benchmarks demonstrate its usability in translating general purpose programs from RISC--V to x86--64.

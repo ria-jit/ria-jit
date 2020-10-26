@@ -188,6 +188,10 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			ybar,
 			area legend,
 			ylabel = {Execution time [ratio to base]},
+			ymode = log,
+%			log ticks with fixed point,
+			log basis y={2},
+			log origin=infty,
 			xtick = data,
 			xtick style = {draw = none},
 			xticklabel style = {
@@ -195,13 +199,13 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 				anchor = north east,
 				rotate = 60
 			},
-			scaled y ticks = false,
+%			scaled y ticks = true,
 			xticklabels from table={\basetable}{Benchmark},
-			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			ymin = 0, ymax = 10.5,
+%			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+			ymin =0.5, ymax = 16,
 			ymajorgrids = true,
 			bar width = 3pt,
-			height = 8.5cm,
+			height = 9.0cm,
 			width = 0.9\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
@@ -235,24 +239,32 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 % ================================
 
 
-Macro operation fusion does not seem to provide a lot of a performance benefit, in most benchmarks the numbers do not even suggest any performance increase above natural deviation of benchmark runs.
-This means the implemented pattern matching did not give the desired effect of a good performance increase.
-Further tweaking of the checked patterns might make this optimisation more worth it.
+Macro operation fusion does not seem to provide a large performance benefit, in most benchmarks the numbers do not even suggest any performance increase above natural deviation of benchmark runs.
+This means the implemented pattern matching does not give the desired effect of a good performance increase.
+Further tweaking of the checked patterns might make this optimisation more worthwhile.
 
-The return address stack gave a significant advantage in some benchmarks.
+The return address stack provided for a significant advantage in some benchmarks.
 Especially the function call heavy \texttt{620.omnetp}, \texttt{623.xalancbmk}, \texttt{631.deepsjeng}, \texttt{641.leela} benchmarks showed good performance gains of over $50\,\%$.
-The \texttt{600.perlbench}, \texttt{648.exchange2}, \texttt{657.xz} benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
+The \texttt{600.perlbench}, as well as the \texttt{648.exchange2} and \texttt{657.xz} benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
 
-Recursive jump translation without also utilizing the return address stack only provided a performance increase over disabling both in some benchmarks.
+Recursive jump translation without also utilising the return address stack only provided a performance increase over disabling both in some benchmarks.
 The main reason for this might be that this also makes context switches necessary on unconditional jumps that aren't function calls or returns.
-This makes jump heavy benchmarks take a performance hit while jump light benchmarks are almost unaffected.
+This makes jump-heavy benchmarks take a performance hit while jump-light benchmarks are almost unaffected.
 
-Expectedly the highest performance penalty was incurred by disabling chaining as well.
+Expectedly, the highest performance penalty was incurred by disabling chaining as well.
 This makes a context switch back to the translator necessary for every executed basic block.
-The benchmarks that had lower performance losses are the ones were less basic blocks were executed relative to their runtime.
-This can be justified by seeing that the most executed parts of the these benchmarks are blocks that are very long.
+The benchmarks that are less impacted by disabling block chaining are the ones where fewer basic blocks were executed relative to their runtime.
+This correlates with the fact that the most executed blocks of these benchmarks contain more instructions and hence execute for a longer time.
 
-Something that also needs to be noted that the lazy replacement register handling described in section~\vref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, providing a roughly $45\,\%$ performance increase there more than any other optimisation apart from chaining.
+Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, providing for a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
+Any workload that frequently accesses registers that are not statically mapped as per table~\vref{tab:static-register-mapping} benefits significantly from this style of register handling, as these registers will essentially behave as if they were statically mapped within the confines of that single basic block.
+
+Of course, our chosen \textit{least recently used}-approach to register replacement into three temporary slots suffers from the same issue known from caching:
+If a program accesses the same four not-statically-mapped registers in order in a loop, the algorithm will always replace and write back the value that would be needed next.
+Preventing this issue, however, is not a trivial task even when presented with the entirety of the guest program.
+So, as this approach can not perform worse than accessing the register file in memory for each instruction and has lead to significant performance increases in some workloads, this is a very worthwhile optimisation.
+
+
 
 \subsection{Data compression via gzip}
 % gzip results
