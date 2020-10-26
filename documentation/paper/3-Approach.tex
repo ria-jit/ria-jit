@@ -137,6 +137,25 @@ If the translator reaches a branch, its two sides can only be chained if the tar
 If that is not the case, the target can instead be chained retroactively after the respective side of the branch is first taken: Following translation of the target block, the branch's host code is modified to jump to the targets now known address directly, instead of returning to the transcode loop.
 Further cache lookups and context switching are thus avoided for this branch.
 
+
+\begin{figure}[h]
+	\begin{center}
+		\begin{subfigure}[b]{\textwidth}
+			\centering
+			\includegraphics[width=0.5\textwidth]{media/chaining-unchained.pdf}
+			\caption{before chaining}
+		\end{subfigure}
+		\begin{subfigure}[b]{\textwidth}
+			\centering
+			\includegraphics[width=0.5\textwidth]{media/chaining-chained.pdf}
+			\caption{after chaining}
+		\end{subfigure}
+	\end{center}
+	
+	\caption{block chaining}
+\end{figure}
+
+
 \subsubsection{Return address stack}
 \label{sec:return-address-stack}
 Dynamic jumps can not be statically chained, because their target address may vary.
