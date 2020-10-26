@@ -229,7 +229,7 @@ The following will describe the specifics of these issues with system calls that
 	
 	
 	\item[Ignoring system calls.]
-	The \texttt{rt\_sigaction} system call is ignored by the DBT.
+	The \texttt{rt\_sigaction} system call is ignored by the DBT\@.
 	Due to the fact that the DBT and guest binary are running within the confines of the same process, any signal handler installed by the guest binary through \texttt{rt\_sigaction} would also capture the respective signal sent to the translator.
 	As it is impossible to distinguish the DBT from the guest program in inter-process communication, we must ignore this call in order to avoid undefined behaviour on signal handling.
 	
