@@ -42,8 +42,10 @@ For this, we allocate a region of memory reserved for the basic block translatio
 Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
 
 The efficiency of the index lookup is increased by a translation lookaside buffer (short \textit{TLB}).
-This technique, which is also implemented in the CPU for page lookup, reduces lookup time for most recent used code blocks.
-% todo info about chaining and optimisations @Johannes
+This technique, which is also implemented in the CPU for page lookup, reduces lookup time for most recent used code blocks. %todo: grammar 
+Still, it is desirable to avoid cache lookups when possible, as they are relatively costly and can cause significant slowdown to the whole system. 
+Repeatedly retrieving many different blocks will also decrease \textit{TLB} performance as soon as their number surpasses the \textit{TLB} size, because entries will be overwritten before they are read again. %todo: better wording ?
+Several of the optimizations we employ thus aim to reduce the number of cache lookups by avoiding having to return to the transcode loop.
 
 It is possible that this code cache might fill up during the execution of a large guest program.
 If it does, there are two different strategies to handle this issue:
