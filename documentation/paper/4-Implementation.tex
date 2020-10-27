@@ -44,7 +44,8 @@ This intermediate format can then be used by special per-mnemonic translation fu
 
 \subsection{Static hybrid register mapping}
 In order to achieve the best performance with the hybrid approach to the register mapping described in section~\vref{sec:context-switch-reg-handle}, we must decide how to make best use of the limited number of host GPRs we have available.
-% todo @Flo Sec. 4.3.2: Fehlt: Begruendung, warum nicht z.B. 10 Register gemapped werden und mehr "lazy" zur Verfuegung stehen. Fehlt: Alternative, dass jeder Block mit einem unterschiedlichen Register-Mapping enden koennte ("This optimization opportunity is left as future work.")
+
+Principally, we chose to statically map into as many registers as we could, without compromising on flexibility in handling instructions that require specific registers.
 
 \subsubsection{Register priority analysis}
 There are two main ways of determining the priority of registers when considering them as candidates for a mapping.
@@ -61,7 +62,7 @@ A dynamic analysis, of course, delivers a largely more accurate idea of the prio
 
 \pgfplotstableread[col sep=comma,header=false]{benchmarks/register-frequency/freq.csv}\regfreqtable
 \pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
-\begin{figure}[h]
+\begin{figure}
 %\pgfplotstabletypeset\sortedregfreqtable
 	\centering
 	\makebox[\textwidth][c]{
@@ -129,13 +130,12 @@ However, evidently, this is impossible with dynamic profiling.
 
 
 \subsubsection{Structure of the mapping}
-When we structure our mapping by the average case of the insights gained, we statistically capture about $83,59\,\%$ of register accesses, initially leaving the remaining $16,41\,\%$ to read from the register file in memory.
-The following section will touch on our approach to optimise the accesses to the remaining not-statically-mapped registers.
-
 From the 16 general-purpose registers x86--64 has to offer, we may use the 12 registers \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}.
 The remaining registers have either implicit or exclusive functions in some instructions (\texttt{rax} and \texttt{rdx} for multiplication/division, \texttt{cl} for shifting), or, like \texttt{rsp}, are impractical to use in combination with block chaining and function calls.
 
-Taking the 12 registers that are most accessed on average, the mapping structure is as seen in table~\vref{tab:static-register-mapping}.
+In keeping with our goal to statically map as many registers as possible, we chose to use all 12 of these registers.
+When we structure our mapping into the chosen slots by the average case of the insights gained (see table~\vref{tab:static-register-mapping}), we statistically capture about $83,59\,\%$ of register accesses, initially leaving the remaining $16,41\,\%$ to read from the register file in memory.
+The following section will touch on our approach to optimise the accesses to the remaining not-statically-mapped registers.
 
 \begin{table}
 	\centering
@@ -233,6 +233,16 @@ mov [gp_file + 8 * 7], rcx
 \end{figure}
 
 
+\subsubsection{Discussion of other solutions}
+Apart from the above-mentioned solution, two more approaches are available in order to optimise register usage within basic blocks:
+\begin{itemize}
+	\item \textbf{Allocating more registers dynamically}, and thereby reducing the amount of statically-mapped registers could theoretically improve the performance in some workloads.
+	However, we dismissed this approach due to the fact that the most frequently used registers in the analysed workloads were largely invariant.
+	Hence, these values are then preserved context-wide and do not need to be written back and restored on block boundaries.
+	
+	\item \textbf{Not mapping statically at all}, resorting to a dynamic allocation unique to every block.
+	This optimisation opportunity is left as future work.
+\end{itemize}
 
 \subsection{Detailed system call overview}
 As described in section~\vref{sec:syscall-handling}, we must assume the role of the kernel by handling system calls during the execution of the guest program.
