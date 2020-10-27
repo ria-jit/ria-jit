@@ -32,7 +32,7 @@ The loop will break if the guest program terminated, after which the translator 
 \subsection{Translation process}
 \paragraph{Instruction parsing} \mbox{}\\
 The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
-Thus, the assembly is parsed in 4 byte blocks with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
+Thus, the assembly is parsed in blocks of 4-byte with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
 %todo: continue, eleborate?
 
 \paragraph{Instruction translation} \mbox{}\\
@@ -242,7 +242,7 @@ The following will describe the specifics of these issues with system calls that
 \begin{description}
 	\item[Adapting structure data format.]
 	There are system calls like \texttt{fstat} and \texttt{fstatat} that exist both on RISC--V as well as x86--64, but use different data structure layouts in their return values.
-	Thus, the DBT must adapt the host's returned data to the required format prior to passing it back to the guest.
+	Thus, the DBT must adapt the data returned by the host to the required format prior to passing it back to the guest.
 	
 	
 	\item[Emulation required.]
