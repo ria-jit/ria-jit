@@ -37,14 +37,27 @@ The loop will break if the guest program terminated, after which the translator 
 
 \subsection{Translation process}
 \paragraph{Instruction parsing} \mbox{}
-
+The first step to translating a basic block is to parse its instructions.
 The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
 Thus, the assembly is parsed in blocks of 4 bytes with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
+Parsing continues until the first possibly control flow altering and thus block ending instruction.
+If this last instruction is a call, the called block as well as the next block to be executed after the return are translated recursively and stored in the code cache.
+
+The pattern matcher (section \ref{sec:pattern-matching}) now iterates over the parsed instructions and replaces detected patterns.
+
 %todo: continue, elaborate? @Johannes
 
 \paragraph{Instruction translation} \mbox{}
 
-This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
+
+The instructions in their uncompressed format are then dispatched to special per-mnemonic translation functions, which generate and emit the x86--64 byte code using faenc~\cite{faenc}.
+Because the block ended on a possibly control flow altering instruction, it is this last instruction which has to ensure execution is continued correctly.
+
+If it is known at translation time what block will have to be executed next, and if this block has already been translated, then the last instruction can be made to directly jump to the next block.
+Dynamic Jumps will check the return stack and also jump directly if possible, as described in section \ref{sec:return-address-stack}.
+If the next block is known but not yet translated, the last instruction will instead signal its ability to be chained to the translator before returning to the transcode loop. %todo: name
+
+Should none of two mentioned methods avoiding returning to the transcode loop be applicable, the last instruction will be made to write the address next to be executed to the program counter, which is then read by the transcode loop to initiate further execution.
 %todo: continue, elaborate? @Johannes
 
 
