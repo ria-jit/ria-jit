@@ -19,18 +19,15 @@ An \texttt{lui~rd,~imm1} followed by \texttt{addi~rd,~rd,~imm2} may for example 
 
 \paragraph{Translation procedure} \mbox{}
 
-% todo info about translate-parsing-execution time @Johannes
 % todo name
 The central element of the translator is the transcode loop, which controls both translation and execution:
-first, it is checked whether the block to be executed next has already been translated (see~\ref{sec:code-cache}), and if it has not, translation is started.
-The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.
-
+first, it is checked whether the block to be executed next has already been translated (by doing a cache lookup, see~\ref{sec:code-cache}), and if it has not, translation is started.
+The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.\\
 Translation itself is done in two steps:
 \begin{enumerate}
 	\item Parsing code of the guest program into easy to work with internal instruction representations, until we hit the end of the basic block.
 	\item Translation is then done by dispatching the parsed instructions to special single-instruction translator functions, which emit the matching x86-64 code into memory allocated for the block.
-\end{enumerate}
-
+\end{enumerate}\mbox{}\\
 When translation of the block is complete, a \texttt{ret} instruction is appended for returning to the translator after execution.
 
 
