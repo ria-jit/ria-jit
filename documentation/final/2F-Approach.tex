@@ -8,6 +8,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\textbf{Überlegung:}
 	\begin{itemize}
 		\item einzelne Instruktionen übersetzen zu aufwändig
@@ -17,6 +18,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{block}{Definition: Basic Block}
 		\begin{itemize}
 			\item einziger Ein- und Ausgangspunkt
@@ -29,24 +31,21 @@
 	\frametitle{Partitionierung des Codes}
 	\framesubtitle{Finden von Blockgrenzen}
 	
-	\textbf{Blockende} durch folgende Instruktionen erreicht:
-	\begin{itemize}
-		\item Unbedingte Sprünge \& Funktionsaufrufe (\texttt{j}, \texttt{call}, \texttt{ret}) % todo I'll list the pseudos here, if that's fine?
-		\item Bedingte Sprünge (\texttt{beq}, \texttt{bne}, \texttt{blt}, \texttt{bge}, \texttt{bltu}, \texttt{bgeu})
-		\item System Calls (\texttt{ecall})
-	\end{itemize}
+	\begin{block}{Blockende erreicht durch\ldots}
+		\begin{itemize}
+			\item Unbedingte Sprünge \& Funktionsaufrufe (\texttt{j}, \texttt{call}, \texttt{ret})
+			\item Bedingte Sprünge (\texttt{beq}, \texttt{bne}, \texttt{blt}, \texttt{bge}, \texttt{bltu}, \texttt{bgeu})
+			\item System Calls (\texttt{ecall})
+		\end{itemize}
+	\end{block}
 	
 	\vspace{0.50cm}
 	
-	\textbf{Optimierungspotenzial:}
-	\begin{itemize}
-		\item Sprüngen folgen
-		\item rekursive Übersetzung von Sprungzielen
-		\item Schwierigkeiten bei bedingten Sprüngen
-	\end{itemize}
+	Einheiten zusammen übersetzt, als \textbf{Blöcke} abgelegt.
 	
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 	\frametitle{Partitionierung des Codes}
 	\framesubtitle{Beispiel}
@@ -73,6 +72,7 @@
 		\end{column}
 	\end{columns}
 \end{frame}
+\end{comment}
 
 
 \subsection{Codegenerierung und Cache} % Flo
@@ -83,18 +83,21 @@
 	
 	\vspace{0.50cm}
 	
-	\textbf{Prinzipieller Ansatz:} Instruktions-Mapping x86--64 \conclude RISC--V
+	\pause
+	\textbf{Prinzipieller Ansatz:} Instruktions-Mapping RISC--V \conclude x86--64
 	
-	\begin{itemize}
-		\item Übersetzungen jeder Instruktion der Quellarchitektur
-		\item Probleme durch architektonische Unterschiede
+	\vspace{0.50cm}
+	
+	\begin{block}{Übersetzungsansatz}
 		\begin{itemize}
-			\item \textit{load-store}- vs. \textit{register-memory-Architektur}
-			\item \textit{Zwei}- bzw. \textit{Dreiadressform}
+			\item Übersetzungen jeder Instruktion der Quellarchitektur
+			\item Probleme durch architektonische Unterschiede
+			\begin{itemize}
+				\item \textit{load-store}- vs. \textit{register-memory-Architektur}
+				\item \textit{Zwei}- bzw. \textit{Dreiadressform}
+			\end{itemize}
 		\end{itemize}
-		
-		\item Mustererkennung im Eingangscode
-	\end{itemize}
+	\end{block}
 \end{frame}
 
 \begin{frame}
@@ -125,7 +128,7 @@
 	\end{columns}
 \end{frame}
 
-
+\begin{comment}
 \begin{frame}
 	\frametitle{Codegenerierung}
 	\framesubtitle{Beispiel: Optimierte Übersetzung}
@@ -152,6 +155,7 @@
 		\end{column}
 	\end{columns}
 \end{frame}
+\end{comment}
 
 
 \begin{frame}
@@ -191,6 +195,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{block}{Code Cache}
 		\begin{itemize}
 			\item Speicherregion, in die generierter Code geschrieben wird
@@ -200,6 +205,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\textbf{Nutzung:}
 	
 	\begin{itemize}
@@ -209,7 +215,7 @@
 	\end{itemize}
 \end{frame}
 
-
+\begin{comment}
 \begin{frame}[c]
 	\frametitle{Code Cache}
 	\framesubtitle{Programmfluss (vereinfacht)}
@@ -218,6 +224,7 @@
 		\includegraphics[width=\textwidth]{diagrams/cache-flow}
 	\end{figure}
 \end{frame}
+\end{comment}
 
 
 \subsection{Registernutzung} % Flo
@@ -229,6 +236,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{block}{Definition: Registerdatei im Speicher}
 		\begin{itemize}
 			\item Speicherbereich, der die Registerwerte des Gastprogramms hält (264 Byte)
@@ -238,6 +246,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\textbf{Problem:} viele Speicherzugriffe \conclude \alert{ineffizient}
 \end{frame}
 
@@ -249,6 +258,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{alertblock}{Register bei RISC--V und x86--64}
 		\begin{columns}[onlytextwidth]
 			\begin{column}{0.45\textwidth}
@@ -276,6 +286,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{itemize}
 		\item zu wenige Register \conclude statische Abbildung nur teilweise möglich
 		\item \texttt{rax}, \texttt{rcx}, \texttt{rdx} speziell benötigt; \texttt{rsp} unpraktisch
@@ -288,6 +299,7 @@
 	
 	\textbf{Überlegung:} Welche 12 Register werden häufig verwendet?
 	
+	\pause
 \pgfplotstableread[col sep=comma,header=false]{../paper/benchmarks/register-frequency/freq.csv}\regfreqtable
 \pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
 \begin{figure}
@@ -347,6 +359,7 @@
 	
 	\vspace{0.50cm}
 	
+	\pause
 	\begin{block}{Register-Handling-Strategie}
 		\begin{itemize}
 			\item statische Abbildung der 12 zugriffshäufigsten Register (außer \texttt{x0})
@@ -355,6 +368,7 @@
 				\item bleiben über Blockgrenzen hinweg erhalten (\refer Kontextwechsel)
 			\end{itemize}
 			
+			\pause
 			\item dynamische Allokation in die restlichen 3 x86-Register
 			\begin{itemize}
 				\item dynamisch in \texttt{rax}, \texttt{rcx}, \texttt{rdx} (\textit{least recently used}, \textit{lazy write-back})
