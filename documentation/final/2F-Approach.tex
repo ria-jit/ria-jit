@@ -241,6 +241,128 @@
 	\textbf{Problem:} viele Speicherzugriffe \conclude \alert{ineffizient}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Ansatz}
+	
+	\textbf{Idee:} Werte in Registern halten
+	
+	\vspace{0.50cm}
+	
+	\begin{alertblock}{Register bei RISC--V und x86--64}
+		\begin{columns}[onlytextwidth]
+			\begin{column}{0.45\textwidth}
+				\begin{itemize}
+					\item \textbf{RISC--V}
+					\begin{itemize}				
+						\item 32 general-purpose Register
+						\item \texttt{x0}, \texttt{x1}--\texttt{x31}
+						\item festes Nullregister
+					\end{itemize}
+				\end{itemize}
+			\end{column}
+			
+			\begin{column}{0.45\textwidth}
+				\begin{itemize}
+					\item \textbf{x86--64}
+					\begin{itemize}				
+						\item 16 general-purpose Register
+						\item \texttt{rax}--\texttt{rdx}, \texttt{rsp}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi}, und \texttt{r8}--\texttt{r15}
+					\end{itemize}
+				\end{itemize}
+			\end{column}
+		\end{columns}
+	\end{alertblock}
+	
+	\vspace{0.50cm}
+	
+	\begin{itemize}
+		\item zu wenige Register \conclude statische Abbildung nur teilweise möglich
+		\item \texttt{rax}, \texttt{rcx}, \texttt{rdx} speziell benötigt; \texttt{rsp} unpraktisch
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Ansatz}
+	
+	\textbf{Überlegung:} Welche 12 Register werden häufig verwendet?
+	
+\pgfplotstableread[col sep=comma,header=false]{../paper/benchmarks/register-frequency/freq.csv}\regfreqtable
+\pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
+\begin{figure}
+%\pgfplotstabletypeset\sortedregfreqtable
+	\centering
+	\makebox[\textwidth][c]{
+	\begin{tikzpicture}
+		\begin{axis}[%
+			ybar,
+			area legend,
+			ylabel = {Access percentage},
+			xtick = data,
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60,
+				font=\footnotesize
+			},
+			ytick = {0.1, 0.2, 0.3, 0.4},
+			scaled y ticks = false,
+			x = 0.4cm,
+			point meta = {y*100},
+			yticklabel = {\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+			enlarge x limits = {abs = 0.5cm},
+			xtick={0,...,31},
+			xticklabels from table = {\sortedregfreqtable}{0},
+			ymin = 0, ymax = 0.45,
+			ymajorgrids = true,
+			bar width = 5pt,
+			bar shift = 0,
+			height = 5.5cm,
+			width = 0.8\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=0:12]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=13:31]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+
+			\legend{statically mapped, not mapped}
+		\end{axis}
+	\end{tikzpicture}
+	}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Vorgehen}
+	
+	\textbf{Idee:} Speicherzugriffe minimieren
+	
+	\vspace{0.50cm}
+	
+	\begin{block}{Register-Handling-Strategie}
+		\begin{itemize}
+			\item statische Abbildung der 12 zugriffshäufigsten Register (außer \texttt{x0})
+			\begin{itemize}
+				\item \texttt{a0}--\texttt{a5}, \texttt{a7}, \texttt{s1}--\texttt{s2}, \texttt{ra}, \texttt{fp}, \texttt{sp}
+				\item bleiben über Blockgrenzen hinweg erhalten (\refer Kontextwechsel)
+			\end{itemize}
+			
+			\item dynamische Allokation in die restlichen 3 x86-Register
+			\begin{itemize}
+				\item dynamisch in \texttt{rax}, \texttt{rcx}, \texttt{rdx} (\textit{least recently used}, \textit{lazy write-back})
+				\item an Blockgrenzen zurückgeschrieben
+			\end{itemize}
+		\end{itemize}
+	\end{block}
+	
+\end{frame}
+
 
 \subsection{Optimierungen} % Johannes
 
