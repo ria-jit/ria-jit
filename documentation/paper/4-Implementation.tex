@@ -265,7 +265,7 @@ The following will describe the specifics of these issues with system calls that
 	Passing them through would immediately terminate the DBT -- an action that is undesirable as it prevents any form of clean-up or post-execution profiling and analysis to take place.
 	Thus, the DBT uses these system calls to set a flag which stops the main loop from executing the next iteration.
 	
-	The \texttt{brk} system call must also be entirely emulated, as it would otherwise allow the guest program to modify the endpoint of the DBT's data segment (\textit{program break}), thus potentially deallocating some of the translator's memory. %todo apostrophe
+	The \texttt{brk} system call must also be entirely emulated, as it would otherwise allow the guest program to modify the data segment (\textit{program break}) belonging to the DBT, thus potentially deallocating some of the critically required memory.
 	
 	
 	\item[Ignoring system calls.]
@@ -278,13 +278,13 @@ The following will describe the specifics of these issues with system calls that
 	Essentially, any system call that has the possibility to influence the state or memory of the translator needs to have respective safe-guards in place.
 	A good example of this behaviour is the \texttt{mmap} system call, the handling of which also reflects the memory layout scheme discussed in section~\vref{sec:memory-layout}.
 	
-	In any case, we must prevent a memory mapping into the translator's memory region. %todo apostrophe
+	In any case, we must prevent a memory mapping into a memory region reserved by the translator.
 	Mappings that do not interfere with the memory of the DBT can be passed along to the host directly.
 	In case a hinted mapping would conflict with the memory of the translator, we may just re-hint the mapping to the top of the guest address space.
 	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping;
 	thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
 	
-	Similarly, we fail a guest \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the de-allocation. %todo apostrophe, wiederholung translator's memory @flo
+	Similarly, we fail a guest \texttt{munmap} with \texttt{EINVAL} in cases where the memory region of the translator would be compromised by the deallocation.
 \end{description}
 
 The other supported system calls may be directly passed through to the host after performing the necessary index mapping.
