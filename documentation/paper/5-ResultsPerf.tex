@@ -62,16 +62,48 @@ Through the various performance optimisations mentioned in section~\vref{sec:opt
 In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
 Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
-% todo add geomean/avg group at the end of the figure @Simon
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
 % ================================
+
+\newcommand{\addAvg}[3]{ %
+% #1=table name
+% #2=first column name
+% #3=list of columns to decorate
+% Transpose the table, so we can work on rows instead of columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+\pgfplotstablecreatecol[
+    create col/assign/.code={%
+      \def\entry{}
+      \foreach \i in {#3} {
+        \ifnum\pgfplotstablerow=\i
+        \def\colsum{0}
+                  \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+                  \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+                      \pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+                  }
+          \pgfmathsetmacro\colmean{\colsum/(\pgfplotstablecols-1)}
+          \xdef\entry{\colmean}
+        \fi
+      }
+      \pgfkeyslet{/pgfplots/table/create col/next content}\entry
+    }
+]{Avg}\intermediatetable
+
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{#1}{\intermediatetable}
+}
+%
+
 \pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-base/dbt.csv}\dbttable
 \pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
-
+\addAvg{\dbttable}{Benchmark}{12}
+\pgfplotstabletypeset[
+  columns/Benchmark/.style={string type},
+  columns={Benchmark, ratio}]{\dbttable}
 
 \begin{figure}[h]
 	\centering
@@ -107,12 +139,14 @@ Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and 
 			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativelocaltable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
+			\addAvg{\nativelocaltable}{Benchmark}{12}
 			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocaltable;
 
 			% QEMU results
 			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/qemu.csv}\qemutable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
+			\addAvg{\qemutable}{Benchmark}{12}
 			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemutable;
 
 			% DBT results
@@ -183,18 +217,23 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\basetable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\basetable
+\addAvg{\basetable}{Benchmark}{12}
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\norastable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\norastable
+\addAvg{\norastable}{Benchmark}{12}
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nofusiontable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nofusiontable
+\addAvg{\nofusiontable}{Benchmark}{12}
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nojumpnorastable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nojumpnorastable
+\addAvg{\nojumpnorastable}{Benchmark}{12}
 
 \pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nonetable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nonetable
+\addAvg{\nonetable}{Benchmark}{12}
 
 \begin{figure}[h]
 	\centering
@@ -212,12 +251,12 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 				rotate = 60
 			},
 			xticklabels from table={\basetable}{Benchmark},
-			ytick = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
-			ymin =0, ymax = 11.5,
+			ytick = {0.5, 1,1.2,1.4,1.6,1.8,2.0},
+			ymin = 0.5, ymax = 2,
 			ymajorgrids = true,
-			bar width = 3pt,
-			height = 9.0cm,
-			width = 0.9\linewidth,
+			bar width = 3.5pt,
+			height = 8.0cm,
+			width = 0.95\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
@@ -237,16 +276,36 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			% no-jump-no-ras results
 			\addplot+[fill=era-dbt-2, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
 			
-			% none results
-			\addplot+[fill=era-dbt-3, draw=black] table [x expr=\coordindex, y=ratio] \nonetable;
-
-			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,~} \texttt{no-ras}, \texttt{none}}
+			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,~} \texttt{no-ras}}
 		\end{axis}
 	\end{tikzpicture}
 	\caption[Translator optimisation evaluation results]%
 	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}s \texttt{intspeed} with various optimisation option combinations (normalised, lower is better).}
 	\label{fig:opt-compare}
 \end{figure}
+
+
+\pgfplotstableset{
+	% define how the ’new’ column shall be filled:
+	create on use/Benchmark/.style={create col/copy column from table=\basetable{Benchmark}}
+}
+\pgfplotstableset{% Global config
+    every head row/.style={before row=\toprule,after row=\midrule},
+    assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+    every last row/.style={after row=\bottomrule},
+}
+\pgfplotstablenew[columns={Benchmark}]{10}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
+
+\begin{table}[h]
+\centering
+\pgfplotstabletypeset[columns/Benchmark/.style={string type},/pgf/number format/fixed, /pgf/number format/precision = 2,/pgf/number format/fixed zerofill=true]{\printtable}
+\caption[Optimisation results]{Optimization results data (including \texttt{----optimize=none} run) normalized to base.}
+\label{tab:table-optim}
+\end{table}
 % ================================
 
 
