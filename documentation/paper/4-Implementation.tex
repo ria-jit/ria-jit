@@ -30,20 +30,23 @@ The loop will break if the guest program terminated, after which the translator 
 \end{figure}
 
 \subsection{Translation process}
-\paragraph{Instruction parsing} \mbox{}\\
+\paragraph{Instruction parsing} \mbox{}
+
 The decoding of the RISC--V assembly is relatively straight-forward, as we have a fixed instruction length of 32 bits.
 Thus, the assembly is parsed in blocks of 4 bytes with the information being extracted in an intermediate instruction format holding the mnemonic, operands and immediates in uncompressed form.
-%todo: continue, elaborate?
+%todo: continue, elaborate? @Johannes
 
-\paragraph{Instruction translation} \mbox{}\\
+\paragraph{Instruction translation} \mbox{}
+
 This intermediate format can then be used by special per-mnemonic translation functions which, in the end, generate the x86--64 byte code using faenc~\cite{faenc}.
-%todo: continue, elaborate?
+%todo: continue, elaborate? @Johannes
 
 
 \subsection{Static hybrid register mapping}
-% todo @Flo introductory sentence
+In order to achieve the best performance with the hybrid approach to the register mapping described in section~\vref{sec:context-switch-reg-handle}, we must decide how to make best use of the limited number of host GPRs we have available.
+% todo @Flo Sec. 4.3.2: Fehlt: Begruendung, warum nicht z.B. 10 Register gemapped werden und mehr "lazy" zur Verfuegung stehen. Fehlt: Alternative, dass jeder Block mit einem unterschiedlichen Register-Mapping enden koennte ("This optimization opportunity is left as future work.")
+
 \subsubsection{Register priority analysis}
-In order to achieve the best performance with the hybrid approach to the register mapping described in section~\vref{sec:context-switch-reg-handle}, we must decide which registers of the RISC--V guest to map into the host's limited number of available GPRs.
 There are two main ways of determining the priority of registers when considering them as candidates for a mapping.
 
 It is, on the one hand, possible to assess the priority statically, by performing an analysis of the binary in question.
@@ -126,7 +129,6 @@ However, evidently, this is impossible with dynamic profiling.
 
 
 \subsubsection{Structure of the mapping}
-% todo @Flo Sec. 4.3.2: Fehlt: Begruendung, warum nicht z.B. 10 Register gemapped werden und mehr "lazy" zur Verfuegung stehen. Fehlt: Alternative, dass jeder Block mit einem unterschiedlichen Register-Mapping enden koennte ("This optimization opportunity is left as future work.")
 When we structure our mapping by the average case of the insights gained, we statistically capture about $83,59\,\%$ of register accesses, initially leaving the remaining $16,41\,\%$ to read from the register file in memory.
 The following section will touch on our approach to optimise the accesses to the remaining not-statically-mapped registers.
 

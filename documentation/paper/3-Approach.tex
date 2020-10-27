@@ -1,7 +1,8 @@
-% todo @Flo introductory sentence
+The following section will elaborate on our approach to the problem at hand and lay out basic principles related to the process of dynamic binary translation.
 
 \subsection{Translating the partitioned code}
-\paragraph{Generating equivalent code}
+\paragraph{Generating equivalent code} \mbox{}
+
 The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
 
 The quality of the code, that can be generated here, strongly depends on the properties of the host and guest architectures in question.
@@ -16,18 +17,18 @@ It is clear, for example, that an instruction like \texttt{xori~x10,~x10,~-1} ca
 The same principle applies to combinations of multiple instructions.
 An \texttt{lui~rd,~imm1} followed by \texttt{addi~rd,~rd,~imm2} may for example be translated as directly loading the result of the computation \texttt{imm1~+~imm2} into \texttt{rd}.
 
-\paragraph{Translation procedure} \mbox{}\\
+\paragraph{Translation procedure} \mbox{}
+
 % todo info about translate-parsing-execution time @Johannes
 The translator's central element is the transcode loop, which controls both translation and execution:
 First, it is checked whether the block to be executed next has already been translated (see \ref{sec:code-cache}), and if it hasn't, translation is started.
 The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.
 
-%todo: formatting @Johannes use \begin{enumerate}
-Translation itself is done in two steps: 
-
-1.: Parsing the guest program's code into easy to work with internal instruction representations, until we hit the end of the basic block.
-
-2.: Translation is then done by dispatching the parsed instructions to special single-instruction translator functions, which emit the matching x86-64 code into memory allocated for the block..
+Translation itself is done in two steps:
+\begin{enumerate}
+	\item Parsing the guest program's code into easy to work with internal instruction representations, until we hit the end of the basic block.
+	\item Translation is then done by dispatching the parsed instructions to special single-instruction translator functions, which emit the matching x86-64 code into memory allocated for the block.
+\end{enumerate}
 
 When translation of the block is complete, a \texttt{ret} instruction is appended for returning to the translator after execution.
 
@@ -55,12 +56,11 @@ It would thus only be possible to either remove all blocks with jump references 
 
 \subsection{Register handling and context switching}
 \label{sec:context-switch-reg-handle}
-% todo @Flo introductory sentence
-\subsubsection{Handling of guest registers}
-\label{sec:reg-handle}
 As outlined in section~\ref{sec:isa-cmp}, the RISC--V and x86--64 architectures have differing amounts of general purpose registers.
 In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86--64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
 
+\subsubsection{Handling of guest registers}
+\label{sec:reg-handle}
 As x86--64 only provides 16 general-purpose registers (\texttt{rax}--\texttt{rdx}, \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}), it is impossible to directly and statically map all guest registers to native host registers.
 Adding to the above, due to the fact that some x86--64 registers have special or implicit purposes in some instructions like \texttt{(i)mul} or \texttt{(i)/div}, care must be taken in choosing the registers that can be used for such a mapping.
 Keeping a guest register file exclusively in memory, and loading them into native registers when needed within the translations of single instructions is technically possible, especially in light of x86--64's ability to extensively use memory operands in the instructions.
@@ -130,7 +130,8 @@ The main difficulties (and their resolutions) that arise by using the x86--64 SS
 
 \subsection{Optimisations}
 \label{sec:optimise}
-% todo @Flo introductory sentence
+% todo @Johannes introductory sentence, don't have 2 section headings follow each other
+
 \subsubsection{Recursive jump translation}
 \label{sec:recursive_translation}
 Returning from translated guest code to the translator's main transcode loop comes with big performance penalties.
@@ -180,7 +181,7 @@ In order to do so, we use a stack holding entries for the calls' respective retu
 The stack is implemented as a ring buffer to prevent over- and underflow.
 
 Calls are first detected at parsing time and have their return targets recursively translated.
-The call's then emitted host code will push its return address pair onto this stack at every execution without having to leave guest context. %todo simplify sentence structure
+The call's then emitted host code will push its return address pair onto this stack at every execution without having to leave guest context. %todo @Johannes simplify sentence structure
 Following dynamic jumps will compare their target address with the value in the top stack entry, and, if it matches, pop the address pair and jump to the target block directly, thus avoiding having to return to the transcode loop.
 In case of a mismatch the stack will not be changed and control is handed back to the host.
 

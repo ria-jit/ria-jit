@@ -2,7 +2,6 @@ In the following, the term \textit{host} will refer to the system of the native 
 
 \subsection{Comparison of the RISC--V and x86--64 ISAs}
 \label{sec:isa-cmp}
-% todo @Flo Sec. 2.1 "(e.g. by vectorisation)" -- Beispiel ungeeignet.
 By its very nature, executing code compiled for one architecture on a different one is not an easy task.
 It is obvious that there are major differences in the two architectures, brought forth by RISC--V being a reduced instruction set computer (RISC) architecture and x86--64 a complex instruction set computer (CISC) architecture.
 
@@ -19,7 +18,7 @@ Contrary to x86, where this problem would be solved by a single \texttt{mov} ins
 
 In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
 However, in practice, this is nearly impossible.
-Efficient fusion of multiple RISC--V instructions into fewer x86--64 instructions (e.g.\ by vectorisation) is difficult even for compilers presented with the entire program context.
+Efficient fusion of multiple RISC--V instructions into fewer x86--64 instructions is a very difficult endeavor.
 When the DBT is only presented with partial block-wise assembly code snippets, some optimisations are impossible to undertake, as there are many unknowable parameters at play.
 Those challenges will be further elaborated on in section~\ref{sec:Approach}.
 
