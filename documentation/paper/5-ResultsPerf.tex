@@ -1,10 +1,10 @@
-% todo @Simon introductory sentence
+The following section will give an overview of the methods used to test the programs correctness and performance, as well as lay out the results of these tests.
 \subsection{Verification}
 The correctness of our translator was checked by extensive unit tests, which were used to check if the translations of a the RISC--V instruction really do perform the operations that are expected.
 Using the parameterized tests provided by the Google~Test~\cite{gtest} framework we were able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
 Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
 
-Apart from this correctness is also confirmed by being able to sucessfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
+Apart from this correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
 
 
 \subsection{SPEC CPU 2017 Benchmark Suite}
@@ -52,9 +52,16 @@ A self compiled GCC with the sources taken from the official toolchain repo at v
 This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
 
 \subsubsection{Results}
-{\color{red} Plot is supposed to be here!!!}
-%todo maybe move the explanation of meaning of results (normalization, overhead etc) @Simon
-% todo \usepackage{float} and use [H] as placement hint if you want the figure right below Results. take care that it fits on the page @Simon
+Figure~\vref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
+Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
+This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
+What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. %todo name
+This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
+
+Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
+In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
+
+Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
 % todo add geomean/avg group at the end of the figure @Simon
 
 % ======= SPEC CPU Results =======
@@ -123,18 +130,7 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 \subsubsection{Analysis}
 % todo @Simon: Sec. 5.2.2 zu 625: Warum ist das euer DBT hier nur unwesentlich schneller als QEMU, im Vergleich zu anderen Benchmarks?
 % todo @Simon: Sec. 5.2.2 zu 600: Dafuer habt ihr doch Chaining? Unklar.
-% todo @Simon: Sec. 5.2: Struktur. 5.2.1 beschreibt die Ergebnisse, d.h. die ersten Absaetze von 5.2.2 gehoeren dort hin.
 % todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
-Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
-Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
-This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
-What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary.
-This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
-
-Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
-In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
-
-Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
 
 \texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
 Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
