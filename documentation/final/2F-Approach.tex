@@ -1,6 +1,5 @@
 \subsection{Programmablauf} % Johannes
 
-
 \subsection{Partitionierung des Codes} % Flo
 \begin{frame}
 	\frametitle{Partitionierung des Codes}
@@ -222,6 +221,25 @@
 
 
 \subsection{Registernutzung} % Flo
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Grundlagen}
+	
+	\textbf{Ziel:} möglichst effizientes Emulieren der RISC--V-Register
+	
+	\vspace{0.50cm}
+	
+	\begin{block}{Definition: Registerdatei im Speicher}
+		\begin{itemize}
+			\item Speicherbereich, der die Registerwerte des Gastprogramms hält (264 Byte)
+			\item Permanenter Speicherbereich, der über Kontextwechsel erhalten bleibt
+		\end{itemize}
+	\end{block}
+	
+	\vspace{0.50cm}
+	
+	\textbf{Problem:} viele Speicherzugriffe \conclude \alert{ineffizient}
+\end{frame}
 
 
 \subsection{Optimierungen} % Johannes
