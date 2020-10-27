@@ -1,16 +1,16 @@
 Looking back at the motivation, the goal of outperforming QEMU~\cite{bellard2005qemu} is achieved consistently by \translatorname{}.
 The performance is measured using \textit{SPEC CPU 2017}~\cite{spec-cpu-2017} an industry-standardized, CPU intensive package of benchmark suites for measuring and comparing compute-intensive performance.
-In most cases we can achieve a execution time of around twice the native, but the tests also show areas with further optimisation possibilities. %todo speed seems strange here makes it sound like we are faster than native @Noah
+In most cases we can achieve a execution time of around twice the native one, but the tests also show areas with further optimisation possibilities.
 The quite significant performance increases in comparison to QEMU can be attributed to the specialisation in RISC--V to x86--64 translation leading to a straight forward design of the translation process and enabling specific optimisations for this guest-host pairing.
 
-The benchmarks suites did not only help to ensure the performance of \translatorname{}, but equally important they tested the implementation in various scenarios and helped to discover bugs due to their assertion of the test programs' outputs.
+The benchmarks suites did not only help to ensure the performance of \translatorname{}, but equally important they tested the implementation in various scenarios and helped to discover bugs due to their assertion of the program outputs.
 Furthermore many unit tests were designed to assure the correct translation of (almost) every RISC--V instruction in diverse contexts.
-All in all nearly 30.000 test cases are being executed by our own test suites based on~\textit{Google Test}~\cite{gtest} covering the RISC--V parser as well as the emitted x86--64 assembly.
+Overall nearly 30.000 test cases are being executed by our own test suites based on~\textit{Google Test}~\cite{gtest} covering the RISC--V parser as well as the emitted x86--64 assembly.
 
 The development of \translatorname{} focused on supporting and optimizing the core instruction set and integer extensions so far.
 Support for floating point extensions however is already implemented and tested.
 It will be benchmarked by~\textit{SPEC CPU 2017} as soon as possible.
-Our preliminary tests nonetheless already show a huge performance increase in comparison to QEMU as a consequence of QEMU's emulation and \translatorname{}'s use of the native SSE--extension for floating point arithmetic.
+Our preliminary tests nonetheless already show a huge performance increase in comparison to QEMU as a consequence of QEMU using emulation and our use of the native SSE--extension for floating point arithmetic.
 
 
 Currently \translatorname{} supports all base instruction sets and extensions needed for executing single threaded programs besides the \textit{"Q" Standard Extension}.

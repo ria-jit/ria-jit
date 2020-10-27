@@ -1,4 +1,4 @@
-The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them.
+The following section aims to provide an in-depth overview of select components central to the translator's functionality and describe the reasoning behind them. %todo name, apostrophe
 
 \subsection{System architecture and execution control flow}
 \paragraph{Initialization}\mbox{}\\
@@ -6,11 +6,12 @@ The following section aims to provide an in-depth overview of select components 
 
 \paragraph{Transcode Loop}\mbox{}\\
 % todo overview, add class diagrams and flow charts @Johannes
-To begin guest program translation and execution, the transcode loop is started with the address next to be executed set to the guest program's entry point.
+To begin guest program translation and execution, the transcode loop is started with the address next to be executed set to the entry point of the guest program.
 
-After entering the loop (see figure \ref{fig:control-flow-chart}), it is first checked if the block next to be executed has already been stored in the code cache. 
+After entering the loop (see figure~\ref{fig:control-flow-chart}), it is first checked if the block next to be executed has already been stored in the code cache.
 
-If this is not the case, translation will start by parsing the blocks instructions, after which the pattern matcher detects and replaces optimizable patterns. The parsed instructions are then translated, and the block is stored in the code cache.
+If this is not the case, translation will start by parsing the blocks instructions, after which the pattern matcher detects and replaces optimisable patterns.
+The parsed instructions are then translated, and the block is stored in the code cache.
 
 Next it is checked if the last executed block ended in a jump that can be statically chained.
 If yes, the chainer is called to link the new block to the last one.
@@ -18,7 +19,7 @@ If yes, the chainer is called to link the new block to the last one.
 The last step is to switch into guest context and start executing the block.
 Due to block chaining and the return address stack, multiple blocks might be executed before switching back to host context, setting the address next to be executed, and returning to the transcode loop.
 
-The loop will break if the guest program terminated, after which the translator will terminate as well, returning the guest's exit code.
+The loop will break if the guest program terminated, after which the translator will terminate as well, returning the guest exit code.
 
 
 \begin{figure}[h]
@@ -52,7 +53,7 @@ There are two main ways of determining the priority of registers when considerin
 
 It is, on the one hand, possible to assess the priority statically, by performing an analysis of the binary in question.
 Essentially, the hereby produced metric counts the number of times the register is used in the assembly instructions listed in the guest program and thus delivers an idea of how important each register is to this specific executable.
-We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag.
+We have built the tools required for this effort directly into the translator's analyser function, accessed via the \texttt{-a} flag. %todo name, apostrophe
 
 However, this approach does not take into account that a single instruction may be executed many times while the program is running.
 Accordingly, the other approach is to assess the register priority dynamically by analysing and profiling the execution of the testing program, thereby gaining an insight into how often each register is actually used during the execution.
@@ -159,7 +160,7 @@ With that, we can implement a \textit{least recently used} register replacement 
 To do this, we track a metric of \textit{replacement recency} (essentially serving as an inverse value age) for each block during translate-time.
 This recency gets incremented for every access not captured by the static register mapping.
 
-An access to a register that is not statically mapped then first checks the contents of all temporary registers -- if the value is already present, the DBT may use that value's register.
+An access to a register that is not statically mapped then first checks the contents of all temporary registers -- if the value is already present, the DBT may use that register.
 If it is not already present, the DBT selects any free replacement register if able, and otherwise selects the register with the oldest value (or minimal recency) for write-back.
 The value is then loaded into the selected register from the register file in memory and marked as being the youngest in order to prevent it from being discarded in following mapping calls.
 
@@ -262,9 +263,9 @@ The following will describe the specifics of these issues with system calls that
 	\item[Emulation required.]
 	The DBT captures the \texttt{exit} and \texttt{exit\_group} calls.
 	Passing them through would immediately terminate the DBT -- an action that is undesirable as it prevents any form of clean-up or post-execution profiling and analysis to take place.
-	Thus, the DBT uses these system calls to set a flag which stops the translator's main loop from executing the next iteration.
+	Thus, the DBT uses these system calls to set a flag which stops the main loop from executing the next iteration.
 	
-	The \texttt{brk} system call must also be entirely emulated, as it would otherwise allow the guest program to modify the endpoint of the DBT's data segment (\textit{program break}), thus potentially deallocating some of the translator's memory.
+	The \texttt{brk} system call must also be entirely emulated, as it would otherwise allow the guest program to modify the endpoint of the DBT's data segment (\textit{program break}), thus potentially deallocating some of the translator's memory. %todo apostrophe
 	
 	
 	\item[Ignoring system calls.]
@@ -277,13 +278,13 @@ The following will describe the specifics of these issues with system calls that
 	Essentially, any system call that has the possibility to influence the state or memory of the translator needs to have respective safe-guards in place.
 	A good example of this behaviour is the \texttt{mmap} system call, the handling of which also reflects the memory layout scheme discussed in section~\vref{sec:memory-layout}.
 	
-	In any case, we must prevent a memory mapping into the translator's memory region.
-	Mappings that do not interfere with the DBT's memory can be passed along to the host directly.
-	In case a hinted mapping would conflict with the translator's memory, we may just re-hint the mapping to the top of the guest's address space.
+	In any case, we must prevent a memory mapping into the translator's memory region. %todo apostrophe
+	Mappings that do not interfere with the memory of the DBT can be passed along to the host directly.
+	In case a hinted mapping would conflict with the memory of the translator, we may just re-hint the mapping to the top of the guest address space.
 	When the call is not hinted (the \texttt{MAP\_FIXED} or \texttt{MAP\_FIXED\_NOREPLACE} flag commands the mapping at exactly the specified address), we are unable to provide the guest with the requested mapping;
 	thus we simulate an existing mapping in the location in question by returning \texttt{EEXIST} for \texttt{MAP\_FIXED\_NOREPLACE} and failing the call with \texttt{EINVAL} for \texttt{MAP\_FIXED}.
 	
-	Similarly, we fail the guest's \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the de-allocation.
+	Similarly, we fail a guest \texttt{munmap} with \texttt{EINVAL} in cases where the translator's memory would be compromised by the de-allocation. %todo apostrophe, wiederholung translator's memory @flo
 \end{description}
 
 The other supported system calls may be directly passed through to the host after performing the necessary index mapping.

@@ -1,16 +1,15 @@
 RISC--V is an open ISA first conceptualised in 2010 with the initial goals of research and education in mind.
-In contrast to Intel's x86~\cite{intel2017man} it employs the RISC (Reduced Instruction Set Computer) scheme by providing fewer and less powerful instructions, addressing modes and cycle-heavy features in favour of a simplified micro architecture.
+In contrast to the widespread x86--64~ISA~\cite{intel2017man} it employs the RISC (Reduced Instruction Set Computer) scheme by providing fewer and less powerful instructions, addressing modes and cycle-heavy features in favour of a simplified micro architecture.
 Its development takes the lessons learned in terms of backwards compatibility and future-proofing from other widespread ISAs like x86 into account, and aims to provide an open interface for the architecture, rather than strict implementation details.
 This grants a large freedom to the implementors and greatly increases the flexibility and ease of working with the architecture~\cite[S. 1f]{riscvspec}.
 As such, it looks to be open to future extensions by already defining a basis for future 128-bit integer instructions and instruction length encodings of up to 176 bits (22 bytes).
 The possibility to expand further when widespread technology developments would require such an expansion is also remained open.
 
 There is already some hardware available for RISC--V\footnote{The biggest name here is probably SIFive~\cite{sifive}, which already produce multi-core CPUs with super scalar out-of-order pipelines reaching multi-GHz clock speeds.}, but it is not yet widespread.
-This means developers usually don't have access to real hardware yet, so they must instead rely on emulation to test their code written for the RISC--V platform.
+This means developers usually do not have access to real hardware yet, so they must instead rely on emulation to test their code written for the RISC--V platform.
 
-When attempting to execute programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches at one's disposal.
+When attempting to execute programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches:
 
-The main principles to achieve this are:
 \begin{itemize}
     \item \textbf{Interpretation}, where, much alike interpreted programming languages (e.g.\ JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the native system in order to simulate the guest ISA\@.
         \subitem While likely being the easiest to actually be implemented, this comes with a significant performance penalty mainly because every single assembly instruction will have to be interpreted for every execution of that program part, potentially causing a lot of redundant work.
