@@ -184,9 +184,13 @@ In order to do so, we use a stack that holds entries consisting of pairs contain
 The stack is implemented as a ring buffer to prevent over- and underflow.
 
 Calls are first detected at parsing time and have their return targets recursively translated.
-The call's then emitted host code will push its return address pair onto this stack at every execution without having to leave guest context. %todo @Johannes simplify sentence structure
-Following dynamic jumps will compare their target address with the value in the top stack entry, and, if it matches, pop the address pair and jump to the target block directly, thus avoiding the return to the transcode loop.
-In case of a mismatch the stack will not be changed and control is handed back to the host.
+The host code then emitted for the call will push its return address pair onto this stack at every execution, without having to leave guest context. %todo: alternative for "its" ?
+
+Following dynamic jumps will compare their target guest-address with the entry in the top stack element.
+If the values match, the address pair is popped, and the target block is jumped to directly.
+Thus, returning to the transcode loop is avoided.
+If the values do not match, control is handed back to the host.
+In this case the stack will not be changed, as it is assumed that a return corresponding to the top stack element will still follow.
 
 
 \subsubsection{Macro operation fusion by pattern matching}
@@ -206,6 +210,8 @@ An exemplary excerpt from the patterns we implemented is shown by table~\ref{tab
 	\small
 	\makebox[\textwidth][c]{
 	\begin{tabular}{ll}
+		\toprule
+		\textbf{RISC-V} & \textbf{x86-64} \\
 		\toprule
 		LUI r1, imm;\ LW r2, imm(r1);\ ADDI r2, r2, imm;\ SW r2, imm(r1); & ADD m32, imm32\\
 		LUI r1, imm;\ LD r2, imm(r1);\ ADDI r2, r2, imm;\ SD r2, imm(r1); & ADD m64, imm32\\
