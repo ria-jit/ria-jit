@@ -185,6 +185,7 @@ The stack is implemented as a ring buffer to prevent over- and underflow.
 
 Calls are first detected at parsing time and have their return targets recursively translated.
 The host code then emitted for the call will push its return address pair onto this stack at every execution, without having to leave guest context. %todo: alternative for "its" ?
+
 Following dynamic jumps will compare their target guest-address with the entry in the top stack element.
 If the values match, the address pair is popped, and the target block is jumped to directly.
 Thus, returning to the transcode loop is avoided.
