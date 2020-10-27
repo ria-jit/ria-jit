@@ -11,8 +11,7 @@ Difficulties can arise due to differences in the instruction operand formats and
 In our case, as outlined in section~\ref{sec:isa-cmp}, challenges stem from the fact that we are translating code from a load-store architecture using a three-operand instruction format into a register-memory architecture in which (generally) one of the source operands is also the implicit destination operand.
 This, for example, means that the single arithmetic instruction \texttt{sub~rd,~rs1,~rs2} in RISC--V assembly language generally can not be translated via a single instruction, but rather requires two instructions: moving \texttt{rs1} to \texttt{rd}, then subtracting the value of \texttt{rs2} from \texttt{rd}.
 
-%todo Formulierung clock cycles @Flo
-Opportunities for optimisation lie wherever there is a way to shorten the translation's amount of CPU clock cycles, possibly by employing semantically equivalent native instructions that run in a shorter timespan.
+Opportunities for optimisation lie wherever there is a way to shorten the execution time of the translation, possibly by employing semantically equivalent native instructions that run in a shorter timespan.
 The RISC--V pseudo-instructions (as mentioned in section~\ref{sec:isa-cmp}) are also of some help here~\cite[S. 139]{riscvspec}, along with discoverable patterns in the input assembly.
 It is clear, for example, that an instruction like \texttt{xori~x10,~x10,~-1} can be directly translated as a \texttt{not x10}, without needing to resort to \texttt{mov} and \texttt{xor}.
 The same principle applies to combinations of multiple instructions.
