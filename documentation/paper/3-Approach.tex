@@ -137,9 +137,10 @@ The main difficulties (and their resolutions) that arise by using the x86--64 SS
 \label{sec:recursive_translation}
 Returning from translated guest code to the main transcode loop comes with big performance penalties.
 These are imposed by the first context switch, code cache lookup, and second context switch necessary for starting execution of the next basic block.
-To avoid these negative performance impacts, we employ the method of recursive translation: When the parser arrives at an unconditional jump, translation of the jump target is started recursively.
+To avoid these negative performance impacts, we employ, among others, the method of recursive translation: 
+When the parser arrives at an unconditional jump, translation of the jump target is started recursively.
 That way, the jump target will always be translated before the jump itself.
-Because this means that the host code address of the jump target is now already known at translate time, we can emit a direct jump to the target block instead of needing to return to the transcode loop. % todo reword @ johannes
+Because the host code address of the jump target is now already known at translate time, we can make the emitted host code jump to the target directly instead of returning to the transcode loop.
 The blocks containing jump and target are thereby chained.
 
 \subsubsection{Retroactive block chaining}
@@ -149,11 +150,10 @@ This especially applies to the handling of conditional jumps, as it is nearly im
 In cases where the translated conditional jump is not taken during execution, translating the target would cause unnecessary overhead.
 For that reason, we do not recursively translate conditional jumps.
 
-If the translator reaches a branch, its two sides can only be chained if the target block has already been translated and its host code address is known.
-% todo @Johannes: Sec. 3.6.2: "the branch’s host code" -- Unverstaendlich schon etwas abgeändert.
-If that is not the case, the target can instead be chained retroactively after the respective side of the branch is first taken:
+If a branch is reached during translation, its two sides can only be chained if the respective target blocks have already been translated and their host code addresses are thus known.
+If that is not the case, the targets can instead be chained retroactively after the respective sides of the branch are first taken:
 following translation of the target block, the host code of the branch is modified to jump directly to the target address, which is now known, instead of returning to the transcode loop.
-Further cache lookups and context switching are thus avoided for this branch.
+Further cache lookups and context switching are thus avoided for this side of the branch.
 
 \begin{figure}[h]
 	\begin{center}
