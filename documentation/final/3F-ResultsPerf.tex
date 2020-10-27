@@ -1,5 +1,136 @@
+\begin{frame}
+	\frametitle{Testing}
+	
+	\textbf{Ziel:} Überprüfung der Korrektheit
+	
+	\vspace{0.5cm}
+	
+	\textbf{Ansätze:}
+	\begin{itemize}
+		\item Extensive Unittests (durch Parametrisierung über 30.000 Test cases)
+		\item Ausführen einfacher bzw.\ komplizierterer Programme und Überprüfen des Outputs
+	\end{itemize}
+\end{frame}
 \subsection{SPEC CPU 2017} % Simon
+\begin{frame}
+	\frametitle{Benchmarks}
+	\framesubtitle{SPEC CPU 2017}
+	
+	\begin{itemize}
+		\item Kommerzielle Benchmark Suite mit einer großen Vielfalt an verschieden Workloads.
+		\item Realitätsnahe Gestaltung
+	\end{itemize}
+	\begin{table}
+		\centering
+		\small
+		\begin{tabular}{rl}
+			\toprule
+			\textbf{SPECspeed Benchmark} & \textbf{Workload}\\
+			\midrule
+			\texttt{600.perlbench} & Perl interpreter\\
+			\texttt{602.gcc} & GNU C compiler\\
+			\texttt{605.mcf} & Route planning\\
+			\texttt{620.omnetpp} & Discrete Event simulation -- computer network\\
+			\texttt{623.xalancbmk} & XML to HTML conversion via XSLT\\
+			\texttt{625.x264} & Video compression\\
+			\texttt{631.deepsjeng} & Artificial Intelligence: alpha-beta tree search (Chess)\\
+			\texttt{641.leela} & Artificial Intelligence: Monte Carlo tree search (Go)\\
+			\texttt{648.exchange2} & Artificial Intelligence: recursive solution generator (Sudoku)\\
+			\texttt{657.xz} & General data compression\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+\end{frame}
+\newcommand{\addAvg}[3]{ %
+% #1=table name
+% #2=first column name
+% #3=list of columns to decorate
+% Transpose the table, so we can work on rows instead of columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+\pgfplotstablecreatecol[
+create col/assign/.code={%
+\def\entry{}
+\foreach \i in {#3} {
+\ifnum\pgfplotstablerow=\i
+\def\colsum{0}
+\pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+\pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+\pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+}
+\pgfmathsetmacro\colmean{\colsum/(\pgfplotstablecols-1)}
+\xdef\entry{\colmean}
+\fi
+}
+\pgfkeyslet{/pgfplots/table/create col/next content}\entry
+}
+]{Avg}\intermediatetable
 
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{#1}{\intermediatetable}
+}
+\begin{frame}
+%	\frametitle{Benchmarks}
+%	\framesubtitle{SPEC CPU 2017}
+%	\vspace{-2cm}
+	\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-base/native.csv}\nativetable
+	\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-base/dbt.csv}\dbttable
+	\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
+	\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
+	\addAvg{\dbttable}{Benchmark}{12}
+	\begin{figure}
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[%
+			title = {SPEC CPU 2017 \texttt{intspeed} Results},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to native]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+			inner sep = 0pt,
+			anchor = north east,
+			rotate = 45
+			},
+			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
+			scaled y ticks = false,
+			xticklabels from table={\dbttable}{Benchmark},
+			ymin = 0, ymax = 6.5,
+			ymajorgrids = true,
+			bar width = 6pt,
+			height = 7.0cm,
+			width = \linewidth,
+			legend style = {
+			at = {(0.98, 0.97)},
+			anchor = north east,
+			legend columns = 3,
+			column sep = 0.2cm
+			}
+			]
+				% Native results
+				\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-base/native.csv}\nativelocaltable
+				\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
+				\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
+				\addAvg{\nativelocaltable}{Benchmark}{12}
+				\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocaltable;
+				
+				% QEMU results
+				\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-base/qemu.csv}\qemutable
+				\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
+				\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
+				\addAvg{\qemutable}{Benchmark}{12}
+				\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemutable;
+				
+				% DBT results
+				\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \dbttable;
+				
+				\legend{native, QEMU, DBT}
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:spec-results}
+	\end{figure}
+\end{frame}
 
 \subsection{Optimierungen} % Simon
 

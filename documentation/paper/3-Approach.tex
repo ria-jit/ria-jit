@@ -62,7 +62,7 @@ In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{
 
 \subsubsection{Handling of guest registers}
 \label{sec:reg-handle}
-As x86--64 only provides 16 general-purpose registers (\texttt{rax}--\texttt{rdx}, \texttt{rbx}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}), it is impossible to directly and statically map all guest registers to native host registers.
+As x86--64 only provides 16 general-purpose registers (\texttt{rax}--\texttt{rdx}, \texttt{rsp}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}), it is impossible to directly and statically map all guest registers to native host registers.
 Adding to the above, due to the fact that some x86--64 registers have special or implicit purposes in some instructions like \texttt{(i)mul} or \texttt{(i)div}, care must be taken in choosing the registers that can be used for such a mapping.
 Keeping a guest register file exclusively in memory, and loading them into native registers when needed within the translations of single instructions is technically possible, especially in light of the ability to extensively use memory operands in the instructions on x86--64.
 However, this necessitates a large number of memory accesses for both memory operands in the instructions as well as local register allocation within the translated blocks.
