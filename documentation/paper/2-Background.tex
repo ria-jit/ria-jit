@@ -6,14 +6,14 @@ By its very nature, executing code compiled for one architecture on a different 
 It is obvious that there are major differences in the two architectures, brought forth by RISC--V being a reduced instruction set computer (RISC) architecture and x86--64 a complex instruction set computer (CISC) architecture.
 
 The most relevant distinction between RISC--V and x86--64 for the development of our DBT is the different address format and mismatching numbers of general purpose and floating point registers.
-RISC--V's load-store architecture with a three-operand instruction format allows for a more flexible register usage but requires more instructions due to the explicit load/store operations.
+The ISA design of RISC--V with a load-store architecture and three-operand instruction format allows for a more flexible register usage but requires more instructions due to the explicit load/store operations.
 x86--64 however is a register-memory architecture with a two-operand instruction format.
 Thus, memory accesses are reduced by implicit loads in instructions using a memory operand.
 
 RISC assembler code includes pseudo-instructions that are translated into multiple instructions by the assembler, due to the nature of a reduced instruction set.
 One example is the absence of a \texttt{mov} instruction in the RISC--V ISA\@; the assembler translates the pseudo-instruction \texttt{mv} into an \texttt{addi rd, rs1, 0} instruction.
 
-Similarly, the hardware offers no instruction to load a 64 bit immediate into a register, as the fixed-width 32 bit instruction encoding does not allow for it.
+Similarly, the ISA offers no instruction to load a 64 bit immediate into a register, as the fixed-width 32 bit instruction encoding does not allow for it.
 Contrary to x86, where this problem would be solved by a single \texttt{mov} instruction, the RISC--V assembler has to build up the immediate in the register by using a specific combination of addition and shifting operations as well as program-counter-relative arithmetic.
 
 In an ideal world, translating a RISC binary for execution on a CISC system would lead to a size reduction of the generated code.
