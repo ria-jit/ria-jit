@@ -1,3 +1,4 @@
+% todo @Simon introductory sentence
 \subsection{Verification}
 The correctness of our translator was checked by extensive unit tests, which were used to check if the translations of a the RISC--V instruction really do perform the operations that are expected.
 Using the parameterized tests provided by the Google~Test~\cite{gtest} framework we were able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
@@ -54,6 +55,7 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 {\color{red} Plot is supposed to be here!!!}
 %todo maybe move the explanation of meaning of results (normalization, overhead etc) @Simon
 % todo \usepackage{float} and use [H] as placement hint if you want the figure right below Results. take care that it fits on the page @Simon
+% todo add geomean/avg group at the end of the figure @Simon
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
@@ -63,7 +65,6 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 \pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
 \pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
 
-\pgfplotstablesort[sort key = ratio, sort cmp=float >]\sorteddbttable{\dbttable}
 
 \begin{figure}[h]
 	\centering
@@ -82,7 +83,7 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 			},
 			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
 			scaled y ticks = false,
-			xticklabels from table={\sorteddbttable}{Benchmark},
+			xticklabels from table={\dbttable}{Benchmark},
 			ymin = 0, ymax = 6.5,
 			ymajorgrids = true,
 			bar width = 5pt,
@@ -99,18 +100,16 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativelocaltable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
-			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\nativelocalsortedtable{\nativelocaltable}
-			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocalsortedtable;
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocaltable;
 
 			% QEMU results
 			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/qemu.csv}\qemutable
 			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
 			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
-			\pgfplotstablesort[sort key = ratio, sort key from ={\dbttable}, sort cmp=float >]\qemusortedtable{\qemutable}
-			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemusortedtable;
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemutable;
 
 			% DBT results
-			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \sorteddbttable;
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \dbttable;
 
 			\legend{native, QEMU, DBT}
 		\end{axis}
@@ -122,6 +121,10 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 % ================================
 
 \subsubsection{Analysis}
+% todo @Simon: Sec. 5.2.2 zu 625: Warum ist das euer DBT hier nur unwesentlich schneller als QEMU, im Vergleich zu anderen Benchmarks?
+% todo @Simon: Sec. 5.2.2 zu 600: Dafuer habt ihr doch Chaining? Unklar.
+% todo @Simon: Sec. 5.2: Struktur. 5.2.1 beschreibt die Ergebnisse, d.h. die ersten Absaetze von 5.2.2 gehoeren dort hin.
+% todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
 Figure~\ref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
 This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
@@ -174,6 +177,8 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 % Results of the optimisation option comparisons.
 % Show all SPEC run results and analyse below.
 % ===============================================
+% todo add geomean/avg group at the end of the figure @Simon
+% todo typeset as table? remove no-chain? @Simon
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-fusion.csv}\nofusiontable
