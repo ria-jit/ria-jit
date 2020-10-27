@@ -2,7 +2,12 @@ The following section aims to provide an in-depth overview of select components 
 
 \subsection{System architecture and execution control flow}
 \paragraph{Initialization}\mbox{}\\
-%todo: add a few words on what has to be set up and initialized here @Johannes
+%todo: is this section enough? @Johannes
+After the command line arguments are parsed, the guest executable is mapped into memory, as specified by the ELF-header. 
+The next step then is to initialize the guest environment.
+This includes setting up the guest program break and the stack, which has to contain the guest arguments and auxiliary vectors when guest execution starts.
+
+Some of the optimization systems also have to initialized, namely the code cache, the return address stack, the register file, and the context switcher.
 
 \paragraph{Transcode Loop}\mbox{}\\
 % todo overview, add class diagrams and flow charts @Johannes
