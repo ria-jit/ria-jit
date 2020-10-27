@@ -319,7 +319,7 @@
 			bar width = 5pt,
 			bar shift = 0,
 			height = 5.5cm,
-			width = 0.8\linewidth,
+			width = 0.85\linewidth,
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
@@ -327,7 +327,9 @@
 				column sep = 0.2cm
 			}
 		]
-			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=0:12]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=0:3]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=4:4]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=5:12]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
 			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=13:31]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
 
 			\legend{statically mapped, not mapped}
