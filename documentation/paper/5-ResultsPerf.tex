@@ -38,7 +38,7 @@ Apart from this, correctness is also confirmed by being able to successfully run
 Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017} \texttt{intspeed} suite of benchmarks.
 This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the translations of the benchmarks.
 
-The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the performance in a non-controlled environment. %todo name
+The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the performance in a non-controlled environment. % name
 An overview of the workloads covered by the aforementioned suite can be found in table~\ref{tab:spec-description}.
 Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
 
@@ -55,7 +55,7 @@ This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatc
 Figure~\vref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
 This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
-What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. %todo name
+What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. % name
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
 Through the various performance optimisations mentioned in section~\vref{sec:optimise}, we are able to reach our goal of consistently outperforming QEMU\@.

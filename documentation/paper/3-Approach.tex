@@ -3,6 +3,7 @@ The following section will elaborate on our approach to the problem at hand and 
 \subsection{Translating the partitioned code}
 \paragraph{Generating equivalent code} \mbox{}
 
+\nopagebreak
 The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
 
 The quality of the code, that can be generated here, strongly depends on the properties of the host and guest architectures in question.
@@ -17,9 +18,10 @@ It is clear, for example, that an instruction like \texttt{xori~x10,~x10,~-1} ca
 The same principle applies to combinations of multiple instructions.
 An \texttt{lui~rd,~imm1} followed by \texttt{addi~rd,~rd,~imm2} may for example be translated as directly loading the result of the computation \texttt{imm1~+~imm2} into \texttt{rd}.
 
+% name
 \paragraph{Translation procedure} \mbox{}
 
-% todo name
+\nopagebreak
 The central element of the translator is the transcode loop, which controls both translation and execution:
 first, it is checked whether the block to be executed next has already been translated (by doing a cache lookup, see~\ref{sec:code-cache}), and if it has not, translation is started.
 The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.\\
@@ -98,7 +100,7 @@ with that, the system call interface also differs~\cite[S. 2f.]{bintrans}.
 In order to handle the \texttt{ECALL} instruction correctly, the translator must thus build the translated instruction to call a specific handler routine not too dissimilar from one that may be found in a kernel.
 There, system calls that exist natively on the host architecture as well (like \texttt{write} or \texttt{clock\_gettime}) can usually be passed along to the host kernel directly.
 
-% todo name
+% name
 Care must be taken for system calls that would enable the guest to change the state or context of the host -- an \texttt{mmap} into the memory region of the translator, for example, or a call to \texttt{exit} -- these calls must be emulated accordingly to prevent these faults.
 In cases where the data structure layout used by the kernels differs, the DBT must also perform necessary actions to adapt the formats to each other.
 Some system calls may not exist at all on the native architecture of the host, it is up to the DBT to emulate the required functionality~\cite[S. 2f.]{bintrans}.
@@ -184,7 +186,7 @@ In order to do so, we use a stack that holds entries consisting of pairs contain
 The stack is implemented as a ring buffer to prevent over- and underflow.
 
 Calls are first detected at parsing time and have their return targets recursively translated.
-The host code then emitted for the call will push its return address pair onto this stack at every execution, without having to leave guest context. %todo: alternative for "its" ?
+After that, host code will be emitted that pushes the corresponding return address pair onto the stack at every execution without having to leave guest context.
 
 Following dynamic jumps will compare their target guest-address with the entry in the top stack element.
 If the values match, the address pair is popped, and the target block is jumped to directly.

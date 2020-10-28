@@ -3,26 +3,27 @@ The performance is measured using \textit{SPEC CPU 2017}~\cite{spec-cpu-2017}, a
 In most cases, we can achieve an execution time of around twice the native one, but the tests also show areas with further optimisation possibilities.
 The quite significant performance increases in comparison to QEMU can be attributed to our specialisation for RISC--V to x86--64 translation, leading to a straight-forward design of the translation process and enabling specific optimisations for this guest-host pairing.
 
-The benchmarks suites not only helped to ensure the performance of \translatorname{}, but also tested the implementation in various scenarios and aided in discovering bugs due to their verification of the program outputs.
+The benchmark suites not only helped to ensure the performance of \translatorname{}, but also tested the implementation in various scenarios and aided in discovering bugs due to their verification of the program outputs.
 In this sense, the \textit{SPEC} suite also served as an integration test for us.
+
 Furthermore, many unit tests were designed to assure the correct translation of (nearly) every supported RISC--V instruction in various contexts.
 Overall, nearly 30.000 parameterised test cases are being executed by our own test suites based on~\textit{Google Test}~\cite{gtest}, covering the RISC--V parser as well as the emitted x86--64 assembly.
 
-The development of \translatorname{} mainly focused on supporting and optimising the core instruction set and integer extensions so far.
+The development mainly focused on supporting and optimising the core instruction set and integer extensions so far.
 Support for floating point extensions, however, is also already implemented and tested.
 Our preliminary tests already show a significant performance increase in comparison to QEMU as a consequence of their use of emulation in order to offer floating point arithmetic support, contrasted by our use of native SSE--extension instructions.
 
 Currently, \translatorname{} supports all base instruction sets and extensions needed for executing single threaded programs apart from the \textit{C-} and \textit{Q standard extensions}.
-Future standard extensions such as the \textit{B standard extension} for bit manipulation can easily be added to \translatorname{} when they come available, by adding decoding of this instructions to the parser and writing tailored translator functions.
-Implementing support for multithreading would be a bigger undertaking, as it requires a redesign of \translatorname{}'s core to support the necessary memory consistency and atomicity of memory accesses (see the \textit{A standard extension}).
+We can easily add support for future standard extensions such as the \textit{B standard extension} for bit manipulation when they come available, by adding decoding of this instructions to the parser and writing tailored translator functions.
+Implementing support for multithreading would be a bigger undertaking, as it would require a redesign of our core architecture to support the necessary memory consistency and atomicity of memory accesses (see the \textit{A standard extension}).
 Thus, we are not planning on adding this in the near future.
 
 Moreover, some features related to the operating system are not provided yet, as only a subset of the existing system calls is implemented and loading of dynamically linked libraries at runtime is not yet supported.
 
-The next steps for generally improving \translatorname{} would be implementing techniques used for integer arithmetic (e.g.\ dynamically allocated register replacement) for floating point arithmetic as well and supporting even more system calls.
+The next steps for general improvement of the project would be implementing techniques used for integer arithmetic (e.g.\ dynamically allocated register replacement) for floating point arithmetic as well and supporting even more system calls.
 Besides this, one could invest into one of the aforementioned areas specifically, for example applying a more rigid memory consistency model.
 The most development time concerning performance optimisations has been invested on optimising the emitted code and reducing the number of necessary context switches.
 
-The current version of \translatorname{} is capable of appreciably outperforming QEMU whilst providing almost the same functionality.
+The current version of our project is capable of appreciably outperforming QEMU whilst providing almost the same functionality.
 In some aspects, e.g.\ floating point arithmetic, we are even ahead of QEMU by using native instructions from the SSE-extension instead of relying on emulation.
 Overall, the results we have demonstrated clearly show the usability and flexibility of \translatorname{} for executing general-purpose RISC--V binaries on an x86--64 processor.
