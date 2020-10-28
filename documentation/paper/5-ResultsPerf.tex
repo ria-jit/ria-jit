@@ -190,6 +190,7 @@ This also means that the same conditional branch instruction might be copied at 
 
 
 \subsection{Evaluation of translator optimisations}
+\label{subsec:evaluation-of-translator-optimisations}
 \begin{table}
 	\centering
 	\begin{tabular}{rl}
@@ -424,8 +425,28 @@ The translator will then have to translate every block one-by-one, jump back int
 
 
 \subsection{Discussion}
-% todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
+We could reach the goal of outperforming QEMU by employing a direct translation from RISC--V to x86--64 and using various optimisations.
+QEMU first translates the instructions into micro instructions in a plattform and ISA independent intermediate representation.
+While this allows easy implementation of new host and guest architectures, it also means that specific advantages of both guest and host can not be used.
+This leads to needing potentially more host instructions than necessary for a simple task.
+QEMU also does not employ a Return Address Stack, an optimisation which proved to be very worthwhile.
+One of the biggest disadvantages of QEMU though is, that it does not use a static register mapping.
+Instead it holds all registers in memory and only loads them into one of a couple of temporary registers, when needing them as input operands.
+The loaded output register may then be reused as input for the next instruction, if this instruction needs different inputs though, the register is written back and needs to be reloaded next time it is needed.
+This obviously leads to a big overhead which we can avoid by statically mapping the most used registers and dynamically allocating temporaries for the rest.
 
+There is probably still some room for improvement to get closer to native compiled binaries.
+One possibilities here would be to further increase the quality of the generated code.
+As mentioned in section~\vref{subsec:evaluation-of-translator-optimisations} there is still room to increase the efficiency of the pattern matcher and the quality of the patterns.
+Something that might also provide a benefit is increasing the number of dynamically allocated register by decreasing the number of statically mapped registers.
+This could prevent unnecessary loads and write backs in case a block needs more than three different not mapped registers.
+Something that also could be done is treating jumps into the middle of block not as jumps to new blocks but redirecting them to the already translated block at the specific offset.
+For this you would need to keep track of the offsets of the specific translated instructions in the block, so it is possible to determine the jump target address.
+Overall though the biggest disadvantage to native compilation can be attributed to the greatly differing architectures.
+The compiler of course takes advantage of both architectures.
+On x86--64 this means using for example vectorisation.
+If a future RISC--V expansion offers support for this as well, there is a potential for a big performance increase.
+This means that while we are producing code that is effectively equivalent to what the compiler does for the native binary, we do not have the possibility to generate code that is as efficient.
 
 
 
