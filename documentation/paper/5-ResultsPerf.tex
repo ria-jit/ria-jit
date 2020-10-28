@@ -339,7 +339,7 @@ This makes a context switch back to the translator necessary for every executed 
 The benchmarks that are less impacted by disabling block chaining are the ones where fewer basic blocks were executed relative to their runtime.
 This correlates with the fact that the most executed blocks of these benchmarks contain more instructions and hence execute for a longer time.
 
-Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, providing for a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
+Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, generating a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
 Any workload that frequently accesses registers that are not statically mapped as per table~\vref{tab:static-register-mapping} benefits significantly from this style of register handling, as these registers will essentially behave as if they were statically mapped within the confines of that single basic block.
 
 Of course, our chosen \textit{least recently used}-approach to register replacement into three temporary slots suffers from the same issue known from caching:
