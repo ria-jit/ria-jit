@@ -60,7 +60,7 @@ It would thus only be possible to either remove all blocks with jump references 
 \label{sec:context-switch-reg-handle}
 As outlined in section~\ref{sec:isa-cmp}, the RISC--V and x86--64 architectures have differing amounts of general purpose registers.
 In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86--64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
-
+% todo there are only 31 GPRs
 \subsubsection{Handling of guest registers}
 \label{sec:reg-handle}
 As x86--64 only provides 16 general-purpose registers (\texttt{rax}--\texttt{rdx}, \texttt{rsp}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi} and \texttt{r8}--\texttt{r15}), it is impossible to directly and statically map all guest registers to native host registers.
@@ -115,7 +115,7 @@ The main difficulties (and their resolutions) that arise by using the x86--64 SS
     \item \textbf{Register handling} is similar to the integer register management laid out in section~\ref{sec:context-switch-reg-handle}.
             As mentioned before, the RISC--V architecture consists of 32 floating point registers (\texttt{f0}--\texttt{f31}) which can hold a single precision (F-extension) or double precision (D-extension) floating point value, whereas the SSE-extensions only provide 16 registers \texttt{XMM0}--\texttt{XMM15}.
             We utilise the tools we designed to discover the most-used registers in the guest programs, and statically map these to x86--64 SSE registers \texttt{XMM2}--\texttt{XMM15}.
-            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for simplicity reasons registers \texttt{XMM0} and \texttt{XMM1} are reserved for use as replacements and missing registers are loaded into them from memory temporarily.
+            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for reasons of simplicity registers \texttt{XMM0} and \texttt{XMM1} are reserved for use as replacements and missing registers are loaded into them from memory temporarily.
     \item \textbf{Missing equivalent SSE instructions} can lead to a huge instruction overhead, as emulation often needs to use bit manipulation operations instead.
             For this constants or masks need to be loaded in from either memory or the general purpose registers because the SSE extensions do not support immediate operands.
             The instructions that need to be emulated are unsigned conversion instructions e.g. \texttt{FCVT.WU.S}, sign-injection instructions e.g. \texttt{FSGNJ.S}, compare instructions e.g. \texttt{FEQ.S}, fused multiply-add instructions e.g. \texttt{FMADD.S} and the \texttt{FCLASS.S} instruction that classifies a floating point value.
