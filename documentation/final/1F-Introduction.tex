@@ -10,8 +10,8 @@
 
     \textbf{Problem:}
     \begin{itemize}
-        \item Verfügbarkeit von RISC--V Prozessoren ist begrenzt.
-        \item Entwickler, die Code für RISC--V als Zielplatform kompilieren, können diesen nicht ausführen.
+        \item RISC--V Prozessoren sind noch nicht weit verbreitet.
+        \item Entwickler, die Code für RISC--V als Zielplatform kompilieren wollen, können diesen nicht nativ ausführen.
     \end{itemize}
 
     \vspace{0.50cm}
@@ -32,7 +32,7 @@
 
     \begin{minipage}[t]{.47\textwidth}
         \textbf{RISC--V Übersicht:}
-
+        \vspace{0.20cm}
         \begin{itemize}
             \item RISC Schema
             \item Load-Store-Architektur
@@ -44,7 +44,7 @@
     \end{minipage}
     \begin{minipage}[t]{.47\textwidth}
         \textbf{x86--64 Übersicht:}
-
+        \vspace{0.20cm}
         \begin{itemize}
             \item CISC Schema
             \item Register-Memory-Architektur
@@ -57,31 +57,37 @@
 
 \subsection{Dynamische Binärübersetzung} % Noah
 \begin{frame}
-    \frametitle{Dynamische Binärübersetzung}
-    \framesubtitle{Interpretation}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Interpretation vs. dynamische Übersetzung}
+    \begin{columns}[c,onlytextwidth]
+        \begin{column}{0.45\textwidth}
+            \begin{exampleblock}{Vorteile}
+                \begin{itemize}
+                    \item[$\textcolor{TUMGreen}\blacksquare$] Einfach zu implementieren
+                    \item[$\textcolor{TUMGreen}\blacksquare$] Keine Erzeugung von JIT Assembler nötig
+                \end{itemize}
+            \end{exampleblock}
 
-    \textbf{Vorgehen}
-    \begin{itemize}
-        \item Laden des nächsten Befehls
-        \item Übersetzung
-        \item Ausführen der Seiteneffekte des Befehls (e.g. Änderung eines Registers)
-    \end{itemize}
+            \vspace{0.50cm}
 
-    \vspace{0.50cm}
+            \begin{alertblock}{Nachteile}
+                \begin{itemize}
+                    \item[$\textcolor{TUMOrange}\blacksquare$] Mehrfache Übersetzung der selben Instruktion
+                    \item[$\textcolor{TUMOrange}\blacksquare$] Wenig Optimierungspotential
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            \begin{exampleblock}{Vorteile}
+                \begin{itemize}
+                    \item[$\textcolor{TUMGreen}\blacksquare$] Einfach zu implementieren
+                    \item[$\textcolor{TUMGreen}\blacksquare$] Keine Erzeugung von JIT Assembler nötig
+                \end{itemize}
+            \end{exampleblock}
 
-    \textbf{Vorteile}
-    \begin{itemize}
-        \item Einfach zu implementieren
-        \item Keine Erzeugung von JIT Assembler nötig
-    \end{itemize}
-
-    \vspace{0.50cm}
-
-    \textbf{Nachteile}
-    \begin{itemize}
-        \item Mehrfache Übersetzung der selben Instruktion
-        \item Wenig Optimierungspotential
-    \end{itemize}
+            \vspace{0.50cm}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 % todo @Noah rework frame titles
