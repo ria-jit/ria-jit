@@ -292,10 +292,10 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
     assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
     every last row/.style={after row=\bottomrule},
 }
-\pgfplotstablenew[columns={Benchmark}]{10}\printtable
+\pgfplotstablenew[columns={Benchmark}]{11}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
-\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
 
 \begin{table}[h]
