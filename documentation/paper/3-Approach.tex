@@ -38,11 +38,11 @@ Naturally, the DBT aims to store the translated code in a semi-permanent way, as
 For this, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
 Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
 
-The efficiency of the index lookup is increased by a translation lookaside buffer (short \textit{TLB}).
-This technique, which is also implemented in the CPU for page lookup, reduces lookup time for most recent used code blocks. %todo: grammar 
+The efficiency of the index lookup is increased by a \textit{translation lookaside buffer} (TLB).
+This technique, also used by the CPU to optimise memory page lookup, reduces the lookup time for the most recently used code blocks.
 Still, it is desirable to avoid cache lookups when possible, as they are relatively costly and can cause significant slowdown to the whole system. 
-Repeatedly retrieving many different blocks will also decrease \textit{TLB} performance as soon as their number surpasses the \textit{TLB} size, because entries will be overwritten before they are read again. %todo: better wording ?
-Several of the optimizations we employ thus aim to reduce the number of cache lookups by avoiding having to return to the transcode loop.
+Repeatedly retrieving a higher number of blocks than the capacity of the TLB will also decrease the performance, because entries will be overwritten before they are read again.
+Several of the optimisations we employ thus aim to reduce the number of cache lookups by avoiding having to return to the transcode loop.
 
 It is possible that this code cache might fill up during the execution of a large guest program.
 If it does, there are two different strategies to handle this issue:
@@ -211,7 +211,7 @@ An exemplary excerpt from the patterns we implemented is shown by table~\ref{tab
 	\makebox[\textwidth][c]{
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{RISC-V} & \textbf{x86-64} \\
+		\normalfont\textbf{RISC-V} & \normalfont\textbf{x86-64} \\
 		\toprule
 		LUI r1, imm;\ LW r2, imm(r1);\ ADDI r2, r2, imm;\ SW r2, imm(r1); & ADD m32, imm32\\
 		LUI r1, imm;\ LD r2, imm(r1);\ ADDI r2, r2, imm;\ SD r2, imm(r1); & ADD m64, imm32\\
