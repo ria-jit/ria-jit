@@ -164,28 +164,33 @@ Most benchmarks show runtimes of about $1.9$x native with \texttt{600.perlbench}
 \subsubsection{Analysis}
 
 \texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
-Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+Retrospective vectorisation on the translator side is not easy, since this would involve detecting the vectorisable loop patterns on assembler level -- a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+
 There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
 Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
+
 Another problem this benchmark causes is, that the hot sections use a lot of different not statically mapped registers.
-Resulting form this there is little benefit in the static register mapping, since they are not used a lot, or the dynamic allocation of registers as it is currently done, since the temporarily loaded registers will not be reused anyways.
+Resulting form this, there is little benefit in the static register mapping (since they are seldom used), or the dynamic allocation of registers as it is currently done, since the temporarily loaded registers will not be reused anyways.
 QEMU always loads register inputs from memory into temporary registers and then does the needed computation.
 Output registers may be reused as inputs for the following instructions and only written back when the used temporary is needed for another value.
-This means that the generated code for the part of the program mentioned above is effectively very similar to the one that QEMU generates preventing us from having a big advantage over QEMU\@.
+This means that the generated code for the part of the program mentioned above is effectively very similar to the one that QEMU generates, hence preventing us from having a big advantage over QEMU\@.
 
-The \texttt{600.perlbench} on the other hand has a lot of conditional branches and jumps in the hot functions.
-Many of these are not existing in the compiled x86--64 binary since they are replaced by conditional move instructions there.
-RISC--V does not have this instruction type and therefore these are replaced by branches in the RISC--V code.
-This already is a big performance penalty since branches are prone to misprediction resulting in needing to rollback the processor state while conditional moves simply cause some delay until the value is ready.
-If the compiler arranges code in a way that the outputs of the conditional moves are only used later, then this delay is basically no problem, while a jump misprediction might cause a major performance hit.
-Initially these jumps cause a lot of context switches since recursive translation currently is only employed for unconditional branches/calls, so for every one of the branches it initially is necessary to switch back for translating the taken paths.
+The \texttt{600.perlbench}, on the other hand, has a lot of conditional branches and jumps in the hot functions.
+Many of these do not exist in the compiled x86--64 binary, since they are replaced by conditional move instructions.
+RISC--V does not have this instruction type and therefore this behaviour is realised by branches in the RISC--V code.
+This already is a big performance penalty, since branches are prone to misprediction.
+This results in needing to roll back the processor state, whereas conditional moves simply cause some delay until the value is ready.
+If the compiler arranges code in a way that the outputs of the conditional moves are only used later, then this delay is basically irrelevant, while a jump misprediction might cause a major performance hit.
+
+Initially, these jumps cause a lot of context switches since recursive translation currently is only employed for unconditional branches/calls, so for every one of the branches it initially is necessary to switch back for translating the taken paths.
 Recursively translating the path that is considered hot by the compiler might improve performance there by a bit.
-Combined with unconditional jumps, which are also very abundant in this section, this also causes a lot of unneeded retranslation, since jumping to the middle of another block is currently handled by treating it like translating a new block beginning at the jump target.
-These re-translated sections also might end with an unconditional jump which will cause more retranslation and so on.
-Apart from causing unnecessary parsing and translation overhead this also pollutes our code cache index increasing the possibility for hash collisions and thus increasing cache lookup time.
+
+Combined with unconditional jumps, which are also very abundant in this section, this causes a lot of unneeded retranslation, since jumping to the middle of an already-translated block is currently handled by treating it like translating a new block beginning at the jump target.
+These re-translated sections also might end with an unconditional jump, which will cause more retranslation, and so on.
+Apart from causing unnecessary parsing and translation overhead, this also pollutes our code cache index, increasing the possibility for hash collisions, and thus increasing cache lookup time.
 It also severely hurts code density, making the CPU instruction cache less effective.
-This also means that the same conditional branch instruction might be copied at multiple places which means that the CPU branch predictor treats them as multiple branches which means it has less information for a right prediction.
+This also means that the same conditional branch instruction might be copied at multiple places, making the CPU branch predictor treat them as multiple branches, which means it has less information for a right prediction.
 
 
 \subsection{Evaluation of translator optimisations}
@@ -424,27 +429,28 @@ The translator will then have to translate every block one-by-one, jump back int
 
 
 \subsection{Discussion}
-We could reach the goal of outperforming QEMU by employing a direct translation from RISC--V to x86--64 and using various optimisations.
-QEMU first translates the instructions into micro instructions in a plattform and ISA independent intermediate representation.
+We reached the goal of outperforming QEMU by employing a direct translation from RISC--V to x86--64 and using various optimisations.
+QEMU first translates the instructions into microinstructions in an intermediate representation independent of platform and ISA.
 While this allows easy implementation of new host and guest architectures, it also means that specific advantages of both guest and host can not be used.
 This leads to needing potentially more host instructions than necessary for a simple task.
-QEMU also does not employ a Return Address Stack, an optimisation which proved to be very worthwhile.
-One of the biggest disadvantages of QEMU though is, that it does not use a static register mapping.
-Instead it holds all registers in memory and only loads them into one of a couple of temporary registers, when needing them as input operands.
-The loaded output register may then be reused as input for the next instruction, if this instruction needs different inputs though, the register is written back and needs to be reloaded next time it is needed.
+QEMU also does not employ a return address stack, an optimisation which proved to be very worthwhile.
+One of the biggest disadvantages of QEMU, though, is that it does not use a static register mapping.
+Instead it holds all registers in memory and only loads them into one of a few temporary registers when needing them as input operands.
+The loaded output register may then be reused as input for the next instruction.
+If the next instruction needs different inputs, though, the register is written back and needs to be reloaded next time it is needed.
 This obviously leads to a big overhead which we can avoid by statically mapping the most used registers and dynamically allocating temporaries for the rest.
 
-There is probably still some room for improvement to get closer to native compiled binaries.
-One possibilities here would be to further increase the quality of the generated code.
-As mentioned in section~\vref{subsec:evaluation-of-translator-optimisations} there is still room to increase the efficiency of the pattern matcher and the quality of the patterns.
+There is probably still some room for improvement to get closer to natively compiled binaries.
+One possibility here would be to further increase the quality of the generated code.
+As mentioned in section~\vref{subsec:evaluation-of-translator-optimisations}, there is still room to increase the efficiency of the pattern matcher and the quality of the patterns.
 Something that might also provide a benefit is increasing the number of dynamically allocated register by decreasing the number of statically mapped registers.
 This could prevent unnecessary loads and write backs in case a block needs more than three different not mapped registers.
-Something that also could be done is treating jumps into the middle of block not as jumps to new blocks but redirecting them to the already translated block at the specific offset.
-For this you would need to keep track of the offsets of the specific translated instructions in the block, so it is possible to determine the jump target address.
-Overall though the biggest disadvantage to native compilation can be attributed to the greatly differing architectures.
-The compiler of course takes advantage of both architectures.
-On x86--64 this means using for example vectorisation.
-If a future RISC--V expansion offers support for this as well, there is a potential for a big performance increase.
+Something that also could be done is treating jumps into the middle of a block not as jumps to new blocks but redirecting them to the already translated block at the specific offset.
+For this, you would need to keep track of the offsets of the specific translated instructions in the block, so it is possible to determine the jump target address.
+
+Overall though, the biggest disadvantage to native compilation can be attributed to the greatly differing architectures.
+The compiler of course takes advantage of both architectures, for example  by employing vectorisation on x86--64.
+If a future RISC--V expansion offers support for this as well, there is the potential for a big performance increase.
 This means that while we are producing code that is effectively equivalent to what the compiler does for the native binary, we do not have the possibility to generate code that is as efficient.
 
 
