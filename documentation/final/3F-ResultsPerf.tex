@@ -17,9 +17,10 @@
 	\framesubtitle{SPEC CPU 2017}
 	
 	\begin{itemize}
-		\item Kommerzielle Benchmark Suite mit einer großen Vielfalt an verschieden Workloads.
+		\item Industriell genutzte Benchmark Suite mit einer großen Vielfalt an verschieden Workloads
 		\item Realitätsnahe Gestaltung
 	\end{itemize}
+	\pause
 	\begin{table}
 		\centering
 		\small
@@ -133,4 +134,120 @@ create col/assign/.code={%
 \end{frame}
 
 \subsection{Optimierungen} % Simon
+\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-compare/base.csv}\basetable
+\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-compare/no-ras.csv}\norastable
+\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-compare/no-fusion.csv}\nofusiontable
+\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-compare/no-jump-no-ras.csv}\nojumpnorastable
+\pgfplotstableread[col sep=comma]{../paper/benchmarks/spec-compare/none.csv}\nonetable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\basetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\basetable
+\addAvg{\basetable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\norastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\norastable
+\addAvg{\norastable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nofusiontable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nofusiontable
+\addAvg{\nofusiontable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nojumpnorastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nojumpnorastable
+\addAvg{\nojumpnorastable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nonetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nonetable
+\addAvg{\nonetable}{Benchmark}{12}
+\begin{frame}
+	\begin{figure}[h]
+		\centering
+		\begin{tikzpicture}
+			\begin{axis}[%
+			title = {Optimisation option evaluation},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to base]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+			inner sep = 0pt,
+			anchor = north east,
+			rotate = 45
+			},
+			xticklabels from table={\basetable}{Benchmark},
+			ytick = {0.5, 1,1.2,1.4,1.6,1.8,2.0},
+			ymin = 0.5, ymax = 2,
+			ymajorgrids = true,
+			bar width = 3.5pt,
+			height = 7.0cm,
+			width = 0.95\linewidth,
+			legend style = {
+			at = {(0.98, 0.97)},
+			anchor = north east,
+			legend columns = 2,
+			column sep = 0.2cm
+			}
+			]
+				% base results
+				\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \basetable;
+				
+				% no-fusion results
+				\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nofusiontable;
+				
+				% no-ras results
+				\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \norastable;
+				
+				% no-jump-no-ras results
+				\addplot+[fill=era-dbt-2, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
+				
+				\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,~} \texttt{no-ras}}
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:opt-compare}
+	\end{figure}
+\end{frame}
+
+
+
+\pgfplotstableset{
+% define how the ’new’ column shall be filled:
+create on use/Benchmark/.style={create col/copy column from table=\basetable{Benchmark}}
+}
+\pgfplotstableset{% Global config
+every head row/.style={before row=\toprule,after row=\midrule},
+assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+every last row/.style={after row=\bottomrule},
+}
+\pgfplotstablenew[columns={Benchmark}]{11}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
+ \begin{frame}
+	 \frametitle{Optimierungen}
+	 \begin{table}[h]
+		 \centering
+		 \pgfplotstabletypeset[columns/Benchmark/.style={string type},/pgf/number format/fixed, /pgf/number format/precision = 2,/pgf/number format/fixed zerofill=true]{\printtable}
+		 \label{tab:table-optim}
+	 \end{table}
+ \end{frame}
+
+\begin{frame}
+	\frametitle{Vergleich}
+	\vspace{0.5cm}
+	\textbf{Vorteile} im Vergleich zu \textbf{QEMU}:
+	\begin{itemize}
+		\item Vermeidung einer Zwischendarstellung
+		\item Zusätzliche Optimierungen
+		\item Statisches Registermapping
+	\end{itemize}
+	\pause
+	\vspace{1cm}
+	\textbf{Nachteile} gegenüber \textbf{native}:
+	\begin{itemize}
+		\item Architektonische Unterschiede
+		\item Overhead durch Parsen, Instruktionsgenerierung, etc.
+	\end{itemize}
+\end{frame}
 
