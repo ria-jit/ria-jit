@@ -1,10 +1,10 @@
 The following section will give an overview of the methods used to test the programs correctness and performance, as well as lay out the results of these tests.
 \subsection{Verification}
-The correctness of our translator was checked by extensive unit tests, which were used to check if the translations of a the RISC--V instruction really do perform the operations that are expected.
-Using the parameterized tests provided by the Google~Test~\cite{gtest} framework we were able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
-Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+The correctness of our translator is checked by extensive unit tests, which are used to check if the translations of a the RISC--V instruction perform the operations that are expected as per the architecture specification.
 
-Apart from this correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
+Using the parameterised tests provided by the Google~Test~\cite{gtest} framework, we are able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
+Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+Apart from this, correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
 
 
 \subsection{SPEC CPU 2017 Benchmark Suite}
@@ -46,9 +46,9 @@ All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} s
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
 The benchmarks were compiled using compiler optimisation level \texttt{-O3} and linked statically.
-For the native run \texttt{-march=x86-64} was used on GCC version 7.5.0 from the Ubuntu standard repo.
+For the native run, \texttt{-march=x86-64} was used on GCC version 7.5.0 from the default Ubuntu package repository.
 The RISC--V binaries for our translator and QEMU were compiled using \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
-A self compiled GCC with the sources taken from the official toolchain repo at version 10.1.0 was used.
+For this, a self-compiled GCC with the sources taken from the official toolchain repository at version 10.1.0 was used.
 This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
 
 \subsubsection{Results}
@@ -58,7 +58,7 @@ This means these results do not directly measure the overhead vs.\ native that t
 What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. %todo name
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
-Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
+Through the various performance optimisations mentioned in section~\vref{sec:optimise}, we are able to reach our goal of consistently outperforming QEMU\@.
 In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
 Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
@@ -260,7 +260,7 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
-				legend columns = 3,
+				legend columns = 2,
 				column sep = 0.2cm
 			}
 		]
@@ -303,7 +303,7 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 \begin{table}[h]
 \centering
 \pgfplotstabletypeset[columns/Benchmark/.style={string type},/pgf/number format/fixed, /pgf/number format/precision = 2,/pgf/number format/fixed zerofill=true]{\printtable}
-\caption[Optimisation results]{Optimisation results data (including \texttt{----optimize=none} run) normalized to base.}
+\caption[Optimisation results]{Optimisation results data (including \texttt{----optimize=none} run), normalised to base.}
 \label{tab:table-optim}
 \end{table}
 % ================================
