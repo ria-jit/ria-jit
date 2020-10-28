@@ -3,6 +3,7 @@ The following section will elaborate on our approach to the problem at hand and 
 \subsection{Translating the partitioned code}
 \paragraph{Generating equivalent code} \mbox{}
 
+\nopagebreak
 The most basic idea for translating the now partitioned basic blocks is to have a fixed association that maps every instruction in the guest ISA to a sequence of instructions native to the host.
 
 The quality of the code, that can be generated here, strongly depends on the properties of the host and guest architectures in question.
@@ -17,9 +18,10 @@ It is clear, for example, that an instruction like \texttt{xori~x10,~x10,~-1} ca
 The same principle applies to combinations of multiple instructions.
 An \texttt{lui~rd,~imm1} followed by \texttt{addi~rd,~rd,~imm2} may for example be translated as directly loading the result of the computation \texttt{imm1~+~imm2} into \texttt{rd}.
 
+% name
 \paragraph{Translation procedure} \mbox{}
 
-% todo name
+\nopagebreak
 The central element of the translator is the transcode loop, which controls both translation and execution:
 first, it is checked whether the block to be executed next has already been translated (by doing a cache lookup, see~\ref{sec:code-cache}), and if it has not, translation is started.
 The translated block is then executed, and, before returning to the transcode loop, sets the address where program execution should continue.\\
@@ -38,11 +40,11 @@ Naturally, the DBT aims to store the translated code in a semi-permanent way, as
 For this, we allocate a region of memory reserved for the basic block translations, also called a \textit{code cache}.
 Additionally, an index to this memory section is required, since there needs to be a way to quickly reference the blocks residing in the cache and associate them with both the host and guest instruction pointers that identify them during execution.
 
-The efficiency of the index lookup is increased by a translation lookaside buffer (short \textit{TLB}).
-This technique, which is also implemented in the CPU for page lookup, reduces lookup time for most recent used code blocks. %todo: grammar 
+The efficiency of the index lookup is increased by a \textit{translation lookaside buffer} (TLB).
+This technique, also used by the CPU to optimise memory page lookup, reduces the lookup time for the most recently used code blocks.
 Still, it is desirable to avoid cache lookups when possible, as they are relatively costly and can cause significant slowdown to the whole system. 
-Repeatedly retrieving many different blocks will also decrease \textit{TLB} performance as soon as their number surpasses the \textit{TLB} size, because entries will be overwritten before they are read again. %todo: better wording ?
-Several of the optimizations we employ thus aim to reduce the number of cache lookups by avoiding having to return to the transcode loop.
+Repeatedly retrieving a higher number of blocks than the capacity of the TLB will also decrease the performance, because entries will be overwritten before they are read again.
+Several of the optimisations we employ thus aim to reduce the number of cache lookups by avoiding having to return to the transcode loop.
 
 It is possible that this code cache might fill up during the execution of a large guest program.
 If it does, there are two different strategies to handle this issue:
@@ -57,7 +59,7 @@ It would thus only be possible to either remove all blocks with jump references 
 \subsection{Register handling and context switching}
 \label{sec:context-switch-reg-handle}
 As outlined in section~\ref{sec:isa-cmp}, the RISC--V and x86--64 architectures have differing amounts of general purpose registers.
-In some way, the state of the 32 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86--64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
+In some way, the state of the 31 general purpose registers \texttt{x1}\footnote{\texttt{x0} is hardwired to a constant zero. All reads will return 0, all writes will be ignored. Hence, this register needs special handling in the DBT, as there is no equivalent construct on x86--64.} to \texttt{x31} and the \texttt{pc} needs to be stored and available to the translations of the identified basic blocks.
 
 \subsubsection{Handling of guest registers}
 \label{sec:reg-handle}
@@ -98,7 +100,7 @@ with that, the system call interface also differs~\cite[S. 2f.]{bintrans}.
 In order to handle the \texttt{ECALL} instruction correctly, the translator must thus build the translated instruction to call a specific handler routine not too dissimilar from one that may be found in a kernel.
 There, system calls that exist natively on the host architecture as well (like \texttt{write} or \texttt{clock\_gettime}) can usually be passed along to the host kernel directly.
 
-% todo name
+% name
 Care must be taken for system calls that would enable the guest to change the state or context of the host -- an \texttt{mmap} into the memory region of the translator, for example, or a call to \texttt{exit} -- these calls must be emulated accordingly to prevent these faults.
 In cases where the data structure layout used by the kernels differs, the DBT must also perform necessary actions to adapt the formats to each other.
 Some system calls may not exist at all on the native architecture of the host, it is up to the DBT to emulate the required functionality~\cite[S. 2f.]{bintrans}.
@@ -113,7 +115,7 @@ The main difficulties (and their resolutions) that arise by using the x86--64 SS
     \item \textbf{Register handling} is similar to the integer register management laid out in section~\ref{sec:context-switch-reg-handle}.
             As mentioned before, the RISC--V architecture consists of 32 floating point registers (\texttt{f0}--\texttt{f31}) which can hold a single precision (F-extension) or double precision (D-extension) floating point value, whereas the SSE-extensions only provide 16 registers \texttt{XMM0}--\texttt{XMM15}.
             We utilise the tools we designed to discover the most-used registers in the guest programs, and statically map these to x86--64 SSE registers \texttt{XMM2}--\texttt{XMM15}.
-            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for simplicity reasons registers \texttt{XMM0} and \texttt{XMM1} are reserved for use as replacements and missing registers are loaded into them from memory temporarily.
+            One could use the same dynamic mapping approach for the remaining registers as is being used for general purpose registers, but for reasons of simplicity registers \texttt{XMM0} and \texttt{XMM1} are reserved for use as replacements and missing registers are loaded into them from memory temporarily.
     \item \textbf{Missing equivalent SSE instructions} can lead to a huge instruction overhead, as emulation often needs to use bit manipulation operations instead.
             For this constants or masks need to be loaded in from either memory or the general purpose registers because the SSE extensions do not support immediate operands.
             The instructions that need to be emulated are unsigned conversion instructions e.g. \texttt{FCVT.WU.S}, sign-injection instructions e.g. \texttt{FSGNJ.S}, compare instructions e.g. \texttt{FEQ.S}, fused multiply-add instructions e.g. \texttt{FMADD.S} and the \texttt{FCLASS.S} instruction that classifies a floating point value.
@@ -184,7 +186,7 @@ In order to do so, we use a stack that holds entries consisting of pairs contain
 The stack is implemented as a ring buffer to prevent over- and underflow.
 
 Calls are first detected at parsing time and have their return targets recursively translated.
-The host code then emitted for the call will push its return address pair onto this stack at every execution, without having to leave guest context. %todo: alternative for "its" ?
+After that, host code will be emitted that pushes the corresponding return address pair onto the stack at every execution without having to leave guest context.
 
 Following dynamic jumps will compare their target guest-address with the entry in the top stack element.
 If the values match, the address pair is popped, and the target block is jumped to directly.
@@ -211,7 +213,7 @@ An exemplary excerpt from the patterns we implemented is shown by table~\ref{tab
 	\makebox[\textwidth][c]{
 	\begin{tabular}{ll}
 		\toprule
-		\textbf{RISC-V} & \textbf{x86-64} \\
+		\normalfont\textbf{RISC-V} & \normalfont\textbf{x86-64} \\
 		\toprule
 		LUI r1, imm;\ LW r2, imm(r1);\ ADDI r2, r2, imm;\ SW r2, imm(r1); & ADD m32, imm32\\
 		LUI r1, imm;\ LD r2, imm(r1);\ ADDI r2, r2, imm;\ SD r2, imm(r1); & ADD m64, imm32\\

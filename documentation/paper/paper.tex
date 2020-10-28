@@ -36,15 +36,15 @@
 % ====================
 
 % typeset current git commit id for drafts
-% todo remove commit id before submission
-\CatchFileDef{\headfull}{../../.git/HEAD}{}
-\StrGobbleRight{\headfull}{1}[\head]
-\StrBehind[2]{\head}{/}[\branch]
-\CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
-\cfoot{Draft after commit \commit on branch \branch.}
+% \CatchFileDef{\headfull}{../../.git/HEAD}{}
+% \StrGobbleRight{\headfull}{1}[\head]
+% \StrBehind[2]{\head}{/}[\branch]
+% \CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
+% \cfoot{Draft after commit \commit on branch \branch.}
 
-%todo name check all other usages of 'our translator' and such, maybe use a bit of variety by manually replacing the command usages.
-\newcommand{\translatorname}{"INSERT PROGRAM NAME HERE"}
+% initially used to replace "our translator" with a program name, right now not in use
+% the name comments were replaced with "% name" so as not to clutter the task list
+\newcommand{\translatorname}{our translator}
 
 % define utilities and symbols
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
@@ -88,14 +88,6 @@
 
 % \input separate files for every section! --> avoids merge conflicts
 
-% todo @Simon replace in path for:
-% don't --> do not
-% hasn't --> has not
-% can't --> cannot
-% can not --> cannot
-% todo find in path for "'s", "s'", ... @all
-% todo regex for : followed by capital @all
-
 \section{Introduction}
 \input{1-Introduction}
 
@@ -132,6 +124,6 @@
 
 \newpage
 \bibliographystyle{ieeetr}
-%\addcontentsline{toc}{section}{References}
+% \addcontentsline{toc}{section}{References}
 \bibliography{paper}
 \end{document}

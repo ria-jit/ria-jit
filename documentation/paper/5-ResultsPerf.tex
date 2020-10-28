@@ -1,10 +1,10 @@
 The following section will give an overview of the methods used to test the programs correctness and performance, as well as lay out the results of these tests.
 \subsection{Verification}
-The correctness of our translator was checked by extensive unit tests, which were used to check if the translations of a the RISC--V instruction really do perform the operations that are expected.
-Using the parameterized tests provided by the Google~Test~\cite{gtest} framework we were able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
-Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+The correctness of our translator is checked by extensive unit tests, which are used to check if the translations of a the RISC--V instruction perform the operations that are expected as per the architecture specification.
 
-Apart from this correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
+Using the parameterised tests provided by the Google~Test~\cite{gtest} framework, we are able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
+Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+Apart from this, correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
 
 
 \subsection{SPEC CPU 2017 Benchmark Suite}
@@ -38,7 +38,7 @@ Apart from this correctness is also confirmed by being able to successfully run 
 Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017} \texttt{intspeed} suite of benchmarks.
 This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the translations of the benchmarks.
 
-The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the performance in a non-controlled environment. %todo name
+The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the performance in a non-controlled environment. % name
 An overview of the workloads covered by the aforementioned suite can be found in table~\ref{tab:spec-description}.
 Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
 
@@ -46,22 +46,22 @@ All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} s
 The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
 
 The benchmarks were compiled using compiler optimisation level \texttt{-O3} and linked statically.
-For the native run \texttt{-march=x86-64} was used on GCC version 7.5.0 from the Ubuntu standard repo.
+For the native run, \texttt{-march=x86-64} was used on GCC version 7.5.0 from the default Ubuntu package repository.
 The RISC--V binaries for our translator and QEMU were compiled using \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
-A self compiled GCC with the sources taken from the official toolchain repo at version 10.1.0 was used.
+For this, a self-compiled GCC with the sources taken from the official toolchain repository at version 10.1.0 was used.
 This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
 
 \subsubsection{Results}
 Figure~\vref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
 Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
 This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
-What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. %todo name
+What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. % name
 This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
 
-Through the various performance optimisations mentioned in section~\vref{sec:optimise} we are able to reach our goal of consistently outperforming QEMU\@.
-In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
+Through the various performance optimisations mentioned in section~\ref{sec:optimise}, we are able to reach our goal of consistently outperforming QEMU\@.
+In some cases the advantage is only slight, but in other workloads like the \texttt{602.gcc} compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
-Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
+Most benchmarks show runtimes of about $1.9$x native with \texttt{600.perlbench} and \texttt{625.x264} being the outliers.
 
 % ======= SPEC CPU Results =======
 % Results of the intspeed SPEC CPU 2017 runs.
@@ -162,24 +162,39 @@ Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and 
 % ================================
 
 \subsubsection{Analysis}
-% todo @Simon: Sec. 5.2.2 zu 625: Warum ist das euer DBT hier nur unwesentlich schneller als QEMU, im Vergleich zu anderen Benchmarks?
-% todo @Simon: Sec. 5.2.2 zu 600: Dafuer habt ihr doch Chaining? Unklar.
-% todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
 
 \texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
-Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+Retrospective vectorisation on the translator side is not easy, since this would involve detecting the vectorisable loop patterns on assembler level -- a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+
 There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
 Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
 
-The \texttt{600.perlbench} on the other hand has a lot of conditional branches and jumps in the hot blocks.
-This causes a lot of context switches since recursive translation currently is only employed for unconditional branches/calls.
-Recursively translating the path that is considered hot by the compiler could improve performance by a bit.
-It also potentially causes redundant work for the translator, since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
+Another problem this benchmark causes is, that the hot sections use a lot of different not statically mapped registers.
+Resulting form this, there is little benefit in the static register mapping (since they are seldom used), or the dynamic allocation of registers as it is currently done, since the temporarily loaded registers will not be reused anyways.
+QEMU always loads register inputs from memory into temporary registers and then does the needed computation.
+Output registers may be reused as inputs for the following instructions and only written back when the used temporary is needed for another value.
+This means that the generated code for the part of the program mentioned above is effectively very similar to the one that QEMU generates, hence preventing us from having a big advantage over QEMU\@.
 
+The \texttt{600.perlbench}, on the other hand, has a lot of conditional branches and jumps in the hot functions.
+Many of these do not exist in the compiled x86--64 binary, since they are replaced by conditional move instructions.
+RISC--V does not have this instruction type and therefore this behaviour is realised by branches in the RISC--V code.
+This already is a big performance penalty, since branches are prone to misprediction.
+This results in needing to roll back the processor state, whereas conditional moves simply cause some delay until the value is ready.
+If the compiler arranges code in a way that the outputs of the conditional moves are only used later, then this delay is basically irrelevant, while a jump misprediction might cause a major performance hit.
+
+Initially, these jumps cause a lot of context switches since recursive translation currently is only employed for unconditional branches/calls, so for every one of the branches it initially is necessary to switch back for translating the taken paths.
+Recursively translating the path that is considered hot by the compiler might improve performance there by a bit.
+
+Combined with unconditional jumps, which are also very abundant in this section, this causes a lot of unneeded retranslation, since jumping to the middle of an already-translated block is currently handled by treating it like translating a new block beginning at the jump target.
+These re-translated sections also might end with an unconditional jump, which will cause more retranslation, and so on.
+Apart from causing unnecessary parsing and translation overhead, this also pollutes our code cache index, increasing the possibility for hash collisions, and thus increasing cache lookup time.
+It also severely hurts code density, making the CPU instruction cache less effective.
+This also means that the same conditional branch instruction might be copied at multiple places, making the CPU branch predictor treat them as multiple branches, which means it has less information for a right prediction.
 
 
 \subsection{Evaluation of translator optimisations}
+\label{subsec:evaluation-of-translator-optimisations}
 \begin{table}
 	\centering
 	\begin{tabular}{rl}
@@ -207,8 +222,6 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 % Results of the optimisation option comparisons.
 % Show all SPEC run results and analyse below.
 % ===============================================
-% todo add geomean/avg group at the end of the figure @Simon
-% todo typeset as table? remove no-chain? @Simon
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
 \pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-fusion.csv}\nofusiontable
@@ -260,7 +273,7 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
 			legend style = {
 				at = {(0.98, 0.97)},
 				anchor = north east,
-				legend columns = 3,
+				legend columns = 2,
 				column sep = 0.2cm
 			}
 		]
@@ -294,16 +307,16 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
     assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
     every last row/.style={after row=\bottomrule},
 }
-\pgfplotstablenew[columns={Benchmark}]{10}\printtable
+\pgfplotstablenew[columns={Benchmark}]{11}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
-\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
 
 \begin{table}[h]
 \centering
 \pgfplotstabletypeset[columns/Benchmark/.style={string type},/pgf/number format/fixed, /pgf/number format/precision = 2,/pgf/number format/fixed zerofill=true]{\printtable}
-\caption[Optimisation results]{Optimisation results data (including \texttt{----optimize=none} run) normalized to base.}
+\caption[Optimisation results]{Optimisation results data (including \texttt{----optimize=none} run), normalised to base.}
 \label{tab:table-optim}
 \end{table}
 % ================================
@@ -326,7 +339,7 @@ This makes a context switch back to the translator necessary for every executed 
 The benchmarks that are less impacted by disabling block chaining are the ones where fewer basic blocks were executed relative to their runtime.
 This correlates with the fact that the most executed blocks of these benchmarks contain more instructions and hence execute for a longer time.
 
-Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, providing for a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
+Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, generating a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
 Any workload that frequently accesses registers that are not statically mapped as per table~\vref{tab:static-register-mapping} benefits significantly from this style of register handling, as these registers will essentially behave as if they were statically mapped within the confines of that single basic block.
 
 Of course, our chosen \textit{least recently used}-approach to register replacement into three temporary slots suffers from the same issue known from caching:
@@ -415,7 +428,30 @@ As mentioned in the caption, the unoptimised run was performed with the command 
 The translator will then have to translate every block one-by-one, jump back into the main loop on every block end and fetch the next position based on the current program counter.
 
 
+\subsection{Discussion}
+We reached the goal of outperforming QEMU by employing a direct translation from RISC--V to x86--64 and using various optimisations.
+QEMU first translates the instructions into microinstructions in an intermediate representation independent of platform and ISA.
+While this allows easy implementation of new host and guest architectures, it also means that specific advantages of both guest and host can not be used.
+This leads to needing potentially more host instructions than necessary for a simple task.
+QEMU also does not employ a return address stack, an optimisation which proved to be very worthwhile.
+One of the biggest disadvantages of QEMU, though, is that it does not use a static register mapping.
+Instead it holds all registers in memory and only loads them into one of a few temporary registers when needing them as input operands.
+The loaded output register may then be reused as input for the next instruction.
+If the next instruction needs different inputs, though, the register is written back and needs to be reloaded next time it is needed.
+This obviously leads to a big overhead which we can avoid by statically mapping the most used registers and dynamically allocating temporaries for the rest.
 
+There is probably still some room for improvement to get closer to natively compiled binaries.
+One possibility here would be to further increase the quality of the generated code.
+As mentioned in section~\vref{subsec:evaluation-of-translator-optimisations}, there is still room to increase the efficiency of the pattern matcher and the quality of the patterns.
+Something that might also provide a benefit is increasing the number of dynamically allocated register by decreasing the number of statically mapped registers.
+This could prevent unnecessary loads and write backs in case a block needs more than three different not mapped registers.
+Something that also could be done is treating jumps into the middle of a block not as jumps to new blocks but redirecting them to the already translated block at the specific offset.
+For this, you would need to keep track of the offsets of the specific translated instructions in the block, so it is possible to determine the jump target address.
+
+Overall though, the biggest disadvantage to native compilation can be attributed to the greatly differing architectures.
+The compiler of course takes advantage of both architectures, for example  by employing vectorisation on x86--64.
+If a future RISC--V expansion offers support for this as well, there is the potential for a big performance increase.
+This means that while we are producing code that is effectively equivalent to what the compiler does for the native binary, we do not have the possibility to generate code that is as efficient.
 
 
 

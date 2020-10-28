@@ -8,10 +8,11 @@
 
     \vspace{0.50cm}
 
+%todo single threaded, user space @noah ?
     \textbf{Problem:}
     \begin{itemize}
-        \item Verfügbarkeit von RISC--V Prozessoren ist begrenzt.
-        \item Entwickler, die Code für RISC--V als Zielplatform kompilieren, können diesen nicht ausführen.
+        \item RISC--V Prozessoren sind noch nicht weit verbreitet.
+        \item Entwickler, die Code für RISC--V als Zielplatform kompilieren wollen, können diesen nicht nativ ausführen.
     \end{itemize}
 
     \vspace{0.50cm}
@@ -32,7 +33,7 @@
 
     \begin{minipage}[t]{.47\textwidth}
         \textbf{RISC--V Übersicht:}
-
+        \vspace{0.20cm}
         \begin{itemize}
             \item RISC Schema
             \item Load-Store-Architektur
@@ -44,7 +45,7 @@
     \end{minipage}
     \begin{minipage}[t]{.47\textwidth}
         \textbf{x86--64 Übersicht:}
-
+        \vspace{0.20cm}
         \begin{itemize}
             \item CISC Schema
             \item Register-Memory-Architektur
@@ -57,87 +58,78 @@
 
 \subsection{Dynamische Binärübersetzung} % Noah
 \begin{frame}
-    \frametitle{Dynamische Binärübersetzung}
+    \frametitle{Instruction Set Emulation}
     \framesubtitle{Interpretation}
 
-    \textbf{Vorgehen}
-    \begin{itemize}
-        \item Laden des nächsten Befehls
-        \item Übersetzung
-        \item Ausführen der Seiteneffekte des Befehls (e.g. Änderung eines Registers)
-    \end{itemize}
+    Das Assembly wird konsekutiv abgearbeitet und jeder Befehl wird einzeln übersetzt.
 
     \vspace{0.50cm}
 
-    \textbf{Vorteile}
-    \begin{itemize}
-        \item Einfach zu implementieren
-        \item Keine Erzeugung von JIT Assembler nötig
-    \end{itemize}
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einfach zu implementieren, portable
+            \item[$\textcolor{TUMGreen}\blacksquare$] Keine Erzeugung von JIT Assembler nötig
+        \end{itemize}
+    \end{exampleblock}
 
     \vspace{0.50cm}
 
-    \textbf{Nachteile}
-    \begin{itemize}
-        \item Mehrfache Übersetzung der selben Instruktion
-        \item Wenig Optimierungspotential
-    \end{itemize}
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Geringe Performance
+            \item[$\textcolor{TUMOrange}\blacksquare$] Wenig Optimierungspotential (e.g. threaded interpretation)
+        \end{itemize}
+    \end{alertblock}
 \end{frame}
 
 % todo @Noah rework frame titles
 \begin{frame}
-    \frametitle{Dynamische Binärübersetzung}
-    \framesubtitle{Statische Binärübersetzung}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Dynamische Binärübersetzung}
 
-    \textbf{Vorgehen}
-    \begin{itemize}
-        \item Eimaliges Übersetzen der gesamten Auszuführenden Datei
-        \item Ausführen der Übersetzung
-    \end{itemize}
+    Das Assembly wird schrittweise in die Ziel Architektur übersetzt und dann ausgeführt.
 
     \vspace{0.50cm}
 
-    \textbf{Vorteile}
-    \begin{itemize}
-        \item Einmaliger Übersetzungsaufwand
-        \item Theoretisch fast native Geschwindigkeit erreichbar
-    \end{itemize}
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einmaliger Übersetzungsaufwand
+            \item[$\textcolor{TUMGreen}\blacksquare$] Höhere Performanze, Optimierung des nativen Codes
+        \end{itemize}
+    \end{exampleblock}
 
     \vspace{0.50cm}
 
-    \textbf{Nachteile}
-    \begin{itemize}
-        \item Schwierig zu implementieren (Halteproblem)
-        \item Problematisch bei Änderungen der Assembly zur Runtime
-    \end{itemize}
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Unterstützt keinen selbstverändernden Code
+            \item[$\textcolor{TUMOrange}\blacksquare$] Eingeschränkt auf ein Quell- und Zielplatformpaar
+        \end{itemize}
+    \end{alertblock}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Dynamische Binärübersetzung}
-    \framesubtitle{Dynamische Binärübersetzung}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Statische Binärübersetzung}
 
-    \textbf{Vorgehen}
-    \begin{itemize}
-        \item Einlesen eines Blocks von Befehlen
-        \item (Optional) Optimierungen
-        \item Übersetzen des einzelnen Blocks
-        \item Ausführen des Übersetzten Blocks
-    \end{itemize}
+    Übersetzen der gesamten Quellassembly in die Zielarchitektur.
+    Ausführen des übersetzten Codes.
 
     \vspace{0.50cm}
 
-    \textbf{Vorteile}
-    \begin{itemize}
-        \item Nur tatsächlich notwendige Teile des Programms werden übersetzt
-        \item Instruktionen werden nur einmal Übersetzt
-        \item Blöcke von Instruktionen eigenen sich zur Optimierung
-    \end{itemize}
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einmalige Übersetzung des gesamten Codes, keine Übersetzung zur Laufzeit
+            \item[$\textcolor{TUMGreen}\blacksquare$] Hohe Performanz
+        \end{itemize}
+    \end{exampleblock}
 
     \vspace{0.50cm}
 
-    \textbf{Nachteile}
-    \begin{itemize}
-        \item Problematisch bei Änderungen der Assembly zur Runtime
-    \end{itemize}
-    %todo spacing? fußzeile etwas nah!
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Code Discorvery Problem
+            \item[$\textcolor{TUMOrange}\blacksquare$] Code Location Problem
+        \end{itemize}
+    \end{alertblock}
 \end{frame}
