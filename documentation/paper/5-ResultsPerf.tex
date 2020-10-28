@@ -163,21 +163,30 @@ Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and 
 % ================================
 
 \subsubsection{Analysis}
-% todo @Simon: Sec. 5.2.2 zu 625: Warum ist das euer DBT hier nur unwesentlich schneller als QEMU, im Vergleich zu anderen Benchmarks?
-% todo @Simon: Sec. 5.2.2 zu 600: Dafuer habt ihr doch Chaining? Unklar.
-% todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
 
 \texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
 Retrospective vectorisation on the translator side is not easy since this would involve detecting the vectorisable loop patterns on assembler level, a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
 There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
 Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
 A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
+Another problem this benchmark causes is, that the hot sections use a lot of different not statically mapped registers.
+Resulting form this there is little benefit in the static register mapping, since they are not used a lot, or the dynamic allocation of registers as it is currently done, since the temporarily loaded registers will not be reused anyways.
+QEMU always loads register inputs from memory into temporary registers and then does the needed computation.
+Output registers may be reused as inputs for the following instructions and only written back when the used temporary is needed for another value.
+This means that the generated code for the part of the program mentioned above is effectively very similar to the one that QEMU generates preventing us from having a big advantage over QEMU\@.
 
-The \texttt{600.perlbench} on the other hand has a lot of conditional branches and jumps in the hot blocks.
-This causes a lot of context switches since recursive translation currently is only employed for unconditional branches/calls.
-Recursively translating the path that is considered hot by the compiler could improve performance by a bit.
-It also potentially causes redundant work for the translator, since jumps to the middle of a basic block currently are handled by treating it like a new block beginning at the jump target.
-
+The \texttt{600.perlbench} on the other hand has a lot of conditional branches and jumps in the hot functions.
+Many of these are not existing in the compiled x86--64 binary since they are replaced by conditional move instructions there.
+RISC--V does not have this instruction type and therefore these are replaced by branches in the RISC--V code.
+This already is a big performance penalty since branches are prone to misprediction resulting in needing to rollback the processor state while conditional moves simply cause some delay until the value is ready.
+If the compiler arranges code in a way that the outputs of the conditional moves are only used later, then this delay is basically no problem, while a jump misprediction might cause a major performance hit.
+Initially these jumps cause a lot of context switches since recursive translation currently is only employed for unconditional branches/calls, so for every one of the branches it initially is necessary to switch back for translating the taken paths.
+Recursively translating the path that is considered hot by the compiler might improve performance there by a bit.
+Combined with unconditional jumps, which are also very abundant in this section, this also causes a lot of unneeded retranslation, since jumping to the middle of another block is currently handled by treating it like translating a new block beginning at the jump target.
+These re-translated sections also might end with an unconditional jump which will cause more retranslation and so on.
+Apart from causing unnecessary parsing and translation overhead this also pollutes our code cache index increasing the possibility for hash collisions and thus increasing cache lookup time.
+It also severely hurts code density, making the CPU instruction cache less effective.
+This also means that the same conditional branch instruction might be copied at multiple places which means that the CPU branch predictor treats them as multiple branches which means it has less information for a right prediction.
 
 
 \subsection{Evaluation of translator optimisations}
@@ -414,6 +423,8 @@ As mentioned in the caption, the unoptimised run was performed with the command 
 The translator will then have to translate every block one-by-one, jump back into the main loop on every block end and fetch the next position based on the current program counter.
 
 
+\subsection{Discussion}
+% todo @Simon: Sec. 5.2.2: Fehlt: Was fehlt, um besser an die native Kompilierung heranzukommen? Warum ist euer DBT besser als QEMU? Die Antworten koennen auch nach 5.3 (oder (vielleicht besser?) in einer neuen "5.5 Discussion") gegeben werden -- aber irgendwo solltet ihr Antworten haben.
 
 
 
