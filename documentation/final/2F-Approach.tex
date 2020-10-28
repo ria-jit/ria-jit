@@ -1,5 +1,89 @@
 \subsection{Programmablauf} % Johannes
 
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=green!30]
+\tikzstyle{process} = [rectangle, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=blue!30, execute at begin node=\setlength{\baselineskip}{10pt}]
+\tikzstyle{decision} = [diamond, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=yellow!30, execute at begin node=\setlength{\baselineskip}{10pt}]
+\tikzstyle{arrow} = [thick,->,>=latex]
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Initialisierung}
+	\centering
+	\begin{tikzpicture}[node distance=1.5cm]
+		\node (start) [startstop] {\scriptsize start translator};
+		\node[process, align=center, below of=start] (parse) {\scriptsize parse command\\\scriptsize line arguments};
+		\draw [arrow] (start) -- (parse);
+		\pause
+		
+		\node[process, align=center, below of=parse] (map-executable) {\scriptsize map executable\\\scriptsize into memory};
+		\draw [arrow] (parse) -- (map-executable);
+		\pause
+		
+		\node[process, align=center, below of=map-executable] (initialize) {\scriptsize initialize guest \\\scriptsize environment \& optimizers};
+		\draw [arrow] (map-executable) -- (initialize);
+		
+		\node[process, draw=none, fill=none, below of=initialize] (bottom-invisible) {};
+		\draw [arrow] (initialize) -- (bottom-invisible);
+	
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Transcode loop}
+	\centering
+	\begin{tikzpicture}[node distance=1.5cm]
+		\node[process, draw=none, fill=none, minimum width=0cm] (top-invisible) {};
+		\node[process, align=center, right of=top-invisible] (get-pc) {\scriptsize get program\\\scriptsize counter value};
+		\draw [arrow] (top-invisible) -- (get-pc);
+		\pause
+		
+		\node[decision, align=center, below of=get-pc, yshift=-0.5cm] (cache-lookup) {\scriptsize block\\\scriptsize cached};
+		\draw[arrow] (get-pc) -- (cache-lookup);
+		\pause
+		
+		\node[process, below of=cache-lookup, yshift=-0.5cm] (get-cache) {\scriptsize retrieve from\\\scriptsize cache};
+		\draw[arrow] (cache-lookup) -- node[anchor=west] {\scriptsize yes} (get-cache);
+		\pause
+		
+		\node[process, right of=cache-lookup, xshift=1cm] (translate) {\scriptsize translate\\\scriptsize block};
+		\draw[arrow] (cache-lookup) -- node[anchor=south] {\scriptsize no} (translate);
+		\pause
+		
+		\node[process, right of=translate, xshift=1cm] (store-cache) {\scriptsize store in\\\scriptsize cache};
+		\draw[arrow] (translate) -- (store-cache);
+		\pause
+		
+		\node[process, below of=store-cache, yshift=-0.5cm, fill=blue!50] (switch-guest) {\scriptsize switch to\\\scriptsize guest context};
+		\draw[arrow] (store-cache) -- (switch-guest);
+		\draw[arrow] (get-cache) -- (switch-guest);
+		\pause
+		
+		\node[process, right of=switch-guest, xshift=1cm, fill=blue!75] (execute) {\scriptsize execute\\\scriptsize block};
+		\draw [arrow] (switch-guest) -- (execute);
+		\pause
+		
+		\node[process, right of=execute, xshift=1cm, fill=blue!50] (switch-host) {\scriptsize switch to\\\scriptsize host context};
+		\draw[arrow] (execute) -- (switch-host);
+		\pause
+		
+		\node[decision, above of=switch-host, yshift=2.5cm] (terminated) {\scriptsize guest\\\scriptsize terminated};
+		\draw[arrow] (switch-host) -- (terminated);
+		\pause
+		
+		\node[startstop, right of=terminated, xshift=1.2cm] (terminate) {\scriptsize exit};
+		\draw[arrow] (terminated) -- node[anchor=south] {\scriptsize no} (terminate);
+		\pause
+		
+		\draw[arrow] (terminated) -- node[anchor=south] {\scriptsize yes} (get-pc);
+	\end{tikzpicture}
+\end{frame}
+
+
+
+
 \subsection{Partitionierung des Codes} % Flo
 \begin{frame}
 	\frametitle{Partitionierung des Codes}
@@ -380,5 +464,35 @@
 \end{frame}
 
 
+
 \subsection{Optimierungen} % Johannes
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Peformance-Einbußen bei Dynamischer Binärübersetzung}
+	\begin{itemize}
+		\item Blockweise Übersetzung und Ausführung -> ständiger Wechsel zwischen guest und host
+		\begin{itemize}
+			\item viele Kontextwechsel
+			\item viele Cache-Lookups
+		\end{itemize}
+		\item ISA-Unterschiede
+		\begin{itemize}
+			\item Mapping einzelner instruktionen ineffizient
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{block}{Optimierungsstrategie}
+		\begin{itemize}
+			\item Wechsel zwischen guest und host vermeiden \\
+				$\rightarrow$ mehrere Blöcke direkt hintereinander ausführen
+			\item Besseres Instruction-Mapping \\
+				$\rightarrow$ mehrere Instruktionen betrachten
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Recursive translation}
+\end{frame}
 
