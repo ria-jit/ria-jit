@@ -11,7 +11,7 @@ This means developers usually do not have access to real hardware yet, so they m
 When attempting to execute programs compiled for a foreign architecture on a different native one, there are essentially three distinct approaches:
 
 \begin{itemize}
-    \item \textbf{Interpretation}, where, much alike interpreted programming languages (e.g.\ JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the native system in order to simulate the guest ISA\@.
+    \item \textbf{Interpretation}, where, much alike interpreted programming languages (such as JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the native system in order to simulate the guest ISA\@.
         \subitem While likely being the easiest to actually be implemented, this comes with a significant performance penalty mainly because every single assembly instruction will have to be interpreted for every execution of that program part, potentially causing a lot of redundant work.
     \item \textbf{Static Binary Translation}, where the executable is statically reverse-engineered and translated to the other architecture as a whole.
     After this translation step, it can be executed as if it were a native binary, without the need for any further special treatment.
