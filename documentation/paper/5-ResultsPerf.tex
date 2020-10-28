@@ -61,6 +61,7 @@ This means the results are a measure for the relative efficiency of the infrastr
 Through the various performance optimisations mentioned in section~\vref{sec:optimise}, we are able to reach our goal of consistently outperforming QEMU\@.
 In some cases the advantage is only slight, but in other workloads like the 602.gcc compiler benchmark the advantage grows to a comfortable $80\,\%$.
 
+%todo text overhang @Simon
 Most benchmarks show runtimes of about $1.9$x native with \texttt{625.x264} and \texttt{600.perlbench} being the outliers.
 
 % ======= SPEC CPU Results =======
@@ -292,10 +293,10 @@ The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an ov
     assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
     every last row/.style={after row=\bottomrule},
 }
-\pgfplotstablenew[columns={Benchmark}]{10}\printtable
+\pgfplotstablenew[columns={Benchmark}]{11}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
-\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
 \pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
 
 \begin{table}[h]
