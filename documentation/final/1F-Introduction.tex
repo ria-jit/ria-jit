@@ -1,0 +1,134 @@
+\subsection{Problembeschreibung} % Noah
+\begin{frame}
+    \frametitle{Problembeschreibung}
+
+    \vspace{0.50cm}
+
+    \textbf{RISC--V:} Offene ISA, die dem Reduced Instruction Set Computer (RISC) Schema folgt.
+
+    \vspace{0.50cm}
+
+%todo single threaded, user space @noah ?
+    \textbf{Problem:}
+    \begin{itemize}
+        \item RISC--V Prozessoren sind noch nicht weit verbreitet.
+        \item Entwickler, die Code für RISC--V als Zielplatform kompilieren wollen, können diesen nicht nativ ausführen.
+    \end{itemize}
+
+    \vspace{0.50cm}
+
+    \textbf{Lösung:} Emulieren des RISC--V Befehlsatzes auf einem x86--64 Prozessor
+
+    \vspace{0.50cm}
+
+    \begin{block}{Warum x86--64?}
+        x86--64 ist der derzeitige Standard für Prozessoren in Laptops und Desktop-PCs.
+    \end{block}
+\end{frame}
+
+\subsection{RISC--V vs. x86--64} % Noah
+\begin{frame}
+    \frametitle{RISC--V vs. x86--64}
+    \framesubtitle{Gegenüberstellung}
+
+    \begin{minipage}[t]{.47\textwidth}
+        \textbf{RISC--V Übersicht:}
+        \vspace{0.20cm}
+        \begin{itemize}
+            \item RISC Schema
+            \item Load-Store-Architektur
+            \item 31 General Purpose Register
+            \item 32 Floating Point Register
+            \item 3-Operanden Adressform
+            \item Spezielles Zero-Register
+        \end{itemize}
+    \end{minipage}
+    \begin{minipage}[t]{.47\textwidth}
+        \textbf{x86--64 Übersicht:}
+        \vspace{0.20cm}
+        \begin{itemize}
+            \item CISC Schema
+            \item Register-Memory-Architektur
+            \item 16 General Purpose Register
+            \item 16 Floating Point (\texttt{XMM}) Register
+            \item 2-Operanden Adressform
+        \end{itemize}
+    \end{minipage}
+\end{frame}
+
+\subsection{Dynamische Binärübersetzung} % Noah
+\begin{frame}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Interpretation}
+
+    Das Assembly wird konsekutiv abgearbeitet und jeder Befehl wird einzeln übersetzt.
+
+    \vspace{0.50cm}
+
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einfach zu implementieren, portable
+            \item[$\textcolor{TUMGreen}\blacksquare$] Keine Erzeugung von JIT Assembler nötig
+        \end{itemize}
+    \end{exampleblock}
+
+    \vspace{0.50cm}
+
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Geringe Performance
+            \item[$\textcolor{TUMOrange}\blacksquare$] Wenig Optimierungspotential (e.g. threaded interpretation)
+        \end{itemize}
+    \end{alertblock}
+\end{frame}
+
+% todo @Noah rework frame titles
+\begin{frame}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Dynamische Binärübersetzung}
+
+    Das Assembly wird schrittweise in die Ziel Architektur übersetzt und dann ausgeführt.
+
+    \vspace{0.50cm}
+
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einmaliger Übersetzungsaufwand
+            \item[$\textcolor{TUMGreen}\blacksquare$] Höhere Performanze, Optimierung des nativen Codes
+        \end{itemize}
+    \end{exampleblock}
+
+    \vspace{0.50cm}
+
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Unterstützt keinen selbstverändernden Code
+            \item[$\textcolor{TUMOrange}\blacksquare$] Eingeschränkt auf ein Quell- und Zielplatformpaar
+        \end{itemize}
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Instruction Set Emulation}
+    \framesubtitle{Statische Binärübersetzung}
+
+    Das gesamten Quellassembly  wird in die Zielarchitektur übersetzt und dann ausgeführt.
+
+    \vspace{0.50cm}
+
+    \begin{exampleblock}{Vorteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMGreen}\blacksquare$] Einmalige Übersetzung des gesamten Codes, keine Übersetzung zur Laufzeit
+            \item[$\textcolor{TUMGreen}\blacksquare$] Hohe Performanz
+        \end{itemize}
+    \end{exampleblock}
+
+    \vspace{0.50cm}
+
+    \begin{alertblock}{Nachteile}
+        \begin{itemize}
+            \item[$\textcolor{TUMOrange}\blacksquare$] Code Discorvery Problem
+            \item[$\textcolor{TUMOrange}\blacksquare$] Code Location Problem
+        \end{itemize}
+    \end{alertblock}
+\end{frame}

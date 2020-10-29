@@ -1,0 +1,53 @@
+RISC--V is an open ISA first conceptualised in 2010 with the initial goals of research and education in mind.
+In contrast to the widespread x86--64~ISA~\cite{intel2017man} it employs the RISC (Reduced Instruction Set Computer) scheme by providing fewer and less powerful instructions, addressing modes and cycle-heavy features in favour of a simplified micro architecture.
+Its development takes the lessons learned in terms of backwards compatibility and future-proofing from other widespread ISAs like x86 into account, and aims to provide an open interface for the architecture, rather than strict implementation details.
+This grants a large freedom to the implementors and greatly increases the flexibility and ease of working with the architecture~\cite[S. 1f]{riscvspec}.
+As such, it looks to be open to future extensions by already defining a basis for future 128-bit integer instructions and instruction length encodings of up to 176 bits (22 bytes).
+The possibility to expand further when widespread technology developments would require such an expansion is also remained open.
+
+There is already some hardware available for RISC--V\footnote{The biggest name here is probably SIFive~\cite{sifive}, which already produce multi-core CPUs with super scalar out-of-order pipelines reaching multi-GHz clock speeds.}, but it is not yet widespread.
+This means developers usually do not have access to real hardware yet, so they must instead rely on emulation to test their code written for the RISC--V platform.
+
+When attempting to execute programs compiled for a foreign architecture on a different native processor, there are essentially three distinct approaches:
+
+\begin{itemize}
+    \item \textbf{Interpretation}, where, much alike interpreted programming languages (such as JavaScript, Python, or Ruby), the assembly instructions located in the binary are examined while emulating the execution of the program, and equivalent actions are taken on the native system in order to simulate the guest ISA\@.
+        \subitem While likely being the easiest to actually be implemented, this comes with a significant performance penalty mainly because every single assembly instruction will have to be interpreted for every execution of that program part, potentially causing a lot of redundant work.
+    \item \textbf{Static Binary Translation}, where the executable is statically reverse-engineered and translated to the other architecture as a whole.
+    After this translation step, it can be executed as if it were a native binary, without the need for any further special treatment.
+    In theory you could reach near native speeds for the generated binary using this technique.
+    There some difficulties with this though, one example is register indirect branches, which require some way to convert the foreign addresses to native at runtime.
+    Any program that produces or edits assembly at runtime would also generally prove difficult to translate statically.
+    \item \textbf{Dynamic Binary Translation} (DBT), which serves as a middle ground between interpreting and statically translating the executable.
+    It aims to translate the program on the fly, while only focussing on the parts that are actually needed for execution.
+    Therefore, it can save some of the overhead of a static translator by not spending execution time on unused code paths.
+    The other aforementioned issues are also fairly easily resolved.
+    Unlike an interpreter, every instruction only has to be translated once and can then be run without any unnecessary overhead.
+    Of course, this assumes that the translation routines are relatively swift in performing their functions, so as not to introduce any more overhead than necessary~\cite[S. 1f.]{bintrans}.
+\end{itemize}
+
+One of the most popular software emulators in general is QEMU~\cite{bellard2005qemu}\@.
+While QEMU is a portable DBT that supports a wide variety of architectural combinations and ISAs, this also makes it hard to optimise it for a specific guest/host combination and therefore the program execution will be slower than necessary.
+
+Our aim is to provide a faster emulator, allowing the execution of RISC--V 64 bit code on an x86--64 machine by means of dynamic binary translation.
+We want to provide a tool to execute binaries compiled for RISC--V Linux on Linux for x86--64, what is conventionally called \textit{user space emulation}, full system emulation is not supported.
+Currently only single threaded applications are supported, since managing the execution environment and guaranteeing atomicity for the respective instructions would be rather difficult.\\
+
+The rest of this paper is structured as follows:
+Section~\ref{sec:Background} will define concepts and constraints relevant for our undertaking, after which section~\ref{sec:Approach} will show our approach and describe the rationale for major design decisions taken during the implementation.
+Selected parts of the translator will then further be elaborated on in section~\ref{sec:Implementation}.
+Finally, sections~\ref{sec:ResultsPerf} and~\ref{sec:Summary} will evaluate the success and quality of our developed solutions by using standardised benchmark suites, as well as provide a short summary and future perspective of the project at hand.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

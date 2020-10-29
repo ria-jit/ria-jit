@@ -1,0 +1,473 @@
+The following section will give an overview of the methods used to test the programs correctness and performance, as well as lay out the results of these tests.
+\subsection{Verification}
+The correctness of our translator is checked by extensive unit tests, which are used to check if the translations of a the RISC--V instruction perform the operations that are expected as per the architecture specification.
+
+Using the parameterised tests provided by the Google~Test~\cite{gtest} framework, we are able to test a variety of different input values and combinations of statically mapped or not mapped register operands.
+Different combinations of using the same register and zero register \texttt{x0} for in- and output are also tested.
+Apart from this, correctness is also confirmed by being able to successfully run the \textit{SPEC CPU 2017} benchmark suite as described in section~\ref{subsec:spec-cpu-2017-benchmark-suite} below.
+
+
+\subsection{SPEC CPU 2017 Benchmark Suite}
+\label{subsec:spec-cpu-2017-benchmark-suite}
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		\textbf{SPECspeed Benchmark} & \textbf{Workload}\\
+		\midrule
+		\texttt{600.perlbench} & Perl interpreter\\
+		\texttt{602.gcc} & GNU C compiler\\
+		\texttt{605.mcf} & Route planning\\
+		\texttt{620.omnetpp} & Discrete Event simulation -- computer network\\
+		\texttt{623.xalancbmk} & XML to HTML conversion via XSLT\\
+		\texttt{625.x264} & Video compression\\
+		\texttt{631.deepsjeng} & Artificial Intelligence: alpha-beta tree search (Chess)\\
+		\texttt{641.leela} & Artificial Intelligence: Monte Carlo tree search (Go)\\
+		\texttt{648.exchange2} & Artificial Intelligence: recursive solution generator (Sudoku)\\
+		\texttt{657.xz} & General data compression\\
+		\bottomrule
+	\end{tabular}
+	\caption[SPEC CPU 2017 workload description]%
+	{A description of the workloads covered by the \textit{SPEC CPU 2017} \texttt{intspeed} suite~\cite{spec-cpu-doc}.}
+	\label{tab:spec-description}
+\end{table}
+
+
+Measuring the performance of the DBT was accomplished by using the tools in \textit{SPEC CPU 2017} \texttt{intspeed} suite of benchmarks.
+This not only generates reproducible and widely accepted results in the industry, it also validates the results produced during the run, thus ruling out any errors in the translations of the benchmarks.
+
+The \texttt{intspeed} suite also presents a variety of different workloads to the translator that are based on real-life scenarios, thus producing an accurate and understandable overview of the performance in a non-controlled environment. % name
+An overview of the workloads covered by the aforementioned suite can be found in table~\ref{tab:spec-description}.
+Further context is provided by performance testing using the data compression utility \textit{gzip}~\cite{gzip}, where compression time is compared between runs on a native machine, in QEMU and in the DBT\@.
+
+All testing was performed on an x86--64 8-core \textit{Intel Xeon Bronze 3106} system clocked at $1,70$ GHz base with $78$ GiB of physical memory, running \textit{Ubuntu 18.04.3 LTS}, kernel version \textit{4.15.0-70-generic}.
+The DBT was compiled via \texttt{CMAKE\_BUILD\_TYPE} set to \texttt{Release} and \texttt{CMAKE\_INTERPROCEDURAL\_OPTIMIZATION} enabled, which implies \texttt{-O3} and \texttt{-flto -fno-fat-lto-objects}.
+
+The benchmarks were compiled using compiler optimisation level \texttt{-O3} and linked statically.
+For the native run, \texttt{-march=x86-64} was used on GCC version 7.5.0 from the default Ubuntu package repository.
+The RISC--V binaries for our translator and QEMU were compiled using \texttt{-march=rv64ima} and \texttt{-mabi=lp64}.
+For this, a self-compiled GCC with the sources taken from the official toolchain repository at version 10.1.0 was used.
+This made it necessary to also specify \texttt{-fcommon -fallow-argument-mismatch} to stay fully compatible.
+
+\subsubsection{Results}
+Figure~\vref{fig:spec-results} shows normalized performance results of the \textit{SPEC CPU 2017} \texttt{intspeed} benchmarks, effectively showing how much overhead QEMU and our translator caused versus the same benchmark compiled and run natively.
+Some of the overhead must of course be attributed to the architectural differences between x86 and RISC--V resulting in needing more instructions in RISC-V assembly than x86.
+This means these results do not directly measure the overhead vs.\ native that the whole translator infrastructure (parsing, translation, code cache etc.) causes.
+What we can compare though, is the relative results of QEMU and our translator, since both use the same compiler and thus get the same binary. % name
+This means the results are a measure for the relative efficiency of the infrastructure and the quality of the generated code.
+
+Through the various performance optimisations mentioned in section~\ref{sec:optimise}, we are able to reach our goal of consistently outperforming QEMU\@.
+In some cases the advantage is only slight, but in other workloads like the \texttt{602.gcc} compiler benchmark the advantage grows to a comfortable $80\,\%$.
+
+Most benchmarks show runtimes of about $1.9$x native with \texttt{600.perlbench} and \texttt{625.x264} being the outliers.
+
+% ======= SPEC CPU Results =======
+% Results of the intspeed SPEC CPU 2017 runs.
+% ================================
+
+\newcommand{\addAvg}[3]{ %
+% #1=table name
+% #2=first column name
+% #3=list of columns to decorate
+% Transpose the table, so we can work on rows instead of columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+\pgfplotstablecreatecol[
+    create col/assign/.code={%
+      \def\entry{}
+      \foreach \i in {#3} {
+        \ifnum\pgfplotstablerow=\i
+        \def\colsum{0}
+                  \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+                  \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+                      \pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+                  }
+          \pgfmathsetmacro\colmean{\colsum/(\pgfplotstablecols-1)}
+          \xdef\entry{\colmean}
+        \fi
+      }
+      \pgfkeyslet{/pgfplots/table/create col/next content}\entry
+    }
+]{Avg}\intermediatetable
+
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{#1}{\intermediatetable}
+}
+%
+
+\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-base/dbt.csv}\dbttable
+\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\dbttable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbttable
+\addAvg{\dbttable}{Benchmark}{12}
+%\pgfplotstabletypeset[
+%  columns/Benchmark/.style={string type},
+%  columns={Benchmark, ratio}]{\dbttable}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {SPEC CPU 2017 \texttt{intspeed} Results},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to native]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			ytick = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0},
+			scaled y ticks = false,
+			xticklabels from table={\dbttable}{Benchmark},
+			ymin = 0, ymax = 6.5,
+			ymajorgrids = true,
+			bar width = 5pt,
+			height = 7.0cm,
+			width = 0.9\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+			% Native results
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/native.csv}\nativelocaltable
+			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\nativelocaltable
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativelocaltable
+			\addAvg{\nativelocaltable}{Benchmark}{12}
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativelocaltable;
+
+			% QEMU results
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-base/qemu.csv}\qemutable
+			\pgfplotstablecreatecol[create col/copy column from table=\nativetable{Est. Base Run Time}]{native}\qemutable
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemutable
+			\addAvg{\qemutable}{Benchmark}{12}
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemutable;
+
+			% DBT results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \dbttable;
+
+			\legend{native, QEMU, DBT}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[SPEC CPU 2017 Results]%
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017} \texttt{intspeed} (normalised, lower is better).}
+	\label{fig:spec-results}
+\end{figure}
+% ================================
+
+\subsubsection{Analysis}
+
+\texttt{625.x264} on x86 heavily takes advantage of vectorisation, which RISC-V does not yet support, meaning that the compiler will have to generate loops that run more often, thus needing significantly more instructions for the same result.
+Retrospective vectorisation on the translator side is not easy, since this would involve detecting the vectorisable loop patterns on assembler level -- a task that even the compiler often isn't very effective at, even though it has the knowledge of the entire program.
+
+There are also instances where it relies heavily on 32 bit integer arithmetic, which in RISC-V always causes the results to be sign extended to the 64 bit register width, in comparison to x86 which zero extends in these cases.
+Thus many consecutive 32 bit instructions on the same values cause a lot of redundant sign extensions.
+A future version of the translator could do the sign extensions lazily to save on a bunch of redundant work in some cases.
+
+Another problem this benchmark causes is, that the hot sections use a lot of different not statically mapped registers.
+Resulting form this, there is little benefit in the static register mapping (since they are seldom used), or the dynamic allocation of registers as it is currently done, since the temporarily loaded registers will not be reused anyways.
+QEMU always loads register inputs from memory into temporary registers and then does the needed computation.
+Output registers may be reused as inputs for the following instructions and only written back when the used temporary is needed for another value.
+This means that the generated code for the part of the program mentioned above is effectively very similar to the one that QEMU generates, hence preventing us from having a big advantage over QEMU\@.
+
+The \texttt{600.perlbench}, on the other hand, has a lot of conditional branches and jumps in the hot functions.
+Many of these do not exist in the compiled x86--64 binary, since they are replaced by conditional move instructions.
+RISC--V does not have this instruction type and therefore this behaviour is realised by branches in the RISC--V code.
+This already is a big performance penalty, since branches are prone to misprediction.
+This results in needing to roll back the processor state, whereas conditional moves simply cause some delay until the value is ready.
+If the compiler arranges code in a way that the outputs of the conditional moves are only used later, then this delay is basically irrelevant, while a jump misprediction might cause a major performance hit.
+
+Initially, these jumps cause a lot of context switches since recursive translation currently is only employed for unconditional branches/calls, so for every one of the branches it initially is necessary to switch back for translating the taken paths.
+Recursively translating the path that is considered hot by the compiler might improve performance there by a bit.
+
+Combined with unconditional jumps, which are also very abundant in this section, this causes a lot of unneeded retranslation, since jumping to the middle of an already-translated block is currently handled by treating it like translating a new block beginning at the jump target.
+These re-translated sections also might end with an unconditional jump, which will cause more retranslation, and so on.
+Apart from causing unnecessary parsing and translation overhead, this also pollutes our code cache index, increasing the possibility for hash collisions, and thus increasing cache lookup time.
+It also severely hurts code density, making the CPU instruction cache less effective.
+This also means that the same conditional branch instruction might be copied at multiple places, making the CPU branch predictor treat them as multiple branches, which means it has less information for a right prediction.
+
+
+\subsection{Evaluation of translator optimisations}
+\label{subsec:evaluation-of-translator-optimisations}
+\begin{table}
+	\centering
+	\begin{tabular}{rl}
+		\toprule
+		\textbf{Option} & \textbf{Description}\\
+		\midrule
+		\texttt{no-ras} & Disable the return address stack\\
+		\texttt{no-chain} & Disable block chaining\\
+		\texttt{no-jump} & Disable recursive jump target translation\\
+		\texttt{no-fusion} & Disable macro operation fusion\\
+		\texttt{none} & All of the above\\
+		\bottomrule
+	\end{tabular}
+	% state: 5afb8706e482917866a3507a54d1512befe56a21
+	\caption[Translator optimisation options]%
+	{The options for translator optimisations, as seen in \texttt{----optimize=help}.}
+	\label{tab:opt-options}
+\end{table}
+
+In order to evaluate the optimisations built into the translator, we ran the \textit{SPEC CPU 2017} suite with various combinations of the available optimisation options in the same translator version (\texttt{v1.3.1}, the final release in the project's main development cycle).
+
+The results of these runs can be seen in figure~\ref{fig:opt-compare}, and an overview of the specified switches can be found in table~\ref{tab:opt-options}.
+
+% ======= Optimisation comparison results =======
+% Results of the optimisation option comparisons.
+% Show all SPEC run results and analyse below.
+% ===============================================
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/base.csv}\basetable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-ras.csv}\norastable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-fusion.csv}\nofusiontable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/no-jump-no-ras.csv}\nojumpnorastable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-compare/none.csv}\nonetable
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\basetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\basetable
+\addAvg{\basetable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\norastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\norastable
+\addAvg{\norastable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nofusiontable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nofusiontable
+\addAvg{\nofusiontable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nojumpnorastable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nojumpnorastable
+\addAvg{\nojumpnorastable}{Benchmark}{12}
+
+\pgfplotstablecreatecol[create col/copy column from table=\basetable{Est. Base Run Time}]{base}\nonetable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{base}}]{ratio}\nonetable
+\addAvg{\nonetable}{Benchmark}{12}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Optimisation option evaluation},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to base]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			xticklabels from table={\basetable}{Benchmark},
+			ytick = {0.5, 1,1.2,1.4,1.6,1.8,2.0},
+			ymin = 0.5, ymax = 2,
+			ymajorgrids = true,
+			bar width = 3.5pt,
+			height = 8.0cm,
+			width = 0.95\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 2,
+				column sep = 0.2cm
+			}
+		]
+			% base results
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \basetable;
+			
+			% no-fusion results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \nofusiontable;
+
+			% no-ras results
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \norastable;
+			
+			% no-jump-no-ras results
+			\addplot+[fill=era-dbt-2, draw=black] table [x expr=\coordindex, y=ratio] \nojumpnorastable;
+			
+			\legend{base, \texttt{no-fusion}, \texttt{no-ras}, \texttt{no-jump}{,~} \texttt{no-ras}}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[Translator optimisation evaluation results]%
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017}s \texttt{intspeed} with various optimisation option combinations (normalised, lower is better).}
+	\label{fig:opt-compare}
+\end{figure}
+
+
+\pgfplotstableset{
+	% define how the ’new’ column shall be filled:
+	create on use/Benchmark/.style={create col/copy column from table=\basetable{Benchmark}}
+}
+\pgfplotstableset{% Global config
+    every head row/.style={before row=\toprule,after row=\midrule},
+    assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+    every last row/.style={after row=\bottomrule},
+}
+\pgfplotstablenew[columns={Benchmark}]{11}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nofusiontable{ratio}]{no-fusion}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\norastable{ratio}]{no-ras}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nojumpnorastable{ratio}]{{no-jump, no-ras}}\printtable
+\pgfplotstablecreatecol[create col/copy column from table=\nonetable{ratio}]{none}\printtable
+
+\begin{table}[h]
+\centering
+\pgfplotstabletypeset[columns/Benchmark/.style={string type},/pgf/number format/fixed, /pgf/number format/precision = 2,/pgf/number format/fixed zerofill=true]{\printtable}
+\caption[Optimisation results]{Optimisation results data (including \texttt{----optimize=none} run), normalised to base.}
+\label{tab:table-optim}
+\end{table}
+% ================================
+
+
+Macro operation fusion does not seem to provide a large performance benefit, in most benchmarks the numbers do not even suggest any performance increase above natural deviation of benchmark runs.
+This means the implemented pattern matching does not give the desired effect of a good performance increase.
+Further tweaking of the checked patterns might make this optimisation more worthwhile.
+
+The return address stack provided for a significant advantage in some benchmarks.
+Especially the function call heavy \texttt{620.omnetp}, \texttt{623.xalancbmk}, \texttt{631.deepsjeng}, \texttt{641.leela} benchmarks showed good performance gains of over $50\,\%$.
+The \texttt{600.perlbench}, as well as the \texttt{648.exchange2} and \texttt{657.xz} benchmarks where most of the runtime is spent in only a couple loops naturally could not benefit a lot.
+
+Recursive jump translation without also utilising the return address stack only provided a performance increase over disabling both in some benchmarks.
+The main reason for this might be that this also makes context switches necessary on unconditional jumps that aren't function calls or returns.
+This makes jump-heavy benchmarks take a performance hit while jump-light benchmarks are almost unaffected.
+
+Expectedly, the highest performance penalty was incurred by disabling chaining as well.
+This makes a context switch back to the translator necessary for every executed basic block.
+The benchmarks that are less impacted by disabling block chaining are the ones where fewer basic blocks were executed relative to their runtime.
+This correlates with the fact that the most executed blocks of these benchmarks contain more instructions and hence execute for a longer time.
+
+Furthermore, the lazy replacement register handling described in section~\ref{sec:reg-handle} had a high impact in some benchmarks, most notably \texttt{657.xz}, generating a roughly $45\,\%$ performance increase -- more than any other optimisation apart from block chaining.
+Any workload that frequently accesses registers that are not statically mapped as per table~\vref{tab:static-register-mapping} benefits significantly from this style of register handling, as these registers will essentially behave as if they were statically mapped within the confines of that single basic block.
+
+Of course, our chosen \textit{least recently used}-approach to register replacement into three temporary slots suffers from the same issue known from caching:
+If a program accesses the same four not-statically-mapped registers in order in a loop, the algorithm will always replace and write back the value that would be needed next.
+Preventing this issue, however, is not a trivial task even when presented with the entirety of the guest program.
+So, as this approach can not perform worse than accessing the register file in memory for each instruction and has lead to significant performance increases in some workloads, this is a very worthwhile optimisation.
+
+
+
+\subsection{Data compression via gzip}
+% gzip results
+Next to the results of the \textit{SPEC CPU 2017} suite, it is also valuable to measure the performance of the translator in real-world workloads by running data compression via \textit{gzip}.
+
+For better comparability, both the native and RISC-V \textit{gzip} binaries were compiled manually with the compiler optimisation level \texttt{-O3} alongside the linker flag \texttt{-static}.
+The RISC-V ABI was setup with \texttt{--march=rv64ima} and \texttt{--mabi=lp64}.
+
+% ======= gzip execution time =======
+% Execution time of compression (500 MB, 5 runs).
+% ===================================
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {Random Data Compression (\textit{gzip}, 500 MB, 5 runs)},
+			xbar,
+			area legend,
+			xlabel = {Execution time [ratio to native] (lower is better)},
+			symbolic y coords = {Native,QEMU,DBT,\ldots unoptimised},
+			xmin = 0,
+			bar shift = 0.0cm,
+			y dir = reverse,
+			enlarge y limits = {value=0.2, auto},
+			xmajorgrids = true,
+			height = 5.5cm,
+			width = 13.0cm,
+			legend style = {
+				at = {(0.5, -0.45)},
+				anchor = north,
+				legend columns = 4,
+				column sep = 0.2cm
+			}
+		]
+			\addplot+ [
+				fill=era-native,
+				draw=black
+			] coordinates {
+				(1.0,Native) % 44.15
+			};
+
+			\addplot+ [
+				fill=era-qemu,
+				draw=black
+			] coordinates {
+				(2.767157418,QEMU) % 122.17
+			};
+			
+			\addplot+ [
+				fill=era-dbt-1,
+				draw=black
+			] coordinates {
+				(1.911438279,DBT) % 84.39
+			};
+			
+			\addplot+ [
+				fill=era-dbt-2,
+				draw=black
+			] coordinates {
+				(9.527180068,\ldots unoptimised) % 420.625
+			};
+			
+			\legend{Native, QEMU, DBT, DBT unoptimised}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[Execution time of gzip compression]%
+	{Execution time of gzip file compression (500 MB of random data, 5 runs) in seconds (normalised, lower is better).\\Unoptimised run executed with \texttt{----optimize=none}.}
+	\label{fig:gzip-execution-time}
+\end{figure}
+% ===================================
+
+Figure~\vref{fig:gzip-execution-time} lists the execution times of \textit{gzip} compressing a pseudo-random $500$ MB file sourced from \texttt{/dev/urandom}\footnote{Reproducible via \texttt{base64 /dev/urandom | head -c 524288000 > random.txt;}}.
+
+Through our very efficient return address stack, recursive jump target translation, macro operation fusion and, most importantly, block chaining we are able to significantly outperform QEMU in random data compression by nearly 45\,\%.
+The achieved performance of approximately two times the execution time of a native run is in line with the \textit{SPEC CPU 2017} results shown in figure~\ref{fig:spec-results}.
+
+As mentioned in the caption, the unoptimised run was performed with the command line option \texttt{----optimize=none}, which disables all of the optimisation features mentioned above.
+The translator will then have to translate every block one-by-one, jump back into the main loop on every block end and fetch the next position based on the current program counter.
+
+
+\subsection{Discussion}
+We reached the goal of outperforming QEMU by employing a direct translation from RISC--V to x86--64 and using various optimisations.
+QEMU first translates the instructions into microinstructions in an intermediate representation independent of platform and ISA.
+While this allows easy implementation of new host and guest architectures, it also means that specific advantages of both guest and host can not be used.
+This leads to needing potentially more host instructions than necessary for a simple task.
+QEMU also does not employ a return address stack, an optimisation which proved to be very worthwhile.
+One of the biggest disadvantages of QEMU, though, is that it does not use a static register mapping.
+Instead it holds all registers in memory and only loads them into one of a few temporary registers when needing them as input operands.
+The loaded output register may then be reused as input for the next instruction.
+If the next instruction needs different inputs, though, the register is written back and needs to be reloaded next time it is needed.
+This obviously leads to a big overhead which we can avoid by statically mapping the most used registers and dynamically allocating temporaries for the rest.
+
+There is probably still some room for improvement to get closer to natively compiled binaries.
+One possibility here would be to further increase the quality of the generated code.
+As mentioned in section~\vref{subsec:evaluation-of-translator-optimisations}, there is still room to increase the efficiency of the pattern matcher and the quality of the patterns.
+Something that might also provide a benefit is increasing the number of dynamically allocated register by decreasing the number of statically mapped registers.
+This could prevent unnecessary loads and write backs in case a block needs more than three different not mapped registers.
+Something that also could be done is treating jumps into the middle of a block not as jumps to new blocks but redirecting them to the already translated block at the specific offset.
+For this, you would need to keep track of the offsets of the specific translated instructions in the block, so it is possible to determine the jump target address.
+
+Overall though, the biggest disadvantage to native compilation can be attributed to the greatly differing architectures.
+The compiler of course takes advantage of both architectures, for example  by employing vectorisation on x86--64.
+If a future RISC--V expansion offers support for this as well, there is the potential for a big performance increase.
+This means that while we are producing code that is effectively equivalent to what the compiler does for the native binary, we do not have the possibility to generate code that is as efficient.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
