@@ -39,7 +39,7 @@ part page = TUM toc,
 section page = TUM blue,
 content page = TUM more space,
 headline = TUM threeliner,
-footline = TUM default,
+footline = TUM infoline,
 headline on = {title page, section page},
 footline on = {section page, content page, part page=false},
 }
@@ -79,14 +79,14 @@ Technische Universität München (TUM)}
 \date{\today}
 
 % todo remove: typeset current commit id for draft management
-\CatchFileDef{\headfull}{../../.git/HEAD}{}
-\StrGobbleRight{\headfull}{1}[\head]
-\StrBehind[2]{\head}{/}[\branch]
-\CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
-\footline{Draft after commit \commit on branch \branch.}
+% \CatchFileDef{\headfull}{../../.git/HEAD}{}
+%\StrGobbleRight{\headfull}{1}[\head]
+%\StrBehind[2]{\head}{/}[\branch]
+%\CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
+%\footline{Draft after commit \commit on branch \branch.}
 
 % beamer setup todo uncomment footer after removing commit id
-%\footline{\insertshortauthor~|~\insertshorttitle} (--> type TUM infoline)
+\footline{\insertshortauthor~|~\insertshorttitle}
 \addtoTUMcolortheme{TUM default}{
 	\setbeamercolor{subtitle}{fg=TUMBlack}
 	\setbeamercolor{framesubtitle}{fg=TUMBlack}
