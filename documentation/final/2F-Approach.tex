@@ -1,0 +1,690 @@
+\subsection{Programmablauf} % Johannes
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{startstop} = [rectangle, align=center, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=green!30, execute at begin node=\setlength{\baselineskip}{10pt}]
+\tikzstyle{process} = [rectangle, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=blue!30, execute at begin node=\setlength{\baselineskip}{10pt}]
+\tikzstyle{decision} = [diamond, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=yellow!30, execute at begin node=\setlength{\baselineskip}{10pt}]
+\tikzstyle{arrow} = [thick,->,>=latex]
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Übersicht}
+	\textbf{Zwei Phasen:}
+	\pause
+	\vspace{0.2cm}
+	\begin{itemize}
+		\item Initialisierung
+		\item Transcode Loop
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Initialisierung}
+	\centering
+	\begin{tikzpicture}[node distance=1.5cm]
+		\node (start) [startstop] {\scriptsize start translator};
+		\node[process, align=center, below of=start] (parse) {\scriptsize parse command\\\scriptsize line arguments};
+		\draw [arrow] (start) -- (parse);
+		\pause
+		
+		\node[process, align=center, below of=parse] (map-executable) {\scriptsize map executable\\\scriptsize into memory};
+		\draw [arrow] (parse) -- (map-executable);
+		\pause
+		
+		\node[process, align=center, below of=map-executable] (initialize) {\scriptsize initialize guest \\\scriptsize environment \& optimizers};
+		\draw [arrow] (map-executable) -- (initialize);
+		
+		\node[process, draw=none, fill=none, below of=initialize] (bottom-invisible) {};
+		\draw [arrow] (initialize) -- (bottom-invisible);
+	
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Transcode loop}
+	\centering
+	\begin{tikzpicture}[node distance=1.5cm]
+		\node[process, draw=none, fill=none, minimum width=0cm] (top-invisible) {};
+		\node[process, align=center, right of=top-invisible] (get-pc) {\scriptsize get program\\\scriptsize counter value};
+		\draw [arrow] (top-invisible) -- (get-pc);
+		\pause
+		
+		\node[decision, align=center, below of=get-pc, yshift=-0.5cm] (cache-lookup) {\scriptsize block\\\scriptsize cached};
+		\draw[arrow] (get-pc) -- (cache-lookup);
+		\pause
+		
+		\node[process, below of=cache-lookup, yshift=-0.5cm] (get-cache) {\scriptsize retrieve from\\\scriptsize cache};
+		\draw[arrow] (cache-lookup) -- node[anchor=west] {\scriptsize yes} (get-cache);
+		\pause
+		
+		\node[process, right of=cache-lookup, xshift=1cm] (translate) {\scriptsize translate\\\scriptsize block};
+		\draw[arrow] (cache-lookup) -- node[anchor=south] {\scriptsize no} (translate);
+		\pause
+		
+		\node[process, right of=translate, xshift=1cm] (store-cache) {\scriptsize store in\\\scriptsize cache};
+		\draw[arrow] (translate) -- (store-cache);
+		\pause
+		
+		\node[process, below of=store-cache, yshift=-0.5cm, fill=blue!50] (switch-guest) {\scriptsize switch to\\\scriptsize guest context};
+		\draw[arrow] (store-cache) -- (switch-guest);
+		\draw[arrow] (get-cache) -- (switch-guest);
+		\pause
+		
+		\node[process, right of=switch-guest, xshift=1cm, fill=blue!75] (execute) {\scriptsize execute\\\scriptsize block};
+		\draw [arrow] (switch-guest) -- (execute);
+		\pause
+		
+		\node[process, right of=execute, xshift=1cm, fill=blue!50] (switch-host) {\scriptsize switch to\\\scriptsize host context};
+		\draw[arrow] (execute) -- (switch-host);
+		\pause
+		
+		\node[decision, above of=switch-host, yshift=2.5cm] (terminated) {\scriptsize guest\\\scriptsize terminated};
+		\draw[arrow] (switch-host) -- (terminated);
+		\pause
+		
+		\node[startstop, right of=terminated, xshift=1.2cm] (terminate) {\scriptsize exit};
+		\draw[arrow] (terminated) -- node[anchor=south] {\scriptsize yes} (terminate);
+		\pause
+		
+		\draw[arrow] (terminated) -- node[anchor=south] {\scriptsize no} (get-pc);
+	\end{tikzpicture}
+\end{frame}
+
+
+
+
+\subsection{Partitionierung des Codes} % Flo
+\begin{frame}
+	\frametitle{Partitionierung des Codes}
+	\framesubtitle{Grundlagen}
+	\textbf{Ziel:} Finden von sinnvollen Übersetzungseinheiten
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\textbf{Überlegung:}
+	\begin{itemize}
+		\item einzelne Instruktionen übersetzen zu aufwändig
+		\item keine Übersetzung des ganzen Programmes
+		\item[\conclude] Übersetzung von \textit{Basic Blocks}
+	\end{itemize}
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{block}{Definition: Basic Block}
+		\begin{itemize}
+			\item einziger Ein- und Ausgangspunkt
+			\item enthaltene Instruktionen der Reihe nach ausgeführt
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Partitionierung des Codes}
+	\framesubtitle{Finden von Blockgrenzen}
+	
+	\begin{block}{Blockende erreicht durch\ldots}
+		\begin{itemize}
+			\item Unbedingte Sprünge \& Funktionsaufrufe (\texttt{j}, \texttt{call}, \texttt{ret})
+			\item Bedingte Sprünge (\texttt{beq}, \texttt{bne}, \texttt{blt}, \texttt{bge}, \texttt{bltu}, \texttt{bgeu})
+			\item System Calls (\texttt{ecall})
+		\end{itemize}
+	\end{block}
+	
+	\vspace{0.50cm}
+	
+	Einheiten zusammen übersetzt, als \textbf{Blöcke} abgelegt.
+	
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+	\frametitle{Partitionierung des Codes}
+	\framesubtitle{Beispiel}
+
+	\textbf{\color{blue} Sprungverfolgung} zu \texttt{\color{blue} label},\\
+	\textbf{\color{red} Blockende} durch \texttt{\color{red}ecall}.
+
+	\vspace{1.5cm}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.49\textwidth}
+			add  x6, x6, x7\\
+			slli x6, x6, 3\\
+			xori x7, x7, -1\\
+			{\color{blue} j label}
+		\end{column}
+		
+		\begin{column}{0.49\textwidth}
+			{\color{blue} label:}\\
+			addi a0, x0, 0\\
+			addi a7, x0, \_\_NR\_exit\\
+			{\color{red} ecall}
+		\end{column}
+	\end{columns}
+\end{frame}
+\end{comment}
+
+
+\subsection{Codegenerierung und Cache} % Flo
+\begin{frame}
+	\frametitle{Codegenerierung}
+	\framesubtitle{Grundlagen}
+	\textbf{Ziel:} Generieren von äquivalentem Code
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\textbf{Prinzipieller Ansatz:} Instruktions-Mapping RISC--V \conclude x86--64
+	
+	\vspace{0.50cm}
+	
+	\begin{block}{Übersetzungsansatz}
+		\begin{itemize}
+			\item Übersetzungen jeder Instruktion der Quellarchitektur
+			\item Probleme durch architektonische Unterschiede
+			\begin{itemize}
+				\item \textit{load-store}- vs. \textit{register-memory-Architektur}
+				\item \textit{Zwei}- bzw. \textit{Dreiadressform}
+			\end{itemize}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Codegenerierung}
+	\framesubtitle{Beispiel: Architektonische Unterschiede}
+	
+	\textbf{Problem:} ein Operand ist implizites Zielregister (x86)
+	
+	\vspace{2cm}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.45\textwidth}
+			\centering
+			sub rd, rs1, rs2
+		\end{column}
+		
+		\begin{column}{0.05\textwidth}
+			\centering
+			\conclude
+		\end{column}
+		
+		\begin{column}{0.45\textwidth}
+			\centering
+			mov rd, rs1\\
+			sub rd, rs2
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+	\frametitle{Codegenerierung}
+	\framesubtitle{Beispiel: Optimierte Übersetzung}
+	
+	\textbf{Optimierungsmöglichkeit:} äquivalente native Instruktion existiert
+	
+	\vspace{2cm}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.45\textwidth}
+			\centering
+			xori rd, rd, -1
+		\end{column}
+		
+		\begin{column}{0.05\textwidth}
+			\centering
+			\conclude
+		\end{column}
+		
+		\begin{column}{0.45\textwidth}
+			\centering
+			not rd
+		\end{column}
+	\end{columns}
+\end{frame}
+\end{comment}
+
+
+\begin{frame}
+	\frametitle{Codegenerierung}
+	\framesubtitle{Beispiel: Macro Operation Fusion}
+	
+	\textbf{Optimierungsmöglichkeit:} mehrere Instruktionen bündeln
+	
+	\vspace{2cm}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.45\textwidth}
+			\centering
+			lui rd, imm1\\
+			addi rd, rd, imm2
+		\end{column}
+		
+		\begin{column}{0.05\textwidth}
+			\centering
+			\conclude
+		\end{column}
+		
+		\begin{column}{0.45\textwidth}
+			\centering
+			mov rd, (imm1 + imm2)
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Code Cache}
+	\framesubtitle{Konzept}
+	
+	\textbf{Hintergrund:} Angetroffene Basic Blocks sollen nur ein Mal übersetzt werden.
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{block}{Code Cache}
+		\begin{itemize}
+			\item Speicherregion, in die generierter Code geschrieben wird
+			\item Index für die Speicherregion für schnellen Lookup (\refer Hash-Tabelle, TLB)
+		\end{itemize}
+	\end{block}
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\textbf{Nutzung:}
+	
+	\begin{itemize}
+		\item Block wird nach erstem Übersetzen in den Cache geschrieben
+		\item Lookup vollzieht Adressübersetzung RISC--V \refer x86
+		\item kein Löschen von übersetzten Blöcken (\refer Optimierungen)
+	\end{itemize}
+\end{frame}
+
+\begin{comment}
+\begin{frame}[c]
+	\frametitle{Code Cache}
+	\framesubtitle{Programmfluss (vereinfacht)}
+	\centering
+	\begin{figure}
+		\includegraphics[width=\textwidth]{diagrams/cache-flow}
+	\end{figure}
+\end{frame}
+\end{comment}
+
+
+\subsection{Registernutzung} % Flo
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Grundlagen}
+	
+	\textbf{Ziel:} möglichst effizientes Emulieren der RISC--V-Register
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{block}{Definition: Registerdatei im Speicher}
+		\begin{itemize}
+			\item Speicherbereich, der die Registerwerte des Gastprogramms hält (264 Byte)
+			\item Permanenter Speicherbereich, der über Kontextwechsel erhalten bleibt
+		\end{itemize}
+	\end{block}
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\textbf{Problem:} viele Speicherzugriffe \conclude \alert{ineffizient}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Ansatz}
+	
+	\textbf{Idee:} Werte in Registern halten
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{alertblock}{Register bei RISC--V und x86--64}
+		\begin{columns}[onlytextwidth]
+			\begin{column}{0.45\textwidth}
+				\begin{itemize}
+					\item \textbf{RISC--V}
+					\begin{itemize}				
+						\item 31 general-purpose Register
+						\item \texttt{x0}, \texttt{x1}--\texttt{x31}
+						\item festes Nullregister
+					\end{itemize}
+				\end{itemize}
+			\end{column}
+			
+			\begin{column}{0.45\textwidth}
+				\begin{itemize}
+					\item \textbf{x86--64}
+					\begin{itemize}				
+						\item 16 general-purpose Register
+						\item \texttt{rax}--\texttt{rdx}, \texttt{rsp}, \texttt{rbp}, \texttt{rsi}, \texttt{rdi}, und \texttt{r8}--\texttt{r15}
+					\end{itemize}
+				\end{itemize}
+			\end{column}
+		\end{columns}
+	\end{alertblock}
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{itemize}
+		\item zu wenige Register \conclude statische Abbildung nur teilweise möglich
+		\item \texttt{rax}, \texttt{rcx}, \texttt{rdx} speziell benötigt; \texttt{rsp} unpraktisch
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Ansatz}
+	
+	\textbf{Überlegung:} Welche 12 Register werden häufig verwendet?
+	
+	\pause
+\pgfplotstableread[col sep=comma,header=false]{../paper/benchmarks/register-frequency/freq.csv}\regfreqtable
+\pgfplotstablesort[sort key =1, sort cmp=float >]\sortedregfreqtable{\regfreqtable}
+\begin{figure}
+%\pgfplotstabletypeset\sortedregfreqtable
+	\centering
+	\makebox[\textwidth][c]{
+	\begin{tikzpicture}
+		\begin{axis}[%
+			ybar,
+			area legend,
+			ylabel = {Access percentage},
+			xtick = data,
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60,
+				font=\footnotesize
+			},
+			ytick = {0.1, 0.2, 0.3, 0.4},
+			scaled y ticks = false,
+			x = 0.4cm,
+			point meta = {y*100},
+			yticklabel = {\pgfmathparse{\tick*100}\pgfmathprintnumber{\pgfmathresult}\%},
+			enlarge x limits = {abs = 0.5cm},
+			xtick={0,...,31},
+			xticklabels from table = {\sortedregfreqtable}{0},
+			ymin = 0, ymax = 0.45,
+			ymajorgrids = true,
+			bar width = 5pt,
+			bar shift = 0,
+			height = 5.5cm,
+			width = 0.85\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=0:3]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=4:4]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-1, draw=black, restrict x to domain=5:12]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+			\addplot+[fill=era-dbt-2, draw=black, restrict x to domain=13:31]table [x expr = \coordindex, y = 1]\sortedregfreqtable;
+
+			\legend{statically mapped, not mapped}
+		\end{axis}
+	\end{tikzpicture}
+	}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Registernutzung}
+	\framesubtitle{Vorgehen}
+	
+	\textbf{Idee:} Speicherzugriffe minimieren
+	
+	\vspace{0.50cm}
+	
+	\pause
+	\begin{block}{Register-Handling-Strategie}
+		\begin{itemize}
+			\item statische Abbildung der 12 zugriffshäufigsten Register (außer \texttt{x0})
+			\begin{itemize}
+				\item \texttt{a0}--\texttt{a5}, \texttt{a7}, \texttt{s1}--\texttt{s2}, \texttt{ra}, \texttt{fp}, \texttt{sp}
+				\item bleiben über Blockgrenzen hinweg erhalten (\refer Kontextwechsel)
+			\end{itemize}
+			
+			\pause
+			\item dynamische Allokation in die restlichen 3 x86-Register
+			\begin{itemize}
+				\item dynamisch in \texttt{rax}, \texttt{rcx}, \texttt{rdx} (\textit{least recently used}, \textit{lazy write-back})
+				\item an Blockgrenzen zurückgeschrieben
+			\end{itemize}
+		\end{itemize}
+	\end{block}
+	
+\end{frame}
+
+
+
+\subsection{Optimierungen} % Johannes
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Peformance-Einbußen bei Dynamischer Binärübersetzung}
+	\begin{itemize}
+		\item Blockweise Übersetzung und Ausführung -> ständiger Wechsel zwischen guest und host
+		\begin{itemize}
+			\item viele Kontextwechsel
+			\item viele Cache-Lookups
+		\end{itemize}
+		\pause
+		\item ISA-Unterschiede
+		\begin{itemize}
+			\item Mapping einzelner instruktionen ineffizient
+		\end{itemize}
+	\end{itemize}
+	\pause
+	\begin{block}{Optimierungsstrategie}
+		\begin{itemize}
+			\item Wechsel zwischen Guest und Host vermeiden \\
+				$\rightarrow$ mehrere Blöcke direkt hintereinander ausführen
+			\pause
+			\item Besseres Instruction-Mapping \\
+				$\rightarrow$ mehrere Instruktionen betrachten
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\begin{minipage}[t]{.75\textwidth}
+		\frametitle{Optimierungen}
+		\framesubtitle{Wechsel zwischen Guest und Host vermeiden}
+		\textbf{Idee:} Blöcke verketten (\texttt{\footnotesize block chaining})\\
+		\pause
+		\textbf{vorher:}\\
+		\includegraphics[width=0.9\textwidth]{diagrams/chaining-unchained.pdf}\\
+		\pause
+		\textbf{nachher:}\\
+		\includegraphics[width=0.9\textwidth]{diagrams/chaining-chained.pdf}
+	\end{minipage}
+	\pause
+	\begin{minipage}[t]{.2\textwidth}
+		\vspace{3cm}
+		\begin{itemize}
+			\item nur für statische Sprungziele
+		\end{itemize}
+	\end{minipage}
+	
+\end{frame}
+	
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Block Chaining}
+	\begin{itemize}
+		\item Verkettung beim Übesetzen
+		\pause
+		\begin{itemize}
+			\item Ziel-Block muss bereits Übersetzt sein\\
+			\pause
+			$\rightarrow$ Rekursiv übersetzen
+			\pause
+			\item mögliche Rekursionsschleife
+			\pause
+			\item nicht für conditional Jumps / Branches
+		\end{itemize}
+		\pause
+		\item Nachträgliche Verkettung
+		\begin{itemize}
+			\pause
+			\item Verkettung im Transcode Loop nach erster Ausführung
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Dynamische Sprünge}
+	\begin{itemize}
+		\item können nicht verkettet werden
+		\pause
+		\item Fast alle dynamischen Sprünge sind function returns\\
+		$\rightarrow$ calls mitverfolgen und Sprungziel vorhersagen
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Return Address Stack}
+	
+	\begin{minipage}[t]{.47\textwidth}
+		\begin{itemize}
+			\item Tupel aus Gast- und Host-code Addressen
+			\pause
+			\item Calls legen Tupel ab
+			\item Dynamische Jumps prüfen Gast-Adresse und springen bei Übereinstimmung direkt zum nächsten Block. \\
+			\pause
+			$\rightarrow$ Transcode Loop wird umgangen
+			\pause
+			\item Implementiert als Ringpuffer gegen Under- und Overflow
+			
+		\end{itemize}
+	\end{minipage}
+	%\pause
+	\onslide<1->
+	\begin{minipage}[t]{.47\textwidth}
+		\vspace{0.1cm}
+		\centering
+		\begin{tabular} { |c|c| }
+			\hline
+			guest address & host address \\ [0.5ex]
+			\hline\hline
+			  & \\
+			 \hline
+			  & \\
+			 \hline
+			0x123 & 0x78238746 \\
+			\hline
+			0x612 & 0x78201241 \\
+			\hline
+			0x719 & 0x78036432 \\
+			\hline
+			0x482 & 0x78840275 \\
+			\hline
+		\end{tabular}
+	\end{minipage}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Macro Opcode Fusion}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.45\textwidth}
+			\centering
+			SLLI r1, r1, 32\\
+			SLRI r1, r1, 32
+		\end{column}
+		
+		\begin{column}{0.05\textwidth}
+			\centering
+			\conclude
+		\end{column}
+		
+		\begin{column}{0.45\textwidth}
+			\centering
+			mov r32, r32
+		\end{column}
+	\end{columns}
+
+	\pause
+
+	\vspace{0.5cm}
+	
+	\textbf{Ziel: } Bestimmte Instruktionsfolgen mit weniger Instruktionen übersetzen
+	\pause
+	
+	\vspace{0.5cm}
+	
+	\begin{itemize}
+		\item Pattern-Matching beim Parsen des Blocks
+		\pause
+		\item Effizienten code emmitieren statt Instruktionen einzeln übersetzen
+	\end{itemize}
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Übersetzungsvorgang}
+	
+	
+	\begin{minipage}[t]{.37\textwidth}
+		\textbf{Übersetzung in\\ zwei Schritten:}
+		\vspace{0.20cm}
+		\begin{itemize}
+			\item<2-> Parsen
+			\item<3-> Übersetzen
+		\end{itemize}
+	\end{minipage}
+	\begin{minipage}[t]{.6\textwidth}
+		\vspace{0.10cm}
+		\pause
+		\begin{tikzpicture}[node distance=1.5cm]
+			\node[process, draw=none, fill=none, minimum width=0cm] (top-invisible) {};
+			\node[process, right of=top-invisible] (parse) {\scriptsize parse next\\\scriptsize instruction};
+			\draw [arrow] (top-invisible) -- (parse);
+			
+			\node[decision, below of=parse, yshift=-1cm] (parse-done) {\scriptsize end of\\\scriptsize basic block};
+			\draw[arrow] (parse) -- (parse-done);
+			\draw[arrow] (parse-done.east) -- node[anchor=south] {\scriptsize no} +(+0.7,0) |- (parse.east);
+			\pause
+			
+			\node[process, right of=parse, xshift=2.5cm] (translate) {\scriptsize translate next\\\scriptsize instruction};
+			\draw[arrow] (parse-done.south) -- +(0,-0.5) -- node[anchor=south]{\scriptsize yes} +(2.5,-0.5) |- (translate.west);
+			
+			\node[decision, below of=translate, yshift=-1cm] (translate-done) {\scriptsize translation\\\scriptsize done};
+			\draw[arrow] (translate) -- (translate-done);
+			\draw[arrow] (translate-done.east) -- node[anchor=south]{\scriptsize no} +(+0.7,0) |- (translate.east);
+			
+			\node[startstop, below of=translate-done, yshift=-0.7cm] (return) {\scriptsize return host\\\scriptsize code address};
+		\draw[arrow] (translate-done) -- (return);
+		\end{tikzpicture}
+	\end{minipage}
+	
+	
+\end{frame}
+\end{comment}
+

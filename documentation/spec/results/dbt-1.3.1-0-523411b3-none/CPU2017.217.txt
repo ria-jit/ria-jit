@@ -1,0 +1,609 @@
+runcpu v6247 started at 2020-10-24 19:28:55 on "sksmall"
+runcpu is: /u/home/schmidtf/spec/bin/harness/runcpu
+runcpu: runcpu --config=RISC-V-dbt_none --size=ref --noreportable 605
+toolset: linux-x86_64
+suite: CPU2017 1.1.0
+
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/u/home/schmidtf/spec/config/RISC-V-dbt_none.cfg'
+
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+validate   speed      refspeed   SPECspeed2017_int   605.mcf_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 605.mcf_s...
+Starting runcpu for 605.mcf_s...
+Running "specperl /u/home/schmidtf/spec/bin/sysinfo" to gather system information.
+sysinfo: r6365 of 2019-08-21 (295195f888a3d7edb1e6e46a485a0011)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get info from /sys/devices/virtual/dmi/id
+sysinfo: ...trying to get info from dmidecode
+Retrieving flags file (/u/home/schmidtf/spec/config/flags/gcc.xml)...
+Verbosity = 5
+Action    = validate
+Tune      = base
+Label     = RISC-V-dbt_none-1.0-m64
+Size      = refspeed
+benchmarks= 605.mcf_s
+outputs   = txt,html,cfg,pdf,csv
+username  = schmidtf
+Environment settings:
+LD_LIBRARY_PATH = "%{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64"
+
+Benchmarks selected: 605.mcf_s
+When checking executables (/u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/exe/mcf_s_base.RISC-V-dbt_none-1.0-m64), no checksums were
+  found in the config file.  They will be installed after build.
+When checking executables (/u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/exe/mcf_s_base.RISC-V-dbt_none-1.0-m64), no checksums were
+  found in the config file.  They will be installed after build.
+Compiling Binaries
+------------------------------------------------------------------------
+When checking options for /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/exe/mcf_s_base.RISC-V-dbt_none-1.0-m64, no checksums were
+  found in the config file.  They will be installed after build.
+When checking executables (/u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/exe/mcf_s_base.RISC-V-dbt_none-1.0-m64), no checksums were
+  found in the config file.  They will be installed after build.
+  Building 605.mcf_s base RISC-V-dbt_none-1.0-m64: (build_base_RISC-V-dbt_none-1.0-m64.0000) [2020-10-24 19:28:58]
+  Compile for '605.mcf_s' started at: 2020-10-24 19:28:59 (1603567739)
+Issuing make.clean command 'specmake --output-sync --jobs=8 clean'
+Start make.clean command: 2020-10-24 19:28:59 (1603567739.15863)
+rm -rf *.o  inp.out mcf.out
+find . \( -name \*.o -o -name '*.fppized.f*' -o -name '*.i' -o -name '*.mod' \) -print | xargs rm -rf
+rm -rf mcf_s
+rm -rf mcf_s.exe
+rm -rf core
+Stop make.clean command: 2020-10-24 19:28:59 (1603567739.35353)
+Elapsed time for make.clean command: 00:00:00 (0.194900035858154)
+Issuing make command 'specmake --output-sync --jobs=8 build'
+Start make command: 2020-10-24 19:28:59 (1603567739.35584)
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o pbla.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  pbla.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o output.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  output.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o pstart.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  pstart.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o treeup.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  treeup.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o mcf.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  mcf.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o readmin.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  readmin.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o mcfutil.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  mcfutil.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o pflowup.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  pflowup.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o pbeampp.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  pbeampp.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o psimplex.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  psimplex.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o implicit.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  implicit.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o spec_qsort/spec_qsort.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  spec_qsort/spec_qsort.c
+cc1: warning: command-line option '-fallow-argument-mismatch' is valid for Fortran but not for C
+/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline mcf.o mcfutil.o readmin.o implicit.o pstart.o output.o treeup.o pbla.o pflowup.o psimplex.o pbeampp.o spec_qsort/spec_qsort.o             -lm         -o mcf_s  
+Stop make command: 2020-10-24 19:29:00 (1603567740.59224)
+Elapsed time for make command: 00:00:01 (1.23639702796936)
+Issuing options command 'specmake --output-sync --jobs=8 options'
+Start options command: 2020-10-24 19:29:00 (1603567740.59491)
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP"
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+Stop options command: 2020-10-24 19:29:00 (1603567740.80042)
+Elapsed time for options command: 00:00:00 (0.205508947372437)
+Issuing compiler-version command 'specmake --output-sync --jobs=8 compiler-version'
+Start compiler-version command: 2020-10-24 19:29:00 (1603567740.80419)
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+Stop compiler-version command: 2020-10-24 19:29:00 (1603567740.9897)
+Elapsed time for compiler-version command: 00:00:00 (0.18550705909729)
+  Compile for '605.mcf_s' ended at: 2020-10-24 19:29:00 (1603567740)
+  Elapsed compile for '605.mcf_s': 00:00:01 (1)
+Wrote to makefile '/u/home/schmidtf/spec/tmp/CPU2017.217.0/options.605.mcf_s.base/Makefile.deps':
+# End dependencies
+# These are the build dependencies
+Wrote to makefile '/u/home/schmidtf/spec/tmp/CPU2017.217.0/options.605.mcf_s.base/Makefile.spec':
+TUNE=base
+LABEL=RISC-V-dbt_none-1.0-m64
+NUMBER=605
+NAME=mcf_s
+SOURCES= mcf.c mcfutil.c readmin.c implicit.c pstart.c output.c treeup.c \
+	 pbla.c pflowup.c psimplex.c pbeampp.c spec_qsort/spec_qsort.c
+EXEBASE=mcf_s
+NEED_MATH=yes
+BENCHLANG=C
+BENCH_CFLAGS     = -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP
+CC               = $(SPECLANG)riscv64-unknown-linux-gnu-gcc     -std=c99   
+CC_VERSION_OPTION = -v
+CXX              = $(SPECLANG)riscv64-unknown-linux-gnu-g++     -std=c++03 
+CXX_VERSION_OPTION = -v
+EXTRA_COPTIMIZE  = -fno-strict-aliasing -fgnu89-inline
+EXTRA_OPTIMIZE   = -fno-openmp
+EXTRA_PORTABILITY = -DSPEC_LP64
+FC               = $(SPECLANG)riscv64-unknown-linux-gnu-gfortran           
+FC_VERSION_OPTION = -v
+OPTIMIZE         = -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch
+OS               = unix
+SPECLANG         = /u/home/schmidtf/riscv-gnu-toolchain/build/bin/
+absolutely_no_locking = 0
+abstol           = 
+action           = validate
+allow_label_override = 0
+backup_config    = 1
+baseexe          = mcf_s
+basepeak         = 1
+benchdir         = benchspec
+benchmark        = 605.mcf_s
+binary           = 
+bindir           = exe
+builddir         = build
+bundleaction     = 
+bundlename       = 
+calctol          = 1
+changedhash      = 0
+check_version    = 0
+clean_between_builds = no
+command_add_redirect = 1
+commanderrfile   = speccmds.err
+commandexe       = mcf_s_base.RISC-V-dbt_none-1.0-m64
+commandfile      = speccmds.cmd
+commandoutfile   = speccmds.out
+commandstdoutfile = speccmds.stdout
+comparedir       = compare
+compareerrfile   = compare.err
+comparefile      = compare.cmd
+compareoutfile   = compare.out
+comparestdoutfile = compare.stdout
+compile_error    = 0
+compwhite        = 
+configdir        = config
+configfile       = RISC-V-dbt_none
+configpath       = /u/home/schmidtf/spec/config/RISC-V-dbt_none.cfg
+copies           = 1
+current_range    = 
+datadir          = data
+default_size     = ref
+default_submit   = $command
+delay            = 0
+deletebinaries   = 0
+deletework       = 0
+dependent_workloads = 0
+device           = 
+difflines        = 10
+dirprot          = 511
+discard_power_samples = 0
+enable_monitor   = 1
+endian           = 12345678
+env_vars         = 0
+expand_notes     = 0
+expid            = 
+exthash_bits     = 256
+failflags        = 0
+fake             = 0
+feedback         = 1
+flag_url_base    = https://www.spec.org/auto/cpu2017/Docs/benchmarks/flags/
+floatcompare     = 
+force_monitor    = 0
+from_runcpu      = 2
+fw_bios          = 
+hostname         = sksmall
+http_proxy       = 
+http_timeout     = 30
+hw_avail         = 
+hw_cpu_max_mhz   = 
+hw_cpu_name      = Intel Xeon Bronze 3106
+hw_cpu_nominal_mhz = 
+hw_disk          = 6.9 TB  add more disk info here
+hw_memory001     = 78.334 GB fixme: If using DDR4, the format is:
+hw_memory002     = 'N GB (N x N GB nRxn PC4-nnnnX-X)'
+hw_model         = 
+hw_nchips        = 1
+hw_ncores        = 
+hw_ncpuorder     = 
+hw_nthreadspercore = 
+hw_ocache        = 
+hw_other         = 
+hw_pcache        = 
+hw_scache        = 
+hw_tcache        = 
+hw_vendor        = not applicable
+idle_current_range = 
+idledelay        = 10
+idleduration     = 60
+ignore_errors    = 1
+ignore_sigint    = 0
+ignorecase       = 
+info_wrap_columns = 50
+inputdir         = input
+inputgenerrfile  = inputgen.err
+inputgenfile     = inputgen.cmd
+inputgenoutfile  = inputgen.out
+inputgenstdoutfile = inputgen.stdout
+iteration        = -1
+iterations       = 1
+keeptmp          = 0
+label            = RISC-V-dbt_none-1.0-m64
+license_num      = nnn (Your SPEC license number)
+line_width       = 1020
+link_input_files = 1
+locking          = 1
+log              = CPU2017
+log_line_width   = 1020
+log_timestamp    = 0
+logfile          = /u/home/schmidtf/spec/tmp/CPU2017.217/templogs/preenv.intspeed.217.0
+logname          = /u/home/schmidtf/spec/tmp/CPU2017.217/templogs/preenv.intspeed.217.0
+lognum           = 217.0
+mail_reports     = all
+mailcompress     = 0
+mailmethod       = smtp
+mailport         = 25
+mailserver       = 127.0.0.1
+mailto           = 
+make             = specmake
+make_no_clobber  = 0
+makefile_template = Makefile.YYYtArGeTYYYspec
+makeflags        = --jobs=8
+max_average_uncertainty = 1
+max_hum_limit    = 0
+max_report_runs  = 3
+max_unknown_uncertainty = 1
+mean_anyway      = 1
+meter_connect_timeout = 30
+meter_errors_default = 5
+meter_errors_percentage = 5
+min_report_runs  = 2
+min_temp_limit   = 20
+minimize_builddirs = 0
+minimize_rundirs = 0
+name             = mcf_s
+nansupport       = 
+need_math        = yes
+no_input_handler = close
+no_monitor       = 
+noratios         = 0
+note_preenv      = 1
+notes_plat_sysinfo_000 = 
+notes_plat_sysinfo_005 =  Sysinfo program /u/home/schmidtf/spec/bin/sysinfo
+notes_plat_sysinfo_010 =  Rev: r6365 of 2019-08-21 295195f888a3d7edb1e6e46a485a0011
+notes_plat_sysinfo_015 =  running on sksmall Sat Oct 24 19:28:58 2020
+notes_plat_sysinfo_020 = 
+notes_plat_sysinfo_025 =  SUT (System Under Test) info as seen by some common utilities.
+notes_plat_sysinfo_030 =  For more information on this section, see
+notes_plat_sysinfo_035 =     https://www.spec.org/cpu2017/Docs/config.html\#sysinfo
+notes_plat_sysinfo_040 = 
+notes_plat_sysinfo_045 =  From /proc/cpuinfo
+notes_plat_sysinfo_050 =     model name : Intel(R) Xeon(R) Bronze 3106 CPU @ 1.70GHz
+notes_plat_sysinfo_055 =        1  "physical id"s (chips)
+notes_plat_sysinfo_060 =        8 "processors"
+notes_plat_sysinfo_065 =     cores, siblings (Caution: counting these is hw and system dependent. The following
+notes_plat_sysinfo_070 =     excerpts from /proc/cpuinfo might not be reliable.  Use with caution.)
+notes_plat_sysinfo_075 =        cpu cores : 8
+notes_plat_sysinfo_080 =        siblings  : 8
+notes_plat_sysinfo_085 =        physical 0: cores 0 1 2 3 4 5 6 7
+notes_plat_sysinfo_090 = 
+notes_plat_sysinfo_095 =  From lscpu:
+notes_plat_sysinfo_100 =       Architecture:        x86_64
+notes_plat_sysinfo_105 =       CPU op-mode(s):      32-bit, 64-bit
+notes_plat_sysinfo_110 =       Byte Order:          Little Endian
+notes_plat_sysinfo_115 =       CPU(s):              8
+notes_plat_sysinfo_120 =       On-line CPU(s) list: 0-7
+notes_plat_sysinfo_125 =       Thread(s) per core:  1
+notes_plat_sysinfo_130 =       Core(s) per socket:  8
+notes_plat_sysinfo_135 =       Socket(s):           1
+notes_plat_sysinfo_140 =       NUMA node(s):        1
+notes_plat_sysinfo_145 =       Vendor ID:           GenuineIntel
+notes_plat_sysinfo_150 =       CPU family:          6
+notes_plat_sysinfo_155 =       Model:               85
+notes_plat_sysinfo_160 =       Model name:          Intel(R) Xeon(R) Bronze 3106 CPU @ 1.70GHz
+notes_plat_sysinfo_165 =       Stepping:            4
+notes_plat_sysinfo_170 =       CPU MHz:             1670.510
+notes_plat_sysinfo_175 =       CPU max MHz:         1700.0000
+notes_plat_sysinfo_180 =       CPU min MHz:         800.0000
+notes_plat_sysinfo_185 =       BogoMIPS:            3400.00
+notes_plat_sysinfo_190 =       Virtualization:      VT-x
+notes_plat_sysinfo_195 =       L1d cache:           32K
+notes_plat_sysinfo_200 =       L1i cache:           32K
+notes_plat_sysinfo_205 =       L2 cache:            1024K
+notes_plat_sysinfo_210 =       L3 cache:            11264K
+notes_plat_sysinfo_215 =       NUMA node0 CPU(s):   0-7
+notes_plat_sysinfo_220 =       Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov
+notes_plat_sysinfo_225 =       pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp
+notes_plat_sysinfo_230 =       lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid
+notes_plat_sysinfo_235 =       aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16
+notes_plat_sysinfo_240 =       xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave
+notes_plat_sysinfo_245 =       avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3
+notes_plat_sysinfo_250 =       invpcid_single pti intel_ppin ssbd mba ibrs ibpb stibp tpr_shadow vnmi flexpriority
+notes_plat_sysinfo_255 =       ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a
+notes_plat_sysinfo_260 =       avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl
+notes_plat_sysinfo_265 =       xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local
+notes_plat_sysinfo_270 =       dtherm arat pln pts hwp hwp_act_window hwp_pkg_req pku ospke md_clear flush_l1d
+notes_plat_sysinfo_275 = 
+notes_plat_sysinfo_280 =  /proc/cpuinfo cache data
+notes_plat_sysinfo_285 =     cache size : 11264 KB
+notes_plat_sysinfo_290 = 
+notes_plat_sysinfo_295 =  From numactl --hardware  WARNING: a numactl 'node' might or might not correspond to a
+notes_plat_sysinfo_300 =  physical chip.
+notes_plat_sysinfo_305 = 
+notes_plat_sysinfo_310 =  From /proc/meminfo
+notes_plat_sysinfo_315 =     MemTotal:       82139464 kB
+notes_plat_sysinfo_320 =     HugePages_Total:       0
+notes_plat_sysinfo_325 =     Hugepagesize:       2048 kB
+notes_plat_sysinfo_330 = 
+notes_plat_sysinfo_335 =  /usr/bin/lsb_release -d
+notes_plat_sysinfo_340 =     Ubuntu 18.04.3 LTS
+notes_plat_sysinfo_345 = 
+notes_plat_sysinfo_350 =  From /etc/*release* /etc/*version*
+notes_plat_sysinfo_355 =     debian_version: buster/sid
+notes_plat_sysinfo_360 =     os-release:
+notes_plat_sysinfo_365 =        NAME="Ubuntu"
+notes_plat_sysinfo_370 =        VERSION="18.04.3 LTS (Bionic Beaver)"
+notes_plat_sysinfo_375 =        ID=ubuntu
+notes_plat_sysinfo_380 =        ID_LIKE=debian
+notes_plat_sysinfo_385 =        PRETTY_NAME="Ubuntu 18.04.3 LTS"
+notes_plat_sysinfo_390 =        VERSION_ID="18.04"
+notes_plat_sysinfo_395 =        HOME_URL="https://www.ubuntu.com/"
+notes_plat_sysinfo_400 =        SUPPORT_URL="https://help.ubuntu.com/"
+notes_plat_sysinfo_405 = 
+notes_plat_sysinfo_410 =  uname -a:
+notes_plat_sysinfo_415 =     Linux sksmall 4.15.0-70-generic \#79-Ubuntu SMP Tue Nov 12 10:36:11 UTC 2019 x86_64
+notes_plat_sysinfo_420 =     x86_64 x86_64 GNU/Linux
+notes_plat_sysinfo_425 = 
+notes_plat_sysinfo_430 =  Kernel self-reported vulnerability status:
+notes_plat_sysinfo_435 = 
+notes_plat_sysinfo_440 =  itlb_multihit:                            KVM: Mitigation: Split huge pages
+notes_plat_sysinfo_445 =  CVE-2018-3620 (L1 Terminal Fault):        Mitigation: PTE Inversion; VMX: conditional
+notes_plat_sysinfo_450 =                                            cache flushes, SMT disabled
+notes_plat_sysinfo_455 =  Microarchitectural Data Sampling:         Mitigation: Clear CPU buffers; SMT disabled
+notes_plat_sysinfo_460 =  CVE-2017-5754 (Meltdown):                 Mitigation: PTI
+notes_plat_sysinfo_465 =  CVE-2018-3639 (Speculative Store Bypass): Mitigation: Speculative Store Bypass disabled
+notes_plat_sysinfo_470 =                                            via prctl and seccomp
+notes_plat_sysinfo_475 =  CVE-2017-5753 (Spectre variant 1):        Mitigation: usercopy/swapgs barriers and __user
+notes_plat_sysinfo_480 =                                            pointer sanitization
+notes_plat_sysinfo_485 =  CVE-2017-5715 (Spectre variant 2):        Mitigation: Full generic retpoline, IBPB:
+notes_plat_sysinfo_490 =                                            conditional, IBRS_FW, STIBP: disabled, RSB
+notes_plat_sysinfo_495 =                                            filling
+notes_plat_sysinfo_500 =  tsx_async_abort:                          Mitigation: Clear CPU buffers; SMT disabled
+notes_plat_sysinfo_505 = 
+notes_plat_sysinfo_510 =  run-level 5 Nov 28 09:46
+notes_plat_sysinfo_515 = 
+notes_plat_sysinfo_520 =  SPEC is set to: /u/home/schmidtf/spec
+notes_plat_sysinfo_525 =     Filesystem                                       Type  Size  Used Avail Use% Mounted
+notes_plat_sysinfo_530 =     on
+notes_plat_sysinfo_535 =     nasil10.informatik.tu-muenchen.de:/srv/il10/home nfs   6.9T  4.4T  2.3T  66% /u/home
+notes_plat_sysinfo_540 = 
+notes_plat_sysinfo_545 =  From /sys/devices/virtual/dmi/id
+notes_plat_sysinfo_550 =      BIOS:    HPE U32 11/13/2019
+notes_plat_sysinfo_555 =      Vendor:  HPE
+notes_plat_sysinfo_560 =      Product: ProLiant DL360 Gen10
+notes_plat_sysinfo_565 =      Product Family: ProLiant
+notes_plat_sysinfo_570 = 
+notes_plat_sysinfo_575 =  Cannot run dmidecode; consider saying (as root)
+notes_plat_sysinfo_580 =     chmod +s /usr/sbin/dmidecode
+notes_plat_sysinfo_585 = 
+notes_plat_sysinfo_590 =  (End of data from sysinfo program)
+notes_wrap_columns = 0
+notes_wrap_indent =   
+num              = 605
+obiwan           = 
+os_exe_ext       = 
+output_format    = txt,html,cfg,pdf,csv
+output_root      = 
+outputdir        = output
+parallel_test    = 0
+parallel_test_submit = 0
+parallel_test_workloads = 
+path             = /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s
+plain_train      = 1
+platform         = 
+power            = 0
+preENV_LD_LIBRARY_PATH = %{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64
+preenv           = 0
+prefix           = 
+prepared_by      = schmidtf  (is never output, only tags rawfile)
+ranks            = 1
+rawhash_bits     = 256
+rebuild          = 0
+reftime          = reftime
+reltol           = 
+reportable       = 0
+resultdir        = result
+review           = 0
+run              = all
+runcpu           = /u/home/schmidtf/spec/bin/harness/runcpu --configfile RISC-V-dbt_none --size ref --noreportable --noreportable --nopower --runmode speed --tune base --size refspeed 605.mcf_s --nopreenv --note-preenv --logfile /u/home/schmidtf/spec/tmp/CPU2017.217/templogs/preenv.intspeed.217.0 --lognum 217.0 --from_runcpu 2
+rundir           = run
+runmode          = speed
+safe_eval        = 1
+save_build_files = 
+section_specifier_fatal = 1
+setprocgroup     = 1
+setup_error      = 0
+sigint           = 2
+size             = refspeed
+size_class       = ref
+skipabstol       = 
+skipobiwan       = 
+skipreltol       = 
+skiptol          = 
+smarttune        = base
+specdiff         = specdiff
+specrun          = specinvoke
+srcalt           = 
+srcdir           = src
+srcsource        = /u/home/schmidtf/spec/benchspec/CPU/505.mcf_r/src
+stagger          = 10
+strict_rundir_verify = 1
+submit_default   = /u/home/schmidtf/dbt-candidate/execute-dbt_none.py ${command}
+sw_avail         = 
+sw_base_ptrsize  = 64-bit
+sw_compiler001   = C/C++/Fortran: Version 10.1.0 of GCC, the
+sw_compiler002   = GNU Compiler Collection
+sw_file          = nfs
+sw_os001         = Ubuntu 18.04.3 LTS
+sw_os002         = 4.15.0-70-generic
+sw_other         = 
+sw_peak_ptrsize  = Not Applicable
+sw_state         = Run level 5 (add definition here)
+sysinfo_hash_bits = 256
+sysinfo_program  = specperl /u/home/schmidtf/spec/bin/sysinfo
+sysinfo_program_hash = sysinfo:SHA:1b187da62efa5d65f0e989c214b6a257d16a31d3cf135973c9043da741052207
+table            = 1
+teeout           = 0
+test_date        = Oct-2020
+test_sponsor     = not applicable
+tester           = not applicable
+threads          = 1
+top              = /u/home/schmidtf/spec
+train_single_thread = 0
+train_with       = train
+tune             = base
+uid              = 27324
+unbuffer         = 1
+uncertainty_exception = 5
+update           = 0
+update_url       = http://www.spec.org/auto/cpu2017/updates/
+use_submit_for_compare = yes
+use_submit_for_speed = yes
+username         = schmidtf
+valid_build      = yes
+verbose          = 5
+verify_binaries  = 1
+version          = 1.000503
+voltage_range    = 
+worklist         = list
+OUTPUT_RMFILES   = inp.out mcf.out
+COMP: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG  -Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp -fno-strict-aliasing -fgnu89-inline   -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-Ispec_qsort -DSPEC_AUTO_SUPPRESS_OPENMP"
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch        -fno-openmp -fno-strict-aliasing -fgnu89-inline <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE="-fno-strict-aliasing -fgnu89-inline"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-gnu-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-gnu-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-gnu-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-gnu-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-gnu-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64 --with-arch=rv64ima --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+
+Build successes for intspeed: 605.mcf_s(base)
+Build errors for intspeed: None
+
+Setting Up Run Directories
+  Setting up 605.mcf_s refspeed (ref) base RISC-V-dbt_none-1.0-m64: run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000
+-----------------------------------
+Running Benchmarks
+-----------------------------------
+  Running 605.mcf_s refspeed (ref) base RISC-V-dbt_none-1.0-m64 [2020-10-24 19:29:02]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000
+    -o inp.out -e inp.err /u/home/schmidtf/dbt-candidate/execute-dbt_none.py ../run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000/mcf_s_base.RISC-V-dbt_none-1.0-m64 inp.in  > inp.out 2>> inp.err (timed)
+**WARNING: environment variable 'TERMCAP' contains embedded CR or LF; they will be converted to spaces
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-10-24 19:29:02 (1603567742.17139)
+Stop command: 2020-10-24 22:01:09 (1603576869.56014)
+Elapsed time for command: 02:32:07 (9127.38875412941)
+Workload elapsed time (copy 0 workload 1) = 9127.218617 seconds
+Copy 0 of 605.mcf_s (base refspeed) run 1 finished at 2020-10-24 22:01:09.  Total elapsed time: 9127.218617
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'inp.out' with 
+comparing 'mcf.out' with 
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/605.mcf_s/run/run_base_refspeed_RISC-V-dbt_none-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-10-24 22:01:09 (1603576869.7564)
+Stop command: 2020-10-24 22:01:10 (1603576870.63374)
+Elapsed time for command: 00:00:00 (0.877341032028198)
+Benchmark Times:
+  Run Start:    2020-10-24 19:29:02 (1603567742)
+  Run Stop:     2020-10-24 22:01:09 (1603576869)
+  Run Elapsed:  02:32:07 (9127)
+  Run Reported: 02:32:07 (9127 218738000 9127.218738)
+ Success 605.mcf_s base refspeed ratio=0.52, runtime=9127.218738, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+Success: 1x605.mcf_s
+Producing Raw Reports
+ label: RISC-V-dbt_none-1.0-m64
+  workload: refspeed (ref)
+   benchset: intspeed
+   metric: SPECspeed2017_int_base
+    format: raw -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.rsf
+Parsing flags for 605.mcf_s base: done
+Doing flag reduction: done
+    format: flags -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.flags.html
+    format: cfg -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.cfg
+    format: CSV -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.csv
+    format: PDF -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.pdf
+    format: HTML -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.html
+    format: Text -> /u/home/schmidtf/spec/result/CPU2017.217.intspeed.refspeed.txt
+   benchset: intrate
+   benchset: fpspeed
+   benchset: fprate
+runcpu finished at 2020-10-24 22:01:16; 9139 total seconds elapsed
+Info: file_tail(23955): file '/u/home/schmidtf/spec/tmp/CPU2017.217/templogs/preenv.intspeed.217.0.debug' was removed and will no longer be followed.  No action is required.
+The log for this run is in /u/home/schmidtf/spec/result/CPU2017.217.log
+
+runcpu finished at 2020-10-24 22:01:17; 9141 total seconds elapsed
