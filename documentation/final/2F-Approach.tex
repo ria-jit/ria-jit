@@ -2,10 +2,22 @@
 
 \usetikzlibrary{shapes.geometric, arrows}
 
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=green!30]
+\tikzstyle{startstop} = [rectangle, align=center, rounded corners, minimum width=2cm, minimum height=1cm,text centered, draw=black, fill=green!30, execute at begin node=\setlength{\baselineskip}{10pt}]
 \tikzstyle{process} = [rectangle, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=blue!30, execute at begin node=\setlength{\baselineskip}{10pt}]
 \tikzstyle{decision} = [diamond, align=center, minimum width=2cm, minimum height=1cm, text centered, draw=black, fill=yellow!30, execute at begin node=\setlength{\baselineskip}{10pt}]
 \tikzstyle{arrow} = [thick,->,>=latex]
+
+\begin{frame}
+	\frametitle{Programmablauf}
+	\framesubtitle{Übersicht}
+	\textbf{Zwei Phasen:}
+	\pause
+	\vspace{0.2cm}
+	\begin{itemize}
+		\item Initialisierung
+		\item Transcode Loop
+	\end{itemize}
+\end{frame}
 
 \begin{frame}
 	\frametitle{Programmablauf}
@@ -475,16 +487,18 @@
 			\item viele Kontextwechsel
 			\item viele Cache-Lookups
 		\end{itemize}
+		\pause
 		\item ISA-Unterschiede
 		\begin{itemize}
 			\item Mapping einzelner instruktionen ineffizient
 		\end{itemize}
 	\end{itemize}
-	
+	\pause
 	\begin{block}{Optimierungsstrategie}
 		\begin{itemize}
-			\item Wechsel zwischen guest und host vermeiden \\
+			\item Wechsel zwischen Guest und Host vermeiden \\
 				$\rightarrow$ mehrere Blöcke direkt hintereinander ausführen
+			\pause
 			\item Besseres Instruction-Mapping \\
 				$\rightarrow$ mehrere Instruktionen betrachten
 		\end{itemize}
@@ -492,7 +506,184 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Optimierungen}
-	\framesubtitle{Recursive translation}
+	\begin{minipage}[t]{.75\textwidth}
+		\frametitle{Optimierungen}
+		\framesubtitle{Wechsel zwischen Guest und Host vermeiden}
+		\textbf{Idee:} Blöcke verketten (\texttt{\footnotesize block chaining})\\
+		\pause
+		\textbf{vorher:}\\
+		\includegraphics[width=0.9\textwidth]{diagrams/chaining-unchained.pdf}\\
+		\pause
+		\textbf{nachher:}\\
+		\includegraphics[width=0.9\textwidth]{diagrams/chaining-chained.pdf}
+	\end{minipage}
+	\pause
+	\begin{minipage}[t]{.2\textwidth}
+		\vspace{3cm}
+		\begin{itemize}
+			\item nur für statische Sprungziele
+		\end{itemize}
+	\end{minipage}
+	
 \end{frame}
+	
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Block Chaining}
+	\begin{itemize}
+		\item Verkettung beim Übesetzen
+		\pause
+		\begin{itemize}
+			\item Ziel-Block muss bereits Übersetzt sein\\
+			\pause
+			$\rightarrow$ Rekursiv übersetzen
+			\pause
+			\item mögliche Rekursionsschleife
+			\pause
+			\item nicht für conditional Jumps / Branches
+		\end{itemize}
+		\pause
+		\item Nachträgliche Verkettung
+		\begin{itemize}
+			\pause
+			\item Verkettung im Transcode Loop nach erster Ausführung
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Dynamische Sprünge}
+	\begin{itemize}
+		\item können nicht verkettet werden
+		\item Fast alle dynamischen Sprünge sind function returns\\
+		$\rightarrow$ calls mitverfolgen und Sprungziel vorhersagen
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Return Address Stack}
+	
+	\begin{minipage}[t]{.47\textwidth}
+		\begin{itemize}
+			\item Tupel aus Gast- und Host-code Addressen
+			\pause
+			\item Calls legen Tupel ab
+			\item Dynamische Jumps prüfen Gast-Adresse und springen bei Übereinstimmung direkt zum nächsten Block. \\
+			\pause
+			$\rightarrow$ Transcode Loop wird umgangen
+			\pause
+			\item Implementiert als Ringpuffer gegen Under- und Overflows
+			
+		\end{itemize}
+	\end{minipage}
+	%\pause
+	\onslide<1->
+	\begin{minipage}[t]{.47\textwidth}
+		\vspace{0.1cm}
+		\centering
+		\begin{tabular} { |c|c| }
+			\hline
+			guest address & host address \\ [0.5ex]
+			\hline\hline
+			  & \\
+			 \hline
+			  & \\
+			 \hline
+			0x123 & 0x78238746 \\
+			\hline
+			0x612 & 0x78201241 \\
+			\hline
+			0x719 & 0x78036432 \\
+			\hline
+			0x482 & 0x78840275 \\
+			\hline
+		\end{tabular}
+	\end{minipage}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Macro Opcode Fusion}
+	
+	\begin{columns}[onlytextwidth]
+		\ttfamily
+		\begin{column}{0.45\textwidth}
+			\centering
+			SLLI r1, r1, 32\\
+			SLRI r1, r1, 32
+		\end{column}
+		
+		\begin{column}{0.05\textwidth}
+			\centering
+			\conclude
+		\end{column}
+		
+		\begin{column}{0.45\textwidth}
+			\centering
+			mov r32, r32
+		\end{column}
+	\end{columns}
+
+	\pause
+
+	\vspace{0.5cm}
+	
+	\textbf{Ziel: } Bestimmte Instruktionsfolgen mit weniger Instruktionen übersetzen
+	\pause
+	
+	\vspace{0.5cm}
+	
+	\begin{itemize}
+		\item Pattern-Matching beim Parsen des Blocks
+		\pause
+		\item Effizienten code emmitieren statt Instruktionen einzeln übersetzen
+	\end{itemize}
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+	\frametitle{Optimierungen}
+	\framesubtitle{Übersetzungsvorgang}
+	
+	
+	\begin{minipage}[t]{.37\textwidth}
+		\textbf{Übersetzung in\\ zwei Schritten:}
+		\vspace{0.20cm}
+		\begin{itemize}
+			\item<2-> Parsen
+			\item<3-> Übersetzen
+		\end{itemize}
+	\end{minipage}
+	\begin{minipage}[t]{.6\textwidth}
+		\vspace{0.10cm}
+		\pause
+		\begin{tikzpicture}[node distance=1.5cm]
+			\node[process, draw=none, fill=none, minimum width=0cm] (top-invisible) {};
+			\node[process, right of=top-invisible] (parse) {\scriptsize parse next\\\scriptsize instruction};
+			\draw [arrow] (top-invisible) -- (parse);
+			
+			\node[decision, below of=parse, yshift=-1cm] (parse-done) {\scriptsize end of\\\scriptsize basic block};
+			\draw[arrow] (parse) -- (parse-done);
+			\draw[arrow] (parse-done.east) -- node[anchor=south] {\scriptsize no} +(+0.7,0) |- (parse.east);
+			\pause
+			
+			\node[process, right of=parse, xshift=2.5cm] (translate) {\scriptsize translate next\\\scriptsize instruction};
+			\draw[arrow] (parse-done.south) -- +(0,-0.5) -- node[anchor=south]{\scriptsize yes} +(2.5,-0.5) |- (translate.west);
+			
+			\node[decision, below of=translate, yshift=-1cm] (translate-done) {\scriptsize translation\\\scriptsize done};
+			\draw[arrow] (translate) -- (translate-done);
+			\draw[arrow] (translate-done.east) -- node[anchor=south]{\scriptsize no} +(+0.7,0) |- (translate.east);
+			
+			\node[startstop, below of=translate-done, yshift=-0.7cm] (return) {\scriptsize return host\\\scriptsize code address};
+		\draw[arrow] (translate-done) -- (return);
+		\end{tikzpicture}
+	\end{minipage}
+	
+	
+\end{frame}
+\end{comment}
 
