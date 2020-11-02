@@ -1,0 +1,50 @@
+image: ubuntu
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+compile:
+  stage: build
+  before_script:
+    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install gcc g++ cmake make autoconf meson git
+  script:
+    - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - build/translator
+      - build/test
+
+gtest:
+  stage: test
+  dependencies:
+    - compile
+  script:
+    - ./build/test
+
+arithm-regular:
+  stage: test
+  dependencies:
+    - compile
+  script:
+    - ./build/translator -m -f test/test_programs/arithmetic_test/arithm
+
+arithm-optimized:
+  stage: test
+  dependencies:
+    - compile
+  script:
+    - ./build/translator -f test/test_programs/arithmetic_test/arithm
+
+sort-regular:
+  stage: test
+  dependencies:
+    - compile
+  script:
+    - ./build/translator -m -f test/test_programs/sort_example/sort
+
+sort-optimized:
+  stage: test
+  dependencies:
+    - compile
+  script:
+    - ./build/translator -f test/test_programs/sort_example/sort
