@@ -4,7 +4,7 @@
 
 > Make RISC-V code executable on the x86-64 ISA by means of dynamic binary translation.
 
-[![pipeline status](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/badges/develop/pipeline.svg)](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/-/commits/develop)
+[![pipeline status](https://github.com/ria-jit/ria-jit/workflows/CMake/badge.svg?branch=develop)](https://github.com/ria-jit/ria-jit/commits/develop)
 
 ### 🏠 [Homepage](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020)
 

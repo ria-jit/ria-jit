@@ -1,0 +1,63 @@
+name: ria-jit
+
+on: [ push ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: RelWithDebInfo
+  CC: gcc-10
+  CXX: g++-10
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout sources with depth 50
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 50 #default of gitlab
+
+      - name: Setup Python 3.x
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+
+      - name: Check PIP cache
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: pip-meson0-56-ninja1-10 # Change to regenerate
+
+      - name: Get dependencies
+        run: pip install meson ninja
+
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment variable
+        # access regardless of the host operating system
+        shell: bash
+        run: cmake -S $GITHUB_WORKSPACE -B ${{runner.workspace}}/build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build
+        shell: bash
+        run: cmake --build ${{runner.workspace}}/build --config $BUILD_TYPE -j $(nproc)
+
+      - name: Upload translator
+        uses: actions/upload-artifact@v2
+        with:
+          name: translator
+          path: ${{runner.workspace}}/build/translator
+
+      - name: Upload test
+        uses: actions/upload-artifact@v2
+        with:
+          name: test
+          path: ${{runner.workspace}}/build/test
+
+      - name: Unit Tests
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        run: ./test
