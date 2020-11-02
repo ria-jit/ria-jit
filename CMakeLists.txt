@@ -52,6 +52,7 @@ add_custom_target(
         version
         ${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/src/util/version.h.in
         -D DST=${CMAKE_BINARY_DIR}/src/util/version.h
+        -D ORIG_SRC=${CMAKE_SOURCE_DIR}
         -P ${CMAKE_SOURCE_DIR}/version.cmake
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/src/util/version.h
 )
