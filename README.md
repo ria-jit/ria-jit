@@ -4,17 +4,16 @@
 
 > Make RISC-V code executable on the x86-64 ISA by means of dynamic binary translation.
 
-[![pipeline status](https://github.com/ria-jit/ria-jit/workflows/CMake/badge.svg?branch=develop)](https://github.com/ria-jit/ria-jit/commits/develop)
+[![pipeline status](https://github.com/ria-jit/ria-jit/workflows/ria-jit/badge.svg?branch=develop)](https://github.com/ria-jit/ria-jit/commits/develop)
 
-### 🏠 [Homepage](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020)
+### 🏠 [Homepage](https://github.com/ria-jit/ria-jit)
 
 ## Building the translator
 After checking out the git repository (and running `git submodule update --init` to fetch the dependencies), the translator can be built via
 1.  `sudo apt-get -y install gcc g++ cmake make autoconf meson` (required dependencies)
 2.  `mkdir build && cd build && cmake .. && make`
 
-We can execute binaries compiled via the [RISC-V toolchain gcc](https://github.com/riscv/riscv-gnu-toolchain) and the options `-static -march=rv64ima -mabi=lp64`.
-
+We can execute binaries compiled via the [RISC-V toolchain gcc](https://github.com/riscv/riscv-gnu-toolchain) and the options `-static -march=rv64imafd -mabi=lp64d`.
 ## Usage
 
 ```sh
