@@ -8,6 +8,9 @@
 
 ### 🏠 [Homepage](https://github.com/ria-jit/ria-jit)
 
+## Paper
+You can find the source code of the paper under documentation. It is also published at [researchgate.net](https://www.researchgate.net/publication/345180829_Dynamic_Binary_Translation_for_RISC-V_code_on_x86-64).
+
 ## Building the translator
 After checking out the git repository (and running `git submodule update --init` to fetch the dependencies), the translator can be built via
 1.  `sudo apt-get -y install gcc g++ cmake make autoconf meson` (required dependencies)
