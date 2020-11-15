@@ -89,7 +89,7 @@ void log_asm_in(const char *format, ...) {
     if (flag_log_asm_in) {
         va_list args;
         va_start(args, format);
-        printf("[asm-in] ");
+        printf("[code-in] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
@@ -100,7 +100,7 @@ void log_asm_out(const char *format, ...) {
     if (flag_log_asm_out) {
         va_list args;
         va_start(args, format);
-        printf("[asm-out] ");
+        printf("[jit-gen] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
@@ -111,7 +111,7 @@ void log_reg_dump(const char *format, ...) {
     if (flag_log_reg_dump) {
         va_list args;
         va_start(args, format);
-        printf("[reg-dump] ");
+        printf("[reg-dmp] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
@@ -133,7 +133,7 @@ void log_cache(const char *format, ...) {
     if (flag_log_cache) {
         va_list args;
         va_start(args, format);
-        printf("[cache] ");
+        printf("[cachebk] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
@@ -144,7 +144,7 @@ void log_benchmark(const char *format, ...) {
     if (flag_do_benchmark) {
         va_list args;
         va_start(args, format);
-        printf("[benchmark] ");
+        printf("[benchmk] ");
         vdprintf(1, format, args);
         va_end(args);
         return;
