@@ -49,6 +49,106 @@ Furthermore, it includes the ability to time the execution of only the guest pro
 Logging can be controlled by passing the requested category to the \texttt{----log} flag as detailed in the help, and can provide insights into the state of the translator during execution or debugging.
 Lastly, it is also possible to selectively disarm optimisation features like the return address stack, block chaining, recursive jump target translation or macro operation fusion via \texttt{----optimize}.
 
+\subsection{Performance testing of floating point translations}
+Similarly to the proceedings laid out in section \ref{subsec:spec-cpu-2017-benchmark-suite}, we also tested the performance of the F- and D-extension translations by using the \texttt{fpspeed} suite of \textit{SPEC CPU 2017}.
+
+% ======= SPEC CPU Results =======
+% Results of the fpspeed SPEC CPU 2017 runs.
+% ================================
+\newcommand{\addAvgFloat}[3]{ %
+% #1=table name
+% #2=first column name
+% #3=list of columns to decorate
+% Transpose the table, so we can work on rows instead of columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+\pgfplotstablecreatecol[
+    create col/assign/.code={%
+      \def\entry{}
+      \foreach \i in {#3} {
+        \ifnum\pgfplotstablerow=\i
+        \def\colsum{0}
+                  \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+                  \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+                      \pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+                  }
+          \pgfmathsetmacro\colmean{\colsum/(\pgfplotstablecols-1)}
+          \xdef\entry{\colmean}
+        \fi
+      }
+      \pgfkeyslet{/pgfplots/table/create col/next content}\entry
+    }
+]{Avg}\intermediatetable
+
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{#1}{\intermediatetable}
+}
+%
+
+\pgfplotstableread[col sep=comma]{benchmarks/spec-float/native.csv}\nativefloattable
+\pgfplotstableread[col sep=comma]{benchmarks/spec-float/dbt.csv}\dbtfloattable
+\pgfplotstablecreatecol[create col/copy column from table=\nativefloattable{Est. Base Run Time}]{native}\dbtfloattable
+\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\dbtfloattable
+\addAvgFloat{\dbtfloattable}{Benchmark}{12}
+%\pgfplotstabletypeset[
+%  columns/Benchmark/.style={string type},
+%  columns={Benchmark, ratio}]{\dbttable}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[%
+			title = {SPEC CPU 2017 \texttt{fpspeed} Results},
+			ybar,
+			area legend,
+			ylabel = {Execution time [ratio to native]},
+			xtick = data,
+			xtick style = {draw = none},
+			xticklabel style = {
+				inner sep = 0pt,
+				anchor = north east,
+				rotate = 60
+			},
+			ytick = {1.0, 10.0, 20.0, 30.0, 40.0},
+			scaled y ticks = false,
+			xticklabels from table={\dbtfloattable}{Benchmark},
+			ymin = 0, ymax = 50.0,
+			ymajorgrids = true,
+			bar width = 5pt,
+			height = 8.0cm,
+			width = 0.9\linewidth,
+			legend style = {
+				at = {(0.98, 0.97)},
+				anchor = north east,
+				legend columns = 3,
+				column sep = 0.2cm
+			}
+		]
+			% Native results
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-float/native.csv}\nativefloatlocaltable
+			\pgfplotstablecreatecol[create col/copy column from table=\nativefloattable{Est. Base Run Time}]{native}\nativefloatlocaltable
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\nativefloatlocaltable
+			\addAvgFloat{\nativefloatlocaltable}{Benchmark}{12}
+			\addplot+[fill=era-native, draw=black] table [x expr=\coordindex, y=ratio] \nativefloatlocaltable;
+
+			% QEMU results
+			\pgfplotstableread[col sep=comma]{benchmarks/spec-float/qemu.csv}\qemufloattable
+			\pgfplotstablecreatecol[create col/copy column from table=\nativefloattable{Est. Base Run Time}]{native}\qemufloattable
+			\pgfplotstablecreatecol[create col/expr={\thisrow{Est. Base Run Time} / \thisrow{native}}]{ratio}\qemufloattable
+			\addAvgFloat{\qemufloattable}{Benchmark}{12}
+			\addplot+[fill=era-qemu, draw=black] table [x expr=\coordindex, y=ratio] \qemufloattable;
+
+			% DBT results
+			\addplot+[fill=era-dbt-1, draw=black] table [x expr=\coordindex, y=ratio] \dbtfloattable;
+
+			\legend{native, QEMU, DBT}
+		\end{axis}
+	\end{tikzpicture}
+	\caption[SPEC CPU 2017 Results (floating point)]%
+	{Results of \texttt{ref}-workload runs of \textit{SPEC CPU 2017} \texttt{fpspeed} (normalised, lower is better).}
+	\label{fig:spec-results}
+\end{figure}
+% ================================
+
 
 \subsection{Version history}
 The following mirrors the version control change log of the translator over the course of its development.
