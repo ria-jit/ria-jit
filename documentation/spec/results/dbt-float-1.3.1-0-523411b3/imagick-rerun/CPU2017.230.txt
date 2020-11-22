@@ -1,0 +1,219 @@
+runcpu v6247 started at 2020-11-19 07:39:58 on "sksmall"
+runcpu is: /u/home/schmidtf/spec/bin/harness/runcpu
+runcpu: runcpu --config=RISC-V-float --size=ref --noreportable imagick_s
+toolset: linux-x86_64
+suite: CPU2017 1.1.0
+
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/u/home/schmidtf/spec/config/RISC-V-float.cfg'
+
+1 configuration selected:
+
+ Action    Run Mode   Workload     Report Type      Benchmarks
+--------   --------   --------   ----------------   ---------------------------
+validate   speed      refspeed   SPECspeed2017_fp   638.imagick_s              
+-------------------------------------------------------------------------------
+
+Setting up environment for running 638.imagick_s...
+Starting runcpu for 638.imagick_s...
+Running "specperl /u/home/schmidtf/spec/bin/sysinfo" to gather system information.
+sysinfo: r6365 of 2019-08-21 (295195f888a3d7edb1e6e46a485a0011)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get info from /sys/devices/virtual/dmi/id
+sysinfo: ...trying to get info from dmidecode
+Read 129 info lines from the sysinfo program.
+Retrieving flags file (/u/home/schmidtf/spec/config/flags/gcc.xml)...
+Verbosity = 5
+Action    = validate
+Tune      = base
+Label     = RISC-V-float-1.0-m64
+Size      = refspeed
+benchmarks= 638.imagick_s
+outputs   = txt,html,cfg,pdf,csv
+username  = schmidtf
+Environment settings:
+LD_LIBRARY_PATH = "%{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64"
+OMP_STACKSIZE = "120M"
+
+Benchmarks selected: 638.imagick_s
+Compiling Binaries
+------------------------------------------------------------------------
+COMP: "/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -I.  -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-float-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+COMP: "/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99    -c -o options.o -DSPEC -DNDEBUG -I.  -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99         -O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc     -std=c99   "
+O: OPTIMIZE="-O3 -static -DSPEC_SUPPRESS_OPENMP -fno-unsafe-math-optimizations -fcommon -fallow-argument-mismatch"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/u/home/schmidtf/riscv-float-toolchain/build/bin/riscv64-unknown-linux-gnu-gcc
+COLLECT_LTO_WRAPPER=/u/home/schmidtf/riscv-float-toolchain/build/libexec/gcc/riscv64-unknown-linux-gnu/10.1.0/lto-wrapper
+Target: riscv64-unknown-linux-gnu
+Configured with: /u/home/schmidtf/riscv-float-toolchain/riscv-gcc/configure --target=riscv64-unknown-linux-gnu --prefix=/u/home/schmidtf/riscv-float-toolchain/build --with-sysroot=/u/home/schmidtf/riscv-float-toolchain/build/sysroot --with-system-zlib --enable-shared --enable-tls --enable-languages=c,c++,fortran --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libsanitizer --disable-nls --disable-bootstrap --src=.././riscv-gcc --disable-multilib --with-abi=lp64d --with-arch=rv64imafd --with-tune=rocket 'CFLAGS_FOR_TARGET=-O2   -mcmodel=medlow' 'CXXFLAGS_FOR_TARGET=-O2   -mcmodel=medlow'
+Thread model: posix
+Supported LTO compression algorithms: zlib
+gcc version 10.1.0 (GCC) 
+  Up to date 638.imagick_s base RISC-V-float-1.0-m64
+
+
+Setting Up Run Directories
+  Setting up 638.imagick_s refspeed (ref) base RISC-V-float-1.0-m64: run_base_refspeed_RISC-V-float-1.0-m64.0000
+-----------------------------------
+Running Benchmarks
+-----------------------------------
+  Running 638.imagick_s refspeed (ref) base RISC-V-float-1.0-m64 [2020-11-19 07:40:05]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000
+    -o refspeed_convert.out -e refspeed_convert.err /u/home/schmidtf/dbt-candidate/execute-dbt.py ../run_base_refspeed_RISC-V-float-1.0-m64.0000/imagick_s_base.RISC-V-float-1.0-m64 -limit disk 0 refspeed_input.tga -resize 817% -rotate -2.76 -shave 540x375 -alpha remove -auto-level -contrast-stretch 1x1% -colorspace Lab -channel R -equalize +channel -colorspace sRGB -define histogram:unique-colors=false -adaptive-blur 0x5 -despeckle -auto-gamma -adaptive-sharpen 55 -enhance -brightness-contrast 10x10 -resize 30% refspeed_output.tga > refspeed_convert.out 2>> refspeed_convert.err (timed)
+**WARNING: environment variable 'TERMCAP' contains embedded CR or LF; they will be converted to spaces
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-19 07:40:05 (1605771605.21062)
+Stop command: 2020-11-22 08:18:49 (1606033129.15808)
+Elapsed time for command: 72:38:43 (261523.947456121)
+Workload elapsed time (copy 0 workload 1) = 261523.771447 seconds
+Copy 0 of 638.imagick_s (base refspeed) run 1 finished at 2020-11-22 08:18:48.  Total elapsed time: 261523.771447
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'refspeed_validate.out' with reltol=0.01
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-22 08:18:49 (1606033129.38996)
+Stop command: 2020-11-22 08:18:54 (1606033134.29673)
+Elapsed time for command: 00:00:04 (4.90677094459534)
+Error with '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'; no non-empty output files exist
+  Command returned exit code 1
+****************************************
+Contents of refspeed_validate.err
+****************************************
+ImageValidator r4696
+INFO: threshold set to 0.900000
+INFO: max threshold set to 0 absolute, 0.001000 relative
+  Blocks below threshold: 253952 blocks of 258 allowed (258538 total)
+                AVG SSIM: 0.585562215
+                MIN SSIM: -0.274308804
+       SSIM distribution:
+         [         1.000]: 0
+         [ 0.900,  1.000): 4586
+         [ 0.800,  0.900): 29334
+         [ 0.700,  0.800): 47132
+         [ 0.600,  0.700): 43296
+         [ 0.500,  0.600): 44833
+         [ 0.400,  0.500): 46661
+         [ 0.300,  0.400): 28471
+         [ 0.200,  0.300): 10257
+         [ 0.100,  0.200): 2889
+         [ 0.000,  0.100): 882
+         [-0.100,  0.000): 162
+         [-0.200, -0.100): 31
+         [-0.300, -0.200): 4
+         [-0.400, -0.300): 0
+         [-0.500, -0.400): 0
+         [-0.600, -0.500): 0
+         [-0.700, -0.600): 0
+         [-0.800, -0.700): 0
+         [-0.900, -0.800): 0
+         [-1.000, -0.900): 0
+
+****************************************
+*** Miscompare of refspeed_validate.out; for details see
+    /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_RISC-V-float-1.0-m64.0000/refspeed_validate.out.mis
+0001:  refspeed_output.tga: AVG SSIM = 1.000000000
+       refspeed_output.tga ERROR:
+                          ^
+'refspeed_validate.out' long
+Benchmark Times:
+  Run Start:    2020-11-19 07:40:05 (1605771605)
+  Run Stop:     2020-11-22 08:18:49 (1606033129)
+  Run Elapsed:  72:38:44 (261524)
+  Run Reported: 72:38:43 (261523 771570000 261523.77157)
+ Error 638.imagick_s base refspeed ratio=0.06, runtime=261523.771570, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%, errorcode=VE
+Error: 1x638.imagick_s
+Producing Raw Reports
+ label: RISC-V-float-1.0-m64
+  workload: refspeed (ref)
+   benchset: intspeed
+   benchset: intrate
+   benchset: fpspeed
+   metric: SPECspeed2017_fp_base
+    format: raw -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.rsf
+Parsing flags for 638.imagick_s base: done
+Doing flag reduction: done
+    format: flags -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.flags.html
+    format: cfg -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.cfg
+    format: CSV -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.csv
+    format: PDF -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.pdf
+    format: HTML -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.html
+    format: Text -> /u/home/schmidtf/spec/result/CPU2017.230.fpspeed.refspeed.txt
+   benchset: fprate
+runcpu finished at 2020-11-22 08:19:01; 261540 total seconds elapsed
+The log for this run is in /u/home/schmidtf/spec/result/CPU2017.230.log
+
+runcpu finished at 2020-11-22 08:19:01; 261543 total seconds elapsed

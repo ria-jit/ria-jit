@@ -1,0 +1,1313 @@
+runcpu v6247 started at 2020-11-03 17:50:47 on "sksmall"
+runcpu is: /u/home/schmidtf/spec/bin/harness/runcpu
+runcpu: runcpu --config=native --size=ref --noreportable fpspeed
+toolset: linux-x86_64
+suite: CPU2017 1.1.0
+
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/u/home/schmidtf/spec/config/native.cfg'
+
+1 configuration selected:
+
+ Action    Run Mode   Workload     Report Type      Benchmarks
+--------   --------   --------   ----------------   ---------------------------
+validate   speed      refspeed   SPECspeed2017_fp   fpspeed                    
+-------------------------------------------------------------------------------
+
+Setting up environment for running fpspeed...
+Starting runcpu for fpspeed...
+Running "specperl /u/home/schmidtf/spec/bin/sysinfo" to gather system information.
+sysinfo: r6365 of 2019-08-21 (295195f888a3d7edb1e6e46a485a0011)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get info from /sys/devices/virtual/dmi/id
+sysinfo: ...trying to get info from dmidecode
+Retrieving flags file (/u/home/schmidtf/spec/config/flags/gcc.xml)...
+Verbosity = 5
+Action    = validate
+Tune      = base
+Label     = native-m64
+Size      = refspeed
+benchmarks= 603.bwaves_s,607.cactuBSSN_s,619.lbm_s,621.wrf_s,627.cam4_s,628.pop2_s,638.imagick_s,644.nab_s,649.fotonik3d_s,654.roms_s,996.specrand_fs
+outputs   = txt,html,cfg,pdf,csv
+username  = schmidtf
+Environment settings:
+LD_LIBRARY_PATH = "%{gcc_dir}/lib64/:%{gcc_dir}/lib/:/lib64"
+OMP_STACKSIZE = "120M"
+
+Benchmarks selected: 603.bwaves_s, 607.cactuBSSN_s, 619.lbm_s, 621.wrf_s, 627.cam4_s, 628.pop2_s, 638.imagick_s, 644.nab_s, 649.fotonik3d_s, 654.roms_s, 996.specrand_fs
+Compiling Binaries
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 603.bwaves_s base native-m64
+------------------------------------------------------------------------
+COMP: "/usr/bin/g++     -std=c++03 -m64 -c -o options.o -DSPEC -DNDEBUG  -Iinclude -DCCODE -DCCTK_DISABLE_RESTRICT=1 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static       -fno-openmp  -DSPEC_LP64  <source>"
+C: CXXC="/usr/bin/g++     -std=c++03 -m64"
+C: CXXOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CXXFLAGS="-Iinclude -DCCODE -DCCTK_DISABLE_RESTRICT=1"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: CXXOPTIMIZE=""
+P: PORTABILITY=""
+P: CXXPORTABILITY=""
+O: EXTRA_CXXFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_CXXOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CXXPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG  -Iinclude -DCCODE -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-Iinclude -DCCODE"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -Iinclude -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS="-Iinclude -DFCODE"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/usr/bin/g++     -std=c++03 -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/g++     -std=c++03 -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CXXC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/g++
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 607.cactuBSSN_s base native-m64
+------------------------------------------------------------------------
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -DLARGE_WORKLOAD  -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DLARGE_WORKLOAD"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gcc     -std=c99   -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/usr/bin/gcc     -std=c99   -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 619.lbm_s base native-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DDM_PARALLEL -DSTUBMPI -w -m literal.pm -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DEM_CORE=1 -DNMM_CORE=0 -DNMM_MAX_DIM=2600 -DCOAMPS_CORE=0 -DDA_CORE=0 -DEXP_CORE=0 -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF -DINTIO -DCONFIG_BUF_LEN=32768 -DMAX_DOMAINS_F=21 -DNMM_NEST=0 -DMAX_HISTORY=25 -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DDM_PARALLEL -DSTUBMPI"
+P: BENCH_FPPFLAGS="-w -m literal.pm -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DEM_CORE=1 -DNMM_CORE=0 -DNMM_MAX_DIM=2600 -DCOAMPS_CORE=0 -DDA_CORE=0 -DEXP_CORE=0 -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF -DINTIO -DCONFIG_BUF_LEN=32768 -DMAX_DOMAINS_F=21 -DNMM_NEST=0 -DMAX_HISTORY=25"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -I./inc -I./netcdf/include -O3 -march=x86-64 -static -fconvert=big-endian -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI"
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI -DSPEC_AUTO_BYTEORDER=0x12345678 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static         -DSPEC_CASE_FLAG  -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI"
+P: BENCH_CFLAGS="-DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY="-DSPEC_CASE_FLAG"
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static      -fconvert=big-endian  -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+FPP: "specpp -DSPEC -DNDEBUG -DDM_PARALLEL -DSTUBMPI -w -m literal.pm -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DEM_CORE=1 -DNMM_CORE=0 -DNMM_MAX_DIM=2600 -DCOAMPS_CORE=0 -DDA_CORE=0 -DEXP_CORE=0 -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF -DINTIO -DCONFIG_BUF_LEN=32768 -DMAX_DOMAINS_F=21 -DNMM_NEST=0 -DMAX_HISTORY=25 -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-DDM_PARALLEL -DSTUBMPI"
+P: BENCH_FPPFLAGS="-w -m literal.pm -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DEM_CORE=1 -DNMM_CORE=0 -DNMM_MAX_DIM=2600 -DCOAMPS_CORE=0 -DDA_CORE=0 -DEXP_CORE=0 -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=4 -DLWORDSIZE=4 -DNETCDF -DINTIO -DCONFIG_BUF_LEN=32768 -DMAX_DOMAINS_F=21 -DNMM_NEST=0 -DMAX_HISTORY=25"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -I./inc -I./netcdf/include -O3 -march=x86-64 -static -fconvert=big-endian -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI"
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI -DSPEC_AUTO_BYTEORDER=0x12345678 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static         -DSPEC_CASE_FLAG  -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I. -I./inc -I./netcdf/include -DDM_PARALLEL -DSTUBMPI"
+P: BENCH_CFLAGS="-DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY="-DSPEC_CASE_FLAG"
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static      -fconvert=big-endian  -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 621.wrf_s base native-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -w -DHIDE_MPI -D_MPISERIAL -DNO_MPI2 -DSPEC_SUPPRESS_OPENMP -DSPEC_CASE_FLAG -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FPPFLAGS="-DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -w -DHIDE_MPI -D_MPISERIAL -DNO_MPI2"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -Iinclude -Inetcdf/include -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS="-I. -Iinclude -Inetcdf/include"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG  -DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -DSPEC_AUTO_BYTEORDER=0x12345678 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -DSPEC_CASE_FLAG   -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static     -DSPEC_CASE_FLAG   -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -Iinclude -Inetcdf/include -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS="-I. -Iinclude -Inetcdf/include"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG  -DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -DSPEC_AUTO_BYTEORDER=0x12345678 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -DSPEC_CASE_FLAG   -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-DNO_SHR_VMATH -DCO2A -DPERGRO -DPLON=144 -DPLAT=96 -DPLEV=26 -DPCNST=3 -DPCOLS=4 -DPTRM=1 -DPTRN=1 -DPTRK=1 -DSTAGGERED -D_NETCDF -DNO_R16 -I. -Iinclude -Inetcdf/include -DUSE_COSP -DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static     -DSPEC_CASE_FLAG   -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+P: PORTABILITY="-DSPEC_CASE_FLAG"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 627.cam4_s base native-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -w -I. -Inetcdf/include -D_MPISERIAL -D_NETCDF -D_USEBOX -DCCSMCOUPLED=1 -DNO_SHR_VMATH -DBLCKX=50 -DBLCKY=4 -DMXBLCKS=58 -DNO_GETTIMEOFDAY -DSPEC_AUTO_BYTEORDER=0x12345678 -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FPPFLAGS="-w -I. -Inetcdf/include -D_MPISERIAL -D_NETCDF -D_USEBOX -DCCSMCOUPLED=1 -DNO_SHR_VMATH -DBLCKX=50 -DBLCKY=4 -DMXBLCKS=58 -DNO_GETTIMEOFDAY -DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -O3 -march=x86-64 -static -fconvert=big-endian -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG  -I. -Inetcdf/include -D_MPISERIAL -D_NETCDF -D_USEBOX -DCCSMCOUPLED=1 -DNO_SHR_VMATH -DBLCKX=50 -DBLCKY=4 -DMXBLCKS=58 -DNO_GETTIMEOFDAY  -DSPEC_AUTO_BYTEORDER=0x12345678 -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static         -DSPEC_CASE_FLAG  -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_CFLAGS="-I. -Inetcdf/include -D_MPISERIAL -D_NETCDF -D_USEBOX -DCCSMCOUPLED=1 -DNO_SHR_VMATH -DBLCKX=50 -DBLCKY=4 -DMXBLCKS=58 -DNO_GETTIMEOFDAY  -DSPEC_AUTO_BYTEORDER=0x12345678"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY="-DSPEC_CASE_FLAG"
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static      -fconvert=big-endian  -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+P: FPORTABILITY="-fconvert=big-endian"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 628.pop2_s base native-m64
+------------------------------------------------------------------------
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -I.  -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gcc     -std=c99   -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/usr/bin/gcc     -std=c99   -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -I.  -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gcc     -std=c99   -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/usr/bin/gcc     -std=c99   -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 638.imagick_s base native-m64
+------------------------------------------------------------------------
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -Ispecrand -Iregex-alpha -DNDEBUG -DNOPERFLIB -DNOREDUCE  -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ispecrand -Iregex-alpha -DNDEBUG -DNOPERFLIB -DNOREDUCE"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gcc     -std=c99   -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>   -lm         -o options  "
+C: LD="/usr/bin/gcc     -std=c99   -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: MATH_LIBS="-lm"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 644.nab_s base native-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-I."
+P: BENCH_FFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 649.fotonik3d_s base native-m64
+------------------------------------------------------------------------
+FPP: "specpp -DSPEC -DNDEBUG -w -m literal-single.pm -m c-comment.pm -I. -DBENCHMARK -DNestedGrids=1 -DNO_GETTIMEOFDAY -DSPEC_SUPPRESS_OPENMP -DSPEC_LP64 <source> -o <source>.fppized.f9x"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FPPFLAGS="-w -m literal-single.pm -m c-comment.pm -I. -DBENCHMARK -DNestedGrids=1 -DNO_GETTIMEOFDAY"
+O: OPTIMIZE="-DSPEC_SUPPRESS_OPENMP"
+O: EXTRA_OPTIMIZE=""
+O: FPPOPTIMIZE=""
+O: EXTRA_FPPOPTIMIZE=""
+O: FOPTIMIZE=""
+O: EXTRA_FOPTIMIZE=""
+P: PORTABILITY=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: FPORTABILITY=""
+P: EXTRA_FPORTABILITY=""
+COMP: "/usr/bin/gfortran           -m64 -c -o options.o -I. -O3 -march=x86-64 -static -fno-openmp <source>"
+C: FC="/usr/bin/gfortran           -m64"
+C: FOBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS=""
+P: BENCH_FFLAGS="-I."
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: FOPTIMIZE=""
+P: PORTABILITY=""
+P: FPORTABILITY=""
+O: EXTRA_FFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_FOPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_FPORTABILITY=""
+LINK: "/usr/bin/gfortran           -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gfortran           -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ FC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gfortran
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 654.roms_s base native-m64
+------------------------------------------------------------------------
+COMP: "/usr/bin/gcc     -std=c99   -m64 -c -o options.o -DSPEC -DNDEBUG -Ispecrand-common  -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static           -fno-openmp    -DSPEC_LP64  <source>"
+C: CC="/usr/bin/gcc     -std=c99   -m64"
+C: COBJOPT="-c -o options"
+P: CPUFLAGS="-DSPEC -DNDEBUG"
+P: BENCH_FLAGS="-Ispecrand-common"
+P: BENCH_CFLAGS=""
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: COPTIMIZE=""
+P: PORTABILITY=""
+P: CPORTABILITY=""
+O: EXTRA_CFLAGS=""
+O: EXTRA_OPTIMIZE="-fno-openmp"
+O: EXTRA_COPTIMIZE=""
+P: EXTRA_PORTABILITY="-DSPEC_LP64"
+P: EXTRA_CPORTABILITY=""
+LINK: "/usr/bin/gcc     -std=c99   -m64      -O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static        -fno-openmp  <objects>            -o options  "
+C: LD="/usr/bin/gcc     -std=c99   -m64"
+O: OPTIMIZE="-O3 -DSPEC_SUPPRESS_OPENMP -march=x86-64 -static"
+O: EXTRA_OPTIMIZE="-fno-openmp"
+C: LDOUT="-o options"
+ CC_VERSION_OPTION:
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 7.5.0-3ubuntu1~18.04' --with-bugurl=file:///usr/share/doc/gcc-7/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++ --prefix=/usr --with-gcc-major-version-only --program-suffix=-7 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --enable-default-pie --with-system-zlib --with-target-system-zlib --enable-objc-gc=auto --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --tar
+get=x86_64-linux-gnu
+Thread model: posix
+gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04) 
+  Up to date 996.specrand_fs base native-m64
+
+
+Setting Up Run Directories
+  Setting up 603.bwaves_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 607.cactuBSSN_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 619.lbm_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 621.wrf_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 627.cam4_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 628.pop2_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 638.imagick_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 644.nab_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 649.fotonik3d_s refspeed (ref) base native-m64: OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+**WARNING: environment variable 'TERMCAP' contains embedded CR or LF; they will be converted to spaces
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000 -f inputgen.cmd -e inputgen.err -o inputgen.stdout'
+Start command: 2020-11-03 17:51:24 (1604425884.20777)
+Stop command: 2020-11-03 17:51:30 (1604425890.99151)
+Elapsed time for command: 00:00:06 (6.78374099731445)
+Input generation total elapsed time = 6 seconds
+Input generation elapsed time (0:1) = 6.614932 seconds
+run_base_refspeed_native-m64.0000
+  Setting up 654.roms_s refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+  Setting up 996.specrand_fs refspeed (ref) base native-m64: run_base_refspeed_native-m64.0000
+-----------------------------------
+Running Benchmarks
+-----------------------------------
+  Running 603.bwaves_s refspeed (ref) base native-m64 [2020-11-03 17:51:34]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/603.bwaves_s/run/run_base_refspeed_native-m64.0000
+    -i bwaves_1.in -o bwaves_1.out -e bwaves_1.err ../run_base_refspeed_native-m64.0000/speed_bwaves_base.native-m64 bwaves_1 < bwaves_1.in > bwaves_1.out 2>> bwaves_1.err (timed)
+    -i bwaves_2.in -o bwaves_2.out -e bwaves_2.err ../run_base_refspeed_native-m64.0000/speed_bwaves_base.native-m64 bwaves_2 < bwaves_2.in > bwaves_2.out 2>> bwaves_2.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/603.bwaves_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/603.bwaves_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-03 17:51:35 (1604425895.03979)
+Stop command: 2020-11-03 21:22:42 (1604438562.93403)
+Elapsed time for command: 03:31:07 (12667.8942439556)
+Workload elapsed time (copy 0 workload 1) = 6294.926045 seconds
+Workload elapsed time (copy 0 workload 2) = 6372.79771 seconds
+Copy 0 of 603.bwaves_s (base refspeed) run 1 finished at 2020-11-03 21:22:42.  Total elapsed time: 12667.723755
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'bwaves_1.out' with abstol=1e-16, reltol=0.015
+comparing 'bwaves_2.out' with abstol=1e-16, reltol=0.015
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/603.bwaves_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/603.bwaves_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-03 21:22:43 (1604438563.02354)
+Stop command: 2020-11-03 21:22:43 (1604438563.87917)
+Elapsed time for command: 00:00:00 (0.855627059936523)
+Benchmark Times:
+  Run Start:    2020-11-03 17:51:35 (1604425895)
+  Run Stop:     2020-11-03 21:22:42 (1604438562)
+  Run Elapsed:  03:31:07 (12667)
+  Run Reported: 03:31:07 (12667 723901000 12667.723901)
+ Success 603.bwaves_s base refspeed ratio=4.66, runtime=12667.723901, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 607.cactuBSSN_s refspeed (ref) base native-m64 [2020-11-03 21:22:44]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/607.cactuBSSN_s/run/run_base_refspeed_native-m64.0000
+    -o spec_ref.out -e spec_ref.err ../run_base_refspeed_native-m64.0000/cactuBSSN_s_base.native-m64 spec_ref.par   > spec_ref.out 2>> spec_ref.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/607.cactuBSSN_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/607.cactuBSSN_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-03 21:22:44 (1604438564.22204)
+Stop command: 2020-11-03 22:40:02 (1604443202.58282)
+Elapsed time for command: 01:17:18 (4638.3607749939)
+Workload elapsed time (copy 0 workload 1) = 4638.18376 seconds
+Copy 0 of 607.cactuBSSN_s (base refspeed) run 1 finished at 2020-11-03 22:40:02.  Total elapsed time: 4638.18376
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'gxx.xl' with abstol=5e-13, floatcompare=1
+comparing 'gxy.xl' with abstol=5e-13, floatcompare=1
+comparing 'spec_ref.out' with floatcompare=1
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/607.cactuBSSN_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/607.cactuBSSN_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-03 22:40:02 (1604443202.67618)
+Stop command: 2020-11-03 22:40:04 (1604443204.06201)
+Elapsed time for command: 00:00:01 (1.38582491874695)
+Benchmark Times:
+  Run Start:    2020-11-03 21:22:44 (1604438564)
+  Run Stop:     2020-11-03 22:40:02 (1604443202)
+  Run Elapsed:  01:17:18 (4638)
+  Run Reported: 01:17:18 (4638 183915000 4638.183915)
+ Success 607.cactuBSSN_s base refspeed ratio=3.59, runtime=4638.183915, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 619.lbm_s refspeed (ref) base native-m64 [2020-11-03 22:40:04]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/619.lbm_s/run/run_base_refspeed_native-m64.0000
+    -o lbm.out -e lbm.err ../run_base_refspeed_native-m64.0000/lbm_s_base.native-m64 2000 reference.dat 0 0 200_200_260_ldc.of > lbm.out 2>> lbm.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/619.lbm_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/619.lbm_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-03 22:40:04 (1604443204.19823)
+Stop command: 2020-11-03 23:13:00 (1604445180.78129)
+Elapsed time for command: 00:32:56 (1976.58305811882)
+Workload elapsed time (copy 0 workload 1) = 1976.412335 seconds
+Copy 0 of 619.lbm_s (base refspeed) run 1 finished at 2020-11-03 23:13:00.  Total elapsed time: 1976.412335
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'lbm.out' with abstol=1e-07
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/619.lbm_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/619.lbm_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-03 23:13:00 (1604445180.92353)
+Stop command: 2020-11-03 23:13:01 (1604445181.42325)
+Elapsed time for command: 00:00:00 (0.499722003936768)
+Benchmark Times:
+  Run Start:    2020-11-03 22:40:04 (1604443204)
+  Run Stop:     2020-11-03 23:13:00 (1604445180)
+  Run Elapsed:  00:32:56 (1976)
+  Run Reported: 00:32:56 (1976 412454000 1976.412454)
+ Success 619.lbm_s base refspeed ratio=2.65, runtime=1976.412454, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 621.wrf_s refspeed (ref) base native-m64 [2020-11-03 23:13:02]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/621.wrf_s/run/run_base_refspeed_native-m64.0000
+    -o rsl.out.0000 -e wrf.err ../run_base_refspeed_native-m64.0000/wrf_s_base.native-m64 > rsl.out.0000 2>> wrf.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/621.wrf_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/621.wrf_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-03 23:13:02 (1604445182.75371)
+Stop command: 2020-11-04 00:37:45 (1604450265.7526)
+Elapsed time for command: 01:24:42 (5082.99889016151)
+Workload elapsed time (copy 0 workload 1) = 5082.828993 seconds
+Copy 0 of 621.wrf_s (base refspeed) run 1 finished at 2020-11-04 00:37:45.  Total elapsed time: 5082.828993
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'diffwrf_output_01.txt' with cw=1
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/621.wrf_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/621.wrf_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 00:37:45 (1604450265.84594)
+Stop command: 2020-11-04 00:37:47 (1604450267.06701)
+Elapsed time for command: 00:00:01 (1.2210681438446)
+Benchmark Times:
+  Run Start:    2020-11-03 23:13:02 (1604445182)
+  Run Stop:     2020-11-04 00:37:45 (1604450265)
+  Run Elapsed:  01:24:43 (5083)
+  Run Reported: 01:24:42 (5082 829195000 5082.829195)
+ Success 621.wrf_s base refspeed ratio=2.60, runtime=5082.829195, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 627.cam4_s refspeed (ref) base native-m64 [2020-11-04 00:37:47]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/627.cam4_s/run/run_base_refspeed_native-m64.0000
+    -o cam4_s_base.native-m64.txt -e cam4_s_base.native-m64.err ../run_base_refspeed_native-m64.0000/cam4_s_base.native-m64 > cam4_s_base.native-m64.txt 2>> cam4_s_base.native-m64.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/627.cam4_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/627.cam4_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 00:37:47 (1604450267.79191)
+Stop command: 2020-11-04 01:59:33 (1604455173.90521)
+Elapsed time for command: 01:21:46 (4906.11330795288)
+Workload elapsed time (copy 0 workload 1) = 4905.942488 seconds
+Copy 0 of 627.cam4_s (base refspeed) run 1 finished at 2020-11-04 01:59:33.  Total elapsed time: 4905.942488
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'cam4_validate.txt' with cw=1
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/627.cam4_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/627.cam4_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 01:59:34 (1604455174.00936)
+Stop command: 2020-11-04 01:59:34 (1604455174.67465)
+Elapsed time for command: 00:00:00 (0.66529107093811)
+Benchmark Times:
+  Run Start:    2020-11-04 00:37:47 (1604450267)
+  Run Stop:     2020-11-04 01:59:33 (1604455173)
+  Run Elapsed:  01:21:46 (4906)
+  Run Reported: 01:21:45 (4905 942653000 4905.942653)
+ Success 627.cam4_s base refspeed ratio=1.81, runtime=4905.942653, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 628.pop2_s refspeed (ref) base native-m64 [2020-11-04 01:59:38]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/628.pop2_s/run/run_base_refspeed_native-m64.0000
+    -o pop2_s.out -e pop2_s.err ../run_base_refspeed_native-m64.0000/speed_pop2_base.native-m64 > pop2_s.out 2>> pop2_s.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/628.pop2_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/628.pop2_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 01:59:38 (1604455178.67426)
+Stop command: 2020-11-04 03:37:03 (1604461023.98482)
+Elapsed time for command: 01:37:25 (5845.31056189537)
+Workload elapsed time (copy 0 workload 1) = 5845.138328 seconds
+Copy 0 of 628.pop2_s (base refspeed) run 1 finished at 2020-11-04 03:37:03.  Total elapsed time: 5845.138328
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'ocn.log' with abstol=0.03, reltol=0.03
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/628.pop2_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/628.pop2_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 03:37:04 (1604461024.08428)
+Stop command: 2020-11-04 03:37:04 (1604461024.75466)
+Elapsed time for command: 00:00:00 (0.670382976531982)
+Benchmark Times:
+  Run Start:    2020-11-04 01:59:38 (1604455178)
+  Run Stop:     2020-11-04 03:37:03 (1604461023)
+  Run Elapsed:  01:37:25 (5845)
+  Run Reported: 01:37:25 (5845 138490000 5845.13849)
+ Success 628.pop2_s base refspeed ratio=2.03, runtime=5845.138490, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 638.imagick_s refspeed (ref) base native-m64 [2020-11-04 03:37:04]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_native-m64.0000
+    -o refspeed_convert.out -e refspeed_convert.err ../run_base_refspeed_native-m64.0000/imagick_s_base.native-m64 -limit disk 0 refspeed_input.tga -resize 817% -rotate -2.76 -shave 540x375 -alpha remove -auto-level -contrast-stretch 1x1% -colorspace Lab -channel R -equalize +channel -colorspace sRGB -define histogram:unique-colors=false -adaptive-blur 0x5 -despeckle -auto-gamma -adaptive-sharpen 55 -enhance -brightness-contrast 10x10 -resize 30% refspeed_output.tga > refspeed_convert.out 2>> refspeed_convert.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 03:37:05 (1604461025.05326)
+Stop command: 2020-11-04 07:09:14 (1604473754.87896)
+Elapsed time for command: 03:32:09 (12729.8257079124)
+Workload elapsed time (copy 0 workload 1) = 12729.65457 seconds
+Copy 0 of 638.imagick_s (base refspeed) run 1 finished at 2020-11-04 07:09:14.  Total elapsed time: 12729.65457
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'refspeed_validate.out' with reltol=0.01
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/638.imagick_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 07:09:14 (1604473754.98859)
+Stop command: 2020-11-04 07:09:16 (1604473756.60268)
+Elapsed time for command: 00:00:01 (1.61408495903015)
+Benchmark Times:
+  Run Start:    2020-11-04 03:37:05 (1604461025)
+  Run Stop:     2020-11-04 07:09:14 (1604473754)
+  Run Elapsed:  03:32:09 (12729)
+  Run Reported: 03:32:09 (12729 654692000 12729.654692)
+ Success 638.imagick_s base refspeed ratio=1.13, runtime=12729.654692, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 644.nab_s refspeed (ref) base native-m64 [2020-11-04 07:09:16]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/644.nab_s/run/run_base_refspeed_native-m64.0000
+    -o 3j1n.out -e 3j1n.err ../run_base_refspeed_native-m64.0000/nab_s_base.native-m64 3j1n 20140317 220 > 3j1n.out 2>> 3j1n.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/644.nab_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/644.nab_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 07:09:16 (1604473756.76402)
+Stop command: 2020-11-04 08:32:20 (1604478740.4301)
+Elapsed time for command: 01:23:03 (4983.66607999802)
+Workload elapsed time (copy 0 workload 1) = 4983.496571 seconds
+Copy 0 of 644.nab_s (base refspeed) run 1 finished at 2020-11-04 08:32:20.  Total elapsed time: 4983.496571
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing '3j1n.out' with reltol=0.01, skipreltol=2
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/644.nab_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/644.nab_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 08:32:20 (1604478740.51832)
+Stop command: 2020-11-04 08:32:21 (1604478741.00704)
+Elapsed time for command: 00:00:00 (0.48871898651123)
+Benchmark Times:
+  Run Start:    2020-11-04 07:09:16 (1604473756)
+  Run Stop:     2020-11-04 08:32:20 (1604478740)
+  Run Elapsed:  01:23:04 (4984)
+  Run Reported: 01:23:03 (4983 496690000 4983.49669)
+ Success 644.nab_s base refspeed ratio=3.51, runtime=4983.496690, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 649.fotonik3d_s refspeed (ref) base native-m64 [2020-11-04 08:32:21]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000
+    -o fotonik3d_s.log -e fotonik3d_s.err ../run_base_refspeed_native-m64.0000/fotonik3d_s_base.native-m64 > fotonik3d_s.log 2>> fotonik3d_s.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 08:32:21 (1604478741.19304)
+Stop command: 2020-11-04 09:03:49 (1604480629.62868)
+Elapsed time for command: 00:31:28 (1888.43564605713)
+Workload elapsed time (copy 0 workload 1) = 1888.259827 seconds
+Copy 0 of 649.fotonik3d_s (base refspeed) run 1 finished at 2020-11-04 09:03:49.  Total elapsed time: 1888.259827
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'pscyee.out' with abstol=1e-27, floatcompare=1, obiwan=1, reltol=1e-10
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/649.fotonik3d_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 09:03:49 (1604480629.72201)
+Stop command: 2020-11-04 09:03:50 (1604480630.50506)
+Elapsed time for command: 00:00:00 (0.783044099807739)
+Benchmark Times:
+  Run Start:    2020-11-04 08:32:21 (1604478741)
+  Run Stop:     2020-11-04 09:03:49 (1604480629)
+  Run Elapsed:  00:31:28 (1888)
+  Run Reported: 00:31:28 (1888 259951000 1888.259951)
+ Success 649.fotonik3d_s base refspeed ratio=4.83, runtime=1888.259951, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 654.roms_s refspeed (ref) base native-m64 [2020-11-04 09:03:50]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+roms_s: Prerun decomposition for 1 threads: NtileI=4 NtileJ=1
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/654.roms_s/run/run_base_refspeed_native-m64.0000
+    -i ocean_benchmark3.in -o ocean_benchmark3.log -e ocean_benchmark3.err ../run_base_refspeed_native-m64.0000/sroms_base.native-m64 < ocean_benchmark3.in > ocean_benchmark3.log 2>> ocean_benchmark3.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/654.roms_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/654.roms_s/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 09:03:50 (1604480630.71617)
+Stop command: 2020-11-04 10:55:58 (1604487358.24834)
+Elapsed time for command: 01:52:07 (6727.53217291832)
+Workload elapsed time (copy 0 workload 1) = 6727.357052 seconds
+Copy 0 of 654.roms_s (base refspeed) run 1 finished at 2020-11-04 10:55:58.  Total elapsed time: 6727.357052
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'ocean_benchmark3.log' with abstol=1e-07, reltol=1e-07
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/654.roms_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/654.roms_s/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 10:55:58 (1604487358.33584)
+Stop command: 2020-11-04 10:55:58 (1604487358.82788)
+Elapsed time for command: 00:00:00 (0.492046117782593)
+Benchmark Times:
+  Run Start:    2020-11-04 09:03:50 (1604480630)
+  Run Stop:     2020-11-04 10:55:58 (1604487358)
+  Run Elapsed:  01:52:08 (6728)
+  Run Reported: 01:52:07 (6727 357174000 6727.357174)
+ Success 654.roms_s base refspeed ratio=2.34, runtime=6727.357174, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+-----------------------------------
+  Running 996.specrand_fs refspeed (ref) base native-m64 [2020-11-04 10:55:58]
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+Commands to run (specinvoke command file):
+    -r
+    -N C
+    -C /u/home/schmidtf/spec/benchspec/CPU/996.specrand_fs/run/run_base_refspeed_native-m64.0000
+    -o rand.234923.out -e rand.234923.err ../run_base_refspeed_native-m64.0000/specrand_fs_base.native-m64 1255432124 234923 > rand.234923.out 2>> rand.234923.err (timed)
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/996.specrand_fs/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/996.specrand_fs/run/run_base_refspeed_native-m64.0000 -f speccmds.cmd -q -e speccmds.err -o speccmds.stdout'
+Start command: 2020-11-04 10:55:58 (1604487358.95842)
+Stop command: 2020-11-04 10:55:59 (1604487359.30093)
+Elapsed time for command: 00:00:00 (0.342514038085938)
+Workload elapsed time (copy 0 workload 1) = 0.172418 seconds
+Copy 0 of 996.specrand_fs (base refspeed) run 1 finished at 2020-11-04 10:55:59.  Total elapsed time: 0.172418
+OpenMP environment variables removed: None
+OpenMP environment variables in effect:
+	OMP_NUM_THREADS	=> '1'
+	OMP_THREAD_LIMIT	=> '1'
+	OMP_STACKSIZE	=> '120M'
+Pre-run environment changes:
+	'OMP_NUM_THREADS' added: (value now '1')
+	'OMP_THREAD_LIMIT' added: (value now '1')
+comparing 'rand.234923.out' with floatcompare=1, nansupport=0
+Specinvoke: /u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/996.specrand_fs/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout
+Issuing command '/u/home/schmidtf/spec/bin/specinvoke -d /u/home/schmidtf/spec/benchspec/CPU/996.specrand_fs/run/run_base_refspeed_native-m64.0000 -f compare.cmd -E -e compare.err -o compare.stdout'
+Start command: 2020-11-04 10:55:59 (1604487359.38643)
+Stop command: 2020-11-04 10:56:01 (1604487361.0904)
+Elapsed time for command: 00:00:01 (1.70397281646729)
+Benchmark Times:
+  Run Start:    2020-11-04 10:55:58 (1604487358)
+  Run Stop:     2020-11-04 10:55:59 (1604487359)
+  Run Elapsed:  00:00:01 (1)
+  Run Reported: 00:00:00 (0 172528000 0.172528)
+ Success 996.specrand_fs base refspeed ratio=57.96, runtime=0.172528, copies=1, threads=1, power=0.00W, temp=0.00 degC, humidity=0.00%
+Success: 1x603.bwaves_s 1x607.cactuBSSN_s 1x619.lbm_s 1x621.wrf_s 1x627.cam4_s 1x628.pop2_s 1x638.imagick_s 1x644.nab_s 1x649.fotonik3d_s 1x654.roms_s 1x996.specrand_fs
+Producing Raw Reports
+ label: native-m64
+  workload: refspeed (ref)
+   benchset: intspeed
+   benchset: intrate
+   benchset: fpspeed
+   metric: SPECspeed2017_fp_base
+    format: raw -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.rsf
+Parsing flags for 603.bwaves_s base: done
+Parsing flags for 607.cactuBSSN_s base: done
+Parsing flags for 619.lbm_s base: done
+Parsing flags for 621.wrf_s base: done
+Parsing flags for 627.cam4_s base: done
+Parsing flags for 628.pop2_s base: done
+Parsing flags for 638.imagick_s base: done
+Parsing flags for 644.nab_s base: done
+Parsing flags for 649.fotonik3d_s base: done
+Parsing flags for 654.roms_s base: done
+Doing flag reduction: done
+    format: flags -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.flags.html
+    format: cfg -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.cfg
+    format: CSV -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.csv
+    format: PDF -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.pdf
+    format: HTML -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.html
+    format: Text -> /u/home/schmidtf/spec/result/CPU2017.227.fpspeed.refspeed.txt
+   benchset: fprate
+runcpu finished at 2020-11-04 10:56:14; 61525 total seconds elapsed
+Info: file_tail(23902): file '/u/home/schmidtf/spec/tmp/CPU2017.227/templogs/preenv.fpspeed.227.0.debug' was removed and will no longer be followed.  No action is required.
+The log for this run is in /u/home/schmidtf/spec/result/CPU2017.227.log
+
+runcpu finished at 2020-11-04 10:56:14; 61527 total seconds elapsed
