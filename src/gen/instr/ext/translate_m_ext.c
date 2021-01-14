@@ -450,6 +450,11 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
 
+    if (regDest != FE_AX) {
+        ///rd is mapped so move the result in RAX there.
+        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
+    }
+
 }
 
 /**
