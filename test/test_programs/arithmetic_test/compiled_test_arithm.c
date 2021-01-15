@@ -75,9 +75,17 @@ int main(int argc, char **argv) {
 
     {
         //div-zero quotient should have all bits set
-        init(++num, "DivZero");
+        init(++num, "DivZero (unsigned)");
         size_t n = 256;
         size_t m = 0;
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
+    }
+
+    {
+        //div-zero quotient should have all bits set
+        init(++num, "DivZero (signed)");
+        int n = 256;
+        int m = 0;
         assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
     }
 
