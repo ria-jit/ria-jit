@@ -444,17 +444,11 @@ void translate_DIVW(const t_risc_instr *instr, const register_info *r_info) {
     uint8_t *divZero = current;
     err |= fe_enc64(&jmpDivZeroBuf, FE_JZ, (intptr_t) divZero);
 
-    err |= fe_enc64(&current, FE_MOV64ri, FE_AX, -1); //-1 is all bits set
+    err |= fe_enc64(&current, FE_MOV64ri, regDest, -1); //-1 is all bits set
 
     //write forward jump target for notDivZero jmp
     uint8_t *notDivZero = current;
     err |= fe_enc64(&jmpNotDivZeroBuf, FE_JMP, (intptr_t) notDivZero);
-
-    if (regDest != FE_AX) {
-        ///rd is mapped so move the result in RAX there.
-        err |= fe_enc64(&current, FE_MOVSXr64r32, regDest, FE_AX);
-    }
-
 }
 
 /**
