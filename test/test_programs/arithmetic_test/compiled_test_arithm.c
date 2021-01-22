@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         init(++num, "DivZero (unsigned)");
         uint32_t n = 256;
         uint32_t m = 0;
-        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
+        assert_equals(0xFFFFFFFF, (n / m), &failed_tests);
     }
 
     {
