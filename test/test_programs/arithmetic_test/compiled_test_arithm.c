@@ -4,8 +4,9 @@
 
 #include "../riscvminilib/rv64minilibc.h"
 #include <stdbool.h>
+#include <stdint.h>
 
-void init(int number, char* name);
+void init(int number, char *name);
 
 bool check_condition(bool cond);
 
@@ -75,9 +76,33 @@ int main(int argc, char **argv) {
 
     {
         //div-zero quotient should have all bits set
-        init(++num, "DivZero");
-        size_t n = 256;
-        size_t m = 0;
+        init(++num, "DivZero (unsigned)");
+        uint32_t n = 256;
+        uint32_t m = 0;
+        assert_equals(0xFFFFFFFF, (n / m), &failed_tests);
+    }
+
+    {
+        //div-zero quotient should have all bits set
+        init(++num, "DivZero (signed)");
+        int n = 256;
+        int m = 0;
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
+    }
+
+    {
+        //div-zero quotient should have all bits set
+        init(++num, "DivZero (64b unsigned)");
+        uint64_t n = 256;
+        uint64_t m = 0;
+        assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
+    }
+
+    {
+        //div-zero quotient should have all bits set
+        init(++num, "DivZero (64b signed)");
+        int64_t n = 256;
+        int64_t m = 0;
         assert_equals(0xFFFFFFFFFFFFFFFF, (n / m), &failed_tests);
     }
 
@@ -143,7 +168,7 @@ int main(int argc, char **argv) {
     m_exit(failed_tests);
 }
 
-void init(int number, char* name) {
+void init(int number, char *name) {
     m_write(1, "Test ", 5);
     printi(number);
     m_write(1, "\t(", 2);
