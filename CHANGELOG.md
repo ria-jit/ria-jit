@@ -4,9 +4,13 @@
 
 > Make RISC-V code executable on the x86-64 ISA by means of dynamic binary translation.
 
-[![pipeline status](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/badges/develop/pipeline.svg)](https://gitlab.lrz.de/lrr-tum/students/eragp-dbt-2020/-/commits/develop)
+## Version 1.3.2 (latest)
+### Release notes
+- fix a divide-by-zero spec compliance bug
+- add research paper, presentation slides and benchmark results
+- rename logging levels for more readable verbose output
 
-## Version 1.3.1 (latest)
+## Version 1.3.1
 ### Release notes
 - fix a bug where the replacement register recency was not reset correctly when loading a non-mapped register that was already present
 - prevent redundant writes to x0 in the A-extension translation
