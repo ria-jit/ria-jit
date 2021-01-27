@@ -1,0 +1,189 @@
+\documentclass[aspectratio=169, sectionpage=false, german]{tumbeamer}
+\usepackage{tumuser}
+\usepackage{tumcolors}
+\usepackage[utf8]{inputenc}
+\usepackage[autostyle]{csquotes}
+\usepackage[T1]{fontenc}
+\usepackage{xstring}
+\usepackage{catchfile}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{icomma}
+\usepackage{siunitx}
+\usepackage{multicol}
+\usepackage[german]{varioref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+% environment setup for pgfplots and tikz
+\pgfplotsset{compat=newest}
+\definecolor{era-qemu}{HTML}{FFB74D}
+\definecolor{era-dbt-1}{HTML}{f44336}
+\definecolor{era-dbt-2}{HTML}{64B5F6}
+\definecolor{era-native}{HTML}{AED581}
+\definecolor{era-dbt-3}{HTML}{ba00e5}
+
+\newcommand{\blueverb}[1]{{\color{TUMBlue} \texttt{#1}}}
+
+\TUMbeamersetup{
+title page = TUM tower,
+part page = TUM toc,
+section page = TUM blue,
+content page = TUM more space,
+headline = TUM threeliner,
+footline = TUM infoline,
+headline on = {title page, section page},
+footline on = {section page, content page, part page=false},
+}
+
+% setup commands
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand*\Diff[1]{\mathop{}\!\mathrm{d^#1}}
+\newcommand{\define}[2]{\item \textbf{#1}\\#2}
+\newcommand{\conclude}[0]{\ensuremath{\Longrightarrow} }
+\newcommand{\refer}[0]{\ensuremath{\rightarrow} }
+\sisetup{range-phrase=--,range-units=single}
+\MakeOuterQuote{"}
+
+% config for source code listings
+\lstset{
+	language=C++,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\ttfamily},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+% document properties
+\title[Binary Translation: RISC--V \refer x86--64]{Dynamische Binärübersetzung:\\RISC--V \refer x86--64}
+\subtitle{Projektvorstellung}
+\author[Dormann, Kammermeier, Pfannschmidt, Schmidt]{Noah Dormann\inst{1}, Simon Kammermeier\inst{1},\\Johannes Pfannschmidt\inst{1}, Florian Schmidt\inst{1}}
+
+\institute[]{\inst{1} Fakultät für Informatik,
+Technische Universität München (TUM)}
+\date{\today}
+
+% todo remove: typeset current commit id for draft management
+% \CatchFileDef{\headfull}{../../.git/HEAD}{}
+%\StrGobbleRight{\headfull}{1}[\head]
+%\StrBehind[2]{\head}{/}[\branch]
+%\CatchFileDef{\commit}{../../.git/refs/heads/\branch}{}
+%\footline{Draft after commit \commit on branch \branch.}
+
+% beamer setup todo uncomment footer after removing commit id
+\footline{\insertshortauthor~|~\insertshorttitle}
+\addtoTUMcolortheme{TUM default}{
+	\setbeamercolor{subtitle}{fg=TUMBlack}
+	\setbeamercolor{framesubtitle}{fg=TUMBlack}
+}
+
+\begin{document}
+\maketitle
+
+\begin{frame}
+	\frametitle{Gliederung}
+	\tableofcontents
+\end{frame}
+
+\section{Motivation}
+\begin{frame}[c]
+	\frametitle{Motivation}
+	\centering\Huge
+	Warum Großpraktikum?
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Motivation}
+	\framesubtitle{Warum Großpraktikum?}
+	
+	Arbeitsaufwand bedeutend höher als beim ERA-P.
+	\pause
+	\textbf{Aber:}
+	
+	\vspace{0.25cm}
+	
+	\begin{block}{Lessons learned}
+		\begin{itemize}
+			\item tiefgreifendes Einarbeiten in ein komplexes Thema
+			\item langfristige Arbeit an einem großen Softwareprojekt
+			\item viel Erfahrung mit Git ($\sim$ 1000 commits)
+			\item Aufrechterhalten einer großen Codebase ($\sim$ 19.000 LOC)
+			\item Benchmarking und Testing mit professionellen Tools/Hardware
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Motivation}
+	\framesubtitle{Warum Großpraktikum?}
+	
+	Zudem:
+	
+	\vspace{0.25cm}
+	
+	\begin{block}{Soft Skills}
+		\begin{itemize}
+			\item Teambuilding und kollaborative Aufgabenverteilung
+			\item Projektmanagement und langfristige Zeitplanung
+			\item Wissenschaftliches Schreiben
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Motivation}
+	\framesubtitle{Warum Großpraktikum?}
+	
+	Sehr angenehm:
+	
+	\vspace{0.25cm}
+	
+	\begin{block}{Vorteile im Großpraktikum}
+		\begin{itemize}
+			\item \textbf{bedeutend freiere} Aufgabenstellung
+			\item persönliche \textbf{Betreuung} und Feedback am Lehrstuhl
+			\item \textit{Bragging rights}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+
+\section{Demo}
+\begin{frame}[c]
+	\frametitle{Demo}
+	\framesubtitle{But can it run Crysis?}
+	\centering\Huge\ttfamily
+	./translator
+\end{frame}
+
+
+\section{Kontakt}
+\begin{frame}[c]
+	\frametitle{Kontakt}
+	\textbf{Repository:}\hspace{0.25cm} {\color{TUMBlue}\url{https://github.com/ria-jit/ria-jit}}
+	
+	\vspace{0.75cm}
+	
+	\begin{itemize}
+		\item Noah Dormann\\\blueverb{n.dormann@tum.de}
+		\item Simon Kammermeier\\\blueverb{simon.kammermeier@tum.de}
+		\item Johannes Pfannschmidt\\\blueverb{johannes.pfannschmidt@tum.de}
+		\item Florian Schmidt\\\blueverb{fs.schmidt@tum.de}
+	\end{itemize}
+\end{frame}
+
+
+
+\end{document}
