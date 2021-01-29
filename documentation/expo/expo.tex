@@ -108,7 +108,7 @@ Technische Universität München (TUM)}
 	\frametitle{Motivation}
 	\framesubtitle{Warum Großpraktikum?}
 	
-	Arbeitsaufwand bedeutend höher als beim ERA-P.
+	Arbeitsaufwand bedeutend höher als beim ERA-P\@.
 	\pause
 	\textbf{Aber:}
 	
@@ -159,6 +159,82 @@ Technische Universität München (TUM)}
 	\end{block}
 \end{frame}
 
+\section{Technischer Überblick}
+\begin{frame}[c]
+	\frametitle{Technischer Überblick}
+	\centering\Huge
+	Dynamische Binärübersetzung\\RISC--V \refer x86--64
+\end{frame}
+
+\begin{frame}
+	\frametitle{Technischer Überblick}
+
+	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
+
+	\begin{block}{x86--64}
+		\begin{itemize}
+			\item 64-Bit Version der x86-ISA
+		\end{itemize}
+	\end{block}
+
+	\vspace{1cm}
+
+	\begin{block}{RISC--V}
+		\begin{itemize}
+			\item Neu entwickelte offene RISC-ISA
+			\item 32- und 64-Bit-Varianten
+		\end{itemize}
+	\end{block}
+\end{frame}
+\begin{frame}
+	\frametitle{Technischer Überblick}
+
+	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
+
+	\begin{block}{Binärübersetzung}
+		\begin{itemize}
+			\item Keine weit verbreiteten RISC--V-Prozessoren
+			\item Für RISC--V kompilierte Programme können nicht getestet werden
+			\item Binärübersetzung ermöglicht es RISC--V-Programme auf x86--64 auszuführen
+		\end{itemize}
+	\end{block}
+	\begin{block}{Dynamische Binärübersetzung}
+		\begin{itemize}
+			\item Problem: Wie in der Datei Befehle von Daten unterscheiden?
+			\item Problem: Wie Sprungziele indirekter Sprünge bestimmen?
+			\item Lösung: Befehle erst übersetzen, wenn benötigt.
+			\item Direkte Übersetzung in x86--64-Instruktionen
+		\end{itemize}
+	\end{block}
+\end{frame}
+\begin{frame}
+	\frametitle{Technischer Überblick}
+
+	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
+
+	\begin{block}{Vorgehen}
+		\begin{itemize}
+			\item Blockweises Übersetzen
+			\item Instruktionen nicht mehrfach übersetzen, bereits übersetzte Blöcke cachen %Todo bessere Formulierungen
+			\item Verwalten der Laufzeitumgebung (Register, Stack, System calls)
+			\item Architekturunterschiede überwinden (unterschiedliche Registeranzahl, separates Zero-Register, unterschiedliche Randfälle, 3 Operanden Adressform)
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+%FIXME ist dieser frame too much?
+\begin{frame}
+	\frametitle{Technischer Überblick}
+
+	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
+
+	\begin{block}{Optimierungen}
+		\begin{itemize}
+			\item Sprungziele oft vorher bekannt \conclude direkt Blöcke aneinaderhängen
+			\item Bessere Instruktionsabbildung
+		\end{itemize}
+	\end{block}
+\end{frame}
 
 \section{Demo}
 \begin{frame}[c]
