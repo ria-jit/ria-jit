@@ -33,14 +33,14 @@
 \newcommand{\blueverb}[1]{{\color{TUMBlue} \texttt{#1}}}
 
 \TUMbeamersetup{
-title page = TUM tower,
-part page = TUM toc,
-section page = TUM blue,
-content page = TUM more space,
-headline = TUM threeliner,
-footline = TUM infoline,
-headline on = {title page, section page},
-footline on = {section page, content page, part page=false},
+	title page = TUM tower,
+	part page = TUM toc,
+	section page = TUM blue,
+	content page = TUM more space,
+	headline = TUM threeliner,
+	footline = TUM infoline,
+	headline on = {title page, section page},
+	footline on = {section page, content page, part page=false},
 }
 
 % setup commands
@@ -198,6 +198,7 @@ Technische Universität München (TUM)}
 			\item Binärübersetzung ermöglicht es RISC--V-Programme auf x86--64 auszuführen
 		\end{itemize}
 	\end{block}
+	\pause
 	\begin{block}{Dynamische Binärübersetzung}
 		\begin{itemize}
 			\item Problem: Wie in der Datei Befehle von Daten unterscheiden?
@@ -209,16 +210,23 @@ Technische Universität München (TUM)}
 \end{frame}
 \begin{frame}
 	\frametitle{Technischer Überblick}
-
-	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
-
-	\begin{block}{Vorgehen}
-		\begin{itemize}
-			\item Blockweises Übersetzen
-			\item Instruktionen nicht mehrfach übersetzen, bereits übersetzte Blöcke cachen %Todo bessere Formulierungen
-			\item Verwalten der Laufzeitumgebung (Register, Stack, System calls)
-			\item Architekturunterschiede überwinden (unterschiedliche Registeranzahl, separates Zero-Register, unterschiedliche Randfälle, 3 Operanden Adressform)
-		\end{itemize}
+	\framesubtitle {Vorgehen}
+%Todo bessere Formulierungen
+	\begin{block}{Blockweises Übersetzen}
+		Mit Ausnahme von Sprüngen sequentieller Ablauf \conclude Übersetzen bis nächsten Sprung:
+		\vspace{0.2cm}
+		\begin{enumerate}
+			\item Instruktionen des Blocks parsen
+			\item Jeweils äquivalente Instruktion(en) in x86--64 erzeugen.\\
+			Architekturunterschiede beachten:
+			\begin{itemize}
+				\item unterschiedliche Registeranzahl
+				\item separates Null-Register
+				\item 3-Operanden-Adressform
+			\end{itemize}
+			\item Block in code cache speichern, um erneutes Übersetzen zu vermeiden
+			\item Neuen code anspringen
+		\end{enumerate}
 	\end{block}
 \end{frame}
 
@@ -227,6 +235,14 @@ Technische Universität München (TUM)}
 	\frametitle{Technischer Überblick}
 
 	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
+
+	\begin{block}{Zusätzliche Aufgaben}
+		\begin{itemize}
+			\item Verwalten der Laufzeitumgebung des übersetzten Programms (Register, Stack, System calls)
+			\item Verwalten der Laufzeitumgebung des Übersetzers (Code cache, cache index)
+		\end{itemize}
+	\end{block}
+	\vspace{1cm}
 
 	\begin{block}{Optimierungen}
 		\begin{itemize}
@@ -259,7 +275,6 @@ Technische Universität München (TUM)}
 		\item Florian Schmidt\\\blueverb{fs.schmidt@tum.de}
 	\end{itemize}
 \end{frame}
-
 
 
 \end{document}
