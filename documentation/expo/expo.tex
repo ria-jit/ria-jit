@@ -194,17 +194,24 @@ Technische Universität München (TUM)}
 	\begin{block}{Binärübersetzung}
 		\begin{itemize}
 			\item Keine weit verbreiteten RISC--V-Prozessoren
-			\item Für RISC--V kompilierte Programme können nicht getestet werden
+			\item Für RISC--V kompilierte/geschriebene Programme können nicht getestet werden
+			\item Weitere Gründe: Verwendung von legacy software, \ldots
 			\item Binärübersetzung ermöglicht es RISC--V-Programme auf x86--64 auszuführen
+			\item Direkte Übersetzung in x86--64-Instruktionen
 		\end{itemize}
 	\end{block}
-	\pause
+\end{frame}
+
+\begin{frame}
+	\frametitle{Technischer Überblick}
+
+	\framesubtitle {Dynamische Binärübersetzung RISC--V \refer x86--64}
 	\begin{block}{Dynamische Binärübersetzung}
 		\begin{itemize}
 			\item Problem: Wie in der Datei Befehle von Daten unterscheiden?
 			\item Problem: Wie Sprungziele indirekter Sprünge bestimmen?
 			\item Lösung: Befehle erst übersetzen, wenn benötigt.
-			\item Direkte Übersetzung in x86--64-Instruktionen
+			\item Außerdem: Vermeidung der Übersetzung von nicht ausgeführtem Code
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -242,7 +249,7 @@ Technische Universität München (TUM)}
 			\item Verwalten der Laufzeitumgebung des Übersetzers (Code cache, cache index)
 		\end{itemize}
 	\end{block}
-	\vspace{1cm}
+	\vspace{0.75cm}
 
 	\begin{block}{Optimierungen}
 		\begin{itemize}
