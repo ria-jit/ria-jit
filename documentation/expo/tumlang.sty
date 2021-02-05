@@ -1,0 +1,87 @@
+% File: tumlang.sty Copyright (C) 2019 The LaTeX4EI Team
+% Provides language support.
+%
+% It may be distributed and/or modified under the conditions of the
+% LaTeX Project Public License (LPPL), either version 1.3c of this
+% license or (at your option) any later version. The latest version
+% of this license is in the file
+%
+%    https://www.latex-project.org/lppl.txt
+%
+% This file is part of the "tum-templates bundle" (The Work in LPPL)
+% and all files in that bundle must be distributed together.
+%
+%
+% ----------------------------------------------------------------------------
+%
+% The development version of the bundle can be found at
+%
+%    https://gitlab.lrz.de/latex4ei/tum-templates
+%
+% for those people who are interested.
+%
+% ----------------------------------------------------------------------------
+%
+% Version history:
+% v1.0 2020/10/01 Initial version.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tumlang}[2020/10/01 v1.0]
+
+
+% .:: Required packages
+% ----------------------------------------------------------------------------
+
+\RequirePackage{pgfkeys}
+\RequirePackage{pgfopts}
+
+
+% .:: Package options
+% ----------------------------------------------------------------------------
+
+\newif\if@tum@language@english@
+
+\pgfqkeys{/TUM/lang}{
+  language/.is choice,
+  language/german/.code = {\@tum@language@english@false},
+  language/english/.code = {\@tum@language@english@true},
+  english/.style = {language=english},
+  german/.style = {language=german},
+}
+
+% set default option (language=english)
+\pgfkeys{/TUM/lang/language=english}
+
+% process package options
+\ProcessPgfOptions{/TUM/lang}
+
+% load babel package with selected language
+\if@tum@language@english@
+  \RequirePackage[main=english, ngerman]{babel}
+\else
+  \RequirePackage[english, main=ngerman]{babel}
+\fi
+
+
+% .:: Macro to provide languange dependent strings
+% ----------------------------------------------------------------------------
+% macro name (arg1), english string (arg2), and german string (arg3)
+
+\newcommand{\provideName}[3]{%
+  \providecommand{#1}{#2}
+  \addto\captionsenglish{\renewcommand{#1}{#2}}
+  \addto\captionsngerman{\renewcommand{#1}{#3}}
+}
+
+
+% .:: Provide default values for university, department, and chair names
+% ----------------------------------------------------------------------------
+
+\provideName{\theUniversityName}{Technical University of Munich}{Technische
+  Universität München}
+
+\provideName{\theDepartmentName}{Department of Electrical and Computer
+  Engineering}{Fakultät für Elektrotechnik und Informationstechnik}
+
+\provideName{\theChairName}{Please adjust group name in tumuser.sty.}{Bitte
+  passen Sie den Lehrstuhlnamen in tumuser.sty an.}
