@@ -72,4 +72,11 @@ Optimization:
 
 👤 **Noah Dormann, Simon Kammermeier, Johannes Pfannschmidt, Florian Schmidt**
 
-* Github: [@Artemis-Skade](https://github.com/Artemis-Skade), [@Simon04090](https://github.com/Simon04090), [@johaza](https://github.com/johaza), [@flodt](https://github.com/flodt)
+* GitHub: [@Artemis-Skade](https://github.com/Artemis-Skade), [@Simon04090](https://github.com/Simon04090), [@johaza](https://github.com/johaza), [@flodt](https://github.com/flodt)
+
+## Supervisor
+
+👤 **Alexis Engelke**
+
+* TUM: [Alexis Engelke, M. Sc.](https://www.in.tum.de/caps/mitarbeiter/engelke/)
+* GitHub: [@aengelke](https://github.com/aengelke)
