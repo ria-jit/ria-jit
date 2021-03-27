@@ -450,14 +450,15 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             //printf("AUIPC + JALR: %p\n", risc_addr);
 
                             //check if pop will happen
-                            if ((parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                            bool is_ret = (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5);
+                            if (is_ret &&
                                     parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
 
                             ///1: recursively translate return addr (+4)
                             //dead ends could arise here
-                            {
+                            if (is_ret) {
                                 t_risc_addr ret_target = risc_addr + parse_buf[parse_pos].size;
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
