@@ -10,7 +10,25 @@
 #include <env/exit.h>
 #include "loadElf.h"
 
-//Apparently not included in the headers on my version.
+// Older glibc versions don't include these flags
+#ifndef EF_RISCV_RVC
+#define EF_RISCV_RVC                    0x0001
+#endif // !EF_RISCV_RVC
+#ifndef EF_RISCV_FLOAT_ABI
+#define EF_RISCV_FLOAT_ABI              0x0006
+#endif // !EF_RISCV_FLOAT_ABI
+#ifndef EF_RISCV_FLOAT_ABI_SOFT
+#define EF_RISCV_FLOAT_ABI_SOFT         0x0000
+#endif // !EF_RISCV_FLOAT_ABI_SOFT
+#ifndef EF_RISCV_FLOAT_ABI_SINGLE
+#define EF_RISCV_FLOAT_ABI_SINGLE       0x0002
+#endif // !EF_RISCV_FLOAT_ABI_SINGLE
+#ifndef EF_RISCV_FLOAT_ABI_DOUBLE
+#define EF_RISCV_FLOAT_ABI_DOUBLE       0x0004
+#endif // !EF_RISCV_FLOAT_ABI_DOUBLE
+#ifndef EF_RISCV_FLOAT_ABI_QUAD
+#define EF_RISCV_FLOAT_ABI_QUAD         0x0006
+#endif // !EF_RISCV_FLOAT_ABI_QUAD
 #ifndef EF_RISCV_RVE
 #define EF_RISCV_RVE 0x8
 #endif
