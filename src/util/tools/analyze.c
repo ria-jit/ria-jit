@@ -49,7 +49,7 @@ struct firstLevel {
 // function to sort a singly linked list using insertion sort
 void insertionSort(t_node **head);
 
-void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count);
+unsigned add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count);
 
 void analyze(const char *file_path) {
     log_analyze("Started file analysis...\n");
@@ -81,8 +81,8 @@ void analyze(const char *file_path) {
     }
 
     //loop over full segment
-    for (t_risc_addr addr = startAddr; addr < endAddr; addr += 4) {
-        add_instruction(addr, mnem, reg);
+    for (t_risc_addr addr = startAddr; addr < endAddr; ) {
+        addr += add_instruction(addr, mnem, reg);
     }
 
     log_analyze("Done reading file.\n");
@@ -302,7 +302,7 @@ t_node *getOrAllocateNode() {
 }
 
 
-void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count) {
+unsigned add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count) {
     prev = cur;
     cur = (t_risc_instr) {0};
     cur.addr = addr;
@@ -378,7 +378,7 @@ void add_instruction(t_risc_addr addr, uint64_t *mnem_count, uint64_t *reg_count
         curNode->count++;
     }
 
-
+    return cur.size;
 }
 
 // Function to insert a given node in a sorted linked list

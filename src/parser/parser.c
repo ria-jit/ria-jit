@@ -75,6 +75,7 @@ int32_t parse_instruction(t_risc_instr *p_instr_struct) {
     log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);
 
     //fill basic struct
+    p_instr_struct->size = 4;
     p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
     p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
     p_instr_struct->reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
