@@ -93,10 +93,6 @@ t_risc_elf_map_result mapIntoMemory(const char *filePath) {
     bool floatBinary = false;
 
     //Check for not supported ABI Flags
-    if (flags & EF_RISCV_RVC) {
-        critical_not_yet_implemented("C ABI is not yet supported");
-        incompatible = true;
-    }
     if (flags & EF_RISCV_FLOAT_ABI_QUAD || flags & EF_RISCV_FLOAT_ABI_DOUBLE || flags & EF_RISCV_FLOAT_ABI_SINGLE) {
         floatBinary = true;
     }

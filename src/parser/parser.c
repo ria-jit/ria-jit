@@ -1,61 +1,7 @@
-//
-// Created by noah on 29.04.20.
-// Based on RISC-V-Spec.pdf ../documentation/RISC-V-Spec.pdf
-// For register assembly conventions look at page 137
-//
 
+#include <frvdec/frvdec.h>
 #include <util/log.h>
 #include "parser.h"
-
-// extract rd register number bit[11:7]
-static inline int32_t extract_rd(int32_t instr) {return instr >> 7 & 0x1f;}
-
-// extract rs1 register number bit[19:15]
-static inline int32_t extract_rs1(int32_t instr) {return instr >> 15 & 0x1f;}
-
-// extract rs2 register number bit[24:20]
-static inline int32_t extract_rs2(int32_t instr) {return instr >> 20 & 0x1f;}
-
-// extract rs3 register number bit[31:27]
-static inline int32_t extract_rs3(int32_t instr) {return instr >> 27 & 0x1f;}
-
-// extract func2 bit [26:25]
-static inline int32_t extract_funct2(int32_t instr) {return instr >> 25 & 0x3;}
-
-// extract func3 bit [14:12]
-static inline int32_t extract_funct3(int32_t instr) {return instr >> 12 & 0x7;}
-
-// extract func7 bit [31:25]
-static inline int32_t extract_funct7(int32_t instr) {return instr >> 25 & 0x7f;}
-
-// extract big_shamt bit[25:20]
-static inline int32_t extract_big_shamt(int32_t instr) {return instr >> 20 & 0x3f;}
-
-// extract small_shamt bit[24:20] -> basically the same as rs2
-static inline int32_t extract_small_shamt(int32_t instr) {return instr >> 20 & 0x1f;}
-
-// extract U-Type immediate bit[31:12] -> mask lower 12 bit [11:0] with zeros
-static inline int32_t extract_imm_U(int32_t instr) {return instr & ~(0xfff);}
-
-// extract I-Type immediate bit[31:20]
-static inline int32_t extract_imm_I(int32_t instr) {return instr >> 20;} //sign extend!
-
-// extract S-Type immediate bit[31:25] + [11:7] => 7bits + 5 bits
-static inline int32_t extract_imm_S(int32_t instr) {return (instr >> 20 & ~0x1f) | (instr >> 7 & 0x1f);}
-
-// extract J-Type immediate bits[31:12] order: [20|10:1|11|19:12]
-// sign extended because jump address is pc relative
-// [20] => [31], [10:1] => [30:21], [11] => [20], [19:12] => [19:12]
-static inline int32_t extract_imm_J(int32_t instr) {
-    return (instr & 0xff000) | (instr >> (20 - 11) & (1 << 11)) | (instr >> 11 & (1 << 20)) |
-            ((signed) instr >> (30 - 10) & 0xffe007fe);
-}
-
-// extract B-Type immediate bits[31:25],[11:7] order: [12|10:5],[4:1|11]
-static inline int32_t extract_imm_B(int32_t instr) {
-    return (instr >> (31 - 12) & 0xfffff000) | (instr << (11 - 7) & (1 << 11)) |
-            (instr >> (30 - 10) & 0x7e0) | (instr >> (11 - 4) & 0x1e);
-}
 
 int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
     p_instr_struct->optype = INVALID_INSTRUCTION;
@@ -66,721 +12,192 @@ int32_t set_error_message(t_risc_instr *p_instr_struct, int32_t error_code) {
 }
 
 /**
- *
  * @param p_instr_struct struct filled with the addr of the instruction to be translated
  */
 int32_t parse_instruction(t_risc_instr *p_instr_struct) {
-    // print out the line to parse in grouped binary as in the spec
-    int32_t raw_instr = *(int32_t *) p_instr_struct->addr; //cast and dereference
-    log_asm_in("Parsing 0x%x at %p\n", raw_instr, (void *) p_instr_struct->addr);
+    log_asm_in("Parsing at %p\n", (void *) p_instr_struct->addr);
 
-    //fill basic struct
-    p_instr_struct->size = 4;
-    p_instr_struct->reg_dest = (t_risc_reg) extract_rd(raw_instr);
-    p_instr_struct->reg_src_1 = (t_risc_reg) extract_rs1(raw_instr);
-    p_instr_struct->reg_src_2 = INVALID_REG; //Set to not used value for analyzer to work correctly
+    FrvInst frv;
+    int frvres = frv_decode(4, p_instr_struct->addr, FRV_RV64, &frv);
+    if (frvres < 0)
+        return set_error_message(p_instr_struct, frvres);
 
-    //extract opcode bits[6:2]
-    t_opcodes opcode = (t_opcodes) (raw_instr >> 2 & 0x1f);
-    switch (opcode) {
-        case OP_LUI:
-            p_instr_struct->optype = UPPER_IMMEDIATE;
-            p_instr_struct->mnem = LUI;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_U(raw_instr);
-            break;
-        case OP_AUIPC:
-            p_instr_struct->optype = IMMEDIATE;
-            p_instr_struct->mnem = AUIPC;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_U(raw_instr);
-            break;
-        case OP_JAL:
-            p_instr_struct->optype = JUMP;
-            p_instr_struct->mnem = JAL;
-            p_instr_struct->reg_src_1 = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_J(raw_instr);
-            break;
-        case OP_JALR:
-            p_instr_struct->optype = JUMP;
-            p_instr_struct->mnem = JALR;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
-            break;
-        case OP_LOAD_FP:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 2:
-                    p_instr_struct->mnem = FLW;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = FLD;
-                    break;
-                default:
-                    critical_not_yet_implemented("Invalid func3 for OP_LOAD_FP Opcode");
-            }
-            break;
-        case OP_STORE_FP:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 2:
-                    p_instr_struct->mnem = FSW;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = FSD;
-                    break;
-                default:
-                    critical_not_yet_implemented("Invalid func3 for OP_LOAD_FP Opcode");
-            }
-            break;
-        case OP_MISC_MEM:
-            p_instr_struct->optype = SYSTEM;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = FENCE;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FENCE_I;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f3_MISC_MEM);
-            }
-            break;
-        case OP_BRANCH:
-            // BEQ, BNE...
-            p_instr_struct->optype = BRANCH;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->imm = extract_imm_B(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = BEQ;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = BNE;
-                    break;
-                case 4:
-                    p_instr_struct->mnem = BLT;
-                    break;
-                case 5:
-                    p_instr_struct->mnem = BGE;
-                    break;
-                case 6:
-                    p_instr_struct->mnem = BLTU;
-                    break;
-                case 7:
-                    p_instr_struct->mnem = BGEU;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f3_BRANCH);
-            }
-            break;
-        case OP_LOAD:
-            p_instr_struct->optype = IMMEDIATE;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 0: {
-                    p_instr_struct->mnem = LB;
-                    break;
-                }
-                case 1: {
-                    p_instr_struct->mnem = LH;
-                    break;
-                }
-                case 2: {
-                    p_instr_struct->mnem = LW;
-                    break;
-                }
-                case 3: {
-                    p_instr_struct->mnem = LD;
-                    break;
-                }
-                case 4: {
-                    p_instr_struct->mnem = LBU;
-                    break;
-                }
-                case 5: {
-                    p_instr_struct->mnem = LHU;
-                    break;
-                }
-                case 6: {
-                    p_instr_struct->mnem = LWU;
-                    break;
-                }
-                default: {
-                    //int error = extract_funct3(raw_instr); (could potentially output this?)
-                    return set_error_message(p_instr_struct, E_f3_LOAD);
-                }
-            }
-            break;
-        case OP_STORE:
-            p_instr_struct->optype = STORE;
-            p_instr_struct->imm = extract_imm_S(raw_instr);
-            p_instr_struct->reg_dest = INVALID_REG; //Set to not used value for analyzer to work correctly
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = SB;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = SH;
-                    break;
-                case 2:
-                    p_instr_struct->mnem = SW;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = SD;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f3_STORE);
-            }
-            break;
-        case OP_OP:
-            p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            if (raw_instr & (1 << 25)) {
-                switch (extract_funct3(raw_instr)) {
-                    case 0:
-                        p_instr_struct->mnem = MUL;
-                        break;
-                    case 1:
-                        p_instr_struct->mnem = MULH;
-                        break;
-                    case 2:
-                        p_instr_struct->mnem = MULHSU;
-                        break;
-                    case 3:
-                        p_instr_struct->mnem = MULHU;
-                        break;
-                    case 4:
-                        p_instr_struct->mnem = DIV;
-                        break;
-                    case 5:
-                        p_instr_struct->mnem = DIVU;
-                        break;
-                    case 6:
-                        p_instr_struct->mnem = REM;
-                        break;
-                    case 7:
-                        p_instr_struct->mnem = REMU;
-                        break;
-                    default:
-                        return set_error_message(p_instr_struct, E_f3_OP);
-                }
-            } else {
-                switch (extract_funct3(raw_instr)) {
-                    case 0:
-                        if (raw_instr & (1 << 30)) {
-                            //SRAI
-                            p_instr_struct->mnem = SUB;
-                        } else {
-                            //SRLI
-                            p_instr_struct->mnem = ADD;
-                        }
-                        break;
-                    case 1:
-                        p_instr_struct->mnem = SLL;
-                        break;
-                    case 2:
-                        p_instr_struct->mnem = SLT;
-                        break;
-                    case 3:
-                        p_instr_struct->mnem = SLTU;
-                        break;
-                    case 4:
-                        p_instr_struct->mnem = XOR;
-                        break;
-                    case 5:
-                        if (raw_instr & (1 << 30)) {
-                            //SRAI
-                            p_instr_struct->mnem = SRA;
-                        } else {
-                            //SRLI
-                            p_instr_struct->mnem = SRL;
-                        }
-                        break;
-                    case 6:
-                        p_instr_struct->mnem = OR;
-                        break;
-                    case 7:
-                        p_instr_struct->mnem = AND;
-                        break;
-                    default:
-                        return set_error_message(p_instr_struct, E_f3_OP);
-                }
-            }
-            break;
-        case OP_SYSTEM:
-            p_instr_struct->optype = SYSTEM;
-            p_instr_struct->imm = extract_imm_I(raw_instr);
-            switch (extract_funct3(raw_instr)) {
-                case 0:
-                    if (raw_instr & (1 << 20)) {
-                        p_instr_struct->mnem = EBREAK;
-                    } else {
-                        p_instr_struct->mnem = ECALL;
-                    }
-                    break;
-                case 1:
-                    p_instr_struct->mnem = CSRRW;
-                    break;
-                case 2:
-                    p_instr_struct->mnem = CSRRS;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = CSRRC;
-                    break;
-                case 5:
-                    p_instr_struct->mnem = CSRRWI;
-                    break;
-                case 6:
-                    p_instr_struct->mnem = CSRRSI;
-                    break;
-                case 7:
-                    p_instr_struct->mnem = CSRRCI;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f3_SYSTEM);
-            }
-            break;
-        case OP_OP_IMM_32:
-            p_instr_struct->optype = IMMEDIATE;
-            switch (extract_funct3(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = ADDIW;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 1: //SLLIW opcode and func3 are unique
-                    p_instr_struct->mnem = SLLIW;
-                    p_instr_struct->imm = extract_small_shamt(raw_instr);
-                    break;
-                case 5: //SRAIW / SRLIW
-                    p_instr_struct->imm = extract_small_shamt(raw_instr);
-                    if (raw_instr & (1 << 30)) {
-                        //SRAI
-                        p_instr_struct->mnem = SRAIW;
-                    } else {
-                        //SRLI
-                        p_instr_struct->mnem = SRLIW;
-                    }
-                    break;
-                default: {
-                    return set_error_message(p_instr_struct, E_f3_IMM_32);
-                }
-            }
-            break;
-        case OP_OP_32:
-            p_instr_struct->optype = REG_REG;
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            if (raw_instr & (1 << 25)) {
-                switch (extract_funct3(raw_instr)) {
-                    case 0:
-                        p_instr_struct->mnem = MULW;
-                        break;
-                    case 4:
-                        p_instr_struct->mnem = DIVW;
-                        break;
-                    case 5:
-                        p_instr_struct->mnem = DIVUW;
-                        break;
-                    case 6:
-                        p_instr_struct->mnem = REMW;
-                        break;
-                    case 7:
-                        p_instr_struct->mnem = REMUW;
-                        break;
-                    default:
-                        return set_error_message(p_instr_struct, E_f3_RV64M);
-                }
-            } else {
-                switch (extract_funct3(raw_instr)) {
-                    case 0:
-                        if (raw_instr & (1 << 30)) {
-                            //SRAI
-                            p_instr_struct->mnem = SUBW;
-                        } else {
-                            //SRLI
-                            p_instr_struct->mnem = ADDW;
-                        }
-                        break;
-                    case 1:
-                        p_instr_struct->mnem = SLLW;
-                        break;
-                    case 5:
-                        if (raw_instr & (1 << 30)) {
-                            //SRAI
-                            p_instr_struct->mnem = SRAW;
-                        } else {
-                            //SRLI
-                            p_instr_struct->mnem = SRLW;
-                        }
-                        break;
-                    default:
-                        return set_error_message(p_instr_struct, E_f3_32);
-                }
-            }
-            break;
-        case OP_OP_IMM:
-            p_instr_struct->optype = IMMEDIATE;
-            switch (extract_funct3(raw_instr)) {
-                case 0: //ADDI
-                    p_instr_struct->mnem = ADDI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 1: //SLLI opcode and func3 are unique
-                    p_instr_struct->mnem = SLLI;
-                    p_instr_struct->imm = extract_big_shamt(raw_instr);
-                    break;
-                case 2: //SLTI
-                    p_instr_struct->mnem = SLTI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 3: //SLTIU
-                    p_instr_struct->mnem = SLTIU;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 4:
-                    p_instr_struct->mnem = XORI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 5: //SRAI / SRLI
-                    p_instr_struct->imm = extract_big_shamt(raw_instr);
-                    if (raw_instr & (1 << 30)) {
-                        //SRAI
-                        p_instr_struct->mnem = SRAI;
-                    } else {
-                        //SRLI
-                        p_instr_struct->mnem = SRLI;
-                    }
-                    break;
-                case 6:
-                    p_instr_struct->mnem = ORI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                case 7:
-                    p_instr_struct->mnem = ANDI;
-                    p_instr_struct->imm = extract_imm_I(raw_instr);
-                    break;
-                default: {
-                    return set_error_message(p_instr_struct, E_f3_IMM);
-                }
-            }
-            break;
-        case OP_MADD:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->mnem = FMADDS;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
-            p_instr_struct->rounding_mode = extract_funct3(raw_instr);
-            if(p_instr_struct->rounding_mode == RMM) {
-                //fallback RMM to RNE
-                not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
-                                             p_instr_struct->addr);
-                p_instr_struct->rounding_mode = RNE;
-            }
-            switch (extract_funct2(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = FMADDS;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FMADDD;
-                    break;
-                default:
-                    critical_not_yet_implemented("unsupported operand size FMADD");
-            }
-            break;
-        case OP_MSUB:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
-            p_instr_struct->rounding_mode = extract_funct3(raw_instr);
-            if(p_instr_struct->rounding_mode == RMM) {
-                //fallback RMM to RNE
-                not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
-                                             p_instr_struct->addr);
-                p_instr_struct->rounding_mode = RNE;
-            }
-            switch (extract_funct2(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = FMSUBS;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FMSUBD;
-                    break;
-                default:
-                    critical_not_yet_implemented("unsupported operand size FMSUB");
-            }
-            break;
-        case OP_NMADD:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
-            p_instr_struct->rounding_mode = extract_funct3(raw_instr);
-            if(p_instr_struct->rounding_mode == RMM) {
-                //fallback RMM to RNE
-                not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
-                                             p_instr_struct->addr);
-                p_instr_struct->rounding_mode = RNE;
-            }
-            switch (extract_funct2(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = FNMADDS;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FNMADDD;
-                    break;
-                default:
-                    critical_not_yet_implemented("unsupported operand size FNMADD");
-            }
-            break;
-        case OP_NMSUB:
-            p_instr_struct->optype = FLOAT;
-            p_instr_struct->reg_src_2 = extract_rs2(raw_instr);
-            p_instr_struct->reg_src_3 = extract_rs3(raw_instr);
-            p_instr_struct->rounding_mode = extract_funct3(raw_instr);
-            if(p_instr_struct->rounding_mode == RMM) {
-                //fallback RMM to RNE
-                not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
-                                             p_instr_struct->addr);
-                p_instr_struct->rounding_mode = RNE;
-            }
-            switch (extract_funct2(raw_instr)) {
-                case 0:
-                    p_instr_struct->mnem = FNMSUBS;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FNMSUBD;
-                    break;
-                default:
-                    critical_not_yet_implemented("unsupported operand size FNMSUB");
-            }
-            break;
-        case OP_OP_FP: {
-            p_instr_struct->optype = FLOAT;
-            int funct7 = extract_funct7(raw_instr);
-            int funct3 = extract_funct3(raw_instr);
-            int rs2 = extract_rs2(raw_instr);
-            int operandSize = funct7 & 0x3; // lower two bits determine operand size
-            // it looks like this bit determines if the rs2 field is used as a rounding mode, or as a funct code
-            if ((funct7 & 0x0100000) == 0) {
-                p_instr_struct->reg_src_2 = rs2;
-            }
+    p_instr_struct->size = frvres;
+    p_instr_struct->reg_dest = frv.rd != FRV_REG_INV ? frv.rd : INVALID_REG;
+    p_instr_struct->reg_src_1 = frv.rs1 != FRV_REG_INV ? frv.rs1 : INVALID_REG;
+    p_instr_struct->reg_src_2 = frv.rs2 != FRV_REG_INV ? frv.rs2 : INVALID_REG;
+    p_instr_struct->imm = frv.imm; // overwritten for rounding mode/rs3.
 
-            // furthermore the 5 bit determines if the funct3 field is used as a rounding mode, or as a funct code
-            if ((funct7 & 0x0010000) == 0) {
-                p_instr_struct->rounding_mode = funct3;
-                if(p_instr_struct->rounding_mode == RMM) {
-                    //fallback RMM to RNE
-                    not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
-                                                 p_instr_struct->addr);
-                    p_instr_struct->rounding_mode = RNE;
-                }
-            }
+    int has_rs3_rm = 0;
+    switch (frv.mnem) {
+    case FRV_LUI: p_instr_struct->optype = UPPER_IMMEDIATE, p_instr_struct->mnem = LUI; break;
+    case FRV_AUIPC: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = AUIPC; break;
+    case FRV_JAL: p_instr_struct->optype = JUMP, p_instr_struct->mnem = JAL; break;
+    case FRV_JALR: p_instr_struct->optype = JUMP, p_instr_struct->mnem = JALR; break;
+    case FRV_FLW: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLW; break;
+    case FRV_FLD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLD; break;
+    case FRV_FSW: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSW; break;
+    case FRV_FSD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSD; break;
+    case FRV_FENCE: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = FENCE; break;
+    case FRV_FENCEI: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = FENCE_I; break;
+    case FRV_BEQ: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BEQ; break;
+    case FRV_BNE: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BNE; break;
+    case FRV_BLT: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BLT; break;
+    case FRV_BGE: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BGE; break;
+    case FRV_BLTU: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BLTU; break;
+    case FRV_BGEU: p_instr_struct->optype = BRANCH, p_instr_struct->mnem = BGEU; break;
+    case FRV_LB: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LB; break;
+    case FRV_LH: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LH; break;
+    case FRV_LW: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LW; break;
+    case FRV_LD: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LD; break;
+    case FRV_LBU: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LBU; break;
+    case FRV_LHU: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LHU; break;
+    case FRV_LWU: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = LWU; break;
+    case FRV_SB: p_instr_struct->optype = STORE, p_instr_struct->mnem = SB; break;
+    case FRV_SH: p_instr_struct->optype = STORE, p_instr_struct->mnem = SH; break;
+    case FRV_SW: p_instr_struct->optype = STORE, p_instr_struct->mnem = SW; break;
+    case FRV_SD: p_instr_struct->optype = STORE, p_instr_struct->mnem = SD; break;
+    case FRV_MUL: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = MUL; break;
+    case FRV_MULH: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = MULH; break;
+    case FRV_MULHSU: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = MULHSU; break;
+    case FRV_MULHU: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = MULHU; break;
+    case FRV_DIV: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = DIV; break;
+    case FRV_DIVU: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = DIVU; break;
+    case FRV_REM: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = REM; break;
+    case FRV_REMU: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = REMU; break;
+    case FRV_MULW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = MULW; break;
+    case FRV_DIVW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = DIVW; break;
+    case FRV_DIVUW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = DIVUW; break;
+    case FRV_REMW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = REMW; break;
+    case FRV_REMUW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = REMUW; break;
+    case FRV_ADD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = ADD; break;
+    case FRV_SLL: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SLL; break;
+    case FRV_SLT: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SLT; break;
+    case FRV_SLTU: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SLTU; break;
+    case FRV_XOR: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = XOR; break;
+    case FRV_SRL: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SRL; break;
+    case FRV_OR: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = OR; break;
+    case FRV_AND: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AND; break;
+    case FRV_SUB: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SUB; break;
+    case FRV_SRA: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SRA; break;
+    case FRV_ADDW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = ADDW; break;
+    case FRV_SLLW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SLLW; break;
+    case FRV_SRLW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SRLW; break;
+    case FRV_SUBW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SUBW; break;
+    case FRV_SRAW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SRAW; break;
+    case FRV_ADDI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = ADDI; break;
+    case FRV_SLLI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SLLI; break;
+    case FRV_SLTI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SLTI; break;
+    case FRV_SLTIU: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SLTIU; break;
+    case FRV_XORI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = XORI; break;
+    case FRV_SRAI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SRAI; break;
+    case FRV_SRLI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SRLI; break;
+    case FRV_ORI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = ORI; break;
+    case FRV_ANDI: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = ANDI; break;
+    case FRV_ADDIW: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = ADDIW; break;
+    case FRV_SLLIW: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SLLIW; break;
+    case FRV_SRAIW: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SRAIW; break;
+    case FRV_SRLIW: p_instr_struct->optype = IMMEDIATE, p_instr_struct->mnem = SRLIW; break;
+    case FRV_ECALL: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = frv.imm & 1 ? EBREAK : ECALL; break;
+    case FRV_CSRRW: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRW; break;
+    case FRV_CSRRS: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRS; break;
+    case FRV_CSRRC: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRC; break;
+    case FRV_CSRRWI: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRWI; break;
+    case FRV_CSRRSI: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRSI; break;
+    case FRV_CSRRCI: p_instr_struct->optype = SYSTEM, p_instr_struct->mnem = CSRRCI; break;
+    case FRV_FMADDS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMADDS, has_rs3_rm = 1; break;
+    case FRV_FMSUBS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMSUBS, has_rs3_rm = 1; break;
+    case FRV_FNMSUBS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FNMSUBS, has_rs3_rm = 1; break;
+    case FRV_FNMADDS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FNMADDS, has_rs3_rm = 1; break;
+    case FRV_FMADDD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMADDD, has_rs3_rm = 1; break;
+    case FRV_FMSUBD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMSUBD, has_rs3_rm = 1; break;
+    case FRV_FNMSUBD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FNMSUBD, has_rs3_rm = 1; break;
+    case FRV_FNMADDD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FNMADDD, has_rs3_rm = 1; break;
+    case FRV_FMVXW: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMVXW, has_rs3_rm = 1; break;
+    case FRV_FMVWX: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMVWX, has_rs3_rm = 1; break;
+    case FRV_FCLASSS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCLASSS, has_rs3_rm = 1; break;
+    case FRV_FADDS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FADDS, has_rs3_rm = 1; break;
+    case FRV_FSUBS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSUBS, has_rs3_rm = 1; break;
+    case FRV_FMULS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMULS, has_rs3_rm = 1; break;
+    case FRV_FDIVS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FDIVS, has_rs3_rm = 1; break;
+    case FRV_FSQRTS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSQRTS, has_rs3_rm = 1; break;
+    case FRV_FSGNJS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJS, has_rs3_rm = 1; break;
+    case FRV_FSGNJNS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJNS, has_rs3_rm = 1; break;
+    case FRV_FSGNJXS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJXS, has_rs3_rm = 1; break;
+    case FRV_FMINS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMINS, has_rs3_rm = 1; break;
+    case FRV_FMAXS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMAXS, has_rs3_rm = 1; break;
+    case FRV_FLES: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLES, has_rs3_rm = 1; break;
+    case FRV_FLTS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLTS, has_rs3_rm = 1; break;
+    case FRV_FEQS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FEQS, has_rs3_rm = 1; break;
+    case FRV_FCVTWS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTWS, has_rs3_rm = 1; break;
+    case FRV_FCVTWUS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTWUS, has_rs3_rm = 1; break;
+    case FRV_FCVTLS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTLS, has_rs3_rm = 1; break;
+    case FRV_FCVTLUS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTLUS, has_rs3_rm = 1; break;
+    case FRV_FCVTSW: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTSW, has_rs3_rm = 1; break;
+    case FRV_FCVTSWU: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTSWU, has_rs3_rm = 1; break;
+    case FRV_FCVTSL: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTSL, has_rs3_rm = 1; break;
+    case FRV_FCVTSLU: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTSLU, has_rs3_rm = 1; break;
+    case FRV_FMVXD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMVXD, has_rs3_rm = 1; break;
+    case FRV_FMVDX: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMVDX, has_rs3_rm = 1; break;
+    case FRV_FCLASSD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCLASSD, has_rs3_rm = 1; break;
+    case FRV_FADDD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FADDD, has_rs3_rm = 1; break;
+    case FRV_FSUBD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSUBD, has_rs3_rm = 1; break;
+    case FRV_FMULD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMULD, has_rs3_rm = 1; break;
+    case FRV_FDIVD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FDIVD, has_rs3_rm = 1; break;
+    case FRV_FSQRTD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSQRTD, has_rs3_rm = 1; break;
+    case FRV_FSGNJD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJD, has_rs3_rm = 1; break;
+    case FRV_FSGNJND: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJND, has_rs3_rm = 1; break;
+    case FRV_FSGNJXD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FSGNJXD, has_rs3_rm = 1; break;
+    case FRV_FMIND: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMIND, has_rs3_rm = 1; break;
+    case FRV_FMAXD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FMAXD, has_rs3_rm = 1; break;
+    case FRV_FLED: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLED, has_rs3_rm = 1; break;
+    case FRV_FLTD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FLTD, has_rs3_rm = 1; break;
+    case FRV_FEQD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FEQD, has_rs3_rm = 1; break;
+    case FRV_FCVTSD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTSD, has_rs3_rm = 1; break;
+    case FRV_FCVTDS: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTDS, has_rs3_rm = 1; break;
+    case FRV_FCVTWD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTWD, has_rs3_rm = 1; break;
+    case FRV_FCVTWUD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTWUD, has_rs3_rm = 1; break;
+    case FRV_FCVTLD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTLD, has_rs3_rm = 1; break;
+    case FRV_FCVTLUD: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTLUD, has_rs3_rm = 1; break;
+    case FRV_FCVTDW: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTDW, has_rs3_rm = 1; break;
+    case FRV_FCVTDWU: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTDWU, has_rs3_rm = 1; break;
+    case FRV_FCVTDL: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTDL, has_rs3_rm = 1; break;
+    case FRV_FCVTDLU: p_instr_struct->optype = FLOAT, p_instr_struct->mnem = FCVTDLU, has_rs3_rm = 1; break;
 
-            //ignore lower two bits which only set operand size
-            funct7 = funct7 >> 2;
-            switch (funct7) {
-                case 0:
-                    p_instr_struct->mnem = FADDS;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = FSUBS;
-                    break;
-                case 2:
-                    p_instr_struct->mnem = FMULS;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = FDIVS;
-                    break;
-                case 4:
-                    switch (funct3) {
-                        case 0:
-                            p_instr_struct->mnem = FSGNJS;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FSGNJNS;
-                            break;
-                        case 2:
-                            p_instr_struct->mnem = FSGNJXS;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for FSGNJ");
-                    }
-                    break;
-                case 5:
-                    switch (funct3) {
-                        case 0:
-                            p_instr_struct->mnem = FMINS;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FMAXS;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for funct7=5");
-                    }
-                    break;
-                case 8:
-                    switch (rs2) {
-                        case 0:
-                            p_instr_struct->mnem = FCVTDS;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FCVTSD;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for funct7=8");
-                    }
-                    break;
-                case 11:
-                    p_instr_struct->mnem = FSQRTS;
-                    break;
-                case 20:
-                    switch (funct3) {
-                        case 0:
-                            p_instr_struct->mnem = FLES;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FLTS;
-                            break;
-                        case 2:
-                            p_instr_struct->mnem = FEQS;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for FSGNJ");
-                    }
-                    break;
-                case 24:
-                    switch (rs2) {
-                        case 0:
-                            p_instr_struct->mnem = FCVTWS;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FCVTWUS;
-                            break;
-                        case 2:
-                            p_instr_struct->mnem = FCVTLS;
-                            break;
-                        case 3:
-                            p_instr_struct->mnem = FCVTLUS;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for FCVTW");
-                    }
-                    break;
-                case 26:
-                    switch (rs2) {
-                        case 0:
-                            p_instr_struct->mnem = FCVTSW;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FCVTSWU;
-                            break;
-                        case 2:
-                            p_instr_struct->mnem = FCVTSL;
-                            break;
-                        case 3:
-                            p_instr_struct->mnem = FCVTSLU;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for FCVTS");
-                    }
-                    break;
-                case 28:
-                    switch (funct3) {
-                        case 0:
-                            p_instr_struct->mnem = FMVXW;
-                            break;
-                        case 1:
-                            p_instr_struct->mnem = FCLASSS;
-                            break;
-                        default:
-                            critical_not_yet_implemented("unknown funct3 for funct7=28");
-                    }
-                    break;
-                case 30:
-                    p_instr_struct->mnem = FMVWX;
-                    break;
-                default:
-                    critical_not_yet_implemented("unknown funct7 for OP_OP_FP");
-                    break;
-            }
-            if (funct7 != 8) {
-                //fit mnem to the operand size
-                switch (operandSize) {
-                    case 0:
-                        //default 16 bit nothing to do
-                        break;
-                    case 1:
-                        //because of our ordering of the mnems in typedef.h we can just add a constant factor
-                        p_instr_struct->mnem += FLD - FLW;
-                        break;
-                    default:
-                        critical_not_yet_implemented("unsupported operand size for OP_OP_FP;\n"
-                                                     " you are probably using the RV32Q/RV64Q extension");
-                }
-            }
-        }
-            break;
-        case OP_AMO:
-            p_instr_struct->reg_src_2 = (t_risc_reg) extract_rs2(raw_instr);
-            p_instr_struct->imm = extract_funct7(raw_instr);
-            // switch between different OP_AMO types, which are decoded in upper bytes of funct7
-            switch (p_instr_struct->imm >> 2) {
-                case 0:
-                    p_instr_struct->mnem = AMOADDW;
-                    break;
-                case 1:
-                    p_instr_struct->mnem = AMOSWAPW;
-                    break;
-                case 2:
-                    p_instr_struct->mnem = LRW;
-                    break;
-                case 3:
-                    p_instr_struct->mnem = SCW;
-                    break;
-                case 4:
-                    p_instr_struct->mnem = AMOXORW;
-                    break;
-                case 8:
-                    p_instr_struct->mnem = AMOORW;
-                    break;
-                case 12:
-                    p_instr_struct->mnem = AMOANDW;
-                    break;
-                case 16:
-                    p_instr_struct->mnem = AMOMINW;
-                    break;
-                case 20:
-                    p_instr_struct->mnem = AMOMAXW;
-                    break;
-                case 24:
-                    p_instr_struct->mnem = AMOMINUW;
-                    break;
-                case 28:
-                    p_instr_struct->mnem = AMOMAXUW;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f7_AMO);
-            }
-            // funct3 differentiates between RV32A and RV64A
-            switch (extract_funct3(raw_instr)) {
-                case 2:
-                    //RV32A
-                    break;
-                case 3:
-                    //RV64A
-                    p_instr_struct->mnem += LRD - LRW;
-                    break;
-                default:
-                    return set_error_message(p_instr_struct, E_f3_AMO);
-            }
-
-            break;
-        default:
-            return set_error_message(p_instr_struct, E_UNKNOWN);
+    case FRV_LRW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = LRW; break;
+    case FRV_SCW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SCW; break;
+    case FRV_LRD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = LRD; break;
+    case FRV_SCD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = SCD; break;
+    case FRV_AMOADDW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOADDW; break;
+    case FRV_AMOSWAPW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOSWAPW; break;
+    case FRV_AMOXORW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOXORW; break;
+    case FRV_AMOORW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOORW; break;
+    case FRV_AMOANDW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOANDW; break;
+    case FRV_AMOMINW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMINW; break;
+    case FRV_AMOMAXW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMAXW; break;
+    case FRV_AMOMINUW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMINUW; break;
+    case FRV_AMOMAXUW: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMAXUW; break;
+    case FRV_AMOADDD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOADDD; break;
+    case FRV_AMOSWAPD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOSWAPD; break;
+    case FRV_AMOXORD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOXORD; break;
+    case FRV_AMOORD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOORD; break;
+    case FRV_AMOANDD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOANDD; break;
+    case FRV_AMOMIND: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMIND; break;
+    case FRV_AMOMAXD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMAXD; break;
+    case FRV_AMOMINUD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMINUD; break;
+    case FRV_AMOMAXUD: p_instr_struct->optype = REG_REG, p_instr_struct->mnem = AMOMAXUD; break;
     }
+
+    if (has_rs3_rm) {
+        p_instr_struct->reg_src_3 = frv.rs3 != FRV_REG_INV ? frv.rs3 : INVALID_REG;
+        p_instr_struct->rounding_mode = frv.misc;
+        if (p_instr_struct->rounding_mode == RMM) {
+            // fallback RMM to RNE
+            not_yet_implemented("unsupported rounding mode RMM at 0x%lx, fallback to RNE",
+                                p_instr_struct->addr);
+            p_instr_struct->rounding_mode = RNE;
+        }
+    }
+
     return 0;
 }
