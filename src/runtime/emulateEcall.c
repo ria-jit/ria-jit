@@ -4,6 +4,7 @@
 
 #include <asm/stat.h>
 #include <linux/mman.h>
+#include <linux/utsname.h>
 #include <common.h>
 #include <runtime/register.h>
 #include <elf/loadElf.h>
@@ -118,7 +119,7 @@ static size_t syscall6(int syscall_number, size_t a1, size_t a2, size_t a3,
 __attribute__((force_align_arg_pointer))
 void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
     ///Increment PC, if the syscall needs to modify it just overwrite it in the specific branch.
-    registerValues[pc] = addr + 4;
+    registerValues[pc] = addr + 4; /// XXX-C!
     switch (registerValues[a7]) {
         case 17: //getcwd
         {
@@ -356,7 +357,13 @@ void emulate_ecall(t_risc_addr addr, t_risc_reg_val *registerValues) {
         case 160: //uname
         {
             log_syscall("Emulate syscall uname (160)...\n");
+            struct new_utsname* buf = (void*) registerValues[a0];
             registerValues[a0] = syscall1(__NR_uname, registerValues[a0]);
+            if (registerValues[a0] == 0) {
+                // Emulate kernel 5.0.0 -- glibc checks kernel versions.
+                if (buf->release[0] <= '4' && buf->release[1] == '.')
+                    memcpy(buf->release, "5.0.0", sizeof "5.0.0");
+            }
         }
             break;
         case 169: //gettimeofday

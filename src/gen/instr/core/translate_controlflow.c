@@ -42,7 +42,8 @@ void translate_JAL(const t_risc_instr *instr, const register_info *r_info) {
             x0,
             x0,
             instr->reg_dest,
-            {{4}}
+            {{instr->size}},
+            instr->size,
     };
 
     translate_AUIPC(&aupicInstr, r_info);
@@ -115,9 +116,9 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
     ///2: write addr of next instruction in rd
     if (instr->reg_dest != x0) {
         if (r_info->gp_mapped[instr->reg_dest]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[instr->reg_dest], instr->addr + 4);
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[instr->reg_dest], instr->addr + instr->size);
         } else {
-            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + 4);
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * instr->reg_dest), instr->addr + instr->size);
         }
     }
 
@@ -156,7 +157,7 @@ void translate_JALR(const t_risc_instr *instr, const register_info *r_info) {
         //TODO: more efficient way of obtaining target (without parsing)
 
         t_risc_instr tmp_p_instr;
-        tmp_p_instr.addr = instr->addr - 4;
+        tmp_p_instr.addr = instr->addr - 4; /// XXX-C!
 
         parse_instruction(&tmp_p_instr);
 
@@ -334,7 +335,7 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
 
 
     ///set pc: NO BRANCH
-    target = instr->addr + 4;
+    target = instr->addr + instr->size;
 
     if (flag_translate_opt_chain && (cache_loc = lookup_cache_entry(target)) != UNSEEN_CODE &&
             cache_loc != TRANSLATION_STARTED) {
@@ -351,9 +352,9 @@ translate_controlflow_set_pc2(const t_risc_instr *instr, const register_info *r_
         }
 
         if (r_info->gp_mapped[pc]) {
-            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], instr->addr + 4);
+            err |= fe_enc64(&current, FE_MOV64ri, r_info->gp_map[pc], target);
         } else {
-            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc), instr->addr + 4);
+            err |= fe_enc64(&current, FE_MOV64mi, FE_MEM_ADDR(r_info->base + 8 * pc), target);
         }
     }
 

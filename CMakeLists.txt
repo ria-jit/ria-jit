@@ -47,6 +47,19 @@ ExternalProject_Add(fadec
         TEST_COMMAND meson test -v
         BUILD_BYPRODUCTS ${FADEC_BYPRODUCTS})
 
+set(FRVDEC_PATH_PREFIX lib/frvdec)
+set(FRVDEC_BYPRODUCTS
+        ${FRVDEC_PATH_PREFIX}/${CMAKE_STATIC_LIBRARY_PREFIX}fadec${CMAKE_STATIC_LIBRARY_SUFFIX})
+ExternalProject_Add(frvdec
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${FRVDEC_PATH_PREFIX}
+        BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${FRVDEC_PATH_PREFIX}
+        CONFIGURE_COMMAND CFLAGS=-fno-stack-protector meson --buildtype ${MESON_BUILD_TYPE} ${CMAKE_CURRENT_SOURCE_DIR}/${FRVDEC_PATH_PREFIX}
+        BUILD_COMMAND ninja -v
+        INSTALL_COMMAND ""
+        UPDATE_COMMAND "pwd" #dummy so cmake always tries to update the subproject
+        TEST_COMMAND meson test -v
+        BUILD_BYPRODUCTS ${FRVDEC_BYPRODUCTS})
+
 #Will always be regenerated
 add_custom_target(
         version
@@ -152,6 +165,19 @@ add_dependencies(test fadecLib version)
 
 target_link_libraries("translator" fadecLib)
 target_link_libraries("test" fadecLib)
+
+add_library(frvdecLib IMPORTED STATIC)
+ExternalProject_get_property(frvdec BINARY_DIR)
+set_target_properties(frvdecLib PROPERTIES
+        IMPORTED_LOCATION "${BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}frvdec${CMAKE_STATIC_LIBRARY_SUFFIX}")
+add_dependencies(frvdecLib frvdec)
+
+#Make sure frvdecLib is built before translator or test
+add_dependencies(translator frvdecLib version)
+add_dependencies(test frvdecLib version)
+
+target_link_libraries("translator" frvdecLib)
+target_link_libraries("test" frvdecLib)
 
 check_c_compiler_flag(-static-pie HAS_STATIC_PIE)
 

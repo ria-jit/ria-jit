@@ -418,6 +418,7 @@ typedef struct {
             uint32_t rounding_mode;
         };
     };
+    uint8_t size;
 } t_risc_instr;
 
 /**

@@ -283,7 +283,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                     case FENCE:
                     case FENCE_I:
                         ///ignore get next instruction address
-                        risc_addr += 4;
+                        risc_addr += parse_buf[parse_pos].size;
                         parse_pos--; //decrement for next loop cycle
                         break;
                     case EBREAK : {
@@ -306,7 +306,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             parse_buf[parse_pos].reg_src_2 = (t_risc_reg) parse_buf[parse_pos].mnem; //save mnem
                             parse_buf[parse_pos].mnem = MANUAL_CSRR; //set different mnem for different dispatch
                         }
-                        risc_addr += 4;
+                        risc_addr += parse_buf[parse_pos].size;
                         instructions_in_block++;
                         break;
                     }
@@ -356,7 +356,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             ///2: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
-                                t_risc_addr ret_target = risc_addr + 4;
+                                t_risc_addr ret_target = risc_addr + parse_buf[parse_pos].size;
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
@@ -408,7 +408,8 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                                 x0,
                                 x0,
                                 parse_buf[parse_pos].reg_dest,
-                                {{4}}
+                                {{parse_buf[parse_pos].size}},
+                                parse_buf[parse_pos].size
                         };
 
                         instructions_in_block++;
@@ -427,7 +428,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             ///1: recursively translate return addr (+4)
                             //dead ends could arise here
                             {
-                                t_risc_addr ret_target = risc_addr + 4;
+                                t_risc_addr ret_target = risc_addr + parse_buf[parse_pos].size;
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
@@ -449,15 +450,16 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             //printf("AUIPC + JALR: %p\n", risc_addr);
 
                             //check if pop will happen
-                            if ((parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5) &&
+                            bool is_ret = (parse_buf[parse_pos].reg_src_1 == x1 || parse_buf[parse_pos].reg_src_1 == x5);
+                            if (is_ret &&
                                     parse_buf[parse_pos].reg_src_1 != parse_buf[parse_pos].reg_dest) {
                                 log_asm_out("---------WRONG POP JALR------------\n");
                             }
 
                             ///1: recursively translate return addr (+4)
                             //dead ends could arise here
-                            {
-                                t_risc_addr ret_target = risc_addr + 4;
+                            if (is_ret) {
+                                t_risc_addr ret_target = risc_addr + parse_buf[parse_pos].size;
                                 t_cache_loc cache_loc = lookup_cache_entry(ret_target);
 
                                 if (cache_loc == UNSEEN_CODE) {
@@ -472,7 +474,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                             ///2: recursively translate target
                             {
                                 t_risc_addr target =
-                                        (risc_addr - 4) + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
+                                        parse_buf[parse_pos - 1].addr + parse_buf[parse_pos - 1].imm + parse_buf[parse_pos].imm;
 
                                 t_cache_loc cache_loc = lookup_cache_entry(target);
 
@@ -513,7 +515,7 @@ int parse_block(t_risc_addr risc_addr, t_risc_instr *parse_buf, int maxCount, co
                 ///no jump or branch -> continue fetching
             default: {
                 ///next instruction address
-                risc_addr += 4;
+                risc_addr += parse_buf[parse_pos].size;
                 instructions_in_block++;
             }
         }

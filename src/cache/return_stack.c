@@ -29,7 +29,7 @@ void rs_emit_push(const t_risc_instr *instr, const register_info *r_info, bool s
     invalidateAllReplacements(r_info);
 
     ///push to return stack
-    t_risc_addr ret_target = instr->addr + 4;
+    t_risc_addr ret_target = instr->addr + instr->size;
 
     t_cache_loc cache_loc;
 
@@ -71,7 +71,7 @@ void rs_emit_push(const t_risc_instr *instr, const register_info *r_info, bool s
 
     err |= fe_enc64(&current, FE_MOV32rm, FE_AX, FE_MEM_ADDR((uint64_t) &rs_front));    //get front
     err |= fe_enc64(&current, FE_MOV64rm, FE_DX, FE_MEM_ADDR((intptr_t) &r_stack));     //get base
-    err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + 4);                      //risc return addr
+    err |= fe_enc64(&current, FE_MOV64ri, FE_CX, instr->addr + instr->size);            //risc return addr
     err |= fe_enc64(&current, FE_ADD32ri, FE_AX, 0x10);                                 //increment front by "1" (=16)
     err |= fe_enc64(&current, FE_AND32ri, FE_AX, 0x3f0);                                //mod 64 (*16..)
     err |= fe_enc64(&current, FE_MOV32mr, FE_MEM_ADDR((uint64_t) &rs_front), FE_AX);    //save front

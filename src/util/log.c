@@ -17,9 +17,9 @@ void not_yet_implemented_internal(const char *info, va_list args);
 const char *const translator_version = VERSION;
 
 void not_yet_implemented_internal(const char *info, va_list args) {
-    dprintf(1, "Warning: ");
-    vdprintf(1, info, args);
-    dprintf(1, " - not yet implemented\n");
+    dprintf(2, "Warning: ");
+    vdprintf(2, info, args);
+    dprintf(2, " - not yet implemented\n");
 }
 
 void not_yet_implemented(const char *info, ...) {
